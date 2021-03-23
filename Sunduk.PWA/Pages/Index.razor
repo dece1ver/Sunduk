@@ -1,0 +1,36 @@
+﻿@page "/"
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-6">
+    <MudGrid>
+        <MudLink Href="/calculator" Underline="Underline.None">
+            <MudPaper Class="pa-8 ma-2">
+                <MudGrid Justify="Justify.Center">
+                    <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Calculate" />
+                </MudGrid>
+                <MudGrid Justify="Justify.Center">
+                    <MudText Typo="Typo.caption" Class="mt-4">Калькулятор режимов</MudText>
+                </MudGrid>
+            </MudPaper>
+        </MudLink>
+        <MudLink Href="/thread" Underline="Underline.None">
+            <MudPaper Class="pa-8 ma-2">
+                <MudGrid Justify="Justify.Center">
+                    <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.LineWeight" />
+                </MudGrid>
+                <MudGrid Justify="Justify.Center">
+                    <MudText Typo="Typo.caption" Class="mt-4">Точение резьбы</MudText>
+                </MudGrid>
+            </MudPaper>
+        </MudLink>
+        <MudLink Href="/turncalc" Underline="Underline.None">
+            <MudPaper Class="pa-8 ma-2">
+                <MudGrid Justify="Justify.Center">
+                    <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.RoundedCorner" />
+                </MudGrid>
+                <MudGrid Justify="Justify.Center">
+                    <MudText Typo="Typo.caption" Class="mt-4">Всякая хрень</MudText>
+                </MudGrid>
+            </MudPaper>
+        </MudLink>
+    </MudGrid>
+</MudContainer>

@@ -1,0 +1,241 @@
+﻿@page "/calculator"
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8">
+    <MudGrid Justify="Justify.SpaceAround">
+        <MudItem xs="6" sm="5" md="5" lg="5">
+            <MudTextField @bind-Value="DiameterString" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"/>
+        </MudItem>
+        <MudItem xs="6" sm="5" md="5" lg="5">
+            <MudTextField @bind-Value="EdgesString" T="string" Label="Зубья" Variant="Variant.Text" Immediate="true"/>
+        </MudItem>
+        <MudItem xs="6" sm="5" md="5" lg="5">
+            <MudTextField @bind-Value="CutSpeedString" @onfocusin="@(() => CalcSpins = true)" T="string" Label="Скорость резания" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true"/>
+        </MudItem>
+        <MudItem xs="6" sm="5" md="5" lg="5">
+            <MudTextField @bind-Value="FeedString" @onfocusin="@(() => CalcMinFeed = true)" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="@FeedUnits" Immediate="true"/>
+        </MudItem>
+        <MudItem xs="6" sm="5" md="5" lg="5">
+            <MudTextField @bind-Value="SpindleSpeedString" @onfocusin="@(() => CalcSpins = false)" T="string" Label="Обороты шпинделя" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="об/мин" Immediate="true"/>
+        </MudItem>
+        <MudItem xs="6" sm="5" md="5" lg="5">
+            <MudTextField @bind-Value="MinFeedString" @onfocusin="@(() => CalcMinFeed = false)" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true"/>
+        </MudItem>
+    </MudGrid>
+    @*<MudDivider Class="mt-4"/>
+    <MudText>Диаметр: @Diameter | Скорость резания: @CutSpeed | Обороты: @SpindleSpeed | Зубья: @Edges | Подача: @Feed | Подача 2: @MinFeed</MudText>
+    <MudText>Считаем обороты: @CalcSpins | Считаем минутную подачу: @CalcMinFeed</MudText>*@
+</MudContainer>
+
+
+@code
+{
+    public bool CalcSpins { get; set; } = true;
+    public bool CalcMinFeed { get; set; } = true;
+
+    #region Диаметр
+
+    private string diameterString = String.Empty;
+
+    public string DiameterString
+    {
+        get { return diameterString; }
+        set
+        {
+            diameterString = value;
+            if(Diameter > 0)
+            {
+                if (CalcSpins)
+                {
+                    SpindleSpeedString = ((CutSpeed * 1000) / (Diameter * Math.PI)).ToString("F0");
+                }
+                else if (!CalcSpins)
+                {
+                    CutSpeedString = ((Diameter * Math.PI * SpindleSpeed) / 1000).ToString("F0");
+                }
+            }
+        }
+    }
+
+    public double Diameter
+    {
+        get
+        {
+            if (Double.TryParse(DiameterString.Replace(".", ","), out double diameter))
+            {
+                return diameter;
+            }
+            return 0;
+        }
+    }
+    #endregion
+
+    #region Скрость резания
+    private string cutSpeedstring = String.Empty;
+
+    public string CutSpeedString
+    {
+        get { return cutSpeedstring; }
+        set
+        {
+            cutSpeedstring = value;
+            if (CalcSpins)
+            {
+                SpindleSpeedString = ((CutSpeed * 1000) / (Diameter * Math.PI)).ToString("F0").Replace(",", ".");
+            }
+            if (CalcMinFeed)
+            {
+                MinFeedString = (Feed * SpindleSpeed * Edges).ToString("F0");
+            }
+            else if (!CalcMinFeed)
+            {
+                FeedString = (MinFeed / (SpindleSpeed * Edges)).ToString("F3").Replace(",", ".");
+            }
+        }
+    }
+
+    public double CutSpeed
+    {
+        get
+        {
+            if (Double.TryParse(CutSpeedString.Replace(".", ","), out double cutSpeed))
+            {
+                return cutSpeed;
+            }
+            return 0;
+        }
+    }
+    #endregion
+
+    #region Обороты
+    private string spingleSpeedString = String.Empty;
+
+    public string SpindleSpeedString
+    {
+        get { return spingleSpeedString; }
+        set
+        {
+            spingleSpeedString = value;
+            if(Diameter > 0)
+            {
+                if (!CalcSpins)
+                {
+                    CutSpeedString = ((Diameter * Math.PI * SpindleSpeed) / 1000).ToString("F0");
+                }
+                if (CalcMinFeed)
+                {
+                    MinFeedString = (Feed * SpindleSpeed * Edges).ToString("F0");
+                }
+                else if (!CalcMinFeed)
+                {
+                    FeedString = (MinFeed / (SpindleSpeed * Edges)).ToString("F3").Replace(",", ".");
+                }
+            }
+        }
+    }
+
+    public Double SpindleSpeed
+    {
+        get
+        {
+            if (Double.TryParse(SpindleSpeedString.Replace(".", ","), out double spindleSpeed))
+            {
+                return spindleSpeed;
+            }
+            return 0;
+        }
+    }
+    #endregion
+
+    #region Зубья
+    private string egdesString = String.Empty;
+
+    public string EdgesString
+    {
+        get { return egdesString; }
+        set
+        {
+            egdesString = value;
+            if (CalcMinFeed)
+            {
+                MinFeedString = (Feed * SpindleSpeed * Edges).ToString("F0");
+            }
+            else if (!CalcMinFeed)
+            {
+                FeedString = (MinFeed / (SpindleSpeed * Edges)).ToString("F3").Replace(",", ".");
+            }
+        }
+    }
+
+    public int Edges
+    {
+        get
+        {
+            if (Int32.TryParse(EdgesString, out int edges))
+            {
+                return edges;
+            }
+            return 1;
+        }
+    }
+    #endregion
+
+    public string FeedUnits { get => Edges > 1 ? "мм/зуб" : "мм/об"; }
+
+    #region Подача
+    private string feedString = String.Empty;
+
+    public string FeedString
+    {
+        get { return feedString; }
+        set
+        {
+            feedString = value;
+            if (CalcMinFeed)
+            {
+                MinFeedString = (Feed * SpindleSpeed * Edges).ToString("F0");
+            }
+        }
+    }
+    public double Feed
+    {
+        get
+        {
+            if (Double.TryParse(FeedString.Replace(".", ","), out double feedString))
+            {
+                return feedString;
+            }
+            return 0;
+        }
+    }
+    #endregion
+
+    #region Минутная подача
+    private string minFeedString = String.Empty;
+
+    public string MinFeedString
+    {
+        get { return minFeedString; }
+        set
+        {
+            minFeedString = value;
+            if (!CalcMinFeed)
+            {
+                FeedString = (MinFeed / (SpindleSpeed * Edges)).ToString("F3").Replace(",", ".");
+            }
+        }
+    }
+
+    public double MinFeed
+    {
+        get
+        {
+            if (Double.TryParse(MinFeedString, out double minFeed))
+            {
+                return minFeed;
+            }
+            return 0;
+        }
+    }
+
+    #endregion
+}

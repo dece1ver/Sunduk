@@ -1,0 +1,84 @@
+﻿@inherits LayoutComponentBase
+
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudThemeProvider Theme="currentTheme" />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudLink Typo="Typo.h5" Href="" Underline="Underline.None"><b>Sunduk</b></MudLink>
+        <MudAppBarSpacer />
+        <MudTooltip Text="@version" Placement="Placement.Start">
+            <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        </MudTooltip>
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <div>
+            @Body
+        </div>
+    </MudMainContent>
+</MudLayout>
+@code
+{
+    string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+    bool _drawerOpen = true;
+
+    protected override void OnInitialized()
+    {
+        currentTheme = darkTheme;
+    }
+
+    void DarkMode()
+    {
+        if (currentTheme == defaultTheme)
+        {
+            currentTheme = darkTheme;
+        }
+        else
+        {
+            currentTheme = defaultTheme;
+        }
+    }
+
+    MudTheme currentTheme = new MudTheme();
+    MudTheme defaultTheme = new MudTheme()
+    {
+        Palette = new Palette()
+        {
+            Black = "#272c34"
+        }
+    };
+
+    MudTheme darkTheme = new MudTheme()
+    {
+        Palette = new Palette()
+        {
+            Black = "#27272f",
+            Primary = "#FF5722",
+            Background = "#32333d",
+            BackgroundGrey = "#27272f",
+            Surface = "#373740",
+            DrawerBackground = "#27272f",
+            DrawerText = "rgba(255,255,255, 0.50)",
+            DrawerIcon = "rgba(255,255,255, 0.50)",
+            AppbarBackground = "#27272f",
+            AppbarText = "rgba(255,255,255, 0.70)",
+            TextPrimary = "rgba(255,255,255, 0.70)",
+            TextSecondary = "rgba(255,255,255, 0.50)",
+            ActionDefault = "#adadb1",
+            ActionDisabled = "rgba(255,255,255, 0.26)",
+            ActionDisabledBackground = "rgba(255,255,255, 0.12)"
+        }
+    };
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
