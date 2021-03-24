@@ -5,7 +5,7 @@
     }
 </style>
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-2">
-    <MudGrid>
+    <MudGrid >
         <MudItem xs="12" md="12">
             <MudSelect Label="Стандарт" T="string" Value="ThreadStandart" Variant="Variant.Outlined" ValueChanged="OnStandartChanged">
                 <MudSelectItem Value="@(metric)" />
@@ -13,7 +13,7 @@
                 @*<MudSelectItem Value="@(trapezoidal)" />*@
             </MudSelect>
         </MudItem>
-        <MudItem xs="12" sm="3" lg="3">
+        <MudItem xs="12" sm="3" lg="12">
             <MudField Label="Тип резьбы" Variant="Variant.Outlined" InnerPadding="false">
                 <MudRadioGroup @bind-SelectedOption="@ThreadType">
                     <MudRadio Option="@(externalThread)" Color="Color.Primary">Наружная</MudRadio>
@@ -21,8 +21,8 @@
                 </MudRadioGroup>
             </MudField>
         </MudItem>
-        <MudItem xs="12" sm="9" lg="9">
-            <MudTextField @bind-Value="ThreadDiameterString" Label="Диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text"></MudTextField>
+        <MudItem xs="12" sm="9" lg="12">
+            <MudTextField @bind-Value="ThreadDiameterString" Label="Диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" ></MudTextField>
             <MudSelect @bind-Value="@ThreadPitch" Label="Шаг" Variant="Variant.Text" Disabled="@(ThreadPitches.Length == 0)" AdornmentText="@ThreadUnits">
                 @foreach (double item in ThreadPitches)
                 {
