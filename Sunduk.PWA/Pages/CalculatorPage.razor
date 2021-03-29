@@ -21,9 +21,11 @@
             <MudTextField @bind-Value="MinFeedString" @onfocusin="@(() => CalcMinFeed = false)" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true"/>
         </MudItem>
     </MudGrid>
+
     @*<MudDivider Class="mt-4"/>
     <MudText>Диаметр: @Diameter | Скорость резания: @CutSpeed | Обороты: @SpindleSpeed | Зубья: @Edges | Подача: @Feed | Подача 2: @MinFeed</MudText>
     <MudText>Считаем обороты: @CalcSpins | Считаем минутную подачу: @CalcMinFeed</MudText>*@
+
 </MudContainer>
 
 
@@ -56,17 +58,7 @@
         }
     }
 
-    public double Diameter
-    {
-        get
-        {
-            if (Double.TryParse(DiameterString.Replace(".", ","), out double diameter))
-            {
-                return diameter;
-            }
-            return 0;
-        }
-    }
+    public double Diameter { get => GetDouble(DiameterString, 0); }
     #endregion
 
     #region Скрость резания
@@ -80,7 +72,7 @@
             cutSpeedstring = value;
             if (CalcSpins)
             {
-                SpindleSpeedString = ((CutSpeed * 1000) / (Diameter * Math.PI)).ToString("F0").Replace(",", ".");
+                SpindleSpeedString = ((CutSpeed * 1000) / (Diameter * Math.PI)).ToString("F0");
             }
             if (CalcMinFeed)
             {
@@ -93,17 +85,7 @@
         }
     }
 
-    public double CutSpeed
-    {
-        get
-        {
-            if (Double.TryParse(CutSpeedString.Replace(".", ","), out double cutSpeed))
-            {
-                return cutSpeed;
-            }
-            return 0;
-        }
-    }
+    public double CutSpeed { get => GetDouble(CutSpeedString, 0); }
     #endregion
 
     #region Обороты
@@ -133,17 +115,7 @@
         }
     }
 
-    public Double SpindleSpeed
-    {
-        get
-        {
-            if (Double.TryParse(SpindleSpeedString.Replace(".", ","), out double spindleSpeed))
-            {
-                return spindleSpeed;
-            }
-            return 0;
-        }
-    }
+    public Double SpindleSpeed { get => GetDouble(SpindleSpeedString, 0); }
     #endregion
 
     #region Зубья
@@ -166,17 +138,7 @@
         }
     }
 
-    public int Edges
-    {
-        get
-        {
-            if (Int32.TryParse(EdgesString, out int edges))
-            {
-                return edges;
-            }
-            return 1;
-        }
-    }
+    public int Edges { get => GetInt(EdgesString, 1); }
     #endregion
 
     public string FeedUnits { get => Edges > 1 ? "мм/зуб" : "мм/об"; }
@@ -196,17 +158,7 @@
             }
         }
     }
-    public double Feed
-    {
-        get
-        {
-            if (Double.TryParse(FeedString.Replace(".", ","), out double feedString))
-            {
-                return feedString;
-            }
-            return 0;
-        }
-    }
+    public double Feed { get => GetDouble(FeedString); }
     #endregion
 
     #region Минутная подача
@@ -225,17 +177,26 @@
         }
     }
 
-    public double MinFeed
-    {
-        get
-        {
-            if (Double.TryParse(MinFeedString, out double minFeed))
-            {
-                return minFeed;
-            }
-            return 0;
-        }
-    }
+    public double MinFeed { get => GetDouble(MinFeedString); }
 
     #endregion
+
+    double GetDouble(string stringNumber, double defaultValue = 0)
+    {
+        NumberFormatInfo numberFomat = new NumberFormatInfo() { NumberDecimalSeparator = "," };
+        if (Double.TryParse(stringNumber, NumberStyles.Any, numberFomat, out double result))
+        {
+            return result;
+        }
+        return defaultValue;
+    }
+    int GetInt(string stringNumber, int defaultValue = 0)
+    {
+        NumberFormatInfo numberFomat = new NumberFormatInfo() { NumberDecimalSeparator = "," };
+        if (Int32.TryParse(stringNumber, NumberStyles.Any, numberFomat, out int result))
+        {
+            return result;
+        }
+        return defaultValue;
+    }
 }

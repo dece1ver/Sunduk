@@ -4,19 +4,19 @@
     <MudTabPanel Text="Фаска">
         <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
             <MudGrid>
-                <MudItem xs="12" sm="4" md="4" lg="2" xl="12">
+                <MudItem xs="12" sm="4" md="4" lg="4" xl="12">
                     <MudField Label="Тип фаски" Variant="Variant.Outlined" InnerPadding="false">
                         <MudRadioGroup @bind-SelectedOption="@ChamferType">
-                            <MudRadio Option="@(externalChamfer)" Color="Color.Primary">Наружная</MudRadio>
-                            <MudRadio Option="@(internalChamfer)" Color="Color.Primary">Внутренняя</MudRadio>
+                            <MudRadio Option="@(Chamfer.External)" Color="Color.Primary">Наружная</MudRadio>
+                            <MudRadio Option="@(Chamfer.Internal)" Color="Color.Primary">Внутренняя</MudRadio>
                         </MudRadioGroup>
                     </MudField>
                 </MudItem>
-                <MudItem xs="6" sm="4" md="4" lg="5" xl="6">
+                <MudItem xs="6" sm="4" md="4" lg="4" xl="6">
                     <MudTextField @bind-Value="ChamferDiameterString" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
                     <MudTextField @bind-Value="AngleString" T="string" Label="Угол" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="°" Immediate="true" />
                 </MudItem>
-                <MudItem xs="6" sm="4" md="4" lg="5" xl="6">
+                <MudItem xs="6" sm="4" md="4" lg="4" xl="6">
                     <MudTextField @bind-Value="ChamferSizeString" T="string" Label="Размер фаски" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
                     <MudTextField @bind-Value="ChamferInsertRadiusString" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" />
                 </MudItem>
@@ -30,8 +30,7 @@
                 </MudItem>
                 <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
                     <MudItem xs="12">
-                        <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@ChamferExample">
-                        </MudTextField>
+                        <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@ChamferExample"/>
                     </MudItem>
                 </MudExpansionPanel>
             }
@@ -44,8 +43,6 @@
 
 @code 
 {
-    public const string externalChamfer = "Наружная";
-    public const string internalChamfer = "Внутренняя";
 
     public string ResultMessage
     {
@@ -68,69 +65,29 @@
                 return
                     $"G0 X{ChamferResultString} Z1. S180 M3\n" +
                     $"G1 Z0. F0.1\n" +
-                    $"X{ChamferDiameter.ToString("N2").Replace(",", ".").Replace(".00", ".").Trim('0')} A{(ChamferType == externalChamfer ? '-' : string.Empty)}{Angle.ToString("N2").Replace(",", ".").Replace(".00", ".").Trim('0')}";
+                    $"X{ChamferDiameter.ToString("N2").Replace(",", ".").Replace(".00", ".").Trim('0')} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{Angle.ToString("N2").Replace(",", ".").Replace(".00", ".").Trim('0')}";
             }
             return string.Empty;
         } }
-
-    public string ChamferType { get; set; } = externalChamfer;
+    public enum Chamfer {External, Internal};
+    public Chamfer ChamferType { get; set; } = Chamfer.External;
 
     public string ChamferDiameterString { get; set; } = string.Empty;
-    public double ChamferDiameter
-    {
-        get
-        {
-            if (Double.TryParse(ChamferDiameterString.Replace(".", ","), out double diameter))
-            {
-                return diameter;
-            }
-            return 0;
-        }
-    }
+    public double ChamferDiameter { get => GetDouble(ChamferDiameterString); }
 
     public string AngleString { get; set; } = string.Empty;
-    public double Angle
-    {
-        get
-        {
-            if (Double.TryParse(AngleString.Replace(".", ","), out double angle))
-            {
-                return angle;
-            }
-            return 0;
-        }
-    }
+    public double Angle { get => GetDouble(AngleString); }
 
     public string ChamferSizeString { get; set; } = string.Empty;
-    public double ChamferSize
-    {
-        get
-        {
-            if (Double.TryParse(ChamferSizeString.Replace(".", ","), out double chamferSize))
-            {
-                return chamferSize;
-            }
-            return 0;
-        }
-    }
+    public double ChamferSize { get => GetDouble(ChamferSizeString); }
 
     public string ChamferInsertRadiusString { get; set; } = string.Empty;
-    public double ChamferInsertRadius
-    {
-        get
-        {
-            if (Double.TryParse(ChamferInsertRadiusString.Replace(".", ","), out double insertRadius))
-            {
-                return insertRadius;
-            }
-            return 0;
-        }
-    }
+    public double ChamferInsertRadius { get => GetDouble(ChamferInsertRadiusString); }
 
     public string ChamferResultString { get
         {
             double result;
-            if(ChamferType == externalChamfer)
+            if(ChamferType == Chamfer.External)
             {
                 result = ((ChamferDiameter - (2 * ChamferSize * Math.Tan(Radians(Angle)))) - ChamferInsertRadius * Math.Tan(Radians(Angle)));
             }
@@ -150,5 +107,24 @@
     double Radians(double degrees)
     {
         return degrees * Math.PI / 180;
+    }
+
+    double GetDouble(string stringNumber, double defaultValue = 0)
+    {
+        NumberFormatInfo numberFomat = new NumberFormatInfo() { NumberDecimalSeparator = "," };
+        if (Double.TryParse(stringNumber, NumberStyles.Any, numberFomat, out double result))
+        {
+            return result;
+        }
+        return defaultValue;
+    }
+    int GetInt(string stringNumber, int defaultValue = 0)
+    {
+        NumberFormatInfo numberFomat = new NumberFormatInfo() { NumberDecimalSeparator = "," };
+        if (Int32.TryParse(stringNumber, NumberStyles.Any, numberFomat, out int result))
+        {
+            return result;
+        }
+        return defaultValue;
     }
 }

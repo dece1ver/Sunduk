@@ -7,17 +7,17 @@
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-2">
     <MudGrid >
         <MudItem xs="12" md="12">
-            <MudSelect Label="Стандарт" T="string" Value="ThreadStandart" Variant="Variant.Outlined" ValueChanged="OnStandartChanged">
-                <MudSelectItem Value="@(metric)" />
-                <MudSelectItem Value="@(inch)" />
+            <MudSelect Label="Стандарт" T="Standart" Value="ThreadStandart" Variant="Variant.Outlined" ValueChanged="OnStandartChanged">
+                <MudSelectItem Value="@(Standart.Metric)">Метрическая</MudSelectItem>
+                <MudSelectItem Value="@(Standart.Inch)" >Дюймовая</MudSelectItem>
                 @*<MudSelectItem Value="@(trapezoidal)" />*@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="3" lg="12">
             <MudField Label="Тип резьбы" Variant="Variant.Outlined" InnerPadding="false">
                 <MudRadioGroup @bind-SelectedOption="@ThreadType">
-                    <MudRadio Option="@(externalThread)" Color="Color.Primary">Наружная</MudRadio>
-                    <MudRadio Option="@(internalThread)" Color="Color.Primary">Внутренняя</MudRadio>
+                    <MudRadio Option="@(Type.External)" Color="Color.Primary">Наружная</MudRadio>
+                    <MudRadio Option="@(Type.Internal)" Color="Color.Primary">Внутренняя</MudRadio>
                 </MudRadioGroup>
             </MudField>
         </MudItem>
@@ -27,7 +27,7 @@
                 @foreach (double item in ThreadPitches)
                 {
                     <MudSelectItem Value="@(item)">
-                        <MudText>@(ThreadStandart == inch ? $"{item.ToString("G3").Replace(",",".")} TPI ({(25.4/item).ToString("N3").Replace(",", ".")} мм)" : $"{item.ToString("G3").Replace(",", ".")} мм")</MudText>
+                        <MudText>@(ThreadStandart == Standart.Inch ? $"{item.ToString("G3").Replace(",",".")} TPI ({(25.4/item).ToString("N3").Replace(",", ".")} мм)" : $"{item.ToString("G3").Replace(",", ".")} мм")</MudText>
                     </MudSelectItem>
                 }
             </MudSelect>
@@ -109,17 +109,14 @@
 
 @code
 {
-    public const string metric = "60° Метрическая";
-    public const string inch = "55° Дюймовая";
-    public const string trapezoidal = "Трапецеидальная";
-    public const string externalThread = "Наружная";
-    public const string internalThread = "Внутренняя";
+    public enum Standart {Metric, Inch }
+    public enum Type {External, Internal }
 
     public readonly double[] metricPitches = { 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6 };
     public readonly double[] inchPitches = { 32, 28, 24, 20, 18, 16, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4.5, 4 };
 
-    public string ThreadStandart { get; set; } = metric;
-    public string ThreadType { get; set; } = externalThread;
+    public Standart ThreadStandart { get; set; } = Standart.Metric;
+    public Type ThreadType { get; set; } = Type.External;
 
     public string ThreadDiameterString { get; set; }
     public double? ThreadDiameter
@@ -143,11 +140,11 @@
     {
         get
         {
-            if (ThreadStandart == metric)
+            if (ThreadStandart == Standart.Metric)
             {
                 return metricPitches;
             }
-            else if (ThreadStandart == inch)
+            else if (ThreadStandart == Standart.Inch)
             {
                 return inchPitches;
             }
@@ -162,7 +159,7 @@
     {
         get
         {
-            return ThreadStandart == inch ? $"{ThreadPitch.ToString("G3").Replace(",", ".")} TPI ({(25.4 / ThreadPitch).ToString("N3").Replace(",", ".")} мм)" : $"{ThreadPitch.ToString("G3").Replace(",", ".")} мм";
+            return ThreadStandart == Standart.Inch ? $"{ThreadPitch.ToString("G3").Replace(",", ".")} TPI ({(25.4 / ThreadPitch).ToString("N3").Replace(",", ".")} мм)" : $"{ThreadPitch.ToString("G3").Replace(",", ".")} мм";
         }
     }
 
@@ -170,11 +167,11 @@
     {
         get
         {
-            if (ThreadStandart == "Метрическая" || ThreadStandart == "Трапецеидальная")
+            if (ThreadStandart == Standart.Metric)
             {
                 return "мм";
             }
-            else if (ThreadStandart == "Дюймовая")
+            else if (ThreadStandart == Standart.Inch)
             {
                 return "TPI";
             }
@@ -191,140 +188,140 @@
             switch ((ThreadType, ThreadStandart, ThreadPitch))
             {
                 // наружная метричка
-                case (externalThread, metric, 0.5):
+                case (Type.External, Standart.Metric, 0.5):
                     return new double[] { 0.10, 0.09, 0.08, 0.07 };
-                case (externalThread, metric, 0.75):
+                case (Type.External, Standart.Metric, 0.75):
                     return new double[] { 0.16, 0.15, 0.12, 0.07 };
-                case (externalThread, metric, 1):
+                case (Type.External, Standart.Metric, 1):
                     return new double[] { 0.16, 0.15, 0.14, 0.12, 0.08 };
-                case (externalThread, metric, 1.25):
+                case (Type.External, Standart.Metric, 1.25):
                     return new double[] { 0.17, 0.15, 0.14, 0.13, 0.12, 0.08 };
-                case (externalThread, metric, 1.5):
+                case (Type.External, Standart.Metric, 1.5):
                     return new double[] { 0.20, 0.19, 0.18, 0.16, 0.14, 0.08 };
-                case (externalThread, metric, 1.75):
+                case (Type.External, Standart.Metric, 1.75):
                     return new double[] { 0.17, 0.17, 0.16, 0.15, 0.14, 0.13, 0.11, 0.08 };
-                case (externalThread, metric, 2):
+                case (Type.External, Standart.Metric, 2):
                     return new double[] { 0.20, 0.19, 0.18, 0.17, 0.16, 0.15, 0.13, 0.08 };
-                case (externalThread, metric, 2.5):
+                case (Type.External, Standart.Metric, 2.5):
                     return new double[] { 0.20, 0.19, 0.18, 0.17, 0.17, 0.16, 0.15, 0.14, 0.12, 0.08 };
-                case (externalThread, metric, 3):
+                case (Type.External, Standart.Metric, 3):
                     return new double[] { 0.20, 0.19, 0.19, 0.18, 0.17, 0.17, 0.16, 0.15, 0.14, 0.13, 0.12, 0.08 };
-                case (externalThread, metric, 3.5):
+                case (Type.External, Standart.Metric, 3.5):
                     return new double[] { 0.24, 0.23, 0.22, 0.21, 0.21, 0.20, 0.18, 0.17, 0.16, 0.15, 0.13, 0.08 };
-                case (externalThread, metric, 4):
+                case (Type.External, Standart.Metric, 4):
                     return new double[] { 0.24, 0.22, 0.22, 0.21, 0.21, 0.20, 0.19, 0.18, 0.17, 0.16, 0.15, 0.14, 0.12, 0.08 };
-                case (externalThread, metric, 4.5):
+                case (Type.External, Standart.Metric, 4.5):
                     return new double[] { 0.27, 0.25, 0.24, 0.23, 0.23, 0.22, 0.21, 0.20, 0.19, 0.18, 0.17, 0.16, 0.14, 0.10 };
-                case (externalThread, metric, 5):
+                case (Type.External, Standart.Metric, 5):
                     return new double[] { 0.29, 0.28, 0.27, 0.26, 0.25, 0.25, 0.24, 0.23, 0.22, 0.20, 0.19, 0.17, 0.15, 0.10 };
-                case (externalThread, metric, 5.5):
+                case (Type.External, Standart.Metric, 5.5):
                     return new double[] { 0.27, 0.26, 0.26, 0.25, 0.25, 0.24, 0.23, 0.23, 0.22, 0.21, 0.20, 0.19, 0.18, 0.16, 0.14, 0.10 };
-                case (externalThread, metric, 6):
+                case (Type.External, Standart.Metric, 6):
                     return new double[] { 0.30, 0.29, 0.29, 0.28, 0.27, 0.26, 0.26, 0.25, 0.24, 0.23, 0.22, 0.20, 0.19, 0.17, 0.15, 0.10 };
                 // внутренняя метричка
-                case (internalThread, metric, 0.5):
+                case (Type.Internal, Standart.Metric, 0.5):
                     return new double[] { 0.10, 0.09, 0.08, 0.07 };
-                case (internalThread, metric, 0.75):
+                case (Type.Internal, Standart.Metric, 0.75):
                     return new double[] { 0.15, 0.14, 0.12, 0.07 };
-                case (internalThread, metric, 1):
+                case (Type.Internal, Standart.Metric, 1):
                     return new double[] { 0.15, 0.14, 0.13, 0.12, 0.08 };
-                case (internalThread, metric, 1.25):
+                case (Type.Internal, Standart.Metric, 1.25):
                     return new double[] { 0.16, 0.15, 0.14, 0.13, 0.11, 0.08 };
-                case (internalThread, metric, 1.5):
+                case (Type.Internal, Standart.Metric, 1.5):
                     return new double[] { 0.20, 0.18, 0.17, 0.15, 0.13, 0.08 };
-                case (internalThread, metric, 1.75):
+                case (Type.Internal, Standart.Metric, 1.75):
                     return new double[] { 0.16, 0.15, 0.15, 0.14, 0.13, 0.12, 0.11, 0.08 };
-                case (internalThread, metric, 2):
+                case (Type.Internal, Standart.Metric, 2):
                     return new double[] { 0.19, 0.18, 0.17, 0.16, 0.15, 0.14, 0.12, 0.08 };
-                case (internalThread, metric, 2.5):
+                case (Type.Internal, Standart.Metric, 2.5):
                     return new double[] { 0.19, 0.18, 0.17, 0.17, 0.16, 0.15, 0.14, 0.13, 0.12, 0.08 };
-                case (internalThread, metric, 3):
+                case (Type.Internal, Standart.Metric, 3):
                     return new double[] { 0.19, 0.18, 0.18, 0.17, 0.16, 0.16, 0.15, 0.14, 0.14, 0.12, 0.11, 0.08 };
-                case (internalThread, metric, 3.5):
+                case (Type.Internal, Standart.Metric, 3.5):
                     return new double[] { 0.22, 0.21, 0.20, 0.20, 0.19, 0.18, 0.17, 0.16, 0.15, 0.14, 0.12, 0.08 };
-                case (internalThread, metric, 4):
+                case (Type.Internal, Standart.Metric, 4):
                     return new double[] { 0.21, 0.21, 0.20, 0.19, 0.19, 0.18, 0.18, 0.17, 0.16, 0.15, 0.14, 0.13, 0.12, 0.08 };
-                case (internalThread, metric, 4.5):
+                case (Type.Internal, Standart.Metric, 4.5):
                     return new double[] { 0.23, 0.23, 0.22, 0.22, 0.21, 0.20, 0.20, 0.19, 0.18, 0.17, 0.16, 0.15, 0.14, 0.10 };
-                case (internalThread, metric, 5):
+                case (Type.Internal, Standart.Metric, 5):
                     return new double[] { 0.26, 0.26, 0.25, 0.24, 0.24, 0.23, 0.22, 0.21, 0.20, 0.19, 0.18, 0.16, 0.15, 0.10 };
-                case (internalThread, metric, 5.5):
+                case (Type.Internal, Standart.Metric, 5.5):
                     return new double[] { 0.25, 0.25, 0.24, 0.24, 0.23, 0.22, 0.22, 0.21, 0.20, 0.20, 0.19, 0.18, 0.17, 0.16, 0.14, 0.10 };
-                case (internalThread, metric, 6):
+                case (Type.Internal, Standart.Metric, 6):
                     return new double[] { 0.28, 0.27, 0.26, 0.26, 0.25, 0.24, 0.24, 0.23, 0.22, 0.21, 0.20, 0.19, 0.18, 0.16, 0.15, 0.10 };
                 // наружная дюймовая
-                case (externalThread, inch, 32):
+                case (Type.External, Standart.Inch, 32):
                     return new double[] { 0.17, 0.16, 0.13, 0.08 };
-                case (externalThread, inch, 28):
+                case (Type.External, Standart.Inch, 28):
                     return new double[] { 0.15, 0.14, 0.13, 0.11, 0.08 };
-                case (externalThread, inch, 24):
+                case (Type.External, Standart.Inch, 24):
                     return new double[] { 0.18, 0.16, 0.15, 0.13, 0.08 };
-                case (externalThread, inch, 20):
+                case (Type.External, Standart.Inch, 20):
                     return new double[] { 0.18, 0.17, 0.15, 0.14, 0.12, 0.08 };
-                case (externalThread, inch, 18):
+                case (Type.External, Standart.Inch, 18):
                     return new double[] { 0.20, 0.18, 0.17, 0.15, 0.13, 0.08 };
-                case (externalThread, inch, 16):
+                case (Type.External, Standart.Inch, 16):
                     return new double[] { 0.19, 0.18, 0.17, 0.16, 0.14, 0.12, 0.08 };
-                case (externalThread, inch, 14):
+                case (Type.External, Standart.Inch, 14):
                     return new double[] { 0.18, 0.18, 0.17, 0.16, 0.15, 0.14, 0.12, 0.08 };
-                case (externalThread, inch, 13):
+                case (Type.External, Standart.Inch, 13):
                     return new double[] { 0.20, 0.19, 0.18, 0.17, 0.16, 0.14, 0.12, 0.08 };
-                case (externalThread, inch, 12):
+                case (Type.External, Standart.Inch, 12):
                     return new double[] { 0.22, 0.21, 0.20, 0.19, 0.17, 0.15, 0.13, 0.08 };
-                case (externalThread, inch, 11):
+                case (Type.External, Standart.Inch, 11):
                     return new double[] { 0.21, 0.20, 0.19, 0.18, 0.17, 0.16, 0.15, 0.13, 0.08 };
-                case (externalThread, inch, 10):
+                case (Type.External, Standart.Inch, 10):
                     return new double[] { 0.21, 0.20, 0.19, 0.18, 0.17, 0.16, 0.15, 0.14, 0.12, 0.08 };
-                case (externalThread, inch, 9):
+                case (Type.External, Standart.Inch, 9):
                     return new double[] { 0.21, 0.20, 0.19, 0.19, 0.18, 0.17, 0.16, 0.15, 0.14, 0.12, 0.08 };
-                case (externalThread, inch, 8):
+                case (Type.External, Standart.Inch, 8):
                     return new double[] { 0.22, 0.21, 0.20, 0.20, 0.19, 0.18, 0.17, 0.16, 0.15, 0.14, 0.12, 0.08 };
-                case (externalThread, inch, 7):
+                case (Type.External, Standart.Inch, 7):
                     return new double[] { 0.25, 0.24, 0.23, 0.22, 0.21, 0.20, 0.19, 0.18, 0.17, 0.15, 0.13, 0.08 };
-                case (externalThread, inch, 6):
+                case (Type.External, Standart.Inch, 6):
                     return new double[] { 0.24, 0.23, 0.23, 0.22, 0.21, 0.21, 0.20, 0.19, 0.18, 0.18, 0.17, 0.15, 0.14, 0.10 };
-                case (externalThread, inch, 5):
+                case (Type.External, Standart.Inch, 5):
                     return new double[] { 0.29, 0.29, 0.28, 0.27, 0.26, 0.25, 0.24, 0.23, 0.22, 0.21, 0.19, 0.18, 0.15, 0.10 };
-                case (externalThread, inch, 4.5):
+                case (Type.External, Standart.Inch, 4.5):
                     return new double[] { 0.28, 0.28, 0.27, 0.26, 0.26, 0.25, 0.24, 0.23, 0.22, 0.22, 0.21, 0.19, 0.18, 0.17, 0.15, 0.10 };
-                case (externalThread, inch, 4):
+                case (Type.External, Standart.Inch, 4):
                     return new double[] { 0.32, 0.32, 0.31, 0.30, 0.29, 0.28, 0.27, 0.26, 0.25, 0.24, 0.23, 0.22, 0.20, 0.18, 0.16, 0.10 };
                 // внутренняя дюймовая
-                case (internalThread, inch, 32):
+                case (Type.Internal, Standart.Inch, 32):
                     return new double[] { 0.16, 0.14, 0.13, 0.08 };
-                case (internalThread, inch, 28):
+                case (Type.Internal, Standart.Inch, 28):
                     return new double[] { 0.14, 0.13, 0.12, 0.11, 0.08 };
-                case (internalThread, inch, 24):
+                case (Type.Internal, Standart.Inch, 24):
                     return new double[] { 0.16, 0.15, 0.14, 0.12, 0.08 };
-                case (internalThread, inch, 20):
+                case (Type.Internal, Standart.Inch, 20):
                     return new double[] { 0.16, 0.15, 0.14, 0.13, 0.12, 0.08 };
-                case (internalThread, inch, 18):
+                case (Type.Internal, Standart.Inch, 18):
                     return new double[] { 0.18, 0.17, 0.16, 0.14, 0.13, 0.08 };
-                case (internalThread, inch, 16):
+                case (Type.Internal, Standart.Inch, 16):
                     return new double[] { 0.17, 0.16, 0.15, 0.14, 0.13, 0.12, 0.08 };
-                case (internalThread, inch, 14):
+                case (Type.Internal, Standart.Inch, 14):
                     return new double[] { 0.16, 0.16, 0.15, 0.14, 0.14, 0.13, 0.11, 0.08 };
-                case (internalThread, inch, 13):
+                case (Type.Internal, Standart.Inch, 13):
                     return new double[] { 0.18, 0.17, 0.16, 0.16, 0.15, 0.13, 0.12, 0.08 };
-                case (internalThread, inch, 12):
+                case (Type.Internal, Standart.Inch, 12):
                     return new double[] { 0.20, 0.19, 0.18, 0.17, 0.16, 0.14, 0.13, 0.08 };
-                case (internalThread, inch, 11):
+                case (Type.Internal, Standart.Inch, 11):
                     return new double[] { 0.19, 0.18, 0.18, 0.17, 0.16, 0.15, 0.14, 0.12, 0.08 };
-                case (internalThread, inch, 10):
+                case (Type.Internal, Standart.Inch, 10):
                     return new double[] { 0.19, 0.18, 0.17, 0.17, 0.16, 0.15, 0.14, 0.13, 0.12, 0.08 };
-                case (internalThread, inch, 9):
+                case (Type.Internal, Standart.Inch, 9):
                     return new double[] { 0.19, 0.18, 0.18, 0.17, 0.16, 0.16, 0.15, 0.14, 0.13, 0.11, 0.08 };
-                case (internalThread, inch, 8):
+                case (Type.Internal, Standart.Inch, 8):
                     return new double[] { 0.19, 0.19, 0.18, 0.18, 0.17, 0.16, 0.16, 0.15, 0.14, 0.13, 0.11, 0.08 };
-                case (internalThread, inch, 7):
+                case (Type.Internal, Standart.Inch, 7):
                     return new double[] { 0.23, 0.22, 0.21, 0.21, 0.20, 0.19, 0.18, 0.17, 0.16, 0.14, 0.12, 0.08 };
-                case (internalThread, inch, 6):
+                case (Type.Internal, Standart.Inch, 6):
                     return new double[] { 0.21, 0.21, 0.20, 0.20, 0.19, 0.19, 0.18, 0.18, 0.17, 0.16, 0.15, 0.14, 0.13, 0.10 };
-                case (internalThread, inch, 5):
+                case (Type.Internal, Standart.Inch, 5):
                     return new double[] { 0.27, 0.26, 0.25, 0.25, 0.24, 0.23, 0.22, 0.21, 0.20, 0.19, 0.18, 0.17, 0.15, 0.10 };
-                case (internalThread, inch, 4.5):
+                case (Type.Internal, Standart.Inch, 4.5):
                     return new double[] { 0.28, 0.27, 0.27, 0.26, 0.25, 0.25, 0.24, 0.23, 0.22, 0.21, 0.20, 0.19, 0.18, 0.16, 0.15, 0.10 };
-                case (internalThread, inch, 4):
+                case (Type.Internal, Standart.Inch, 4):
                     return new double[] { 0.30, 0.29, 0.28, 0.27, 0.27, 0.26, 0.25, 0.24, 0.23, 0.22, 0.21, 0.20, 0.19, 0.17, 0.15, 0.10 };
 
                 default:
@@ -339,7 +336,7 @@
         {
             if (ThreadDiameter != null)
             {
-                double result = Math.Atan((ThreadStandart == metric ? ThreadPitch : (25.4/ThreadPitch)) / ((ThreadDiameter ?? 0) * Math.PI));
+                double result = Math.Atan((ThreadStandart == Standart.Metric ? ThreadPitch : (25.4/ThreadPitch)) / ((ThreadDiameter ?? 0) * Math.PI));
                 result = result / Math.PI * 180;
                 return result;
             }
@@ -351,23 +348,23 @@
 
     public string ApproachDiameter { get
         {
-            if(ValidThreading() && (ThreadType == externalThread))
+            if(ValidThreading() && (ThreadType == Type.External))
             {
                 return ((ThreadDiameter ?? 0) + 2).ToString("N1").Replace(",",".").Replace(".0",".");
             }
-            else if (ValidThreading() && (ThreadType == internalThread))
+            else if (ValidThreading() && (ThreadType == Type.Internal))
             {
-                return ((ThreadDiameter ?? 0) - (ThreadStandart == metric ? ThreadPitch : 25.4/ThreadPitch) - 1).ToString("N1").Replace(",", ".").Replace(".0", ".");
+                return ((ThreadDiameter ?? 0) - (ThreadStandart == Standart.Metric ? ThreadPitch : 25.4/ThreadPitch) - 1).ToString("N1").Replace(",", ".").Replace(".0", ".");
             }
             else
             {
                 return string.Empty;
             }
         } }
-    public string ThreadProfile { get => ThreadStandart == metric ? "60" : "55"; }
-    public string EndDiameter { get => ThreadType == externalThread ? ((ThreadDiameter ?? 0) - (2 * Passes.Sum())).ToString("N3").Replace(",", ".").Trim('0') : (ThreadDiameter ?? 0).ToString("N3").Replace(",",".").Trim('0') ; }
+    public string ThreadProfile { get => ThreadStandart == Standart.Metric ? "60" : "55"; }
+    public string EndDiameter { get => ThreadType == Type.External ? ((ThreadDiameter ?? 0) - (2 * Passes.Sum())).ToString("N3").Replace(",", ".").Trim('0') : (ThreadDiameter ?? 0).ToString("N3").Replace(",",".").Trim('0') ; }
 
-    private void OnStandartChanged(string value)
+    private void OnStandartChanged(Standart value)
     {
         if (ThreadStandart != value)
         {
