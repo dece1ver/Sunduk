@@ -8,8 +8,8 @@
     <MudGrid >
         <MudItem xs="12" md="12">
             <MudSelect Label="Стандарт" T="Standart" Value="ThreadStandart" Variant="Variant.Outlined" ValueChanged="OnStandartChanged">
-                <MudSelectItem Value="@(Standart.Metric)">Метрическая</MudSelectItem>
-                <MudSelectItem Value="@(Standart.Inch)" >Дюймовая</MudSelectItem>
+                <MudSelectItem Value="@(Standart.Metric)">60° Метрическая</MudSelectItem>
+                <MudSelectItem Value="@(Standart.Inch)">55° Дюймовая</MudSelectItem>
                 @*<MudSelectItem Value="@(trapezoidal)" />*@
             </MudSelect>
         </MudItem>
@@ -95,7 +95,7 @@
             <MudItem xs="12">
                 <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z0. S{SpindleSpeed} M3 G97\n" +
                                 $"G76 P0201{ThreadProfile} Q{(int)(Passes.Last()*1000)} R0.1\n" +
-                                $"G76 X{EndDiameter} Z-20. P{(int)(Passes.Sum()*1000)} Q{(int)(Passes[0]*1000)} F{ThreadPitch.ToString("N2").Replace(",", ".").Replace(".00", ".").Trim('0')}")">
+                                $"G76 X{EndDiameter} Z-20. P{(int)(Passes.Sum()*1000)} Q{(int)(Passes[0]*1000)} F{RealThreadPitch.ToString("F3").Replace(",", ".").Replace(".00", ".").Trim('0')}")">
                 </MudTextField>
             </MudItem>
         </MudExpansionPanel>
@@ -155,6 +155,7 @@
         }
     }
     public double ThreadPitch { get; set; }
+    public double RealThreadPitch { get => ThreadStandart == Standart.Metric ? ThreadPitch : (25.4 / ThreadPitch); }
     public string ThreadPitchString
     {
         get
@@ -336,7 +337,7 @@
         {
             if (ThreadDiameter != null)
             {
-                double result = Math.Atan((ThreadStandart == Standart.Metric ? ThreadPitch : (25.4/ThreadPitch)) / ((ThreadDiameter ?? 0) * Math.PI));
+                double result = Math.Atan(RealThreadPitch / ((ThreadDiameter ?? 0) * Math.PI));
                 result = result / Math.PI * 180;
                 return result;
             }
@@ -354,7 +355,7 @@
             }
             else if (ValidThreading() && (ThreadType == Type.Internal))
             {
-                return ((ThreadDiameter ?? 0) - (ThreadStandart == Standart.Metric ? ThreadPitch : 25.4/ThreadPitch) - 1).ToString("N1").Replace(",", ".").Replace(".0", ".");
+                return ((ThreadDiameter ?? 0) - RealThreadPitch - 1).ToString("N1").Replace(",", ".").Replace(".0", ".");
             }
             else
             {
