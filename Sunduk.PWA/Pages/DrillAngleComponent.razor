@@ -1,0 +1,58 @@
+﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudGrid Justify="Justify.SpaceAround">
+        <MudItem xs="6" sm="5" md="5" lg="5">
+            <MudTextField @bind-Value="DrillDiameterString" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+        </MudItem>
+        <MudItem xs="6" sm="5" md="5" lg="5">
+            <MudTextField @bind-Value="DrillAngleString" T="string" Label="Угол" Variant="Variant.Text" Immediate="true" />
+        </MudItem>
+        @if (DrillDiameter > 0 && DrillAngle > 0 && DrillAngle < 180)
+        {
+            <MudItem xs="12">
+                <MudField Variant="Variant.Outlined">
+                    <MudText>@ResultMessage</MudText>
+                </MudField>
+            </MudItem>
+        }
+        </MudGrid>
+</MudContainer>
+
+@code 
+{
+    public string DrillDiameterString { get; set; }
+    public double DrillDiameter { get => GetDouble(DrillDiameterString); }
+
+    public string DrillAngleString { get; set; }
+    public double DrillAngle { get => GetDouble(DrillAngleString); }
+
+    public string ResultMessage { get => $"Длина конуса {((DrillDiameter/2) * Math.Tan(Radians(90 - DrillAngle / 2))).ToString("F3")} мм"; }
+
+    double Degrees(double radians)
+    {
+        return radians * 180 / Math.PI;
+    }
+
+    double Radians(double degrees)
+    {
+        return degrees * Math.PI / 180;
+    }
+
+    double GetDouble(string stringNumber, double defaultValue = 0)
+    {
+        NumberFormatInfo numberFomat = new NumberFormatInfo() { NumberDecimalSeparator = "," };
+        if (Double.TryParse(stringNumber, NumberStyles.Any, numberFomat, out double result))
+        {
+            return result;
+        }
+        return defaultValue;
+    }
+    int GetInt(string stringNumber, int defaultValue = 0)
+    {
+        NumberFormatInfo numberFomat = new NumberFormatInfo() { NumberDecimalSeparator = "," };
+        if (Int32.TryParse(stringNumber, NumberStyles.Any, numberFomat, out int result))
+        {
+            return result;
+        }
+        return defaultValue;
+    }
+}

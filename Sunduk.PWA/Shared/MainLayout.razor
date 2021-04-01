@@ -10,6 +10,7 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudLink Typo="Typo.h5" Href="" Underline="Underline.None">Sunduk</MudLink>
         <MudAppBarSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.SendToMobile" OnClick="OpenDialog" Color="Color.Inherit" Edge="Edge.End" />
         <MudTooltip Text="@version" Placement="Placement.Start">
             <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" Color="Color.Inherit" Edge="Edge.End" />
         </MudTooltip>
@@ -21,11 +22,28 @@
         @Body
     </MudMainContent>
 </MudLayout>
+
+<MudDialog @bind-IsVisible="visible">
+    <TitleContent>
+        <MudText Typo="Typo.h5"></MudText>
+    </TitleContent>
+    <DialogContent>
+        <img src="/qr-code.png" asp-append-version="true" width="300px" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Class="px-10">OK</MudButton>
+    </DialogActions>
+</MudDialog>
+
 @code
 {
     string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
     bool _drawerOpen = true;
+
+    private bool visible;
+    private void OpenDialog() => visible = true;
+    void Submit() => visible = false;
 
     protected override void OnInitialized()
     {

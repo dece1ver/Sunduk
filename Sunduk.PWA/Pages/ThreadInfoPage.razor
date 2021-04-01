@@ -5,7 +5,8 @@
     }
 </style>
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-2">
-    <MudGrid >
+    <MudAlert Class="mb-2" Severity="Severity.Warning">Раздел с резьбой мне не нравится, когда-нибудь я его перепишу.</MudAlert>
+    <MudGrid>
         <MudItem xs="12" md="12">
             <MudSelect Label="Стандарт" T="Standart" Value="ThreadStandart" Variant="Variant.Outlined" ValueChanged="OnStandartChanged">
                 <MudSelectItem Value="@(Standart.Metric)">60° Метрическая</MudSelectItem>
@@ -22,13 +23,13 @@
             </MudField>
         </MudItem>
         <MudItem xs="12" sm="9" lg="12">
-            <MudTextField @bind-Value="ThreadDiameterString" Label="Диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" ></MudTextField>
+            <MudTextField @bind-Value="ThreadDiameterString" Label="Диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
             <MudSelect @bind-Value="@ThreadPitch" Label="Шаг" Variant="Variant.Text" Disabled="@(ThreadPitches.Length == 0)" AdornmentText="@ThreadUnits">
                 @foreach (double item in ThreadPitches)
                 {
-                    <MudSelectItem Value="@(item)">
-                        <MudText>@(ThreadStandart == Standart.Inch ? $"{item.ToString("G3").Replace(",",".")} TPI ({(25.4/item).ToString("N3").Replace(",", ".")} мм)" : $"{item.ToString("G3").Replace(",", ".")} мм")</MudText>
-                    </MudSelectItem>
+                <MudSelectItem Value="@(item)">
+                    <MudText>@(ThreadStandart == Standart.Inch ? $"{item.ToString("G3").Replace(",",".")} TPI ({(25.4/item).ToString("N3").Replace(",", ".")} мм)" : $"{item.ToString("G3").Replace(",", ".")} мм")</MudText>
+                </MudSelectItem>
                 }
             </MudSelect>
         </MudItem>
@@ -36,72 +37,72 @@
     @*<MudDivider Class="my-4"/>*@
     @if (ValidThreading())
     {
-        <MudItem Class="mt-4" xs="12">
-            <MudPaper Class="pa-4" Outlined="true">
+    <MudItem Class="mt-4" xs="12">
+        <MudPaper Class="pa-4" Outlined="true">
 
-                <table>
-                    <tr>
-                        <MudText>Информация:</MudText>
-                    </tr>
-                    <tr>
-                        <td class="tl"><MudText Typo="Typo.caption">Диаметр:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@(ThreadDiameter) мм</MudText></td>
-                    </tr>
-                    <tr>
-                        <td class="tl"><MudText Typo="Typo.caption">Шаг:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@ThreadPitchString</MudText></td>
-                    </tr>
-                    <tr>
-                        <td class="tl"><MudText Typo="Typo.caption">Общая высота профиля:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@(Passes.Sum().ToString("G3").Replace(",", ".")) мм</MudText></td>
-                    </tr>
-                    <tr>
-                        <td class="tl"><MudText Typo="Typo.caption">Угол подъема винтовой линии:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@(ThreadAngle.ToString("G3").Replace(",",".")) °</MudText></td>
-                    </tr>
-                    <tr>
-                        <td class="tl"><MudText Typo="Typo.caption">Угол опорной пластины:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@(ThreadAngle.ToString("N0").Replace(",",".")) °</MudText></td>
-                    </tr>
-                    <tr>
-                        <td class="tl"><MudText Typo="Typo.caption">Количество проходов:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@(Passes.Length)</MudText></td>
-                    </tr>
-                    <tr>
-                        <td class="tl"><MudText Typo="Typo.caption">Обороты шпинделя:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@SpindleSpeed об/мин (120 м/мин)</MudText></td>
-                    </tr>
-                </table>
-            </MudPaper>
-        </MudItem>
-        <MudExpansionPanel Text="Проходы">
-            <MudItem xs="12">
-                <table>
-                    <tr>
-                        <td class="tl"><MudText>Проход</MudText></td>
-                        <td><MudText>Съем</MudText></td>
-                    </tr>
-                    @foreach (var (value, index) in Passes.Select((v, i) => (v, i)))
+            <table>
+                <tr>
+                    <MudText>Информация:</MudText>
+                </tr>
+                <tr>
+                    <td class="tl"><MudText Typo="Typo.caption">Диаметр:</MudText></td>
+                    <td><MudText Typo="Typo.caption">@(ThreadDiameter) мм</MudText></td>
+                </tr>
+                <tr>
+                    <td class="tl"><MudText Typo="Typo.caption">Шаг:</MudText></td>
+                    <td><MudText Typo="Typo.caption">@ThreadPitchString</MudText></td>
+                </tr>
+                <tr>
+                    <td class="tl"><MudText Typo="Typo.caption">Общая высота профиля:</MudText></td>
+                    <td><MudText Typo="Typo.caption">@(Passes.Sum().ToString("G3").Replace(",", ".")) мм</MudText></td>
+                </tr>
+                <tr>
+                    <td class="tl"><MudText Typo="Typo.caption">Угол подъема винтовой линии:</MudText></td>
+                    <td><MudText Typo="Typo.caption">@(ThreadAngle.ToString("G3").Replace(",",".")) °</MudText></td>
+                </tr>
+                <tr>
+                    <td class="tl"><MudText Typo="Typo.caption">Угол опорной пластины:</MudText></td>
+                    <td><MudText Typo="Typo.caption">@(ThreadAngle.ToString("N0").Replace(",",".")) °</MudText></td>
+                </tr>
+                <tr>
+                    <td class="tl"><MudText Typo="Typo.caption">Количество проходов:</MudText></td>
+                    <td><MudText Typo="Typo.caption">@(Passes.Length)</MudText></td>
+                </tr>
+                <tr>
+                    <td class="tl"><MudText Typo="Typo.caption">Обороты шпинделя:</MudText></td>
+                    <td><MudText Typo="Typo.caption">@SpindleSpeed об/мин (120 м/мин)</MudText></td>
+                </tr>
+            </table>
+        </MudPaper>
+    </MudItem>
+    <MudExpansionPanel Text="Проходы">
+        <MudItem xs="12">
+            <table>
+                <tr>
+                    <td class="tl"><MudText>Проход</MudText></td>
+                    <td><MudText>Съем</MudText></td>
+                </tr>
+                @foreach (var (value, index) in Passes.Select((v, i) => (v, i)))
                     {
-                        <tr>
-                            <td><MudText Typo="Typo.caption">@(index + 1)</MudText></td>
-                            <td><MudText Typo="Typo.caption">@value.ToString("N3").Replace(",", ".")</MudText></td>
-                        </tr>
+                <tr>
+                    <td><MudText Typo="Typo.caption">@(index + 1)</MudText></td>
+                    <td><MudText Typo="Typo.caption">@value.ToString("N3").Replace(",", ".")</MudText></td>
+                </tr>
                     }
-                </table>
-            </MudItem>
-        </MudExpansionPanel>
-        <MudExpansionPanel Text="Пример программы для Fanuc">
-            <MudItem xs="12">
-                <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z0. S{SpindleSpeed} M3 G97\n" +
+            </table>
+        </MudItem>
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="Пример программы для Fanuc">
+        <MudItem xs="12">
+            <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z0. S{SpindleSpeed} M3 G97\n" +
                                 $"G76 P0201{ThreadProfile} Q{(int)(Passes.Last()*1000)} R0.1\n" +
                                 $"G76 X{EndDiameter} Z-20. P{(int)(Passes.Sum()*1000)} Q{(int)(Passes[0]*1000)} F{RealThreadPitch.ToString("F3").Replace(",", ".").Replace(".00", ".").Trim('0')}")">
-                </MudTextField>
-            </MudItem>
-        </MudExpansionPanel>
+            </MudTextField>
+        </MudItem>
+    </MudExpansionPanel>
 
-        
-        
+
+
     }
 
 </MudContainer>

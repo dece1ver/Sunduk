@@ -1,6 +1,6 @@
-﻿@page "/turncalc"
+﻿@page "/stuff"
 
-<MudTabs Elevation="2" Style="margin-top: -2vh" >
+<MudTabs Elevation="2" Style="margin-top: -2vh">
     <MudTabPanel Text="Фаска">
         <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
             <MudGrid>
@@ -30,14 +30,17 @@
                 </MudItem>
                 <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
                     <MudItem xs="12">
-                        <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@ChamferExample"/>
+                        <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@ChamferExample" />
                     </MudItem>
                 </MudExpansionPanel>
             }
         </MudContainer>
     </MudTabPanel>
     <MudTabPanel Text="Скругление">
-        
+
+    </MudTabPanel>
+    <MudTabPanel Text="Конус сверла">
+        <DrillAngleComponent/>
     </MudTabPanel>
 </MudTabs>
 
