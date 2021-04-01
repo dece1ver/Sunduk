@@ -5,10 +5,11 @@
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <AssemblyName>Sunduk</AssemblyName>
     <ApplicationIcon>wwwroot\favicon.ico</ApplicationIcon>
-    <AssemblyVersion>1.0.1.4</AssemblyVersion>
-    <FileVersion>1.0.1.4</FileVersion>
+    <AssemblyVersion>1.0.1.7</AssemblyVersion>
+    <FileVersion>1.0.1.7</FileVersion>
     <Authors>dece1ver</Authors>
     <Version>1.0.1</Version>
+    <Description>Всякая полезная хрень</Description>
   </PropertyGroup>
 
   <ItemGroup>
