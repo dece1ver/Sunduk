@@ -2,42 +2,10 @@
 
 <MudTabs Elevation="2" Style="margin-top: -2vh">
     <MudTabPanel Text="Фаска">
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-            <MudGrid>
-                <MudItem xs="12" sm="4" md="4" lg="3" xl="12">
-                    <MudField Label="Тип фаски" Variant="Variant.Outlined" InnerPadding="false">
-                        <MudRadioGroup @bind-SelectedOption="@ChamferType">
-                            <MudRadio Option="@(Chamfer.External)" Color="Color.Primary">Наружная</MudRadio>
-                            <MudRadio Option="@(Chamfer.Internal)" Color="Color.Primary">Внутренняя</MudRadio>
-                        </MudRadioGroup>
-                    </MudField>
-                </MudItem>
-                <MudItem xs="6" sm="4" md="4" lg="5" xl="6">
-                    <MudTextField @bind-Value="ChamferDiameterString" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
-                    <MudTextField @bind-Value="AngleString" T="string" Label="Угол" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="°" Immediate="true" />
-                </MudItem>
-                <MudItem xs="6" sm="4" md="4" lg="4" xl="6">
-                    <MudTextField @bind-Value="ChamferSizeString" T="string" Label="Размер фаски" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
-                    <MudTextField @bind-Value="ChamferInsertRadiusString" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" />
-                </MudItem>
-            </MudGrid>
-            @if (ChamferDiameter > 0 && Angle > 0 && ChamferSize > 0)
-            {
-                <MudItem xs="12">
-                    <MudField Variant="Variant.Outlined">
-                        <MudText>@ResultMessage</MudText>
-                    </MudField>
-                </MudItem>
-                <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
-                    <MudItem xs="12">
-                        <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@ChamferExample" />
-                    </MudItem>
-                </MudExpansionPanel>
-            }
-        </MudContainer>
+        <ChamferComponent />
     </MudTabPanel>
     <MudTabPanel Text="Скругление">
-
+        <RadiusComponent/>
     </MudTabPanel>
     <MudTabPanel Text="Конус сверла">
         <DrillAngleComponent/>
@@ -47,87 +15,5 @@
 @code 
 {
 
-    public string ResultMessage
-    {
-        get
-        {
-            if (ChamferDiameter > 0 && Angle > 0 && ChamferSize > 0)
-            {
-                return $"Начальный диаметр фаски с учетом радиуса пластины: {ChamferResultString} мм";
-            }
-            return string.Empty;
-        }
-    }
-
-    public string ChamferExample
-    {
-        get
-        {
-            if (ChamferDiameter > 0 && Angle > 0 && ChamferSize > 0)
-            {
-                return
-                    $"G0 X{ChamferResultString} Z1. S180 M3\n" +
-                    $"G1 Z0. F0.1\n" +
-                    $"X{ChamferDiameter.ToString("N2").Replace(",", ".").Replace(".00", ".").Trim('0')} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{Angle.ToString("N2").Replace(",", ".").Replace(".00", ".").Trim('0')}";
-            }
-            return string.Empty;
-        } }
-    public enum Chamfer {External, Internal};
-    public Chamfer ChamferType { get; set; } = Chamfer.External;
-
-    public string ChamferDiameterString { get; set; } = string.Empty;
-    public double ChamferDiameter { get => GetDouble(ChamferDiameterString); }
-
-    public string AngleString { get; set; } = string.Empty;
-    public double Angle { get => GetDouble(AngleString); }
-
-    public string ChamferSizeString { get; set; } = string.Empty;
-    public double ChamferSize { get => GetDouble(ChamferSizeString); }
-
-    public string ChamferInsertRadiusString { get; set; } = string.Empty;
-    public double ChamferInsertRadius { get => GetDouble(ChamferInsertRadiusString); }
-
-    public string ChamferResultString { get
-        {
-            double result;
-            if(ChamferType == Chamfer.External)
-            {
-                result = ((ChamferDiameter - (2 * ChamferSize * Math.Tan(Radians(Angle)))) - ChamferInsertRadius * Math.Tan(Radians(Angle)));
-            }
-            else
-            {
-                result = ((ChamferDiameter + (2 * ChamferSize * Math.Tan(Radians(Angle)))) + ChamferInsertRadius * Math.Tan(Radians(Angle)));
-
-            }
-            return result.ToString("N2").Replace(",", ".").Replace(".00", ".").Trim('0');
-        } }
-
-    double Degrees(double radians)
-    {
-        return radians * 180 / Math.PI;
-    }
-
-    double Radians(double degrees)
-    {
-        return degrees * Math.PI / 180;
-    }
-
-    double GetDouble(string stringNumber, double defaultValue = 0)
-    {
-        NumberFormatInfo numberFomat = new NumberFormatInfo() { NumberDecimalSeparator = "," };
-        if (Double.TryParse(stringNumber, NumberStyles.Any, numberFomat, out double result))
-        {
-            return result;
-        }
-        return defaultValue;
-    }
-    int GetInt(string stringNumber, int defaultValue = 0)
-    {
-        NumberFormatInfo numberFomat = new NumberFormatInfo() { NumberDecimalSeparator = "," };
-        if (Int32.TryParse(stringNumber, NumberStyles.Any, numberFomat, out int result))
-        {
-            return result;
-        }
-        return defaultValue;
-    }
+    
 }

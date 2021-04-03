@@ -20,39 +20,11 @@
 @code 
 {
     public string DrillDiameterString { get; set; }
-    public double DrillDiameter { get => GetDouble(DrillDiameterString); }
+    public double DrillDiameter { get => Util.GetDouble(DrillDiameterString); }
 
     public string DrillAngleString { get; set; }
-    public double DrillAngle { get => GetDouble(DrillAngleString); }
+    public double DrillAngle { get => Util.GetDouble(DrillAngleString); }
 
-    public string ResultMessage { get => $"Длина конуса {((DrillDiameter/2) * Math.Tan(Radians(90 - DrillAngle / 2))).ToString("F3")} мм"; }
+    public string ResultMessage { get => $"Длина конуса {Util.ToPrettyString((DrillDiameter / 2) * Math.Tan(Util.Radians(90 - DrillAngle / 2)))} мм"; }
 
-    double Degrees(double radians)
-    {
-        return radians * 180 / Math.PI;
-    }
-
-    double Radians(double degrees)
-    {
-        return degrees * Math.PI / 180;
-    }
-
-    double GetDouble(string stringNumber, double defaultValue = 0)
-    {
-        NumberFormatInfo numberFomat = new NumberFormatInfo() { NumberDecimalSeparator = "," };
-        if (Double.TryParse(stringNumber, NumberStyles.Any, numberFomat, out double result))
-        {
-            return result;
-        }
-        return defaultValue;
-    }
-    int GetInt(string stringNumber, int defaultValue = 0)
-    {
-        NumberFormatInfo numberFomat = new NumberFormatInfo() { NumberDecimalSeparator = "," };
-        if (Int32.TryParse(stringNumber, NumberStyles.Any, numberFomat, out int result))
-        {
-            return result;
-        }
-        return defaultValue;
-    }
 }
