@@ -58,7 +58,7 @@
         }
     }
 
-    public double Diameter { get => GetDouble(DiameterString, 0); }
+    public double Diameter { get => Util.GetDouble(DiameterString, 0); }
     #endregion
 
     #region Скрость резания
@@ -85,7 +85,7 @@
         }
     }
 
-    public double CutSpeed { get => GetDouble(CutSpeedString, 0); }
+    public double CutSpeed { get => Util.GetDouble(CutSpeedString, 0); }
     #endregion
 
     #region Обороты
@@ -115,7 +115,7 @@
         }
     }
 
-    public Double SpindleSpeed { get => GetDouble(SpindleSpeedString, 0); }
+    public Double SpindleSpeed { get => Util.GetDouble(SpindleSpeedString, 0); }
     #endregion
 
     #region Зубья
@@ -138,7 +138,7 @@
         }
     }
 
-    public int Edges { get => GetInt(EdgesString, 1); }
+    public int Edges { get => Util.GetInt(EdgesString, 1); }
     #endregion
 
     public string FeedUnits { get => Edges > 1 ? "мм/зуб" : "мм/об"; }
@@ -158,7 +158,7 @@
             }
         }
     }
-    public double Feed { get => GetDouble(FeedString); }
+    public double Feed { get => Util.GetDouble(FeedString); }
     #endregion
 
     #region Минутная подача
@@ -177,26 +177,8 @@
         }
     }
 
-    public double MinFeed { get => GetDouble(MinFeedString); }
+    public double MinFeed { get => Util.GetDouble(MinFeedString); }
 
     #endregion
 
-    double GetDouble(string stringNumber, double defaultValue = 0)
-    {
-        NumberFormatInfo numberFomat = new NumberFormatInfo() { NumberDecimalSeparator = "," };
-        if (Double.TryParse(stringNumber, NumberStyles.Any, numberFomat, out double result))
-        {
-            return result;
-        }
-        return defaultValue;
-    }
-    int GetInt(string stringNumber, int defaultValue = 0)
-    {
-        NumberFormatInfo numberFomat = new NumberFormatInfo() { NumberDecimalSeparator = "," };
-        if (Int32.TryParse(stringNumber, NumberStyles.Any, numberFomat, out int result))
-        {
-            return result;
-        }
-        return defaultValue;
-    }
 }

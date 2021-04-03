@@ -1,0 +1,93 @@
+﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudGrid>
+        <MudItem xs="12" sm="4" md="4" lg="3" xl="12">
+            <MudField Label="Тип скругления" Variant="Variant.Outlined" InnerPadding="false">
+                <MudRadioGroup @bind-SelectedOption="@RadiusType">
+                    <MudRadio Option="@(Radius.External)" Color="Color.Primary">Наружное</MudRadio>
+                    <MudRadio Option="@(Radius.Internal)" Color="Color.Primary">Внутреннее</MudRadio>
+                </MudRadioGroup>
+            </MudField>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="4" lg="5" xl="6">
+            <MudTextField @bind-Value="RadiusDiameterString" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+        </MudItem>
+        <MudItem xs="6" sm="4" md="4" lg="4" xl="6">
+            <MudTextField @bind-Value="RadiusSizeString" T="string" Label="Радиус скругления" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+            <MudTextField @bind-Value="InsertRadiusString" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" />
+        </MudItem>
+    </MudGrid>
+    @if (RadiusDiameter > 0 && RadiusSize > 0)
+    {
+        <MudItem xs="12">
+            <MudField Variant="Variant.Outlined">
+                <MudText>@ResultMessage</MudText>
+            </MudField>
+        </MudItem>
+        <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
+            <MudItem xs="12">
+                <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@RadiusExample" />
+            </MudItem>
+        </MudExpansionPanel>
+    }
+</MudContainer>
+
+@code {
+    public string ResultMessage
+    {
+        get
+        {
+            if (RadiusDiameter > 0 && RadiusSize > 0)
+            {
+                return $"Начальный диаметр скругления с учетом радиуса пластины: {Util.ToPrettyString(RadiusResult)} мм";
+            }
+            return string.Empty;
+        }
+    }
+
+    public string RadiusExample
+    {
+        get
+        {
+            if (RadiusDiameter > 0 && RadiusSize > 0)
+            {
+                return
+                    $"G0 X{Util.NCFormat(RadiusResult)} Z1. S180 M3\n" +
+                    $"G1 Z0. F0.1\n" +
+                    $"X{Util.NCFormat(RadiusDiameter)} R{Util.NCFormat(RadiusSize + InsertRadius)}\n" +
+                    $"W-{Util.NCFormat(RadiusSize + InsertRadius)}";
+            }
+            return string.Empty;
+        }
+    }
+    public enum Radius { External, Internal };
+    public Radius RadiusType { get; set; } = Radius.External;
+
+    public string RadiusDiameterString { get; set; } = string.Empty;
+    public double RadiusDiameter { get => Util.GetDouble(RadiusDiameterString); }
+
+    public string RadiusSizeString { get; set; } = string.Empty;
+    public double RadiusSize { get => Util.GetDouble(RadiusSizeString); }
+
+    public string InsertRadiusString { get; set; } = string.Empty;
+    public double InsertRadius { get => Util.GetDouble(InsertRadiusString); }
+
+    public double RadiusResult
+    {
+        get
+        {
+            double result;
+            if (RadiusType == Radius.External)
+            {
+                result = RadiusDiameter - (2 * (RadiusSize + InsertRadius) );
+            }
+            else
+            {
+                result = RadiusDiameter + (2 * (RadiusSize + InsertRadius));
+
+            }
+            return result;
+        }
+    }
+
+
+}
