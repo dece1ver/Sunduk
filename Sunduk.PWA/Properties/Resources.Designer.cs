@@ -59,15 +59,5 @@ namespace Sunduk.PWA.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Byte[].
-        /// </summary>
-        internal static byte[] qr_code {
-            get {
-                object obj = ResourceManager.GetObject("qr_code", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }
