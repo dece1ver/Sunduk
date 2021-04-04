@@ -25,7 +25,7 @@
         </MudItem>
         <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
             <MudItem xs="12">
-                <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@RadiusExample" />
+                <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="ExampleLines" Value="@RadiusExample" />
             </MudItem>
         </MudExpansionPanel>
     }
@@ -89,5 +89,6 @@
         }
     }
 
+    public int ExampleLines { get => RadiusExample.Count(f => f == '\n') + 1; }
 
 }

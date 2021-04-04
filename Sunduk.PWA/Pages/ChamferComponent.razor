@@ -25,8 +25,19 @@
             </MudField>
         </MudItem>
         <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
+            <MudGrid>
+                <MudItem xs="6" sm="5" md="4" xl="3">
+                    <MudSwitch @bind-Checked="@RoundCorners" Label="Скруглить углы" Color="Color.Primary"/>
+                </MudItem>
+                <MudItem xs="6" sm="7" md="8" xl="9" Style="margin-top: -2vh">
+                    @if (RoundCorners)
+                    {
+                        <MudTextField @bind-Value="RoundCornerString" T="string" Label="Радиус скругления" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" />
+                    }
+                </MudItem>
+            </MudGrid>
             <MudItem xs="12">
-                <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@ChamferExample" />
+                <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="ExampleLines" Value="@ChamferExample" />
             </MudItem>
         </MudExpansionPanel>
     }
@@ -49,12 +60,20 @@
     {
         get
         {
-            if (ChamferDiameter > 0 && Angle > 0 && ChamferSize > 0)
+            if (ChamferDiameter > 0 && Angle > 0 && ChamferSize > 0 && !RoundCorners)
             {
                 return
                     $"G0 X{Util.NCFormat(ChamferResult)} Z1. S180 M3\n" +
                     $"G1 Z0. F0.1\n" +
                     $"X{Util.NCFormat(ChamferDiameter)} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{Util.NCFormat(Angle)}";
+            }
+            else if(ChamferDiameter > 0 && Angle > 0 && ChamferSize > 0 && RoundCorners)
+            {
+                return
+                $"G0 X{Util.NCFormat(ChamferType == Chamfer.External ? ChamferResult - 2 * (ChamferInsertRadius + RoundCorner) : ChamferResult + 2 * (ChamferInsertRadius + RoundCorner))} Z1. S180 M3\n" +
+                $"G1 Z0. F0.1\n" +
+                $"X{Util.NCFormat(ChamferResult)} R{Util.NCFormat(ChamferInsertRadius + RoundCorner)}\n" +
+                $"X{Util.NCFormat(ChamferDiameter)} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{Util.NCFormat(Angle)}";
             }
             return string.Empty;
         }
@@ -92,5 +111,10 @@
         }
     }
 
+    public bool RoundCorners { get; set; } = false;
+    public string RoundCornerString { get; set; } = "0.3";
+    public double RoundCorner { get => Util.GetDouble(RoundCornerString); }
+
+    public int ExampleLines { get => ChamferExample.Count(f => f == '\n') + 1; }
 
 }
