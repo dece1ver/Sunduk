@@ -3,7 +3,7 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudThemeProvider Theme="currentTheme" />
+<MudThemeProvider Theme="darkTheme" />
 
 <MudLayout>
     <MudAppBar Dense="true" Elevation="1">
@@ -28,12 +28,45 @@
         <MudText Typo="Typo.h5"></MudText>
     </TitleContent>
     <DialogContent>
-        <img src="/qr.svg" asp-append-version="true" width="300px" />
-    </DialogContent>
+        @if (!androidhelp && !applehelp)
+        {
+            <img src="/qr.svg" asp-append-version="true" width="300" />
+        }
+        @if (androidhelp)
+        {
+            <div id="android" class="ma-0" style="height:305px;width:300px;overflow: auto;">
+                <MudPaper Elevation="0">
+                    <MudText Typo="Typo.caption" Align="Align.Center">"Установку" нормально поддерживает только Google Chrome. После сканирования QR-кода и открытия сундука в браузере телефона появится предложение установить.</MudText>
+                    <img src="/img/android-1.png" asp-append-version="true" width="280" />
+                    <MudText Typo="Typo.caption" Align="Align.Center">Если предложения установить нет, то в выпадающем меню также есть пункт "Установить приложение"</MudText>
+                    <img src="/img/android-1-1.png" asp-append-version="true" width="280" />
+                    <MudText Typo="Typo.caption" Align="Align.Center">После чего нужно подтвердить установку.</MudText>
+                    <img src="/img/android-2.png" asp-append-version="true" width="280" />
+                </MudPaper>
+            </div>
+        }
+        @if (applehelp)
+        {
+            <div id="apple" class="ma-0" style="height:305px;width:300px;overflow: auto;">
+                <MudPaper Elevation="0">
+                    <MudText Typo="Typo.body1" Align="Align.Center">Картинки запилю потом.</MudText>
+                    <MudText Typo="Typo.caption" Align="Align.Center">"Установку" нормально поддерживает Safari и, наверное, Google Chrome. После сканирования QR-кода и открытия сундука в браузере телефона нажимаем "поделиться".</MudText>
+                    <MudDivider />
+                    <MudText Typo="Typo.caption" Align="Align.Center">Листаем и нажимаем "На экран «Домой»"</MudText>
+                    <MudDivider />
+                    <MudText Typo="Typo.caption" Align="Align.Center">После чего нужно подтвердить установку.</MudText>
+                </MudPaper>
+            </div>
+         }
+        </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Class="px-10">OK</MudButton>
+        <MudText Typo="Typo.caption">Установка:</MudText>
+        <MudIconButton Icon="@Icons.Material.Filled.Android" Color="Color.Primary" OnClick="Android"></MudIconButton>
+        <MudIconButton Icon="@Icons.Custom.Brands.Apple" Color="Color.Primary" OnClick="Apple" Class="mr-3"></MudIconButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="Submit" Class="px-10 mr-4">OK</MudButton>
     </DialogActions>
 </MudDialog>
+
 
 @code
 {
@@ -42,34 +75,30 @@
     bool _drawerOpen = true;
 
     private bool visible;
+    private bool androidhelp = false;
+    private bool applehelp = false;
+
     private void OpenDialog() => visible = true;
     void Submit() => visible = false;
-
-    protected override void OnInitialized()
+    void Android()
     {
-        currentTheme = darkTheme;
-    }
-
-    void DarkMode()
-    {
-        if (currentTheme == defaultTheme)
+        androidhelp = !androidhelp;
+        if (applehelp)
         {
-            currentTheme = darkTheme;
-        }
-        else
-        {
-            currentTheme = defaultTheme;
+            applehelp = false;
         }
     }
-
-    MudTheme currentTheme = new MudTheme();
-    MudTheme defaultTheme = new MudTheme()
+    void Apple()
     {
-        Palette = new Palette()
+        applehelp = !applehelp;
+        if (androidhelp)
         {
-            Black = "#272c34"
+            androidhelp = false;
         }
-    };
+    }
+
+
+
 
     MudTheme darkTheme = new MudTheme()
     {
