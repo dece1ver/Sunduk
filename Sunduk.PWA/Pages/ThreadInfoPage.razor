@@ -9,8 +9,8 @@
         <MudItem xs="12" md="6">
             <MudSelect Label="Стандарт" T="Standart" Value="ThreadStandart" Variant="Variant.Outlined" ValueChanged="OnStandartChanged">
                 <MudSelectItem Value="@(Standart.Metric)">60° Метрическая</MudSelectItem>
-                <MudSelectItem Value="@(Standart.BSPP)">55° Дюймовая</MudSelectItem>
-                @*<MudSelectItem Value="@(trapezoidal)" />*@
+                <MudSelectItem Value="@(Standart.BSPP)">55° Трубная цилиндрическая</MudSelectItem>
+                @*<MudSelectItem Value="@(Standart.BSPP)">30° Трапецеидальная</MudSelectItem>*@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" md="6">
@@ -56,7 +56,7 @@
                 </tr>
                 <tr>
                     <td class="tl"><MudText Typo="Typo.caption">Общая высота профиля:</MudText></td>
-                    <td><MudText Typo="Typo.caption">@($"{ProfileHeight.ToString("G3").Replace(",", ".")} ({NominalHeight})") мм</MudText></td>
+                    <td><MudText Typo="Typo.caption">@($"{Passes.Sum().ToString("G3").Replace(",", ".")}") мм</MudText></td>
                 </tr>
                 <tr>
                     <td class="tl"><MudText Typo="Typo.caption">Угол подъема винтовой линии:</MudText></td>
@@ -82,13 +82,15 @@
             <table>
                 <tr>
                     <td class="tl"><MudText>Проход</MudText></td>
-                    <td><MudText>Съем</MudText></td>
+                    <td class="tl"><MudText>Съем</MudText></td>
+                    <td><MudText>Накопленный</MudText></td>
                 </tr>
                 @foreach (var (value, index) in Passes.Select((v, i) => (v, i)))
                     {
                 <tr>
                     <td><MudText Typo="Typo.caption">@(index + 1)</MudText></td>
                     <td><MudText Typo="Typo.caption">@value.ToString("N3").Replace(",", ".")</MudText></td>
+                    <td><MudText Typo="Typo.caption">@TotalPasses[index].ToString("N3").Replace(",", ".")</MudText></td>
                 </tr>
                     }
             </table>
@@ -98,7 +100,7 @@
         <MudItem xs="12">
             <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z0. S{SpindleSpeed} M3 G97\n" +
                                 $"G76 P0201{ThreadProfile} Q{(int)(Passes.Last()*1000)} R0.1\n" +
-                                $"G76 X{EndDiameter} Z-20. P{(int)(ProfileHeight*1000)} Q{(int)(Passes[0]*1000)} F{RealThreadPitch.ToString("F3").Replace(",", ".").Replace(".00", ".").Trim('0')}")">
+                                $"G76 X{EndDiameter} Z-20. P{(int)(Passes.Sum()*1000)} Q{(int)(Passes[0]*1000)} F{ThreadPitch.ToString("F3").Replace(",", ".").Replace(".00", ".").Trim('0')}")">
             </MudTextField>
         </MudItem>
     </MudExpansionPanel>
@@ -254,11 +256,36 @@
 
     public string ThreadPitchString { get; set; }
     public double ThreadPitch { get => Util.GetDouble(ThreadPitchString); }
-    public double RealThreadPitch { get => ThreadStandart == Standart.Metric ? ThreadPitch : (25.4 / ThreadPitch); }
 
-    public double NominalHeight { get => Math.Sqrt(3) / 2 * ThreadPitch; }
-    public double ProfileHeight { get => ThreadType == Type.External ? ((17.0 / 24.0) * NominalHeight) : ((5.0 / 8.0) * NominalHeight ); }
+    public double NominalHeight
+    {
+        get
+        {
+            if(ThreadStandart == Standart.Metric)
+            {
+                return Math.Sqrt(3) / 2 * ThreadPitch;
+            }
+            else
+            {
+                return 0.960491 * ThreadPitch;
+            }
+        }
+    }
+    public double ProfileHeight
+    {
+        get
+        {
+            if (ThreadStandart == Standart.Metric)
+            {
+                return ThreadType == Type.External ? ((17.0 / 24.0) * NominalHeight) : ((5.0 / 8.0) * NominalHeight);
+            }
+            else
+            {
+                return 0.640327 * ThreadPitch;
+            }
 
+        }
+    }
     public string ThreadUnits
     {
         get
@@ -277,13 +304,36 @@
             }
         }
     }
-    public double[] Passes
-    {
-        get
+
+    public int PassesCount
+    { get
         {
-            return Util.CalcPasses(ProfileHeight, 6, Util.PassesOption.Infeed);
+            switch (ThreadPitch)
+            {
+                case <= 0.75:
+                    return 4;
+                case <= 1:
+                    return 5;
+                case <= 1.5:
+                    return 6;
+                case <= 2:
+                    return 8;
+                case <= 2.5:
+                    return 10;
+                case <= 3.5:
+                    return 12;
+                case <= 5.5:
+                    return 14;
+                case > 5.5:
+                    return 16;
+                default:
+                    return 0;
+            }
         }
-    }
+    } // написать зависимость от шага
+
+    public double[] Passes { get => Util.CalcPasses(ProfileHeight, PassesCount, Util.PassesOption.Infeed); }
+    public double[] TotalPasses { get => Util.CalcPasses(ProfileHeight, PassesCount, Util.PassesOption.FullPasses); }
 
     public int SpindleSpeed { get => ((int)(120000 / (Math.PI * ThreadDiameter))); }
 
@@ -291,7 +341,7 @@
         {
             if (ValidThreading())
             {
-                double result = Math.Atan(RealThreadPitch / (ThreadDiameter * Math.PI));
+                double result = Math.Atan(ThreadPitch / (ThreadDiameter * Math.PI));
                 result = result / Math.PI * 180;
                 return result;
             }
@@ -309,14 +359,14 @@
             }
             else if (ValidThreading() && (ThreadType == Type.Internal))
             {
-                return (ThreadDiameter - RealThreadPitch - 1).ToString("N1").Replace(",", ".").Replace(".0", ".");
+                return (ThreadDiameter - ThreadPitch - 1).ToString("N1").Replace(",", ".").Replace(".0", ".");
             }
             else
             {
                 return string.Empty;
             }
         } }
-    public string ThreadProfile { get => ThreadStandart == Standart.Metric ? "60" : "55"; }
+    public string ThreadProfile { get => ThreadStandart == Standart.BSPP ? "55" : "60"; }
     public string EndDiameter { get => ThreadType == Type.External ? (ThreadDiameter - (2 * Passes.Sum())).ToString("N3").Replace(",", ".").Trim('0') : ThreadDiameter.ToString("N3").Replace(",",".").Trim('0') ; }
 
     private void OnStandartChanged(Standart value)
@@ -325,6 +375,8 @@
         {
             ThreadStandart = value;
             ThreadPitchString = string.Empty;
+            ThreadDiameterString = string.Empty;
+            CurrentThreadTemplate = null;
         }
     }
 
@@ -335,6 +387,122 @@
         {
             ThreadDiameterString = value.TrimStart('M').Split('x')[0];
             ThreadPitchString = value.TrimStart('M').Split('x')[1].Split()[0];
+        }
+        else if(ThreadStandart == Standart.BSPP)
+        {
+            switch (CurrentThreadTemplate)
+            {
+                case "G1/16":
+                    ThreadDiameterString = "7.723";
+                    ThreadPitchString = "0.907";
+                    break;
+                case "G1/8":
+                    ThreadDiameterString = "9.728";
+                    ThreadPitchString = "0.907";
+                    break;
+                case "G1/4":
+                    ThreadDiameterString = "13.157";
+                    ThreadPitchString = "1.337";
+                    break;
+                case "G3/8":
+                    ThreadDiameterString = "16.662";
+                    ThreadPitchString = "1.337";
+                    break;
+                case "G1/2":
+                    ThreadDiameterString = "20.995";
+                    ThreadPitchString = "1.814";
+                    break;
+                case "G5/8":
+                    ThreadDiameterString = "22.911";
+                    ThreadPitchString = "1.814";
+                    break;
+                case "G3/4":
+                    ThreadDiameterString = "26.441";
+                    ThreadPitchString = "1.814";
+                    break;
+                case "G7/8":
+                    ThreadDiameterString = "30.201";
+                    ThreadPitchString = "1.814";
+                    break;
+                case "G1":
+                    ThreadDiameterString = "33.249";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G1⅛":
+                    ThreadDiameterString = "37.897";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G1¼":
+                    ThreadDiameterString = "41.91";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G1⅜":
+                    ThreadDiameterString = "44.323";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G1½":
+                    ThreadDiameterString = "47.803";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G1¾":
+                    ThreadDiameterString = "53.746";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G2":
+                    ThreadDiameterString = "59.614";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G2¼":
+                    ThreadDiameterString = "65.71";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G2½":
+                    ThreadDiameterString = "75.184";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G2¾":
+                    ThreadDiameterString = "81.534";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G3":
+                    ThreadDiameterString = "87.884";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G3¼":
+                    ThreadDiameterString = "93.98";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G3½":
+                    ThreadDiameterString = "100.33";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G3¾":
+                    ThreadDiameterString = "106.68";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G4":
+                    ThreadDiameterString = "113.03";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G4½":
+                    ThreadDiameterString = "125.73";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G5":
+                    ThreadDiameterString = "138.43";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G5½":
+                    ThreadDiameterString = "151.13";
+                    ThreadPitchString = "2.309";
+                    break;
+                case "G6":
+                    ThreadDiameterString = "163.83";
+                    ThreadPitchString = "2.309";
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
