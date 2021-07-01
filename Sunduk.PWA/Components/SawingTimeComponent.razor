@@ -1,0 +1,87 @@
+﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudGrid>
+        <MudItem xs="6">
+            <MudSelect @bind-Value="WorkpieceForm" Label="Форма заготовки" T="Form" Variant="Variant.Outlined">
+                <MudSelectItem Value="@(Form.Circle)">Круглая</MudSelectItem>
+                <MudSelectItem Value="@(Form.Rectangle)">Прямоугольная</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="6">
+            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Material" Variant="Variant.Outlined">
+                <MudSelectItem Value="@(Material.Steel)">Черная сталь</MudSelectItem>
+                <MudSelectItem Value="@(Material.Stainless)">Нержавеющая сталь</MudSelectItem>
+            </MudSelect>
+
+        </MudItem>
+        <MudItem xs="6">
+            @if (WorkpieceForm == Form.Circle)
+            {
+                <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+                <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+            }
+            @if (WorkpieceForm == Form.Rectangle)
+            {
+                <MudTextField @bind-Value="_WorkpieceWidth" Label="Ширина" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+                <MudTextField @bind-Value="_WorkpieceHeight" Label="Высота" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+            }
+        </MudItem>
+        <MudItem xs="6">
+            <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+            <MudTextField @bind-Value="_PartsCount" Label="Количество" Adornment="Adornment.End" AdornmentText="шт" Variant="Variant.Text" Immediate="true"></MudTextField>
+        </MudItem>
+        <MudItem Class="mt-4" xs="12">
+            <MudPaper Class="pa-4" Outlined="true">
+
+                <table>
+                    <tr>
+                        <MudText>Информация:</MudText>
+                    </tr>
+                    <tr>
+                        <td class="tl"><MudText Typo="Typo.caption">Заготовка:</MudText></td>
+                        @if (WorkpieceForm == Form.Circle)
+                        {
+                            <td><MudText Typo="Typo.caption">@((WorkpieceInternalDiameter > 0 ? $"Труба Ø{WorkpieceExternalDiameter}x{(WorkpieceExternalDiameter-WorkpieceInternalDiameter)/2}" : $"Круг Ø{WorkpieceExternalDiameter}") + $" L-{WorkpieceLength}мм")</MudText></td>
+                        }
+                        @if (WorkpieceForm == Form.Rectangle)
+                        {
+                            <td><MudText Typo="Typo.caption">@($"Прямоугольник {WorkpieceWidth}x{WorkpieceHeight}")</MudText></td>
+                        }
+                    </tr>
+                    <tr>
+                        <td class="tl"><MudText Typo="Typo.caption">Партия:</MudText></td>
+                        <td><MudText Typo="Typo.caption">@(PartsCount + " шт.")</MudText></td>
+                    </tr>
+                </table>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code
+{
+    public enum Form { Circle, Rectangle }
+    public Form WorkpieceForm { get; set; } = Form.Circle;
+
+    public enum Material { Steel, Stainless }
+    public Material WorkpieceMaterial { get; set; } = Material.Steel;
+
+    public string _WorkpieceExternalDiameter { get; set; } = string.Empty;
+    public double WorkpieceExternalDiameter { get => Util.GetDouble(_WorkpieceExternalDiameter); }
+
+    public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
+    public double WorkpieceInternalDiameter { get => Util.GetDouble(_WorkpieceInternalDiameter); }
+
+    public string _WorkpieceWidth { get; set; } = string.Empty;
+    public double WorkpieceWidth { get => Util.GetDouble(_WorkpieceWidth); }
+
+    public string _WorkpieceHeight { get; set; } = string.Empty;
+    public double WorkpieceHeight { get => Util.GetDouble(_WorkpieceHeight); }
+
+    public string _WorkpieceLength { get; set; } = string.Empty;
+    public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
+
+    public string _PartsCount { get; set; } = string.Empty;
+    public double PartsCount { get => Util.GetDouble(_PartsCount, 1); }
+
+    public double CutSpeed { get; set; } = 40;
+}

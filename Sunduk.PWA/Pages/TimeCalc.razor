@@ -1,0 +1,36 @@
+﻿@page "/timecalc"
+
+<MudSwipeArea OnSwipe="@OnSwipe">
+    <MudTabs Elevation="2" Style="margin-top: -2vh" @ref="tabs">
+        <MudTabPanel Text="Распиловка">
+            <SawingTimeComponent/>
+        </MudTabPanel>
+        <MudTabPanel Text="Точение">
+            
+        </MudTabPanel>
+    </MudTabs>
+</MudSwipeArea>
+
+
+@code
+{
+    MudTabs tabs;
+
+    public void OnSwipe(SwipeDirection direction)
+    {
+        if (direction == SwipeDirection.LeftToRight)
+        {
+            if (tabs.ActivePanelIndex > 0)
+            {
+                tabs.ActivatePanel(tabs.ActivePanelIndex - 1);
+            }
+        }
+        else if (direction == SwipeDirection.RightToLeft)
+        {
+            if (tabs.ActivePanelIndex < 1)
+            {
+                tabs.ActivatePanel(tabs.ActivePanelIndex + 1);
+            }
+        }
+    }
+}
