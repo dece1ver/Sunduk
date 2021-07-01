@@ -38,14 +38,7 @@
                     </tr>
                     <tr>
                         <td class="tl"><MudText Typo="Typo.caption">Заготовка:</MudText></td>
-                        @if (WorkpieceForm == Form.Circle)
-                        {
-                            <td><MudText Typo="Typo.caption">@((WorkpieceInternalDiameter > 0 ? $"Труба Ø{WorkpieceExternalDiameter}x{(WorkpieceExternalDiameter-WorkpieceInternalDiameter)/2}" : $"Круг Ø{WorkpieceExternalDiameter}") + $" L-{WorkpieceLength}мм")</MudText></td>
-                        }
-                        @if (WorkpieceForm == Form.Rectangle)
-                        {
-                            <td><MudText Typo="Typo.caption">@($"Прямоугольник {WorkpieceWidth}x{WorkpieceHeight}")</MudText></td>
-                        }
+                        <td><MudText Typo="Typo.caption">@WorkpieceInfo</MudText></td>
                     </tr>
                     <tr>
                         <td class="tl"><MudText Typo="Typo.caption">Партия:</MudText></td>
@@ -56,6 +49,7 @@
         </MudItem>
     </MudGrid>
 </MudContainer>
+
 
 @code
 {
@@ -83,5 +77,67 @@
     public string _PartsCount { get; set; } = string.Empty;
     public double PartsCount { get => Util.GetDouble(_PartsCount, 1); }
 
-    public double CutSpeed { get; set; } = 40;
+    public bool ValidWorkpiece { get
+        {
+            if (WorkpieceForm == Form.Circle && WorkpieceExternalDiameter > 0 && WorkpieceInternalDiameter < WorkpieceExternalDiameter && WorkpieceLength > 0)
+            {
+                return true;
+            }
+            if (WorkpieceForm == Form.Rectangle && WorkpieceWidth > 0 && WorkpieceHeight > 0 && WorkpieceLength > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public string WorkpieceInfo
+    {
+        get
+        {
+            if (ValidWorkpiece && WorkpieceForm == Form.Circle)
+            {
+                if (WorkpieceInternalDiameter > 0)
+                {
+                    return $"Труба Ø{Util.ToPrettyString(WorkpieceExternalDiameter)}x{Util.ToPrettyString((WorkpieceExternalDiameter - WorkpieceInternalDiameter) / 2)} " +
+                            $"L{Util.ToPrettyString(WorkpieceLength)}мм";
+                }
+                else
+                {
+                    return $"Круг Ø{Util.ToPrettyString(WorkpieceExternalDiameter)} " +
+                            $"L{Util.ToPrettyString(WorkpieceLength)}мм";
+                }
+            }
+            if (ValidWorkpiece && WorkpieceForm == Form.Rectangle)
+            {
+                return $"Прямоугольник {Util.ToPrettyString(WorkpieceWidth)}x{Util.ToPrettyString(WorkpieceHeight)} " +
+                        $"L{Util.ToPrettyString(WorkpieceLength)}мм";
+            }
+            return $"Не указана";
+        }
+    }
+
+    public double CutSpeed {
+        get
+        {
+            if (WorkpieceMaterial == Material.Steel)
+            {
+                return 50;
+            }
+            if (WorkpieceMaterial == Material.Stainless)
+            {
+                return 40;
+            }
+            return 0;
+        }
+    }
+
+    public double BarFeed { get; set; }
+
+    public double SawFeed { get; set; }
+
+    public double SawRapidFeed { get; set; }
+
+    public double ClampingTime { get; set; }
+
 }

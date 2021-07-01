@@ -6,22 +6,52 @@ namespace Sunduk.PWA.Util
     public static class Util
     {
         public enum PassesOption { FullPasses, Infeed }
+        public enum GetNumberOption { Any, OnlyPositive }
 
-        public static double GetDouble(string stringNumber, double defaultValue = 0)
+        /// <summary>
+        /// Получает число из строки
+        /// </summary>
+        /// <param name="stringNumber">Строка для получения</param>
+        /// <param name="defaultValue">Значение по умолчанию</param>
+        /// <param name="numberOption">Возвращаемое значение: только положительное или любое</param>
+        /// <returns>Значение Double, при неудаче возвращает значение по умолчанию</returns>
+        public static double GetDouble(string stringNumber, double defaultValue = 0, GetNumberOption numberOption = GetNumberOption.OnlyPositive)
         {
             NumberFormatInfo numberFomat = new() { NumberDecimalSeparator = "," };
             if (Double.TryParse(stringNumber, NumberStyles.Any, numberFomat, out double result))
             {
-                return result;
+                if (numberOption == GetNumberOption.OnlyPositive && result > 0)
+                {
+                    return result;
+                }
+                else
+                {
+                    return defaultValue;
+                }
             }
             return defaultValue;
         }
-        public static int GetInt(string stringNumber, int defaultValue = 0)
+
+        /// <summary>
+        /// Получает число из строки
+        /// </summary>
+        /// <param name="stringNumber">Строка для получения</param>
+        /// <param name="defaultValue">Значение по умолчанию</param>
+        /// <param name="numberOption">Возвращаемое значение: только положительное или любое</param>
+        /// <returns>Значение Int32, при неудаче возвращает значение по умолчанию</returns>
+        public static int GetInt(string stringNumber, int defaultValue = 0, GetNumberOption numberOption = GetNumberOption.OnlyPositive)
         {
             NumberFormatInfo numberFomat = new() { NumberDecimalSeparator = "," };
             if (Int32.TryParse(stringNumber, NumberStyles.Any, numberFomat, out int result))
             {
-                return result;
+                if (numberOption == GetNumberOption.OnlyPositive && result > 0)
+                {
+                    return result;
+                }
+                else
+                {
+                    return defaultValue;
+                }
             }
             return defaultValue;
         }
@@ -41,6 +71,12 @@ namespace Sunduk.PWA.Util
             return value.ToString($"F{precision}").Replace(",", ".").TrimEnd('0');
         }
 
+        /// <summary>
+        /// Форматирует число в такую строку, какую хочу я
+        /// </summary>
+        /// <param name="value">Число</param>
+        /// <param name="precision">Точность</param>
+        /// <returns>Строку содержащую число</returns>
         public static string ToPrettyString(double value, int precision = 3)
         {
             return value.ToString($"F{precision}").Replace(",", ".").TrimEnd('0').TrimEnd('.');
