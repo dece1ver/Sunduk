@@ -31,7 +31,6 @@
         </MudItem>
         <MudItem Class="mt-4" xs="12">
             <MudPaper Class="pa-4" Outlined="true">
-
                 <table>
                     <tr>
                         <MudText>Информация:</MudText>
@@ -53,6 +52,10 @@
 
 @code
 {
+    private const double _sawBarFeed = 3600;    // мм/мин
+    private const double _sawRapidFeed = 2000;  // мм/мин
+    private const double _clampingTime = 6.5;   // сек
+
     public enum Form { Circle, Rectangle }
     public Form WorkpieceForm { get; set; } = Form.Circle;
 
@@ -77,7 +80,10 @@
     public string _PartsCount { get; set; } = string.Empty;
     public double PartsCount { get => Util.GetDouble(_PartsCount, 1); }
 
-    public bool ValidWorkpiece { get
+    #region Заготовка
+    public bool ValidWorkpiece
+    {
+        get
         {
             if (WorkpieceForm == Form.Circle && WorkpieceExternalDiameter > 0 && WorkpieceInternalDiameter < WorkpieceExternalDiameter && WorkpieceLength > 0)
             {
@@ -116,6 +122,7 @@
             return $"Не указана";
         }
     }
+    #endregion
 
     public double CutSpeed {
         get
@@ -132,12 +139,63 @@
         }
     }
 
-    public double BarFeed { get; set; }
+    public double SawFeed { get
+        {
+            if (WorkpieceForm == Form.Circle)
+            {
+                if (WorkpieceMaterial == Material.Steel)
+                {
+                    switch (WorkpieceExternalDiameter)
+                    {
+                        case < 50:
+                            return 20;
+                        case < 100:
+                            return 14;
+                        case < 150:
+                            return 12;
+                        case < 190:
+                            return 9;
+                        case < 230:
+                            return 7;
+                        case < 280:
+                            return 6;
+                        case < 320:
+                            return 5;
+                        default:
+                            return 0;
+                    }
+                }
+                if (WorkpieceMaterial == Material.Stainless)
+                {
+                    switch (WorkpieceExternalDiameter)
+                    {
+                        case < 50:
+                            return 30;
+                        case < 100:
+                            return 20;
+                        case < 150:
+                            return 16;
+                        case < 190:
+                            return 12;
+                        case < 230:
+                            return 10;
+                        case < 280:
+                            return 8;
+                        case < 320:
+                            return 7;
+                        default:
+                            return 0;
+                    }
+                }
+            }
+            return 0;
+        }
+    }
 
-    public double SawFeed { get; set; }
+    public int SawingTime { get
+        {
 
-    public double SawRapidFeed { get; set; }
-
-    public double ClampingTime { get; set; }
+            return 0;
+        } }
 
 }
