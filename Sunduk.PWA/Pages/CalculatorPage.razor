@@ -48,11 +48,11 @@
             {
                 if (CalcSpins)
                 {
-                    SpindleSpeedString = ((CutSpeed * 1000) / (Diameter * Math.PI)).ToString("F0");
+                    SpindleSpeedString = Util.ToPrettyString((CutSpeed * 1000) / (Diameter * Math.PI));
                 }
                 else if (!CalcSpins)
                 {
-                    CutSpeedString = ((Diameter * Math.PI * SpindleSpeed) / 1000).ToString("F0");
+                    CutSpeedString = Util.ToPrettyString((Diameter * Math.PI * SpindleSpeed) / 1000);
                 }
             }
         }
@@ -72,15 +72,15 @@
             cutSpeedstring = value;
             if (CalcSpins)
             {
-                SpindleSpeedString = ((CutSpeed * 1000) / (Diameter * Math.PI)).ToString("F0");
+                SpindleSpeedString = Util.ToPrettyString((CutSpeed * 1000) / (Diameter * Math.PI), 0);
             }
             if (CalcMinFeed)
             {
-                MinFeedString = (Feed * SpindleSpeed * Edges).ToString("F0");
+                MinFeedString = Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0);
             }
             else if (!CalcMinFeed)
             {
-                FeedString = (MinFeed / (SpindleSpeed * Edges)).ToString("F3").Replace(",", ".");
+                FeedString = Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3);
             }
         }
     }
@@ -101,21 +101,21 @@
             {
                 if (!CalcSpins)
                 {
-                    CutSpeedString = ((Diameter * Math.PI * SpindleSpeed) / 1000).ToString("F0");
+                    CutSpeedString = Util.ToPrettyString((Diameter * Math.PI * SpindleSpeed) / 1000, 0);
                 }
                 if (CalcMinFeed)
                 {
-                    MinFeedString = (Feed * SpindleSpeed * Edges).ToString("F0");
+                    MinFeedString = Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0);
                 }
                 else if (!CalcMinFeed)
                 {
-                    FeedString = (MinFeed / (SpindleSpeed * Edges)).ToString("F3").Replace(",", ".");
+                    FeedString = Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3);
                 }
             }
         }
     }
 
-    public Double SpindleSpeed { get => Util.GetDouble(SpindleSpeedString, 0); }
+    public double SpindleSpeed { get => Util.GetDouble(SpindleSpeedString, 0); }
     #endregion
 
     #region Зубья
@@ -129,11 +129,11 @@
             egdesString = value;
             if (CalcMinFeed)
             {
-                MinFeedString = (Feed * SpindleSpeed * Edges).ToString("F0");
+                MinFeedString = Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0);
             }
             else if (!CalcMinFeed)
             {
-                FeedString = (MinFeed / (SpindleSpeed * Edges)).ToString("F3").Replace(",", ".");
+                FeedString = Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3);
             }
         }
     }
@@ -154,7 +154,7 @@
             feedString = value;
             if (CalcMinFeed)
             {
-                MinFeedString = (Feed * SpindleSpeed * Edges).ToString("F0");
+                MinFeedString = Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0);
             }
         }
     }
@@ -172,7 +172,7 @@
             minFeedString = value;
             if (!CalcMinFeed)
             {
-                FeedString = (MinFeed / (SpindleSpeed * Edges)).ToString("F3").Replace(",", ".");
+                FeedString = Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3);
             }
         }
     }

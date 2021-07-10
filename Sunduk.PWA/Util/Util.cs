@@ -7,6 +7,7 @@ namespace Sunduk.PWA.Util
     {
         public enum PassesOption { FullPasses, Infeed }
         public enum GetNumberOption { Any, OnlyPositive }
+        public enum PrettyStringOption { AsIs, ZeroToEmpty }
 
         /// <summary>
         /// Получает число из строки
@@ -77,9 +78,15 @@ namespace Sunduk.PWA.Util
         /// <param name="value">Число</param>
         /// <param name="precision">Точность</param>
         /// <returns>Строку содержащую число</returns>
-        public static string ToPrettyString(double value, int precision = 3)
+        public static string ToPrettyString(double value, int precision = 3, PrettyStringOption stringOption = PrettyStringOption.ZeroToEmpty)
         {
-            return value.ToString($"F{precision}").Replace(",", ".").TrimEnd('0').TrimEnd('.');
+            if (value == 0 && stringOption == PrettyStringOption.ZeroToEmpty)
+            {
+                return string.Empty;
+            }
+            string result = value.ToString($"F{precision}").Replace(",", ".");
+            string _trimmed = '.' + new string('0', precision);
+            return result.Replace(_trimmed, string.Empty);
         }
 
         public static double[] CalcPasses(double threadDepth, int passesCount, PassesOption passesOption = PassesOption.FullPasses)

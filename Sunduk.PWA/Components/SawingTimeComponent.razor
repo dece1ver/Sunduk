@@ -1,4 +1,9 @@
-﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+﻿<style>
+    .tl {
+        padding: 0px 15px 0px 0px;
+    }
+</style>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid>
         <MudItem xs="6">
             <MudSelect @bind-Value="WorkpieceForm" Label="Форма заготовки" T="Form" Variant="Variant.Outlined">
@@ -33,15 +38,78 @@
             <MudPaper Class="pa-4" Outlined="true">
                 <table>
                     <tr>
-                        <MudText>Информация:</MudText>
+                        <td>
+                            <MudText>Информация:</MudText>
+                        </td>
+                        <td>
+                            <MudButtonGroup Color="Color.Primary" Variant="Variant.Text" OverrideStyles="false">
+                                <MudButton OnClick="(() => TimeModifier = TimeValue.Second)"
+                                           Variant="(TimeModifier == TimeValue.Second ? Variant.Outlined : Variant.Text)" 
+                                           Color="(TimeModifier == TimeValue.Second ? Color.Primary : Color.Default)">с</MudButton>
+                                <MudButton OnClick="(() => TimeModifier = TimeValue.Minute)"
+                                           Variant="(TimeModifier == TimeValue.Minute ? Variant.Outlined : Variant.Text)" 
+                                           Color="(TimeModifier == TimeValue.Minute ? Color.Primary : Color.Default)">мин</MudButton>
+                                <MudButton OnClick="(() => TimeModifier = TimeValue.Hour)"
+                                           Variant="(TimeModifier == TimeValue.Hour ? Variant.Outlined : Variant.Text)" 
+                                           Color="(TimeModifier == TimeValue.Hour ? Color.Primary : Color.Default)">ч</MudButton>
+                            </MudButtonGroup>
+                        </td>
                     </tr>
                     <tr>
                         <td class="tl"><MudText Typo="Typo.caption">Заготовка:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@WorkpieceInfo</MudText></td>
+                        <td colspan="4"><MudText Typo="Typo.caption">@WorkpieceInfo</MudText></td>
                     </tr>
                     <tr>
                         <td class="tl"><MudText Typo="Typo.caption">Партия:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@(PartsCount + " шт.")</MudText></td>
+                        <td colspan="4"><MudText Typo="Typo.caption">@(PartsCount + " шт.")</MudText></td>
+                    </tr>
+                    @if (_debug)
+                    {
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">CutSpeed:</MudText></td>
+                            <td><MudText Typo="Typo.caption">@(CutSpeed)</MudText></td>
+                        </tr>
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">SawFeed:</MudText></td>
+                            <td><MudText Typo="Typo.caption">@(SawFeed)</MudText></td>
+                        </tr>
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">ReturnTime:</MudText></td>
+                            <td><MudText Typo="Typo.caption">@(ReturnTime)</MudText></td>
+                        </tr>
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">BarTime:</MudText></td>
+                            <td><MudText Typo="Typo.caption">@(BarTime)</MudText></td>
+                        </tr>
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">PrepTime:</MudText></td>
+                            <td><MudText Typo="Typo.caption">@(PrepTime)</MudText></td>
+                        </tr>
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">SawingTime:</MudText></td>
+                            <td><MudText Typo="Typo.caption">@(SawingTime)</MudText></td>
+                        </tr>
+                    }
+                    <tr>
+                        <td class="tl"><MudText Typo="Typo.caption">Время распила 1шт:</MudText></td>
+                        @if (ValidWorkpiece)
+                        {
+                            <td><MudText Typo="Typo.caption">@(Util.ToPrettyString(SawingTime / (double)TimeModifier, TimePrecision) + TimeUnit)</MudText></td>
+                        }
+                    </tr>
+                    <tr>
+                        <td class="tl"><MudText Typo="Typo.caption">Время смены 1шт:</MudText></td>
+                        @if (ValidWorkpiece)
+                        {
+                            <td><MudText Typo="Typo.caption">@(Util.ToPrettyString(PrepTime / (double)TimeModifier, TimePrecision) + TimeUnit)</MudText></td>
+                        }
+                    </tr>
+                    <tr>
+                        <td class="tl"><MudText Typo="Typo.caption">Общее время:</MudText></td>
+                        @if (ValidWorkpiece)
+                        {
+                            <td><MudText Typo="Typo.caption">@(Util.ToPrettyString(TotalTime / (double)TimeModifier, TimePrecision) + TimeUnit)</MudText></td>
+                        }
                     </tr>
                 </table>
             </MudPaper>
@@ -52,15 +120,62 @@
 
 @code
 {
-    private const double _sawBarFeed = 3600;    // мм/мин
-    private const double _sawRapidFeed = 2000;  // мм/мин
-    private const double _clampingTime = 6.5;   // сек
+    /// <summary>
+    /// Подача тисков, мм/мин
+    /// </summary>
+    private const double _sawBarFeed = 3600;
+
+    /// <summary>
+    /// Подача отвода полотна, мм/мин
+    /// </summary>
+    private const double _sawRapidFeed = 2000;
+
+    /// <summary>
+    /// Суммарное время отжима и поджима прутка тисками, сек
+    /// </summary>
+    private const double _clampingTime = 6.5;
+
+    public string TimeUnit { get
+        {
+            switch (TimeModifier)
+            {
+                case TimeValue.Second:
+                    return " с";
+                case TimeValue.Minute:
+                    return " мин";
+                case TimeValue.Hour:
+                    return " ч";
+            }
+            return string.Empty;
+        } }
+
+    public int TimePrecision
+    {
+        get
+        {
+            switch (TimeModifier)
+            {
+                case TimeValue.Second:
+                    return 0;
+                case TimeValue.Minute:
+                    return 2;
+                case TimeValue.Hour:
+                    return 4;
+            }
+            return 0;
+        }
+    }
+
+    private bool _debug = false;
 
     public enum Form { Circle, Rectangle }
     public Form WorkpieceForm { get; set; } = Form.Circle;
 
     public enum Material { Steel, Stainless }
-    public Material WorkpieceMaterial { get; set; } = Material.Steel;
+    public Material WorkpieceMaterial { get; set; } = Material.Stainless;
+
+    public enum TimeValue { Second = 1, Minute = 60, Hour = 3600 }
+    public TimeValue TimeModifier { get; set; } = TimeValue.Minute;
 
     public string _WorkpieceExternalDiameter { get; set; } = string.Empty;
     public double WorkpieceExternalDiameter { get => Util.GetDouble(_WorkpieceExternalDiameter); }
@@ -124,6 +239,9 @@
     }
     #endregion
 
+    /// <summary>
+    /// Скорость резания, м/мин (не нужна вроде)
+    /// </summary>
     public double CutSpeed {
         get
         {
@@ -139,16 +257,21 @@
         }
     }
 
+    /// <summary>
+    /// Подача, мм/мин
+    /// </summary>
     public double SawFeed { get
         {
             if (WorkpieceForm == Form.Circle)
             {
-                if (WorkpieceMaterial == Material.Steel)
+                if (WorkpieceMaterial == Material.Stainless)
                 {
                     switch (WorkpieceExternalDiameter)
                     {
                         case < 50:
                             return 20;
+                        case < 75:
+                            return 16;
                         case < 100:
                             return 14;
                         case < 150:
@@ -161,11 +284,9 @@
                             return 6;
                         case < 320:
                             return 5;
-                        default:
-                            return 0;
                     }
                 }
-                if (WorkpieceMaterial == Material.Stainless)
+                if (WorkpieceMaterial == Material.Steel)
                 {
                     switch (WorkpieceExternalDiameter)
                     {
@@ -183,8 +304,6 @@
                             return 8;
                         case < 320:
                             return 7;
-                        default:
-                            return 0;
                     }
                 }
             }
@@ -192,10 +311,29 @@
         }
     }
 
-    public int SawingTime { get
-        {
+    /// <summary>
+    /// Время отвода, сек
+    /// </summary>
+    public double ReturnTime => (WorkpieceExternalDiameter + 25) / (_sawRapidFeed / 60);
 
-            return 0;
-        } }
+    /// <summary>
+    /// Время отвода и толкания прутка тисками, сек
+    /// </summary>
+    public double BarTime => WorkpieceLength / (_sawBarFeed / 60) * 2;
+
+    /// <summary>
+    /// Общее время смены заготовки, сек
+    /// </summary>
+    public double PrepTime => ReturnTime + BarTime + _clampingTime;
+
+    /// <summary>
+    /// Время распила одной заготовки, сек
+    /// </summary>
+    public double SawingTime => WorkpieceExternalDiameter / (SawFeed / 60);
+
+    /// <summary>
+    /// Общее время распиловки партии, сек
+    /// </summary>
+    public double TotalTime => PartsCount * (PrepTime + SawingTime);
 
 }
