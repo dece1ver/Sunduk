@@ -16,7 +16,7 @@ namespace Sunduk.PWA.Util
         /// <param name="defaultValue">Значение по умолчанию</param>
         /// <param name="numberOption">Возвращаемое значение: только положительное или любое</param>
         /// <returns>Значение Double, при неудаче возвращает значение по умолчанию</returns>
-        public static double GetDouble(string stringNumber, double defaultValue = 0, GetNumberOption numberOption = GetNumberOption.OnlyPositive)
+        public static double GetDouble(this string stringNumber, double defaultValue = 0, GetNumberOption numberOption = GetNumberOption.OnlyPositive)
         {
             NumberFormatInfo numberFomat = new() { NumberDecimalSeparator = "," };
             if (Double.TryParse(stringNumber, NumberStyles.Any, numberFomat, out double result))
@@ -40,7 +40,7 @@ namespace Sunduk.PWA.Util
         /// <param name="defaultValue">Значение по умолчанию</param>
         /// <param name="numberOption">Возвращаемое значение: только положительное или любое</param>
         /// <returns>Значение Int32, при неудаче возвращает значение по умолчанию</returns>
-        public static int GetInt(string stringNumber, int defaultValue = 0, GetNumberOption numberOption = GetNumberOption.OnlyPositive)
+        public static int GetInt(this string stringNumber, int defaultValue = 0, GetNumberOption numberOption = GetNumberOption.OnlyPositive)
         {
             NumberFormatInfo numberFomat = new() { NumberDecimalSeparator = "," };
             if (Int32.TryParse(stringNumber, NumberStyles.Any, numberFomat, out int result))
@@ -57,17 +57,32 @@ namespace Sunduk.PWA.Util
             return defaultValue;
         }
 
-        public static double Degrees(double radians)
+        /// <summary>
+        /// Переводит радианы в угол</summary>
+        /// <param name="radians">Значение в радианах</param>
+        /// <returns>Угловое значение</returns>
+        public static double Degrees(this double radians)
         {
             return radians * 180 / Math.PI;
         }
 
-        public static double Radians(double degrees)
+        /// <summary>
+        /// Переводит угол в радианы
+        /// </summary>
+        /// <param name="degrees">Угловое значение</param>
+        /// <returns>Радиан</returns>
+        public static double Radians(this double degrees)
         {
             return degrees * Math.PI / 180;
         }
 
-        public static string NCFormat(double value, int precision = 3)
+        /// <summary>
+        /// Форматирует число в строку подходящую для СЧПУ
+        /// </summary>
+        /// <param name="value">Число</param>
+        /// <param name="precision">Точность</param>
+        /// <returns>Отформатированную строку</returns>
+        public static string NC(this double value, int precision = 3)
         {
             return value.ToString($"F{precision}").Replace(",", ".").TrimEnd('0');
         }
@@ -78,7 +93,7 @@ namespace Sunduk.PWA.Util
         /// <param name="value">Число</param>
         /// <param name="precision">Точность</param>
         /// <returns>Строку содержащую число</returns>
-        public static string ToPrettyString(double value, int precision = 3, PrettyStringOption stringOption = PrettyStringOption.ZeroToEmpty)
+        public static string ToPrettyString(this double value, int precision = 3, PrettyStringOption stringOption = PrettyStringOption.ZeroToEmpty)
         {
             if (value == 0 && stringOption == PrettyStringOption.ZeroToEmpty)
             {
@@ -89,6 +104,13 @@ namespace Sunduk.PWA.Util
             return result.Replace(_trimmed, string.Empty);
         }
 
+        /// <summary>
+        /// Считает количество проходов при нарезании резьбы
+        /// </summary>
+        /// <param name="threadDepth">Высота профиля резьбы</param>
+        /// <param name="passesCount">Количество проходов</param>
+        /// <param name="passesOption">Возврат абсолютных или инкрементных значений.</param>
+        /// <returns>Массив с глубиной каждого прохода</returns>
         public static double[] CalcPasses(double threadDepth, int passesCount, PassesOption passesOption = PassesOption.FullPasses)
         {
             double[] passes = new double[passesCount];

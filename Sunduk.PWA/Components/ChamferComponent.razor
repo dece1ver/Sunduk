@@ -105,18 +105,18 @@
             if (ChamferDiameter > 0 && Angle > 0 && ChamferSize > 0 && !RoundCorners)
             {
                 return
-                    $"G0 X{Util.NCFormat(ChamferResult)} Z1. S180 M3\n" +
+                    $"G0 X{(ChamferResult).NC()} Z1. S180 M3\n" +
                     $"G1 Z0. F0.1\n" +
-                    $"X{Util.NCFormat(ChamferDiameter)} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{Util.NCFormat(Angle)}";
+                    $"X{ChamferDiameter.NC()} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{(Angle).NC()}";
             }
             else if(ChamferDiameter > 0 && Angle > 0 && ChamferSize > 0 && RoundCorners)
             {
                 return
-                $"G0 X{Util.NCFormat(ChamferType == Chamfer.External ? ChamferResult - 2 * (ChamferInsertRadius + RoundCorner) : ChamferResult + 2 * (ChamferInsertRadius + RoundCorner))} Z1. S180 M3\n" +
+                $"G0 X{(ChamferType == Chamfer.External ? ChamferResult - 2 * (ChamferInsertRadius + RoundCorner) : ChamferResult + 2 * (ChamferInsertRadius + RoundCorner)).NC()} Z1. S180 M3\n" +
                 $"G1 Z0. F0.1\n" +
-                $"X{Util.NCFormat(ChamferResult)} R{Util.NCFormat(ChamferInsertRadius + RoundCorner)}\n" +
-                $"X{Util.NCFormat(ChamferDiameter)} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{Util.NCFormat(Angle)} R{Util.NCFormat(ChamferInsertRadius + RoundCorner)}\n" +
-                $"W-{Util.NCFormat(ChamferInsertRadius + RoundCorner)}";
+                $"X{ChamferResult.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
+                $"X{ChamferDiameter.NC()} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{Angle.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
+                $"W-{(ChamferInsertRadius + RoundCorner).NC()}";
             }
             return string.Empty;
         }

@@ -51,10 +51,10 @@
             if (RadiusDiameter > 0 && RadiusSize > 0)
             {
                 return
-                    $"G0 X{Util.NCFormat(RadiusResult)} Z1. S180 M3\n" +
+                    $"G0 X{RadiusResult.NC()} Z1. S180 M3\n" +
                     $"G1 Z0. F0.1\n" +
-                    $"X{Util.NCFormat(RadiusDiameter)} R{Util.NCFormat(RadiusSize + InsertRadius)}\n" +
-                    $"W-{Util.NCFormat(RadiusSize + InsertRadius)}";
+                    $"X{RadiusDiameter.NC()} R{(RadiusSize + InsertRadius).NC()}\n" +
+                    $"W-{(RadiusSize + InsertRadius).NC()}";
             }
             return string.Empty;
         }

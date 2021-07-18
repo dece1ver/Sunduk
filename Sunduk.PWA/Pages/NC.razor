@@ -1,0 +1,72 @@
+﻿@page "/nc"
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudGrid>
+        <MudItem xs="9">
+            <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Outlined">
+                <MudSelectItem Value="@(Machines.GS1500)">Goodway GS-1500</MudSelectItem>
+                <MudSelectItem Value="@(Machines.L230A)">Hyundai L230A</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="3">
+            <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="AddOperation">Создать преход</MudButton>
+        </MudItem>
+        <MudItem xs="6">
+            <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+            <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+        </MudItem>
+        <MudItem xs="6">
+            <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Text">
+                <MudSelectItem Value="@(Materials.Steel)">Черная сталь</MudSelectItem>
+                <MudSelectItem Value="@(Materials.Stainless)">Нержавеющая сталь</MudSelectItem>
+                <MudSelectItem Value="@(Materials.Brass)">Бронза</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="12">
+            <MudTextField T="string" Label="Программа" Style="font-family: Consolas" Variant="Variant.Text" Text="@Program" Lines="@(Program.Count(x => x == '\n'))" />
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code
+{
+    private bool _debug = false;
+
+    public Materials WorkpieceMaterial { get; set; }
+    public Machines Machine { get; set; }
+
+    public string _WorkpieceExternalDiameter { get; set; } = string.Empty;
+    public double WorkpieceExternalDiameter { get => Util.GetDouble(_WorkpieceExternalDiameter); }
+
+    public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
+    public double WorkpieceInternalDiameter { get => Util.GetDouble(_WorkpieceInternalDiameter); }
+
+    public string _WorkpieceLength { get; set; } = string.Empty;
+    public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
+
+    public string Program { get => Operations.Count > 0 ? string.Concat(Operations) : string.Empty; }
+
+    public bool ValidWorkpiece
+    {
+        get
+        {
+            if (WorkpieceExternalDiameter > 0 && WorkpieceInternalDiameter < WorkpieceExternalDiameter && WorkpieceLength > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public List<string> Operations { get; set; } = new();
+
+    private void AddOperation()
+    {
+        Operation operation = new(Machine, WorkpieceMaterial, WorkpieceExternalDiameter, WorkpieceInternalDiameter, WorkpieceLength);
+        Operations.Add(operation.Header);
+        Operations.Add(operation.SafetyString);
+        Operations.Add(operation.Limiter);
+        Operations.Add(operation.Facing);
+    }
+}
