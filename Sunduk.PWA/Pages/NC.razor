@@ -9,7 +9,7 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="3">
-            <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="AddOperation">Создать преход</MudButton>
+            <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => toolDialog = true)">Инструмент</MudButton>
         </MudItem>
         <MudItem xs="6">
             <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
@@ -29,9 +29,52 @@
     </MudGrid>
 </MudContainer>
 
+<MudDialog @bind-IsVisible="toolDialog">
+    <TitleContent>Инструмент</TitleContent>
+    <DialogContent>
+        @foreach (var tool in Tools)
+        {
+            switch (tool)
+            {
+                case TurningTool turn:
+                    <MudText>@($"T{turn.Position}({turn.Name} {turn.Angle} R{turn.Raduis})")</MudText>
+                    break;
+                case ThreadingTool thread:
+                    <MudText>@($"T{thread.Position}({thread.Name})")</MudText>
+                    break;
+                case DrillingTool drill:
+                    <MudText>@($"T{drill.Position}({drill.Name} D{drill.Diameter})")</MudText>
+                    break;
+                case GroovingTool groove:
+                    <MudText>@($"T{groove.Position}({groove.Name} {groove.Width}mm)")</MudText>
+                    break;
+                default:
+                    break;
+            }
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="ToolDialogSubmit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
 @code
 {
-    private bool _debug = false;
+    public NC()
+    {
+        Tools.Add(new TurningTool(0101, "PROHOD", 55, 0.8));
+        Tools.Add(new TurningTool(0202, "PROHOD", 55, 0.4));
+        Tools.Add(new DrillingTool(0303, "SV TV", 10, 140));
+        Tools.Add(new GroovingTool(0404, "KANAVA", 3, GroovingTool.Point.Left));
+    }
+
+    private bool toolDialog;
+    void ToolDialogSubmit() => toolDialog = false;
+
+    public DetailModel Detail { get; set; }
+
+    public List<Tool> Tools { get; set; } = new();
 
     public Materials WorkpieceMaterial { get; set; }
     public Machines Machine { get; set; }
