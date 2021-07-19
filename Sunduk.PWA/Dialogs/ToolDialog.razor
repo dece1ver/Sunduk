@@ -1,0 +1,42 @@
+﻿<MudDialog>
+    <TitleContent>Инструмент</TitleContent>
+    <DialogContent>
+        <MudSelect Label="Токарные" T="Tool">
+            @foreach (var tool in Tools.Where(x => x is TurningTool))
+            {
+                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect Label="Сверла" T="Tool">
+            @foreach (var tool in Tools.Where(x => x is DrillingTool))
+            {
+                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect Label="Резьбовые" T="Tool">
+            @foreach (var tool in Tools.Where(x => x is ThreadingTool))
+            {
+                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect Label="Канавочные" T="Tool">
+            @foreach (var tool in Tools.Where(x => x is GroovingTool))
+            {
+                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public List<Tool> Tools { get; set; }
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}

@@ -1,4 +1,5 @@
 ﻿@page "/nc"
+@inject IDialogService DialogService
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid>
@@ -9,7 +10,7 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="3">
-            <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => toolDialog = true)">Инструмент</MudButton>
+            <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenToolDialog">Инструмент</MudButton>
         </MudItem>
         <MudItem xs="6">
             <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
@@ -29,34 +30,6 @@
     </MudGrid>
 </MudContainer>
 
-<MudDialog @bind-IsVisible="toolDialog">
-    <TitleContent>Инструмент</TitleContent>
-    <DialogContent>
-        @foreach (var tool in Tools)
-        {
-            switch (tool)
-            {
-                case TurningTool turn:
-                    <MudText>@($"T{turn.Position}({turn.Name} {turn.Angle} R{turn.Raduis})")</MudText>
-                    break;
-                case ThreadingTool thread:
-                    <MudText>@($"T{thread.Position}({thread.Name})")</MudText>
-                    break;
-                case DrillingTool drill:
-                    <MudText>@($"T{drill.Position}({drill.Name} D{drill.Diameter})")</MudText>
-                    break;
-                case GroovingTool groove:
-                    <MudText>@($"T{groove.Position}({groove.Name} {groove.Width}mm)")</MudText>
-                    break;
-                default:
-                    break;
-            }
-        }
-    </DialogContent>
-    <DialogActions>
-        <MudButton Color="Color.Primary" OnClick="ToolDialogSubmit">Ok</MudButton>
-    </DialogActions>
-</MudDialog>
 
 
 @code
@@ -65,12 +38,18 @@
     {
         Tools.Add(new TurningTool(0101, "PROHOD", 55, 0.8));
         Tools.Add(new TurningTool(0202, "PROHOD", 55, 0.4));
-        Tools.Add(new DrillingTool(0303, "SV TV", 10, 140));
-        Tools.Add(new GroovingTool(0404, "KANAVA", 3, GroovingTool.Point.Left));
+        Tools.Add(new DrillingTool(1212, "SV TV", 10, 140));
+        Tools.Add(new GroovingTool(1010, "KANAVA", 3, GroovingTool.Point.Left));
+        Tools.Add(new ThreadingTool(0313, "REZBA"));
     }
 
-    private bool toolDialog;
-    void ToolDialogSubmit() => toolDialog = false;
+    private void OpenToolDialog()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(Tools), Tools);
+        var options = new DialogOptions() { FullScreen = true, CloseButton = true };
+        DialogService.Show<ToolDialog>("Инструмент", parameters, options);
+    }
 
     public DetailModel Detail { get; set; }
 
@@ -103,13 +82,4 @@
     }
 
     public List<string> Operations { get; set; } = new();
-
-    private void AddOperation()
-    {
-        Operation operation = new(Machine, WorkpieceMaterial, WorkpieceExternalDiameter, WorkpieceInternalDiameter, WorkpieceLength);
-        Operations.Add(operation.Header);
-        Operations.Add(operation.SafetyString);
-        Operations.Add(operation.Limiter);
-        Operations.Add(operation.Facing);
-    }
 }

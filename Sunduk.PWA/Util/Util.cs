@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sunduk.PWA.NC;
+using System;
 using System.Globalization;
 
 namespace Sunduk.PWA.Util
@@ -85,6 +86,28 @@ namespace Sunduk.PWA.Util
         public static string NC(this double value, int precision = 3)
         {
             return value.ToString($"F{precision}").Replace(",", ".").TrimEnd('0');
+        }
+
+        public static string ToolNumber(this int value)
+        {
+            return value.ToString($"D{4}");
+        }
+
+        public static string Description(this Tool tool)
+        {
+            switch (tool)
+            {
+                case TurningTool turningTool:
+                    return $"T{turningTool.Position.ToolNumber()}({turningTool.Name} {turningTool.Angle} R{turningTool.Raduis})";
+                case DrillingTool drillingTool:
+                    return $"T{drillingTool.Position.ToolNumber()}({drillingTool.Name} D{drillingTool.Diameter})";
+                case ThreadingTool threadingTool:
+                    return $"T{threadingTool.Position.ToolNumber()}({threadingTool.Name})";
+                case GroovingTool groovingTool:
+                    return $"T{groovingTool.Position.ToolNumber()}({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})";
+                default:
+                    return $"T{tool.Position.ToolNumber()}({tool.Name})";
+            }
         }
 
         /// <summary>
