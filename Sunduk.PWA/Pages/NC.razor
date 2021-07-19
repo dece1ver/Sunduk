@@ -1,6 +1,19 @@
 ﻿@page "/nc"
 @inject IDialogService DialogService
 
+<style>
+    .monofield {
+        font-family: Consolas;
+        font-size: 10px;
+    }
+</style>
+<style>
+    .monoitem {
+        font-family: Consolas;
+        font-size: 10px;
+    }
+</style>
+
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid>
         <MudItem xs="9">
@@ -25,7 +38,7 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="12" md="12">
-            <MudTextField T="string" Label="Программа" Style="font-family: Consolas" Variant="Variant.Text" Text="@Program" Lines="@(Program.Count(x => x == '\n'))" />
+            <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" Text="@ProgramText" Lines="@(ProgramText.Count(x => x == '\n'))" />
         </MudItem>
     </MudGrid>
 </MudContainer>
@@ -40,7 +53,10 @@
         Tools.Add(new TurningTool(0202, "PROHOD", 55, 0.4));
         Tools.Add(new DrillingTool(1212, "SV TV", 10, 140));
         Tools.Add(new GroovingTool(1010, "KANAVA", 3, GroovingTool.Point.Left));
-        Tools.Add(new ThreadingTool(0313, "REZBA"));
+        Tools.Add(new ThreadingTool(0313, "REZBA", 1.5, 1));
+
+        //var header = new Sequence()
+
     }
 
     private void OpenToolDialog()
@@ -67,7 +83,7 @@
     public string _WorkpieceLength { get; set; } = string.Empty;
     public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
 
-    public string Program { get => Operations.Count > 0 ? string.Concat(Operations) : string.Empty; }
+    public string ProgramText { get => Operations.Count > 0 ? string.Concat(Program) : string.Empty; }
 
     public bool ValidWorkpiece
     {
@@ -80,6 +96,8 @@
             return false;
         }
     }
+
+    public List<Sequence> Program { get; set; } = new();
 
     public List<string> Operations { get; set; } = new();
 }

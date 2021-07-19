@@ -102,7 +102,7 @@ namespace Sunduk.PWA.Util
                 case DrillingTool drillingTool:
                     return $"T{drillingTool.Position.ToolNumber()}({drillingTool.Name} D{drillingTool.Diameter})";
                 case ThreadingTool threadingTool:
-                    return $"T{threadingTool.Position.ToolNumber()}({threadingTool.Name})";
+                    return $"T{threadingTool.Position.ToolNumber()}({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})";
                 case GroovingTool groovingTool:
                     return $"T{groovingTool.Position.ToolNumber()}({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})";
                 default:
