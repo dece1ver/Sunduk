@@ -49,8 +49,15 @@
 {
     public NC()
     {
+        Tools.Add(new TurningTool(0101, "PROHOD", 80, 0.8));
+        Tools.Add(new TurningTool(0101, "PROHOD", 80, 0.4));
+        Tools.Add(new TurningTool(0101, "PROHOD", 80, 0.2));
         Tools.Add(new TurningTool(0101, "PROHOD", 55, 0.8));
-        Tools.Add(new TurningTool(0202, "PROHOD", 55, 0.4));
+        Tools.Add(new TurningTool(0101, "PROHOD", 55, 0.4));
+        Tools.Add(new TurningTool(0101, "PROHOD", 55, 0.2));
+        Tools.Add(new TurningTool(0101, "PROHOD", 35, 0.8));
+        Tools.Add(new TurningTool(0101, "PROHOD", 35, 0.4));
+        Tools.Add(new TurningTool(0101, "PROHOD", 35, 0.2));
         Tools.Add(new DrillingTool(1212, "SV TV", 10, 140));
         Tools.Add(new GroovingTool(1010, "KANAVA", 3, GroovingTool.Point.Left));
         Tools.Add(new ThreadingTool(0313, "REZBA", 1.5, 1));

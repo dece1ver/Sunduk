@@ -1,7 +1,7 @@
 ﻿<MudDialog>
     <TitleContent>Добавление перехода</TitleContent>
     <DialogContent>
-        <MudSelect Label="Тип" T="SequenceType">
+        <MudSelect @bind-Value="Type" Label="Тип" T="SequenceType">
             @foreach (var type in Enum.GetValues(typeof(SequenceType)))
             {
                 switch (type)
@@ -20,8 +20,6 @@
                         break;
                     case SequenceType.Grooving:
                         <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
-                        break;
-                    default:
                         break;
                 }
             }
