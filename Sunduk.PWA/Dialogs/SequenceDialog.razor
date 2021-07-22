@@ -1,0 +1,45 @@
+﻿<MudDialog>
+    <TitleContent>Добавление перехода</TitleContent>
+    <DialogContent>
+        <MudSelect Label="Тип" T="SequenceType">
+            @foreach (var type in Enum.GetValues(typeof(SequenceType)))
+            {
+                switch (type)
+                {
+                    case SequenceType.Genaral:
+                        <MudSelectItem Value="@SequenceType.Genaral">Общие</MudSelectItem>
+                        break;
+                    case SequenceType.Turning:
+                        <MudSelectItem Value="@SequenceType.Turning">Точение</MudSelectItem>
+                        break;
+                    case SequenceType.Drilling:
+                        <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
+                        break;
+                    case SequenceType.Threading:
+                        <MudSelectItem Value="@SequenceType.Threading">Нарезание резьбы</MudSelectItem>
+                        break;
+                    case SequenceType.Grooving:
+                        <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
+                        break;
+                    default:
+                        break;
+                }
+            }
+        </MudSelect>
+        <MudText>@Type</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    public SequenceType Type { get; set; }
+
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}

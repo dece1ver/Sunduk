@@ -23,7 +23,7 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="3">
-            <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenToolDialog">Инструмент</MudButton>
+            <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenSequencelDialog">Инструмент</MudButton>
         </MudItem>
         <MudItem xs="6">
             <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
@@ -65,6 +65,13 @@
         parameters.Add(nameof(Tools), Tools);
         var options = new DialogOptions() { FullScreen = true, CloseButton = true };
         DialogService.Show<ToolDialog>("Инструмент", parameters, options);
+    }
+
+    private void OpenSequencelDialog()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions() { FullScreen = true, CloseButton = true };
+        DialogService.Show<SequenceDialog>("Переходы", parameters, options);
     }
 
     public DetailModel Detail { get; set; }
