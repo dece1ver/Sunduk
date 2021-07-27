@@ -10,6 +10,7 @@ namespace Sunduk.PWA.NC
     {
         public Operation(Machines machine, Materials material, double workpieceExternalDiameter, double workpieceInternalDiameter, double workpieceLength)
         {
+            Machine = machine;
             Material = material;
             WorkpieceExternalDiameter = workpieceExternalDiameter;
             WorkpieceInternalDiameter = workpieceInternalDiameter;

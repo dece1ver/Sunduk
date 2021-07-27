@@ -38,7 +38,9 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="12" md="12">
-            <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" Text="@ProgramText" Lines="@(ProgramText.Count(x => x == '\n'))" />
+            <MudText>@($"{Detail.ExternalDiameter} {Detail.InternalDiameter} {Detail.Length}")</MudText>
+            <MudText>@($"{WorkpieceExternalDiameter} {WorkpieceInternalDiameter} {WorkpieceLength}")</MudText>
+            @*<MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" Text="@ProgramText" Lines="@(ProgramText.Count(x => x == '\n'))" />*@
         </MudItem>
     </MudGrid>
 </MudContainer>
@@ -81,7 +83,7 @@
         DialogService.Show<SequenceDialog>("Переходы", parameters, options);
     }
 
-    public DetailModel Detail { get; set; }
+    public DetailModel Detail { get; set; } = new();
 
     public List<Tool> Tools { get; set; } = new();
 
@@ -89,13 +91,34 @@
     public Machines Machine { get; set; }
 
     public string _WorkpieceExternalDiameter { get; set; } = string.Empty;
-    public double WorkpieceExternalDiameter { get => Util.GetDouble(_WorkpieceExternalDiameter); }
+    public double WorkpieceExternalDiameter { get
+        {
+            var result = Util.GetDouble(_WorkpieceExternalDiameter);
+            Detail.ExternalDiameter = result;
+            return result;
+        }  }
 
     public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
-    public double WorkpieceInternalDiameter { get => Util.GetDouble(_WorkpieceInternalDiameter); }
+    public double WorkpieceInternalDiameter
+    {
+        get
+        {
+            var result = Util.GetDouble(_WorkpieceInternalDiameter);
+            Detail.InternalDiameter = result;
+            return result;
+        }
+    }
 
     public string _WorkpieceLength { get; set; } = string.Empty;
-    public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
+    public double WorkpieceLength
+    {
+        get
+        {
+            var result = Util.GetDouble(_WorkpieceLength);
+            Detail.Length = result;
+            return result;
+        }
+    }
 
     public string ProgramText { get => Operations.Count > 0 ? string.Concat(Program) : string.Empty; }
 
