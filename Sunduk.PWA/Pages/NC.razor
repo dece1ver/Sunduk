@@ -23,7 +23,7 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="3">
-            <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenSequencelDialog">Инструмент</MudButton>
+            <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenToolDialog">Инструмент</MudButton>
         </MudItem>
         <MudItem xs="6">
             <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
@@ -32,15 +32,14 @@
         <MudItem xs="6">
             <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
             <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Text">
-                <MudSelectItem Value="@(Materials.Steel)">Черная сталь</MudSelectItem>
-                <MudSelectItem Value="@(Materials.Stainless)">Нержавеющая сталь</MudSelectItem>
-                <MudSelectItem Value="@(Materials.Brass)">Бронза</MudSelectItem>
+                <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
+                <MudSelectItem Value="@Materials.Stainless">Нержавеющая сталь</MudSelectItem>
+                <MudSelectItem Value="@Materials.Brass">Бронза</MudSelectItem>
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="12" md="12">
-            <MudText>@($"{Detail.ExternalDiameter} {Detail.InternalDiameter} {Detail.Length}")</MudText>
             <MudText>@($"{WorkpieceExternalDiameter} {WorkpieceInternalDiameter} {WorkpieceLength}")</MudText>
-            @*<MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" Text="@ProgramText" Lines="@(ProgramText.Count(x => x == '\n'))" />*@
+            <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" Text="@ProgramText" Lines="@(ProgramText.Count(x => x == '\n'))" />
         </MudItem>
     </MudGrid>
 </MudContainer>
@@ -64,8 +63,8 @@
         Tools.Add(new GroovingTool(1010, "KANAVA", 3, GroovingTool.Point.Left));
         Tools.Add(new ThreadingTool(0313, "REZBA", 1.5, 1));
 
-        //var header = new Sequence()
-
+        Operations.Add(Operation.Header(Machine));
+        Operations.Add(Operation.SafetyString(Machine, 2500));
     }
 
     private void OpenToolDialog()
@@ -83,42 +82,19 @@
         DialogService.Show<SequenceDialog>("Переходы", parameters, options);
     }
 
-    public DetailModel Detail { get; set; } = new();
-
     public List<Tool> Tools { get; set; } = new();
 
     public Materials WorkpieceMaterial { get; set; }
     public Machines Machine { get; set; }
 
     public string _WorkpieceExternalDiameter { get; set; } = string.Empty;
-    public double WorkpieceExternalDiameter { get
-        {
-            var result = Util.GetDouble(_WorkpieceExternalDiameter);
-            Detail.ExternalDiameter = result;
-            return result;
-        }  }
+    public double WorkpieceExternalDiameter { get => Util.GetDouble(_WorkpieceExternalDiameter); }
 
     public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
-    public double WorkpieceInternalDiameter
-    {
-        get
-        {
-            var result = Util.GetDouble(_WorkpieceInternalDiameter);
-            Detail.InternalDiameter = result;
-            return result;
-        }
-    }
+    public double WorkpieceInternalDiameter { get => Util.GetDouble(_WorkpieceInternalDiameter); }
 
     public string _WorkpieceLength { get; set; } = string.Empty;
-    public double WorkpieceLength
-    {
-        get
-        {
-            var result = Util.GetDouble(_WorkpieceLength);
-            Detail.Length = result;
-            return result;
-        }
-    }
+    public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
 
     public string ProgramText { get => Operations.Count > 0 ? string.Concat(Program) : string.Empty; }
 

@@ -1,10 +1,12 @@
 ﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Justify="Justify.SpaceAround">
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="DrillDiameterString" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+            <MudTextField @bind-Value="_DrillDiameter" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" 
+                          @onfocus="() => CurrentImage = Images.DrillDiameter"/>
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="DrillAngleString" T="string" Label="Угол" Variant="Variant.Text" Immediate="true" />
+            <MudTextField @bind-Value="_DrillAngle" T="string" Label="Угол" Variant="Variant.Text" Immediate="true"
+                          @onfocus="() => CurrentImage = Images.DrillAngle"/>
         </MudItem>
         @if (DrillDiameter > 0 && DrillAngle > 0 && DrillAngle < 180)
         {
@@ -14,16 +16,45 @@
                 </MudField>
             </MudItem>
         }
-        </MudGrid>
+        <MudItem xs="12" xl="12">
+            <MudCard Outlined="true" Style="margin: 0">
+                <MudCardContent>
+                    @if (CurrentImage == Images.DrillDiameter)
+                    {
+                        <center>
+                            <img src="/img/stuffimages/chamfer/ext_chamfer_angle.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                        </center>
+                    }
+                    @if (CurrentImage == Images.DrillAngle)
+                    {
+                        <center>
+                            <img src="/img/stuffimages/chamfer/ext_chamfer_size.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                        </center>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
 </MudContainer>
 
 @code 
 {
-    public string DrillDiameterString { get; set; }
-    public double DrillDiameter { get => Util.GetDouble(DrillDiameterString); }
+    readonly int _imgHeigth = 150;
+    readonly int _imgWidth = 350;
 
-    public string DrillAngleString { get; set; }
-    public double DrillAngle { get => Util.GetDouble(DrillAngleString); }
+    public enum Images
+    {
+        DrillDiameter,
+        DrillAngle
+    };
+    public enum ImageType { Diameter, ToolRaduis, ChamferAngle, ChamferSize };
+    public Images CurrentImage { get; set; } = Images.DrillDiameter;
+
+    public string _DrillDiameter { get; set; }
+    public double DrillDiameter { get => Util.GetDouble(_DrillDiameter); }
+
+    public string _DrillAngle { get; set; }
+    public double DrillAngle { get => Util.GetDouble(_DrillAngle); }
 
     public string ResultMessage { get => $"Длина конуса {((DrillDiameter / 2) * Math.Tan((90 - DrillAngle / 2).Radians())).ToPrettyString()} мм"; }
 
