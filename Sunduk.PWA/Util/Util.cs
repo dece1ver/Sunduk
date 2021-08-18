@@ -95,19 +95,14 @@ namespace Sunduk.PWA.Util
 
         public static string Description(this Tool tool)
         {
-            switch (tool)
+            return tool switch
             {
-                case TurningTool turningTool:
-                    return $"T{turningTool.Position.ToolNumber()}({turningTool.Name} {turningTool.Angle} R{turningTool.Raduis})";
-                case DrillingTool drillingTool:
-                    return $"T{drillingTool.Position.ToolNumber()}({drillingTool.Name} D{drillingTool.Diameter})";
-                case ThreadingTool threadingTool:
-                    return $"T{threadingTool.Position.ToolNumber()}({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})";
-                case GroovingTool groovingTool:
-                    return $"T{groovingTool.Position.ToolNumber()}({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})";
-                default:
-                    return $"T{tool.Position.ToolNumber()}({tool.Name})";
-            }
+                TurningTool turningTool => $"T{turningTool.Position.ToolNumber()}({turningTool.Name} {turningTool.Angle} R{turningTool.Raduis})",
+                DrillingTool drillingTool => $"T{drillingTool.Position.ToolNumber()}({drillingTool.Name} D{drillingTool.Diameter})",
+                ThreadingTool threadingTool => $"T{threadingTool.Position.ToolNumber()}({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})",
+                GroovingTool groovingTool => $"T{groovingTool.Position.ToolNumber()}({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})",
+                _ => $"T{tool.Position.ToolNumber()}({tool.Name})",
+            };
         }
 
         /// <summary>
@@ -162,9 +157,6 @@ namespace Sunduk.PWA.Util
                 }
                 return infeed;
             }
-
         }
     }
-
-
 }

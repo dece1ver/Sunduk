@@ -1,21 +1,21 @@
 ﻿@page "/thread"
 <style>
-    .tl{
+    .tl {
         padding: 0px 15px 0px 0px;
     }
 </style>
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-2">
     <MudGrid>
         <MudItem xs="12" md="6">
-            <MudSelect Label="Стандарт" T="Standart" Value="ThreadStandart" Variant="Variant.Outlined" ValueChanged="OnStandartChanged">
+            <MudSelect Label="Стандарт" T="Standart" Variant="Variant.Outlined" ValueChanged="OnStandartChanged">
                 <MudSelectItem Value="@(Standart.Metric)">60° Метрическая</MudSelectItem>
                 <MudSelectItem Value="@(Standart.BSPP)">55° Трубная цилиндрическая</MudSelectItem>
                 @*<MudSelectItem Value="@(Standart.BSPP)">30° Трапецеидальная</MudSelectItem>*@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" md="6">
-            <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Outlined" ValueChanged="OnTemplateChanged">
-                @foreach (string item in ThreadTemplates)
+            <MudSelect Label="Шаблон" T="string" Variant="Variant.Outlined" ValueChanged="OnTemplateChanged">
+                @foreach (string item in metricTemplates)
                 {
                     <MudSelectItem Value="@(item)">
                         <MudText>@item</MudText>
@@ -39,71 +39,71 @@
     @*<MudDivider Class="my-4"/>*@
     @if (ValidThreading())
     {
-    <MudItem Class="mt-4" xs="12">
-        <MudPaper Class="pa-4" Outlined="true">
+        <MudItem Class="mt-4" xs="12">
+            <MudPaper Class="pa-4" Outlined="true">
 
-            <table>
-                <tr>
-                    <MudText>Информация:</MudText>
-                </tr>
-                <tr>
-                    <td class="tl"><MudText Typo="Typo.caption">Диаметр:</MudText></td>
-                    <td><MudText Typo="Typo.caption">@(ThreadDiameter) мм</MudText></td>
-                </tr>
-                <tr>
-                    <td class="tl"><MudText Typo="Typo.caption">Шаг:</MudText></td>
-                    <td><MudText Typo="Typo.caption">@ThreadPitchString</MudText></td>
-                </tr>
-                <tr>
-                    <td class="tl"><MudText Typo="Typo.caption">Общая высота профиля:</MudText></td>
-                    <td><MudText Typo="Typo.caption">@($"{Passes.Sum().ToString("G3").Replace(",", ".")}") мм</MudText></td>
-                </tr>
-                <tr>
-                    <td class="tl"><MudText Typo="Typo.caption">Угол подъема винтовой линии:</MudText></td>
-                    <td><MudText Typo="Typo.caption">@(ThreadAngle.Value.ToString("G3").Replace(",",".")) °</MudText></td>
-                </tr>
-                <tr>
-                    <td class="tl"><MudText Typo="Typo.caption">Угол опорной пластины:</MudText></td>
-                    <td><MudText Typo="Typo.caption">@(ThreadAngle.Value.ToString("N0").Replace(",",".")) °</MudText></td>
-                </tr>
-                <tr>
-                    <td class="tl"><MudText Typo="Typo.caption">Количество проходов:</MudText></td>
-                    <td><MudText Typo="Typo.caption">@(Passes.Length)</MudText></td>
-                </tr>
-                <tr>
-                    <td class="tl"><MudText Typo="Typo.caption">Обороты шпинделя:</MudText></td>
-                    <td><MudText Typo="Typo.caption">@SpindleSpeed об/мин (120 м/мин)</MudText></td>
-                </tr>
-            </table>
-        </MudPaper>
-    </MudItem>
-    <MudExpansionPanel Text="Проходы">
-        <MudItem xs="12">
-            <table>
-                <tr>
-                    <td class="tl"><MudText>Проход</MudText></td>
-                    <td class="tl"><MudText>Съем</MudText></td>
-                    <td><MudText>Накопленный</MudText></td>
-                </tr>
-                @foreach (var (value, index) in Passes.Select((v, i) => (v, i)))
-                    {
-                <tr>
-                    <td><MudText Typo="Typo.caption">@(index + 1)</MudText></td>
-                    <td><MudText Typo="Typo.caption">@value.ToString("N3").Replace(",", ".")</MudText></td>
-                    <td><MudText Typo="Typo.caption">@TotalPasses[index].ToString("N3").Replace(",", ".")</MudText></td>
-                </tr>
-                    }
-            </table>
+                <table>
+                    <tr>
+                        <MudText>Информация:</MudText>
+                    </tr>
+                    <tr>
+                        <td class="tl"><MudText Typo="Typo.caption">Диаметр:</MudText></td>
+                        <td><MudText Typo="Typo.caption">@(ThreadDiameter) мм</MudText></td>
+                    </tr>
+                    <tr>
+                        <td class="tl"><MudText Typo="Typo.caption">Шаг:</MudText></td>
+                        <td><MudText Typo="Typo.caption">@ThreadPitchString</MudText></td>
+                    </tr>
+                    <tr>
+                        <td class="tl"><MudText Typo="Typo.caption">Общая высота профиля:</MudText></td>
+                        <td><MudText Typo="Typo.caption">@($"{Passes.Sum().ToPrettyString(3)}") мм</MudText></td>
+                    </tr>
+                    <tr>
+                        <td class="tl"><MudText Typo="Typo.caption">Угол подъема винтовой линии:</MudText></td>
+                        <td><MudText Typo="Typo.caption">@(ThreadAngle.Value.ToPrettyString(3)) °</MudText></td>
+                    </tr>
+                    <tr>
+                        <td class="tl"><MudText Typo="Typo.caption">Угол опорной пластины:</MudText></td>
+                        <td><MudText Typo="Typo.caption">@(ThreadAngle.Value.ToPrettyString(0)) °</MudText></td>
+                    </tr>
+                    <tr>
+                        <td class="tl"><MudText Typo="Typo.caption">Количество проходов:</MudText></td>
+                        <td><MudText Typo="Typo.caption">@(Passes.Length)</MudText></td>
+                    </tr>
+                    <tr>
+                        <td class="tl"><MudText Typo="Typo.caption">Обороты шпинделя:</MudText></td>
+                        <td><MudText Typo="Typo.caption">@SpindleSpeed об/мин (при 120 м/мин)</MudText></td>
+                    </tr>
+                </table>
+            </MudPaper>
         </MudItem>
-    </MudExpansionPanel>
-    <MudExpansionPanel Text="Пример программы для Fanuc">
-        <MudItem xs="12">
-            <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z0. S{SpindleSpeed} M3 G97\n" +
+        <MudExpansionPanel Text="Проходы">
+            <MudItem xs="12">
+                <table>
+                    <tr>
+                        <td class="tl"><MudText>Проход</MudText></td>
+                        <td class="tl"><MudText>Съем</MudText></td>
+                        <td><MudText>Накопленный</MudText></td>
+                    </tr>
+                    @foreach (var (value, index) in Passes.Select((v, i) => (v, i)))
+                    {
+                        <tr>
+                            <td><MudText Typo="Typo.caption">@(index + 1)</MudText></td>
+                            <td><MudText Typo="Typo.caption">@value.ToString("N3").Replace(",", ".")</MudText></td>
+                            <td><MudText Typo="Typo.caption">@TotalPasses[index].ToString("N3").Replace(",", ".")</MudText></td>
+                        </tr>
+                    }
+                </table>
+            </MudItem>
+        </MudExpansionPanel>
+        <MudExpansionPanel Text="Пример программы для Fanuc">
+            <MudItem xs="12">
+                <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z0. S{SpindleSpeed} M3 G97\n" +
                                 $"G76 P0201{ThreadProfile} Q{(int)(Passes.Last()*1000)} R0.1\n" +
                                 $"G76 X{EndDiameter} Z-20. P{(int)(Passes.Sum()*1000)} Q{(int)(Passes[0]*1000)} F{ThreadPitch.NC()}")">
-            </MudTextField>
-        </MudItem>
-    </MudExpansionPanel>
+                </MudTextField>
+            </MudItem>
+        </MudExpansionPanel>
     }
 
 </MudContainer>
@@ -111,16 +111,16 @@
 
 @code
 {
-    public enum Standart {Metric, BSPP }
-    public enum Type {External, Internal }
+    public enum Standart { Metric, BSPP }
+    public enum Type { External, Internal }
 
-    public readonly HashSet<string> metricTemplates =
-    new HashSet<string> {
+
+    public static readonly IEnumerable<string> metricTemplates = new HashSet<string> {
         //"M2x0.4 (Стандартный)", "M2x0.25 (Мелкий)",
         //"M2.5x0.45 (Стандартный)", "M2.5x0.35 (Мелкий)",
         //"M3x0.5 (Стандартный)", "M3x0.35 (Мелкий)",
         //"M3.5x0.6 (Стандартный)", "M3.5x0.35 (Мелкий)",
-        "M4x0.7 (Стандартный)", "M4x0.5 (Мелкий)", "M4.5x0.75", "M4.5x0.5 (Мелкий)",
+        //"M4x0.7 (Стандартный)", "M4x0.5 (Мелкий)", "M4.5x0.75", "M4.5x0.5 (Мелкий)",
         "M5x0.8 (Стандартный)", "M5x0.5 (Мелкий)", "M5.5x0.5 (Стандартный)",
         "M6x1 (Стандартный)", "M6x0.75 (Мелкий)", "M6x0.5 (Мелкий)",
         "M7x1 (Стандартный)", "M7x0.75 (Мелкий)", "M7x0.5 (Мелкий)",
@@ -173,26 +173,26 @@
         "M90x6 (Стандартный)", "M90x4 (Мелкий)", "M90x3 (Мелкий)", "M90x2 (Мелкий)", "M90x1.5 (Мелкий)",
         "M95x6 (Стандартный)", "M95x4 (Мелкий)", "M95x3 (Мелкий)", "M95x2 (Мелкий)", "M95x1.5 (Мелкий)",
         "M100x6 (Стандартный)", "M100x4 (Мелкий)", "M100x3 (Мелкий)", "M100x2 (Мелкий)", "M100x1.5 (Мелкий)",
-        "M105x6 (Стандартный)", "M105x4 (Мелкий)", "M105x3 (Мелкий)", "M105x2 (Мелкий)", "M105x1.5 (Мелкий)",
-        "M110x6 (Стандартный)", "M110x4 (Мелкий)", "M110x3 (Мелкий)", "M110x2 (Мелкий)", "M110x1.5 (Мелкий)",
-        "M115x6 (Стандартный)", "M115x4 (Мелкий)", "M115x3 (Мелкий)", "M115x2 (Мелкий)", "M115x1.5 (Мелкий)",
-        "M120x6 (Стандартный)", "M120x4 (Мелкий)", "M120x3 (Мелкий)", "M120x2 (Мелкий)", "M120x1.5 (Мелкий)",
-        "M125x8 (Стандартный)", "M125x6 (Мелкий)", "M125x4 (Мелкий)", "M125x3 (Мелкий)", "M125x2 (Мелкий)", "M125x1.5 (Мелкий)",
-        "M130x8 (Стандартный)", "M130x6 (Мелкий)", "M130x4 (Мелкий)", "M130x3 (Мелкий)", "M130x2 (Мелкий)", "M130x1.5 (Мелкий)",
-        "M135x6 (Стандартный)", "M135x4 (Мелкий)", "M135x3 (Мелкий)", "M135x2 (Мелкий)", "M135x1.5 (Мелкий)",
-        "M140x8 (Стандартный)", "M140x6 (Мелкий)", "M140x4 (Мелкий)", "M140x3 (Мелкий)", "M140x2 (Мелкий)", "M140x1.5 (Мелкий)",
-        "M145x6 (Стандартный)", "M145x4 (Мелкий)", "M145x3 (Мелкий)", "M145x2 (Мелкий)", "M145x1.5 (Мелкий)",
-        "M150x8 (Стандартный)", "M150x6 (Мелкий)", "M150x4 (Мелкий)", "M150x3 (Мелкий)", "M150x2 (Мелкий)", "M150x1.5 (Мелкий)",
-        "M155x6 (Стандартный)", "M155x4 (Мелкий)", "M155x3 (Мелкий)", "M155x2 (Мелкий)",
-        "M160x8 (Стандартный)", "M160x6 (Мелкий)", "M160x4 (Мелкий)", "M160x3 (Мелкий)", "M160x2 (Мелкий)",
-        "M165x6 (Стандартный)", "M165x4 (Мелкий)", "M165x3 (Мелкий)", "M165x2 (Мелкий)",
-        "M170x8 (Стандартный)", "M170x6 (Мелкий)", "M170x4 (Мелкий)", "M170x3 (Мелкий)", "M170x2 (Мелкий)",
-        "M175x6 (Стандартный)", "M175x4 (Мелкий)", "M175x3 (Мелкий)", "M175x2 (Мелкий)",
-        "M180x8 (Стандартный)", "M180x6 (Мелкий)", "M180x4 (Мелкий)", "M180x3 (Мелкий)", "M180x2 (Мелкий)",
-        "M185x6 (Стандартный)", "M185x4 (Мелкий)", "M185x3 (Мелкий)", "M185x2 (Мелкий)",
-        "M190x8 (Стандартный)", "M190x6 (Мелкий)", "M190x4 (Мелкий)", "M190x3 (Мелкий)", "M190x2 (Мелкий)",
-        "M195x6 (Стандартный)", "M195x4 (Мелкий)", "M195x3 (Мелкий)", "M195x2 (Мелкий)",
-        "M200x8 (Стандартный)", "M200x6 (Мелкий)", "M200x4 (Мелкий)", "M200x3 (Мелкий)", "M200x2 (Мелкий)",
+        //"M105x6 (Стандартный)", "M105x4 (Мелкий)", "M105x3 (Мелкий)", "M105x2 (Мелкий)", "M105x1.5 (Мелкий)",
+        //"M110x6 (Стандартный)", "M110x4 (Мелкий)", "M110x3 (Мелкий)", "M110x2 (Мелкий)", "M110x1.5 (Мелкий)",
+        //"M115x6 (Стандартный)", "M115x4 (Мелкий)", "M115x3 (Мелкий)", "M115x2 (Мелкий)", "M115x1.5 (Мелкий)",
+        //"M120x6 (Стандартный)", "M120x4 (Мелкий)", "M120x3 (Мелкий)", "M120x2 (Мелкий)", "M120x1.5 (Мелкий)",
+        //"M125x8 (Стандартный)", "M125x6 (Мелкий)", "M125x4 (Мелкий)", "M125x3 (Мелкий)", "M125x2 (Мелкий)", "M125x1.5 (Мелкий)",
+        //"M130x8 (Стандартный)", "M130x6 (Мелкий)", "M130x4 (Мелкий)", "M130x3 (Мелкий)", "M130x2 (Мелкий)", "M130x1.5 (Мелкий)",
+        //"M135x6 (Стандартный)", "M135x4 (Мелкий)", "M135x3 (Мелкий)", "M135x2 (Мелкий)", "M135x1.5 (Мелкий)",
+        //"M140x8 (Стандартный)", "M140x6 (Мелкий)", "M140x4 (Мелкий)", "M140x3 (Мелкий)", "M140x2 (Мелкий)", "M140x1.5 (Мелкий)",
+        //"M145x6 (Стандартный)", "M145x4 (Мелкий)", "M145x3 (Мелкий)", "M145x2 (Мелкий)", "M145x1.5 (Мелкий)",
+        //"M150x8 (Стандартный)", "M150x6 (Мелкий)", "M150x4 (Мелкий)", "M150x3 (Мелкий)", "M150x2 (Мелкий)", "M150x1.5 (Мелкий)",
+        //"M155x6 (Стандартный)", "M155x4 (Мелкий)", "M155x3 (Мелкий)", "M155x2 (Мелкий)",
+        //"M160x8 (Стандартный)", "M160x6 (Мелкий)", "M160x4 (Мелкий)", "M160x3 (Мелкий)", "M160x2 (Мелкий)",
+        //"M165x6 (Стандартный)", "M165x4 (Мелкий)", "M165x3 (Мелкий)", "M165x2 (Мелкий)",
+        //"M170x8 (Стандартный)", "M170x6 (Мелкий)", "M170x4 (Мелкий)", "M170x3 (Мелкий)", "M170x2 (Мелкий)",
+        //"M175x6 (Стандартный)", "M175x4 (Мелкий)", "M175x3 (Мелкий)", "M175x2 (Мелкий)",
+        //"M180x8 (Стандартный)", "M180x6 (Мелкий)", "M180x4 (Мелкий)", "M180x3 (Мелкий)", "M180x2 (Мелкий)",
+        //"M185x6 (Стандартный)", "M185x4 (Мелкий)", "M185x3 (Мелкий)", "M185x2 (Мелкий)",
+        //"M190x8 (Стандартный)", "M190x6 (Мелкий)", "M190x4 (Мелкий)", "M190x3 (Мелкий)", "M190x2 (Мелкий)",
+        //"M195x6 (Стандартный)", "M195x4 (Мелкий)", "M195x3 (Мелкий)", "M195x2 (Мелкий)",
+        //"M200x8 (Стандартный)", "M200x6 (Мелкий)", "M200x4 (Мелкий)", "M200x3 (Мелкий)", "M200x2 (Мелкий)",
         //"M205x6 (Стандартный)", "M205x4 (Мелкий)", "M205x3 (Мелкий)",
         //"M210x8 (Стандартный)", "M210x6 (Мелкий)", "M210x4 (Мелкий)", "M210x3 (Мелкий)",
         //"M215x6 (Стандартный)", "M215x4 (Мелкий)", "M215x3 (Мелкий)",
@@ -212,11 +212,10 @@
         //"M285x6 (Стандартный)", "M285x4 (Мелкий)", "M285x3 (Мелкий)",
         //"M290x8 (Стандартный)", "M290x6 (Мелкий)", "M290x4 (Мелкий)", "M290x3 (Мелкий)",
         //"M295x6 (Стандартный)", "M295x4 (Мелкий)", "M295x3 (Мелкий)",
-        //"M300x8 (Стандартный)", "M300x6 (Мелкий)", "M300x4 (Мелкий)", "M300x3 (Мелкий)",
-};
+        //"M300x8 (Стандартный)", "M300x6 (Мелкий)", "M300x4 (Мелкий)", "M300x3 (Мелкий)"
+    };
 
-    public readonly HashSet<string> bsppTemplates =
-        new HashSet<string> {
+    public static readonly IEnumerable<string> bsppTemplates = new HashSet<string> {
         "G1/16", "G1/8", "G1/4", "G3/8", "G1/2", "G5/8", "G3/4", "G7/8",
         "G1", "G1⅛", "G1¼", "G1⅜", "G1½", "G1¾",
         "G2", "G2¼", "G2½", "G2¾",
@@ -225,7 +224,7 @@
         "G5", "G5½",
         "G6"
     };
-    public HashSet<string> ThreadTemplates
+    public static IEnumerable<string> ThreadTemplates
     {
         get
         {
@@ -239,37 +238,22 @@
             }
             else
             {
-                return new HashSet<string> { };
+                return new string[] { };
             }
         }
     }
-    public string CurrentThreadTemplate { get; set; }
 
-    public Standart ThreadStandart { get; set; } = Standart.Metric;
-    public Type ThreadType { get; set; } = Type.External;
+    public static Standart ThreadStandart { get; set; } = Standart.Metric;
+    public static Type ThreadType { get; set; } = Type.External;
 
+    public static string ThreadDiameterString { get; set; }
+    public static double ThreadDiameter { get => Util.GetDouble(ThreadDiameterString); }
 
-    public string ThreadDiameterString { get; set; }
-    public double ThreadDiameter { get => Util.GetDouble(ThreadDiameterString); }
+    public static string ThreadPitchString { get; set; }
+    public static double ThreadPitch { get => Util.GetDouble(ThreadPitchString); }
 
-    public string ThreadPitchString { get; set; }
-    public double ThreadPitch { get => Util.GetDouble(ThreadPitchString); }
-
-    public double NominalHeight
-    {
-        get
-        {
-            if(ThreadStandart == Standart.Metric)
-            {
-                return Math.Sqrt(3) / 2 * ThreadPitch;
-            }
-            else
-            {
-                return 0.960491 * ThreadPitch;
-            }
-        }
-    }
-    public double ProfileHeight
+    public static double NominalHeight { get => ThreadStandart == Standart.Metric ? Math.Sqrt(3) / 2 * ThreadPitch : 0.960491 * ThreadPitch; }
+    public static double ProfileHeight
     {
         get
         {
@@ -281,10 +265,10 @@
             {
                 return 0.640327 * ThreadPitch;
             }
-
         }
     }
-    public string ThreadUnits
+
+    public static string ThreadUnits
     {
         get
         {
@@ -303,8 +287,9 @@
         }
     }
 
-    public int PassesCount
-    { get
+    public static int PassesCount
+    {
+        get
         {
             switch (ThreadPitch)
             {
@@ -330,65 +315,67 @@
         }
     } // написать зависимость от шага
 
-    public double[] Passes { get => Util.CalcPasses(ProfileHeight, PassesCount, Util.PassesOption.Infeed); }
-    public double[] TotalPasses { get => Util.CalcPasses(ProfileHeight, PassesCount, Util.PassesOption.FullPasses); }
+    public static double[] Passes { get => Util.CalcPasses(ProfileHeight, PassesCount, Util.PassesOption.Infeed); }
+    public static double[] TotalPasses { get => Util.CalcPasses(ProfileHeight, PassesCount, Util.PassesOption.FullPasses); }
 
-    public int SpindleSpeed { get => ((int)(120000 / (Math.PI * ThreadDiameter))); }
+    public static int SpindleSpeed { get => ((int)(120000 / (Math.PI * ThreadDiameter))); }
 
-    public double? ThreadAngle { get
+    public static double? ThreadAngle
+    {
+        get
         {
             if (ValidThreading())
             {
-                double result = Math.Atan(ThreadPitch / (ThreadDiameter * Math.PI));
-                result = result / Math.PI * 180;
-                return result;
+                return Math.Atan(ThreadPitch / (ThreadDiameter * Math.PI)).Degrees();
             }
             else
             {
                 return 0;
             }
-        } }
+        }
+    }
 
-    public string ApproachDiameter { get
+    public static string ApproachDiameter
+    {
+        get
         {
-            if(ValidThreading() && (ThreadType == Type.External) )
+            if (ValidThreading() && (ThreadType == Type.External))
             {
-                return (ThreadDiameter + 2).ToString("N1").Replace(",",".").Replace(".0",".");
+                return (ThreadDiameter.ToPrettyString(1));
             }
             else if (ValidThreading() && (ThreadType == Type.Internal))
             {
-                return (ThreadDiameter - ThreadPitch - 1).ToString("N1").Replace(",", ".").Replace(".0", ".");
+                return (ThreadDiameter - ThreadPitch - 1).ToPrettyString(1);
             }
             else
             {
                 return string.Empty;
             }
-        } }
-    public string ThreadProfile { get => ThreadStandart == Standart.BSPP ? "55" : "60"; }
-    public string EndDiameter { get => ThreadType == Type.External ? (ThreadDiameter - (2 * Passes.Sum())).ToString("N3").Replace(",", ".").Trim('0') : ThreadDiameter.ToString("N3").Replace(",",".").Trim('0') ; }
+        }
+    }
+    public static string ThreadProfile { get => ThreadStandart == Standart.BSPP ? "55" : "60"; }
+    public static string EndDiameter { get => ThreadType == Type.External ? (ThreadDiameter - (2 * Passes.Sum())).ToPrettyString(3) : ThreadDiameter.ToPrettyString(3); }
 
-    private void OnStandartChanged(Standart value)
+    private static void OnStandartChanged(Standart value)
     {
         if (ThreadStandart != value)
         {
             ThreadStandart = value;
             ThreadPitchString = string.Empty;
             ThreadDiameterString = string.Empty;
-            CurrentThreadTemplate = null;
         }
     }
 
-    private void OnTemplateChanged(string value)
+    private static void OnTemplateChanged(string value)
     {
-        CurrentThreadTemplate = value;
-        if(ThreadStandart == Standart.Metric)
+        if (ThreadStandart == Standart.Metric)
         {
             ThreadDiameterString = value.TrimStart('M').Split('x')[0];
             ThreadPitchString = value.TrimStart('M').Split('x')[1].Split()[0];
         }
-        else if(ThreadStandart == Standart.BSPP)
+        else if (ThreadStandart == Standart.BSPP)
         {
-            switch (CurrentThreadTemplate)
+            switch (value)
             {
                 case "G1/16":
                     ThreadDiameterString = "7.723";
@@ -504,7 +491,7 @@
         }
     }
 
-    private bool ValidThreading()
+    private static bool ValidThreading()
     {
         if (ThreadDiameter != 0 && ThreadPitch != 0)
         {
