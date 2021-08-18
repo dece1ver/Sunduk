@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sunduk.PWA.NC
 {
-    public static class Operation
+    public abstract class Operation
     {
         /// <summary>
         /// Скорость резания на черновом точении
@@ -37,13 +37,28 @@ namespace Sunduk.PWA.NC
         }
 
         /// <summary>
+        /// Скорость резания при сверлении
+        /// </summary>
+        private static int DrillCuttingSpeed(Materials material)
+        {
+            return material switch
+            {
+                Materials.Steel => 200,
+                Materials.Stainless => 180,
+                Materials.Brass => 350,
+                _ => 0
+            };
+        }
+
+
+        /// <summary>
         /// шапка
         /// </summary>
         public static string Header(Machines machine)
         {
             return machine switch
             {
-                Machines.GS1500 => 
+                Machines.GS1500 =>
                 "%\n" +
                 "<AR00-00-000>(NAME)\n" +
                 "(VER)\n" +
@@ -72,14 +87,14 @@ namespace Sunduk.PWA.NC
         {
             return machine switch
             {
-                Machines.GS1500 => 
+                Machines.GS1500 =>
                 "G30U0\n" +
                 "G55G30B0\n" +
                 "G30W0\n" +
                 "G40G80\n" +
                 $"G50S{speedLimit}\n" +
                 "G96\n",
-                Machines.L230A => 
+                Machines.L230A =>
                 "G30U0\n" +
                 "G30W0\n" +
                 "G23\n" +
@@ -122,30 +137,30 @@ namespace Sunduk.PWA.NC
         /// <summary>
         /// Торцовка черновая
         /// </summary>
-        public static string FacingRough(Machines machine, Materials material, double externalDiameter, double internalDiameter)
+        public static string RoughFacing(Machines machine, Materials material, Tool tool, double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, double stepOver)
         {
             return machine switch
             {
                 Machines.GS1500 =>
                 "G30U0W0\n" +
-                "T0000G54M58(PROHOD 80 R0.8)\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z2.S{CuttingSpeedRough(material)}\n" +
-                "G72W1.R0.1\n" +
+                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}\n" +
+                $"G72W{stepOver.NC()}R0.1\n" +
                 "G72P1Q2F0.2\n" +
-                "N1G0Z0.2\n" +
-                $"N2G1X{(internalDiameter - 1.6).NC()}.\n" +
+                $"N1G0Z{profStockAllow.NC()}\n" +
+                $"N2G1X{(internalDiameter - 1.6).NC()}\n" +
                 "M59\n" +
                 "G30U0W0\n" +
                 "\n",
                 Machines.L230A =>
                 "G30U0W0\n" +
-                "T0000(TORC R0.8)\n" +
-                "M8" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z2.S{CuttingSpeedRough(material)}\n" +
-                "G72W1.R0.1\n" +
+                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                "M8\n" +
+                $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}\n" +
+                $"G72W{stepOver.NC()}R0.1\n" +
                 "G72P1Q2F0.2\n" +
-                "N1G0Z0.2\n" +
-                $"N2G1X{(internalDiameter - 1.6).NC()}.\n" +
+                $"N1G0Z{profStockAllow.NC()}\n" +
+                $"N2G1X{(internalDiameter - 1.6).NC()}\n" +
                 "M9\n" +
                 "G30U0W0\n" +
                 "\n",
@@ -156,17 +171,17 @@ namespace Sunduk.PWA.NC
         /// <summary>
         /// Торцовка 
         /// </summary>
-        public static string Facing(Machines machine, Materials material, double externalDiameter, double internalDiameter)
+        public static string Facing(Machines machine, Materials material, Tool tool, double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, double stepOver)
         {
             return machine switch
             {
                 Machines.GS1500 =>
                 "G30U0W0\n" +
-                "T0000G54M58(PROHOD 80 R0.8)\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z2.S{CuttingSpeedRough(material)}\n" +
-                "G72W1.R0.1\n" +
-                "G72P1Q2W0.2F0.2\n" +
-                "N1G0Z0.2\n" +
+                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}\n" +
+                $"G72W{stepOver.NC()}R0.1\n" +
+                $"G72P1Q2W{profStockAllow.NC()}F0.2\n" +
+                "N1G0Z0.\n" +
                 $"N2G1X{(internalDiameter - 1.6).NC()}.\n" +
                 $"G70P1Q2{CuttingSpeedFinish(material)}F0.15\n" +
                 "M59\n" +
@@ -174,12 +189,12 @@ namespace Sunduk.PWA.NC
                 "\n",
                 Machines.L230A =>
                 "G30U0W0\n" +
-                "T0000(TORC R0.8)\n" +
-                "M8" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z2.S{CuttingSpeedRough(material)}\n" +
-                "G72W1.R0.1\n" +
-                "G72P1Q2W0.2F0.2\n" +
-                "N1G0Z0.2\n" +
+                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                "M8\n" +
+                $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}\n" +
+                $"G72W{stepOver.NC()}R0.1\n" +
+                $"G72P1Q2W{profStockAllow.NC()}F0.2\n" +
+                "N1G0Z0.\n" +
                 $"N2G1X{(internalDiameter - 1.6).NC()}.\n" +
                 $"G70P1Q2{CuttingSpeedFinish(material)}F0.15\n" +
                 "M9\n" +
@@ -217,6 +232,66 @@ namespace Sunduk.PWA.NC
                     $"W-{(0.8 + 0.3).NC()}";
             }
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Высокоскоростное сверление
+        /// </summary>
+        public static string DrillingHighSpeed(Machines machine, Materials material)
+        {
+            return machine switch
+            {
+                Machines.GS1500 =>
+                "G30U0W0\n" +
+                "T0000G54M58(SVERLO)\n" +
+                $"G0X{-20}Z2.S{DrillCuttingSpeed(material)}\n" +
+                $"G1Z{-20}.\n" +
+                $"G0Z{2}.\n" +
+                "M59\n" +
+                "G30U0W0\n" +
+                "\n",
+                Machines.L230A =>
+                "G30U0W0\n" +
+                "T0000(SVERLO)\n" +
+                "M8\n" +
+                $"G0X{-20}Z2.S{DrillCuttingSpeed(material)}\n" +
+                $"G1Z{-20}.\n" +
+                $"G0Z{2}.\n" +
+                "M9\n" +
+                "G30U0W0\n" +
+                "\n",
+                _ => string.Empty
+            };
+        }
+
+        /// <summary>
+        /// Нарезание резьбы
+        /// </summary>
+        public static string ThreadCutting(Machines machine, Materials material, double threadDiameter)
+        {
+            return machine switch
+            {
+                Machines.GS1500 =>
+                "G30U0W0\n" +
+                "T0000G54M58(REZBA)\n" +
+                $"G0X{(threadDiameter + 5).NC(1)}Z2.S{120 * 1000 / (threadDiameter * Math.PI)}\nG97" +
+                "G76P010160Q80R0.1\n" +
+                $"G76X{threadDiameter.NC(3)}Z-10.P900Q250F1.5\n" +
+                "G96M59\n" +
+                "G30U0W0\n" +
+                "\n",
+                Machines.L230A =>
+                "G30U0W0\n" +
+                "T0000(REZBA)\n" +
+                "M8\n" +
+                $"G0X{(threadDiameter + 5).NC(1)}Z2.S{120 * 1000 / (threadDiameter * Math.PI)}\nG97" +
+                "G76P010160Q80R0.1\n" +
+                $"G76X{threadDiameter.NC(3)}Z-10.P900Q250F1.5\n" +
+                "G96M59\n" +
+                "G30U0W0\n" +
+                "\n",
+                _ => string.Empty,
+            };
         }
     }
 }

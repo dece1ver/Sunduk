@@ -7,7 +7,7 @@ namespace Sunduk.PWA.NC
 {
     public enum SequenceType
     {
-        Genaral,
+        General,
         Turning,
         Drilling,
         Threading,

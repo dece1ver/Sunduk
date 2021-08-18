@@ -1,30 +1,159 @@
 ﻿<MudDialog>
     <TitleContent>Добавление перехода</TitleContent>
     <DialogContent>
-        <MudSelect @bind-Value="Type" Label="Тип" T="SequenceType">
-            @foreach (var type in Enum.GetValues(typeof(SequenceType)))
+        <MudText>@WorkpieceInfo</MudText>
+        <MudGrid>
+            <MudItem xs="4">
+                <MudSelect @bind-Value="Type" Label="Тип" T="SequenceType">
+                    @foreach (var type in Enum.GetValues(typeof(SequenceType)))
+                    {
+                        switch (type)
+                        {
+                            case SequenceType.General:
+                                <MudSelectItem Value="@SequenceType.General">Общие</MudSelectItem>
+                                break;
+                            case SequenceType.Turning:
+                                <MudSelectItem Value="@SequenceType.Turning">Точение</MudSelectItem>
+                                break;
+                            case SequenceType.Drilling:
+                                <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
+                                break;
+                            case SequenceType.Threading:
+                                <MudSelectItem Value="@SequenceType.Threading">Нарезание резьбы</MudSelectItem>
+                                break;
+                            case SequenceType.Grooving:
+                                <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
+                                break;
+                        }
+                    }
+                </MudSelect>
+            </MudItem>
+
+            @switch (Type)
             {
-                switch (type)
-                {
-                    case SequenceType.Genaral:
-                        <MudSelectItem Value="@SequenceType.Genaral">Общие</MudSelectItem>
-                        break;
-                    case SequenceType.Turning:
-                        <MudSelectItem Value="@SequenceType.Turning">Точение</MudSelectItem>
-                        break;
-                    case SequenceType.Drilling:
-                        <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
-                        break;
-                    case SequenceType.Threading:
-                        <MudSelectItem Value="@SequenceType.Threading">Нарезание резьбы</MudSelectItem>
-                        break;
-                    case SequenceType.Grooving:
-                        <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
-                        break;
-                }
+                case SequenceType.General:
+                    <MudItem xs="4">
+                        <MudSelect Label="Переход" T="GeneralSequences" @bind-Value="GeneralSequence">
+                            <MudSelectItem Value="@(GeneralSequences.Limiter)">Упор</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudSelect @bind-Value="Tool" Label="Токарные" T="Tool">
+                            @foreach (var tool in Tools.Where(x => x is TurningTool))
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    break;
+                case SequenceType.Turning:
+                    <MudItem xs="4">
+                        <MudSelect Label="Переход" T="TurningSequences" @bind-Value="TurningSequence">
+                            <MudSelectItem Value="@(TurningSequences.Facing)">Торцевание</MudSelectItem>
+                            <MudSelectItem Value="@(TurningSequences.RoughFacing)">Черновое торцевание</MudSelectItem>
+                            <MudSelectItem Value="@(TurningSequences.RoughTurning)">Черновое точение</MudSelectItem>
+                            <MudSelectItem Value="@(TurningSequences.FinishFacing)">Чистовое торцевание</MudSelectItem>
+                            <MudSelectItem Value="@(TurningSequences.FinishTurning)">Чистовое точение</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudSelect @bind-Value="Tool" Label="Токарные" T="Tool">
+                            @foreach (var tool in Tools.Where(x => x is TurningTool))
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    @if (TurningSequence == TurningSequences.RoughFacing)
+                    {
+                        <MudItem xs="4">
+                            <MudTextField Label="Съем" @bind-Value="_StepOver" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudTextField Label="Общий припуск" @bind-Value="_RoughStockAllow" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudTextField Label="Чистовой припуск по Z" @bind-Value="_ProfStockAllowZ" Immediate="true" />
+                        </MudItem>
+                    }
+                    @if (TurningSequence == TurningSequences.Facing)
+                    {
+                        <MudItem xs="4">
+                            <MudTextField Label="Съем" @bind-Value="_StepOver" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudTextField Label="Общий припуск" @bind-Value="_RoughStockAllow" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudTextField Label="Чистовой припуск по Z" @bind-Value="_ProfStockAllowZ" Immediate="true" />
+                        </MudItem>
+                    }
+                    @if (TurningSequence == TurningSequences.RoughTurning)
+                    {
+                        <MudItem xs="4">
+                            <MudTextField Label="Съем" @bind-Value="_StepOver" Immediate="true"  />
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudTextField Label="Чистовой припуск по Х" @bind-Value="_ProfStockAllowX" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudTextField Label="Чистовой припуск по Z" @bind-Value="_ProfStockAllowZ" Immediate="true" />
+                        </MudItem>
+                    }
+                    break;
+                case SequenceType.Drilling:
+                    <MudItem xs="46">
+                        <MudSelect Label="Переход" T="DrillingSequences" Value="DrillingSequence">
+                            <MudSelectItem Value="@(DrillingSequences.HighspeedDrilling)">Высокоскоростное сверление</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudSelect Label="Сверла" T="Tool">
+                            @foreach (var tool in Tools.Where(x => x is DrillingTool))
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    break;
+                case SequenceType.Threading:
+                    <MudItem xs="4">
+                        <MudSelect Label="Переход" T="ThreadingSequences" Value="ThreadingSequence">
+                            <MudSelectItem Value="@(ThreadingSequences.ThreadCutting)">Точение резьбы</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudSelect Label="Резьбовые" T="Tool">
+                            @foreach (var tool in Tools.Where(x => x is ThreadingTool))
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    break;
+                case SequenceType.Grooving:
+                    <MudItem xs="4">
+                        <MudSelect Label="Переход" T="GroovingSequences" Value="GroovingSequence">
+                            <MudSelectItem Value="@(GroovingSequences.Grooving)">Канавка</MudSelectItem>
+                            <MudSelectItem Value="@(GroovingSequences.Cutting)">Отрезка</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudSelect Label="Канавочные" T="Tool">
+                            @foreach (var tool in Tools.Where(x => x is GroovingTool))
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    break;
+                default:
+                    break;
             }
-        </MudSelect>
-        <MudText>@Type</MudText>
+        </MudGrid>
+        <MudItem xs="12" sm="12" md="12">
+            <MudTextField T="string" DisableUnderLine="true" Label="Предпросмотр" Class="monofield" Variant="Variant.Filled" Text="@ProgramText" Lines="@(ProgramText.Count(x => x == '\n'))" />
+        </MudItem>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
@@ -32,11 +161,124 @@
 </MudDialog>
 
 
-@code {
+@code 
+{
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
+    [Parameter] public Machines Machine { get; set; }
+    [Parameter] public List<Tool> Tools { get; set; }
+    [Parameter] public double WorkpieceExternalDiameter { get; set; }
+    [Parameter] public double WorkpieceInternalDiameter { get; set; }
+    [Parameter] public double WorkpieceLength { get; set; }
+    [Parameter] public Materials WorkpieceMaterial { get; set; }
+
+    public Tool Tool { get; set; }
+
+    #region Типы переходов
     public SequenceType Type { get; set; }
 
+    public enum GeneralSequences
+    {
+        Limiter
+    }
+
+    public GeneralSequences GeneralSequence { get; set; }
+
+    public enum TurningSequences
+    {
+        RoughFacing,
+        FinishFacing,
+        Facing,
+        RoughTurning,
+        FinishTurning
+    }
+
+    public TurningSequences TurningSequence { get; set; }
+
+    public enum DrillingSequences
+    {
+        HighspeedDrilling
+    }
+
+    public DrillingSequences DrillingSequence { get; set; }
+
+    public enum ThreadingSequences
+    {
+        ThreadCutting
+    }
+
+    public ThreadingSequences ThreadingSequence { get; set; }
+
+    public enum GroovingSequences
+    {
+        Grooving,
+        Cutting
+    }
+
+    public GroovingSequences GroovingSequence { get; set; }
+    #endregion
+
+    public string WorkpieceInfo { get
+        {
+            string materialInfo = string.Empty;
+            switch (WorkpieceMaterial)
+            {
+                case Materials.Steel:
+                    materialInfo = "Стальная";
+                    break;
+                case Materials.Stainless:
+                    materialInfo = "Нержавеющая";
+                    break;
+                case Materials.Brass:
+                    materialInfo = "Бронзовая";
+                    break;
+            }
+            string hole = string.Empty;
+            switch (WorkpieceInternalDiameter)
+            {
+                case > 0:
+                    hole = $" с отверстием Ø{WorkpieceInternalDiameter}мм";
+                    break;
+                default:
+                    break;
+            }
+            return $"{materialInfo} заготовка Ø{WorkpieceExternalDiameter}мм{hole}, L-{WorkpieceLength}мм";
+        } }
+
+    public string _StepOver { get; set; }
+    public double StepOver { get => Util.GetDouble(_StepOver); }
+
+    public string _RoughStockAllow { get; set; }
+    public double RoughStockAllow { get => Util.GetDouble(_RoughStockAllow); }
+
+    public string _ProfStockAllowX { get; set; }
+    public double ProfStockAllowX { get => Util.GetDouble(_ProfStockAllowX); }
+
+    public string _ProfStockAllowZ { get; set; }
+    public double ProfStockAllowZ { get => Util.GetDouble(_ProfStockAllowZ); }
+
+    public string _DrillStart { get; set; }
+    public double DrillStart { get => Util.GetDouble(_DrillStart); }
+
+    public string _DrillEnd { get; set; }
+    public double DrillEnd { get => Util.GetDouble(_DrillEnd); }
+
+    public string ProgramText { get
+        {
+            if (Type == SequenceType.General && GeneralSequence == GeneralSequences.Limiter)
+            {
+                return Operation.Limiter(Machine, WorkpieceExternalDiameter);
+            }
+            if (Type == SequenceType.Turning && TurningSequence == TurningSequences.RoughFacing)
+            {
+                return Operation.RoughFacing(Machine, WorkpieceMaterial, Tool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver);
+            }
+            if (Type == SequenceType.Turning && TurningSequence == TurningSequences.Facing)
+            {
+                return Operation.Facing(Machine, WorkpieceMaterial, Tool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver);
+            }
+            return string.Empty;
+        } }
 
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
