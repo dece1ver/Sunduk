@@ -1,10 +1,10 @@
 ﻿<MudDialog>
     <TitleContent>Добавление перехода</TitleContent>
     <DialogContent>
-        <MudText>@WorkpieceInfo</MudText>
-        <MudGrid>
+        <MudField Label="Заготовка" Variant="Variant.Outlined">@WorkpieceInfo</MudField>
+        <MudGrid Class="mt-2">
             <MudItem xs="4">
-                <MudSelect @bind-Value="Type" Label="Тип" T="SequenceType">
+                <MudSelect Label="Тип" T="SequenceType" ValueChanged="OnSequenceChanged">
                     @foreach (var type in Enum.GetValues(typeof(SequenceType)))
                     {
                         switch (type)
@@ -31,6 +31,7 @@
 
             @switch (Type)
             {
+                #region Общие
                 case SequenceType.General:
                     <MudItem xs="4">
                         <MudSelect Label="Переход" T="GeneralSequences" @bind-Value="GeneralSequence">
@@ -46,6 +47,8 @@
                         </MudSelect>
                     </MudItem>
                     break;
+                #endregion
+                #region Токарные
                 case SequenceType.ExternalTurning:
                     <MudItem xs="4">
                         <MudSelect Label="Переход" T="TurningSequences" @bind-Value="TurningSequence">
@@ -97,7 +100,7 @@
                     @if (TurningSequence == TurningSequences.RoughTurning)
                     {
                         <MudItem xs="4">
-                            <MudTextField Label="Съем" @bind-Value="_StepOver" Immediate="true"  />
+                            <MudTextField Label="Съем" @bind-Value="_StepOver" Immediate="true" />
                         </MudItem>
                         <MudItem xs="4">
                             <MudTextField Label="Чистовой припуск по Х" @bind-Value="_ProfStockAllowX" Immediate="true" />
@@ -107,10 +110,14 @@
                         </MudItem>
                     }
                     break;
+                #endregion
+                #region Сверлильные
                 case SequenceType.Drilling:
                     <MudItem xs="4">
                         <MudSelect Label="Переход" T="DrillingSequences" @bind-Value="DrillingSequence">
-                            <MudSelectItem Value="@(DrillingSequences.HighspeedDrilling)">Высокоскоростное сверление</MudSelectItem>
+                            <MudSelectItem Value="@(DrillingSequences.HighSpeedDrilling)">Высокоскоростное сверление</MudSelectItem>
+                            <MudSelectItem Value="@(DrillingSequences.PeckingDrilling)">Прерывистое сверление</MudSelectItem>
+                            <MudSelectItem Value="@(DrillingSequences.PeckingDeepDrilling)">Глубокое сверление</MudSelectItem>
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="4">
@@ -121,8 +128,32 @@
                             }
                         </MudSelect>
                     </MudItem>
-                    @if (DrillingSequence == DrillingSequences.HighspeedDrilling)
+                    @if (DrillingSequence == DrillingSequences.HighSpeedDrilling)
                     {
+                        <MudItem xs="6">
+                            <MudTextField Label="Начальная точка" @bind-Value="_DrillStart" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTextField Label="Конечная точка" @bind-Value="_DrillEnd" Immediate="true" />
+                        </MudItem>
+                    }
+                    @if (DrillingSequence == DrillingSequences.PeckingDrilling)
+                    {
+                        <MudItem xs="4">
+                            <MudTextField Label="Глубина" @bind-Value="_PeckingDepth" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudTextField Label="Начальная точка" @bind-Value="_DrillStart" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudTextField Label="Конечная точка" @bind-Value="_DrillEnd" Immediate="true" />
+                        </MudItem>
+                    }
+                    @if (DrillingSequence == DrillingSequences.PeckingDeepDrilling)
+                    {
+                        <MudItem xs="4">
+                            <MudTextField Label="Глубина" @bind-Value="_PeckingDeepDepth" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                        </MudItem>
                         <MudItem xs="4">
                             <MudTextField Label="Начальная точка" @bind-Value="_DrillStart" Immediate="true" />
                         </MudItem>
@@ -131,14 +162,16 @@
                         </MudItem>
                     }
                     break;
+                #endregion
+                #region Резьбонарезные
                 case SequenceType.Threading:
                     <MudItem xs="4">
-                        <MudSelect Label="Переход" T="ThreadingSequences" @bind-Value="ThreadingSequence">
+                        <MudSelect Label="Переход" T="ThreadingSequences" ValueChanged="OnThreadingSequenceChanged">
                             <MudSelectItem Value="@(ThreadingSequences.ThreadCutting)">Точение резьбы</MudSelectItem>
                             <MudSelectItem Value="@(ThreadingSequences.Tapping)">Нарезание метчиком</MudSelectItem>
                         </MudSelect>
                     </MudItem>
-                    
+
                     @if (ThreadingSequence == ThreadingSequences.ThreadCutting)
                     {
                         <MudItem xs="4">
@@ -195,6 +228,8 @@
                         </MudItem>
                     }
                     break;
+                #endregion
+                #region Канавочные
                 case SequenceType.Grooving:
                     <MudItem xs="4">
                         <MudSelect Label="Переход" T="GroovingSequences" @bind-Value="GroovingSequence">
@@ -211,11 +246,12 @@
                         </MudSelect>
                     </MudItem>
                     break;
+                #endregion
                 default:
                     break;
             }
         </MudGrid>
-        <MudItem Class="mt-2" xs="12" sm="12" md="12">
+        <MudItem Class="mt-4" xs="12" sm="12" md="12">
             <MudTextField T="string" DisableUnderLine="true" Label="Предпросмотр" Class="monofield" Variant="Variant.Filled" Text="@ProgramText.Trim('\n')" Lines="@(ProgramText.Trim('\n').Count(x => x == '\n') + 1)" />
         </MudItem>
     </DialogContent>
@@ -235,6 +271,17 @@
     [Parameter] public double WorkpieceLength { get; set; }
     [Parameter] public Materials WorkpieceMaterial { get; set; }
 
+    private void OnSequenceChanged(SequenceType value)
+    {
+        Type = value;
+        Tool = null;
+    }
+
+    private void OnThreadingSequenceChanged(ThreadingSequences value)
+    {
+        ThreadingSequence = value;
+        Tool = null;
+    }
 
 
     #region Типы переходов
@@ -260,7 +307,9 @@
 
     public enum DrillingSequences
     {
-        HighspeedDrilling
+        HighSpeedDrilling,
+        PeckingDrilling,
+        PeckingDeepDrilling
     }
 
     public DrillingSequences DrillingSequence { get; set; }
@@ -358,6 +407,12 @@
 
     public string _DrillEnd { get; set; } = "-";
     public double DrillEnd { get => Util.GetDouble(_DrillEnd, numberOption: Util.GetNumberOption.Any); }
+
+    public string _PeckingDepth { get; set; } = "0.25";
+    public double PeckingDepth { get => Util.GetDouble(_PeckingDepth); }
+
+    public string _PeckingDeepDepth { get; set; } = "2";
+    public double PeckingDeepDepth { get => Util.GetDouble(_PeckingDeepDepth); }
     #endregion
 
     public string ProgramText { get
@@ -366,6 +421,7 @@
             {
                 return Operation.Limiter(Machine, Tool, WorkpieceExternalDiameter);
             }
+
             if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.Facing)
             {
                 return Operation.Facing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver);
@@ -378,10 +434,20 @@
             {
                 return Operation.FinishFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, ProfStockAllowZ);
             }
-            if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.HighspeedDrilling)
+
+            if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.HighSpeedDrilling)
             {
-                return Operation.DrillingHighSpeed(Machine, WorkpieceMaterial, Tool as DrillingTool, DrillStart, DrillEnd);
+                return Operation.HighSpeedDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, DrillStart, DrillEnd);
             }
+            if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.PeckingDrilling)
+            {
+                return Operation.PeckDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDepth, DrillStart, DrillEnd);
+            }
+            if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.PeckingDeepDrilling)
+            {
+                return Operation.PeckDeepDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDeepDepth, DrillStart, DrillEnd);
+            }
+
             if (Type == SequenceType.Threading && ThreadingSequence == ThreadingSequences.ThreadCutting)
             {
                 return Operation.ThreadCutting(Machine, Tool as ThreadingExternalTool, ThreadStandart, ThreadType, ThreadDiameter, ThreadPitch, ThreadStart, ThreadEnd);

@@ -218,17 +218,13 @@
         CurrentThreadTemplate = value;
         if(ThreadStandart == ThreadStandart.Metric)
         {
-            string diameter = string.Empty;
-            string pitch = string.Empty;
-            Thread.GetMetricValues(CurrentThreadTemplate, ref diameter, ref pitch);
+            Thread.GetMetricValues(CurrentThreadTemplate, out string diameter, out string pitch);
             ThreadDiameterString = diameter;
             ThreadPitchString = pitch;
         }
         else if(ThreadStandart == ThreadStandart.BSPP)
         {
-            string diameter = string.Empty;
-            string pitch = string.Empty;
-            Thread.GetBSPPValues(CurrentThreadTemplate, ref diameter, ref pitch);
+            Thread.GetBSPPValues(CurrentThreadTemplate, out string diameter, out string pitch);
             ThreadDiameterString = diameter;
             ThreadPitchString = pitch;
         }

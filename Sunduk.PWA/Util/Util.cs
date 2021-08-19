@@ -113,12 +113,39 @@ namespace Sunduk.PWA.Util
         /// <returns>Отформатированную строку</returns>
         public static string NC(this double value, int precision = 3)
         {
-            return value.ToString($"F{precision}").Replace(",", ".").TrimEnd('0');
+            return value.ToString($"F{precision}").Replace(",", ".").Contains('.')
+                ? value.ToString($"F{precision}").Replace(",", ".").TrimEnd('0')
+                : value.ToString($"F{precision}");
         }
 
+        /// <summary>
+        /// Форматирует число в номер инструмента
+        /// </summary>
+        /// <param name="value">Число</param>
+        /// <returns>Отформатированную строку</returns>
         public static string ToolNumber(this int value)
         {
             return value.ToString($"D{4}");
+        }
+
+        /// <summary>
+        /// Миллиметры в микроны
+        /// </summary>
+        /// <param name="value">Число в миллиметрах</param>
+        /// <returns>Отформатированную строку</returns>
+        public static int Microns(this double value)
+        {
+            return (value * 1000).Round(10);
+        }
+
+        /// <summary>
+        /// Миллиметры в микроны
+        /// </summary>
+        /// <param name="value">Число в миллиметрах</param>
+        /// <returns>Отформатированную строку</returns>
+        public static int Microns(this int value)
+        {
+            return (value * 1000).Round(10);
         }
 
         public static string Description(this Tool tool, ToolDescriptionOption option = ToolDescriptionOption.General)
