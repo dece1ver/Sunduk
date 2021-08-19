@@ -260,12 +260,204 @@
     </DialogActions>
 </MudDialog>
 
-
-@code {
+@code 
+{
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
+    [Parameter] public Machines Machine { get; set; }
+    [Parameter] public List<Tool> Tools { get; set; }
+    [Parameter] public double WorkpieceExternalDiameter { get; set; }
+    [Parameter] public double WorkpieceInternalDiameter { get; set; }
+    [Parameter] public double WorkpieceLength { get; set; }
+    [Parameter] public Materials WorkpieceMaterial { get; set; }
+
+    private void OnSequenceChanged(SequenceType value)
+    {
+        Type = value;
+        Tool = null;
+    }
+
+    private void OnThreadingSequenceChanged(ThreadingSequences value)
+    {
+        ThreadingSequence = value;
+        Tool = null;
+    }
+
+
+    #region Типы переходов
     public SequenceType Type { get; set; }
 
+    public enum GeneralSequences
+    {
+        Limiter
+    }
+
+    public GeneralSequences GeneralSequence { get; set; }
+
+    public enum TurningSequences
+    {
+        Facing,
+        RoughFacing,
+        FinishFacing,
+        RoughTurning,
+        FinishTurning
+    }
+
+    public TurningSequences TurningSequence { get; set; }
+
+    public enum DrillingSequences
+    {
+        HighSpeedDrilling,
+        PeckingDrilling,
+        PeckingDeepDrilling
+    }
+
+    public DrillingSequences DrillingSequence { get; set; }
+
+    public enum ThreadingSequences
+    {
+        ThreadCutting, Tapping
+    }
+
+    public ThreadingSequences ThreadingSequence { get; set; }
+
+    public enum GroovingSequences
+    {
+        Grooving,
+        Cutting
+    }
+
+    public GroovingSequences GroovingSequence { get; set; }
+    #endregion
+
+    public Tool Tool { get; set; }
+
+    #region Точение резьбы
+    public ThreadStandart ThreadStandart { get; set; }
+    public CuttingType ThreadType { get; set; }
+
+    public string _ThreadDiameter { get; set; }
+    public double ThreadDiameter { get => Util.GetDouble(_ThreadDiameter, numberOption: Util.GetNumberOption.Any); }
+
+    public string _ThreadPitch { get; set; }
+    public double ThreadPitch { get => Util.GetDouble(_ThreadPitch, numberOption: Util.GetNumberOption.Any); }
+
+    public string _ThreadStart { get; set; }
+    public double ThreadStart { get => Util.GetDouble(_ThreadStart, numberOption: Util.GetNumberOption.Any); }
+
+    public string _ThreadEnd { get; set; } = "-";
+    public double ThreadEnd { get => Util.GetDouble(_ThreadEnd, numberOption: Util.GetNumberOption.Any); }
+    #endregion
+
+    #region Резьбонарезание
+    public string _TapCutSpeed { get; set; }
+    public double TapCutSpeed { get => Util.GetDouble(_TapCutSpeed, numberOption: Util.GetNumberOption.Any); }
+
+    public string _TapStart { get; set; }
+    public double TapStart { get => Util.GetDouble(_TapStart, numberOption: Util.GetNumberOption.Any); }
+
+    public string _TapEnd { get; set; } = "-";
+    public double TapEnd { get => Util.GetDouble(_TapEnd, numberOption: Util.GetNumberOption.Any); }
+    #endregion
+
+    public string WorkpieceInfo { get
+        {
+            string materialInfo = string.Empty;
+            switch (WorkpieceMaterial)
+            {
+                case Materials.Steel:
+                    materialInfo = "Стальная";
+                    break;
+                case Materials.Stainless:
+                    materialInfo = "Нержавеющая";
+                    break;
+                case Materials.Brass:
+                    materialInfo = "Бронзовая";
+                    break;
+            }
+            string hole = string.Empty;
+            switch (WorkpieceInternalDiameter)
+            {
+                case > 0:
+                    hole = $" с отверстием Ø{WorkpieceInternalDiameter.ToPrettyString()}мм";
+                    break;
+                default:
+                    break;
+            }
+            return $"{materialInfo} заготовка Ø{WorkpieceExternalDiameter.ToPrettyString()}мм{hole}, L-{WorkpieceLength.ToPrettyString()}мм";
+        } }
+
+    #region Токарка
+    public string _StepOver { get; set; }
+    public double StepOver { get => Util.GetDouble(_StepOver); }
+
+    public string _RoughStockAllow { get; set; }
+    public double RoughStockAllow { get => Util.GetDouble(_RoughStockAllow); }
+
+    public string _ProfStockAllowX { get; set; }
+    public double ProfStockAllowX { get => Util.GetDouble(_ProfStockAllowX); }
+
+    public string _ProfStockAllowZ { get; set; }
+    public double ProfStockAllowZ { get => Util.GetDouble(_ProfStockAllowZ); }
+    #endregion
+
+    #region Сверловка
+    public string _DrillStart { get; set; }
+    public double DrillStart { get => Util.GetDouble(_DrillStart, numberOption: Util.GetNumberOption.Any); }
+
+    public string _DrillEnd { get; set; } = "-";
+    public double DrillEnd { get => Util.GetDouble(_DrillEnd, numberOption: Util.GetNumberOption.Any); }
+
+    public string _PeckingDepth { get; set; } = "0.25";
+    public double PeckingDepth { get => Util.GetDouble(_PeckingDepth); }
+
+    public string _PeckingDeepDepth { get; set; } = "2";
+    public double PeckingDeepDepth { get => Util.GetDouble(_PeckingDeepDepth); }
+    #endregion
+
+    public string ProgramText { get
+        {
+            if (Type == SequenceType.General && GeneralSequence == GeneralSequences.Limiter)
+            {
+                return Operation.Limiter(Machine, Tool, WorkpieceExternalDiameter);
+            }
+
+            if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.Facing)
+            {
+                return Operation.Facing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver);
+            }
+            if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.RoughFacing)
+            {
+                return Operation.RoughFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver);
+            }
+            if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.FinishFacing)
+            {
+                return Operation.FinishFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, ProfStockAllowZ);
+            }
+
+            if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.HighSpeedDrilling)
+            {
+                return Operation.HighSpeedDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, DrillStart, DrillEnd);
+            }
+            if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.PeckingDrilling)
+            {
+                return Operation.PeckDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDepth, DrillStart, DrillEnd);
+            }
+            if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.PeckingDeepDrilling)
+            {
+                return Operation.PeckDeepDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDeepDepth, DrillStart, DrillEnd);
+            }
+
+            if (Type == SequenceType.Threading && ThreadingSequence == ThreadingSequences.ThreadCutting)
+            {
+                return Operation.ThreadCutting(Machine, Tool as ThreadingExternalTool, ThreadStandart, ThreadType, ThreadDiameter, ThreadPitch, ThreadStart, ThreadEnd);
+            }
+            if (Type == SequenceType.Threading && ThreadingSequence == ThreadingSequences.Tapping)
+            {
+                return Operation.Tapping(Machine, Tool as TappingTool, TapCutSpeed, TapStart, TapEnd);
+            }
+            return string.Empty;
+        } }
 
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
