@@ -1,4 +1,4 @@
-﻿using Sunduk.PWA.NC;
+﻿using Sunduk.PWA.Infrastructure.Tools;
 using System;
 using System.Globalization;
 
@@ -6,9 +6,10 @@ namespace Sunduk.PWA.Util
 {
     public static class Util
     {
-        public enum PassesOption { FullPasses, Infeed }
+        
         public enum GetNumberOption { Any, OnlyPositive }
         public enum PrettyStringOption { AsIs, ZeroToEmpty }
+        public enum ToolDescriptionOption { General, L230, GoodwayLeft, GoodwayRight }
 
         /// <summary>
         /// Получает число из строки
@@ -22,7 +23,11 @@ namespace Sunduk.PWA.Util
             NumberFormatInfo numberFomat = new() { NumberDecimalSeparator = "," };
             if (Double.TryParse(stringNumber, NumberStyles.Any, numberFomat, out double result))
             {
-                if (numberOption == GetNumberOption.OnlyPositive && result > 0)
+                if (numberOption == GetNumberOption.OnlyPositive && result >= 0)
+                {
+                    return result;
+                }
+                else if (numberOption == GetNumberOption.Any)
                 {
                     return result;
                 }
@@ -30,6 +35,7 @@ namespace Sunduk.PWA.Util
                 {
                     return defaultValue;
                 }
+                
             }
             return defaultValue;
         }
@@ -68,6 +74,28 @@ namespace Sunduk.PWA.Util
         }
 
         /// <summary>
+        /// Округляет
+        /// </summary>
+        /// <param name="rounder">Значение округления</param>
+        /// <returns>Радиан</returns>
+        public static int Round(this int value, int rounder = 10)
+        {
+            if (value < rounder) return value;
+            return value / rounder * rounder;
+        }
+
+        /// <summary>
+        /// Округляет
+        /// </summary>
+        /// <param name="rounder">Значение округления</param>
+        /// <returns>Радиан</returns>
+        public static int Round(this double value, int rounder = 10)
+        {
+            if (value < rounder) return (int)value;
+            return (int)Math.Round(value / rounder) * rounder;
+        }
+
+        /// <summary>
         /// Переводит угол в радианы
         /// </summary>
         /// <param name="degrees">Угловое значение</param>
@@ -93,16 +121,65 @@ namespace Sunduk.PWA.Util
             return value.ToString($"D{4}");
         }
 
-        public static string Description(this Tool tool)
+        public static string Description(this Tool tool, ToolDescriptionOption option = ToolDescriptionOption.General)
         {
             return tool switch
             {
-                TurningTool turningTool => $"T{turningTool.Position.ToolNumber()}({turningTool.Name} {turningTool.Angle} R{turningTool.Raduis})",
-                DrillingTool drillingTool => $"T{drillingTool.Position.ToolNumber()}({drillingTool.Name} D{drillingTool.Diameter})",
-                ThreadingTool threadingTool => $"T{threadingTool.Position.ToolNumber()}({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})",
-                GroovingTool groovingTool => $"T{groovingTool.Position.ToolNumber()}({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})",
-                _ => $"T{tool.Position.ToolNumber()}({tool.Name})",
+                SpecialTool specialTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{specialTool.Position.ToolNumber()} ({specialTool.Name})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{specialTool.Position.ToolNumber()}({specialTool.Name})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{specialTool.Position.ToolNumber()}G54M58({specialTool.Name})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{specialTool.Position.ToolNumber()}G55M58({specialTool.Name})".Replace(',', '.'),
+                    _ => string.Empty,
+                },
+                TurningExternalTool turningTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{turningTool.Position.ToolNumber()} ({turningTool.Name} {turningTool.Angle} R{turningTool.Radius})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{turningTool.Position.ToolNumber()}({turningTool.Name} {turningTool.Angle} R{turningTool.Radius})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{turningTool.Position.ToolNumber()}G54M58({turningTool.Name} {turningTool.Angle} R{turningTool.Radius})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{turningTool.Position.ToolNumber()}G55M58({turningTool.Name} {turningTool.Angle} R{turningTool.Radius})".Replace(',', '.'),
+                    _ => string.Empty,
+                },
+                DrillingTool drillingTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{drillingTool.Position.ToolNumber()} ({drillingTool.Name} D{drillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{drillingTool.Position.ToolNumber()}({drillingTool.Name} D{drillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{drillingTool.Position.ToolNumber()}G54M58({drillingTool.Name} D{drillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{drillingTool.Position.ToolNumber()}G55M58({drillingTool.Name} D{drillingTool.Diameter})".Replace(',', '.'),
+                    _ => string.Empty,
+                },
+                TappingTool tappingTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{tappingTool.Position.ToolNumber()} ({tappingTool.Name} M{tappingTool.Diameter}x{tappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{tappingTool.Position.ToolNumber()}({tappingTool.Name} M{tappingTool.Diameter}x{tappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{tappingTool.Position.ToolNumber()}G54M58({tappingTool.Name} M{tappingTool.Diameter}x{tappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{tappingTool.Position.ToolNumber()}G55M58({tappingTool.Name} M{tappingTool.Diameter}x{tappingTool.Pitch})".Replace(',', '.'),
+                    _ => string.Empty,
+                },
+                ThreadingExternalTool threadingTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{threadingTool.Position.ToolNumber()} ({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{threadingTool.Position.ToolNumber()}({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{threadingTool.Position.ToolNumber()}G54M58({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{threadingTool.Position.ToolNumber()}G55M58({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})".Replace(',', '.'),
+                    _ => string.Empty,
+                },
+                GroovingExternalTool groovingTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{groovingTool.Position.ToolNumber()} ({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})"
+                    .Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{groovingTool.Position.ToolNumber()}({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})"
+                    .Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{groovingTool.Position.ToolNumber()}G54M58({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})"
+                    .Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{groovingTool.Position.ToolNumber()}G55M58({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})"
+                    .Replace(',', '.'),
+                    _ => string.Empty,
+                },
+                _ => string.Empty,
             };
+            ;
         }
 
         /// <summary>
@@ -113,50 +190,14 @@ namespace Sunduk.PWA.Util
         /// <returns>Строку содержащую число</returns>
         public static string ToPrettyString(this double value, int precision = 3, PrettyStringOption stringOption = PrettyStringOption.ZeroToEmpty)
         {
-            if (value == 0 && stringOption == PrettyStringOption.ZeroToEmpty)
-            {
-                return string.Empty;
-            }
+            if (value == 0 && stringOption == PrettyStringOption.ZeroToEmpty) return string.Empty;
             string result = value.ToString($"F{precision}").Replace(",", ".");
             string _trimmed = '.' + new string('0', precision);
             return result.Replace(_trimmed, string.Empty);
         }
 
-        /// <summary>
-        /// Считает количество проходов при нарезании резьбы
-        /// </summary>
-        /// <param name="threadDepth">Высота профиля резьбы</param>
-        /// <param name="passesCount">Количество проходов</param>
-        /// <param name="passesOption">Возврат абсолютных или инкрементных значений.</param>
-        /// <returns>Массив с глубиной каждого прохода</returns>
-        public static double[] CalcPasses(double threadDepth, int passesCount, PassesOption passesOption = PassesOption.FullPasses)
-        {
-            double[] passes = new double[passesCount];
-            for (int pass = 1; pass <= passesCount; pass++)
-            {
-                passes[pass - 1] = Math.Round(threadDepth / Math.Sqrt(passesCount - 1) * Math.Sqrt(pass > 1 ? pass - 1 : 0.3), 2);
-            }
-            if (passesOption == PassesOption.FullPasses)
-            {
-                return passes;
-            }
-            else
-            {
-                double[] infeed = new double[passesCount];
-                for (int i = 0; i < passes.Length; i++)
-                {
-
-                    if (i > 0)
-                    {
-                        infeed[i] = passes[i] - passes[i - 1];
-                    }
-                    else
-                    {
-                        infeed[i] = passes[i];
-                    }
-                }
-                return infeed;
-            }
-        }
+        
     }
+
+
 }

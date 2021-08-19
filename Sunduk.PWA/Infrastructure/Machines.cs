@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Sunduk.PWA.NC
+namespace Sunduk.PWA.Infrastructure
 {
-    public enum Materials
+    public enum Machines
     {
-        Steel,
-        Stainless,
-        Brass
+        GS1500,
+        L230A
     }
 }

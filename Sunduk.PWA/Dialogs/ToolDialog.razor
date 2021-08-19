@@ -2,7 +2,7 @@
     <TitleContent>Инструмент</TitleContent>
     <DialogContent>
         <MudSelect Label="Токарные" T="Tool">
-            @foreach (var tool in Tools.Where(x => x is TurningTool))
+            @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
             {
                 <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
             }
@@ -14,13 +14,13 @@
             }
         </MudSelect>
         <MudSelect Label="Резьбовые" T="Tool">
-            @foreach (var tool in Tools.Where(x => x is ThreadingTool))
+            @foreach (var tool in Tools.Where(x => x is ThreadingExternalTool))
             {
                 <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
             }
         </MudSelect>
         <MudSelect Label="Канавочные" T="Tool">
-            @foreach (var tool in Tools.Where(x => x is GroovingTool))
+            @foreach (var tool in Tools.Where(x => x is GroovingExternalTool))
             {
                 <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
             }

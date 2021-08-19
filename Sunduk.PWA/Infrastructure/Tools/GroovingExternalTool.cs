@@ -1,18 +1,19 @@
-﻿using System;
+﻿using Sunduk.PWA.Infrastructure.Sequences;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Sunduk.PWA.NC
+namespace Sunduk.PWA.Infrastructure.Tools
 {
-    public class GroovingTool : Tool
+    public class GroovingExternalTool : Tool
     {
         public double Width { get; set; }
         public enum Point { Left, Right }
         public Point ZeroPoint { get; set; }
-        public GroovingTool(int position, string name, double width, Point zeroPoint)
+
+        public GroovingExternalTool(int position, string name, double width, Point zeroPoint)
         {
-            Usage = SequenceType.Grooving;
             Position = position;
             Name = name;
             Width = width;
