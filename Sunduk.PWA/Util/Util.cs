@@ -135,78 +135,19 @@ namespace Sunduk.PWA.Util
         /// <returns>Отформатированную строку</returns>
         public static int Microns(this double value)
         {
-            return (value * 1000).Round(10);
-        }
-
-        /// <summary>
-        /// Миллиметры в микроны
-        /// </summary>
-        /// <param name="value">Число в миллиметрах</param>
-        /// <returns>Отформатированную строку</returns>
-        public static int Microns(this int value)
-        {
-            return (value * 1000).Round(10);
-        }
-
-        public static string Description(this Tool tool, ToolDescriptionOption option = ToolDescriptionOption.General)
-        {
-            return tool switch
+            switch (tool)
             {
-                SpecialTool specialTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{specialTool.Position.ToolNumber()} ({specialTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{specialTool.Position.ToolNumber()}({specialTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{specialTool.Position.ToolNumber()}G54M58({specialTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{specialTool.Position.ToolNumber()}G55M58({specialTool.Name})".Replace(',', '.'),
-                    _ => string.Empty,
-                },
-                TurningExternalTool turningTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{turningTool.Position.ToolNumber()} ({turningTool.Name} {turningTool.Angle} R{turningTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{turningTool.Position.ToolNumber()}({turningTool.Name} {turningTool.Angle} R{turningTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{turningTool.Position.ToolNumber()}G54M58({turningTool.Name} {turningTool.Angle} R{turningTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{turningTool.Position.ToolNumber()}G55M58({turningTool.Name} {turningTool.Angle} R{turningTool.Radius})".Replace(',', '.'),
-                    _ => string.Empty,
-                },
-                DrillingTool drillingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{drillingTool.Position.ToolNumber()} ({drillingTool.Name} D{drillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{drillingTool.Position.ToolNumber()}({drillingTool.Name} D{drillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{drillingTool.Position.ToolNumber()}G54M58({drillingTool.Name} D{drillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{drillingTool.Position.ToolNumber()}G55M58({drillingTool.Name} D{drillingTool.Diameter})".Replace(',', '.'),
-                    _ => string.Empty,
-                },
-                TappingTool tappingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{tappingTool.Position.ToolNumber()} ({tappingTool.Name} M{tappingTool.Diameter}x{tappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{tappingTool.Position.ToolNumber()}({tappingTool.Name} M{tappingTool.Diameter}x{tappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{tappingTool.Position.ToolNumber()}G54M58({tappingTool.Name} M{tappingTool.Diameter}x{tappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{tappingTool.Position.ToolNumber()}G55M58({tappingTool.Name} M{tappingTool.Diameter}x{tappingTool.Pitch})".Replace(',', '.'),
-                    _ => string.Empty,
-                },
-                ThreadingExternalTool threadingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{threadingTool.Position.ToolNumber()} ({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{threadingTool.Position.ToolNumber()}({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{threadingTool.Position.ToolNumber()}G54M58({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{threadingTool.Position.ToolNumber()}G55M58({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})".Replace(',', '.'),
-                    _ => string.Empty,
-                },
-                GroovingExternalTool groovingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{groovingTool.Position.ToolNumber()} ({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})"
-                    .Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{groovingTool.Position.ToolNumber()}({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})"
-                    .Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{groovingTool.Position.ToolNumber()}G54M58({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})"
-                    .Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{groovingTool.Position.ToolNumber()}G55M58({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})"
-                    .Replace(',', '.'),
-                    _ => string.Empty,
-                },
-                _ => string.Empty,
-            };
-            ;
+                case TurningTool turningTool:
+                    return $"T{turningTool.Position.ToolNumber()}({turningTool.Name} {turningTool.Angle} R{turningTool.Raduis})";
+                case DrillingTool drillingTool:
+                    return $"T{drillingTool.Position.ToolNumber()}({drillingTool.Name} D{drillingTool.Diameter})";
+                case ThreadingTool threadingTool:
+                    return $"T{threadingTool.Position.ToolNumber()}({threadingTool.Name} {threadingTool.Pitch} {threadingTool.Angle})";
+                case GroovingTool groovingTool:
+                    return $"T{groovingTool.Position.ToolNumber()}({groovingTool.Name} {groovingTool.Width}MM {(groovingTool.ZeroPoint == GroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})";
+                default:
+                    return $"T{tool.Position.ToolNumber()}({tool.Name})";
+            }
         }
 
         /// <summary>
