@@ -16,27 +16,31 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid>
-        <MudItem xs="9">
+        <MudItem xs="10">
             <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Outlined">
                 <MudSelectItem Value="@(Machines.GS1500)">Goodway GS-1500</MudSelectItem>
                 <MudSelectItem Value="@(Machines.L230A)">Hyundai L230A</MudSelectItem>
             </MudSelect>
         </MudItem>
-        <MudItem xs="3">
+        <MudItem xs="2">
             <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenSequencelDialog" Disabled="@(!ValidWorkpiece)">Создать переход</MudButton>
         </MudItem>
-        <MudItem xs="6">
-            <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
-            <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
-        </MudItem>
-        <MudItem xs="6">
-            <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
-            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Text">
-                <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
-                <MudSelectItem Value="@Materials.Stainless">Нержавеющая сталь</MudSelectItem>
-                <MudSelectItem Value="@Materials.Brass">Бронза</MudSelectItem>
-            </MudSelect>
-        </MudItem>
+        <MudField Label="Заготовка" Variant="Variant.Outlined">
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+                    <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+                    <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Text">
+                        <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
+                        <MudSelectItem Value="@Materials.Stainless">Нержавеющая сталь</MudSelectItem>
+                        <MudSelectItem Value="@Materials.Brass">Бронза</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+        </MudField>
         <MudItem xs="12" sm="12" md="12">
             <MudText>@($"{WorkpieceExternalDiameter} {WorkpieceInternalDiameter} {WorkpieceLength}")</MudText>
             <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" Text="@ProgramText" Lines="@(ProgramText.Count(x => x == '\n'))" />
@@ -50,21 +54,15 @@
 {
     public NC()
     {
-        Tools.Add(new SpecialTool(0000, "UPOR"));
-        Tools.Add(new TurningExternalTool(0101, "PROHOD", 80, 0.8));
-        Tools.Add(new TurningExternalTool(0101, "PROHOD", 80, 0.4));
-        Tools.Add(new TurningExternalTool(0101, "PROHOD", 80, 0.2));
-        Tools.Add(new TurningExternalTool(0101, "PROHOD", 55, 0.8));
-        Tools.Add(new TurningExternalTool(0101, "PROHOD", 55, 0.4));
-        Tools.Add(new TurningExternalTool(0101, "PROHOD", 55, 0.2));
-        Tools.Add(new TurningExternalTool(0101, "PROHOD", 35, 0.8));
-        Tools.Add(new TurningExternalTool(0101, "PROHOD", 35, 0.4));
-        Tools.Add(new TurningExternalTool(0101, "PROHOD", 35, 0.2));
-        Tools.Add(new DrillingTool(1212, "SV TV", 10, 140));
-        Tools.Add(new GroovingExternalTool(1010, "KANAVA", 3, GroovingExternalTool.Point.Left));
-        Tools.Add(new ThreadingExternalTool(0303, "REZBA", 1.5, 1));
-        Tools.Add(new TappingTool(0202, "METCHIK", 12, 1.75));
-        Tools.Add(new TappingTool(0404, "RASKATNIK", 10, 1.5));
+        Tools.Add(new SpecialTool(0101, "UPOR"));
+        Tools.Add(new TurningExternalTool(0202, "PROHOD", 80, 0.8));
+        Tools.Add(new TurningExternalTool(0303, "PROHOD", 35, 0.4));
+        Tools.Add(new DrillingTool(0505, "SV HSS", 5, 120));
+        Tools.Add(new DrillingTool(0707, "SV TV", 10, 140));
+        Tools.Add(new GroovingExternalTool(1212, "KANAVA", 3, GroovingExternalTool.Point.Left));
+        Tools.Add(new ThreadingExternalTool(1111, "REZBA", 1.5, 1));
+        Tools.Add(new TappingTool(0909, "METCHIK", 12, 1.75));
+        Tools.Add(new TappingTool(0808, "RASKATNIK", 10, 1.5));
 
         Operations.Add(Operation.Header(Machine));
         Operations.Add(Operation.SafetyString(Machine, 2500));

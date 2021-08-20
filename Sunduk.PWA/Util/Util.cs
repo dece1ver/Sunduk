@@ -219,8 +219,8 @@ namespace Sunduk.PWA.Util
         {
             if (value == 0 && stringOption == PrettyStringOption.ZeroToEmpty) return string.Empty;
             string result = value.ToString($"F{precision}").Replace(",", ".");
-            string _trimmed = '.' + new string('0', precision);
-            return result.Replace(_trimmed, string.Empty);
+            if (result.Contains('.')) return result.TrimEnd('0').TrimEnd('.');
+            return result;
         }
 
         

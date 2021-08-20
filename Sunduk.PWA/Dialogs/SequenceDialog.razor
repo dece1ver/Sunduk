@@ -1,4 +1,6 @@
-﻿<MudDialog>
+﻿@inject IDialogService DialogService
+
+<MudDialog>
     <TitleContent>Добавление перехода</TitleContent>
     <DialogContent>
         <MudField Label="Заготовка" Variant="Variant.Outlined">@WorkpieceInfo</MudField>
@@ -256,11 +258,12 @@
         </MudItem>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Submit">Ok</MudButton>
+        <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenToolDialog">Список инструмента</MudButton>
+        <MudButton Size="Size.Large" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Submit">Ok</MudButton>
     </DialogActions>
 </MudDialog>
 
-@code 
+@code
 {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
@@ -360,7 +363,9 @@
     public double TapEnd { get => Util.GetDouble(_TapEnd, numberOption: Util.GetNumberOption.Any); }
     #endregion
 
-    public string WorkpieceInfo { get
+    public string WorkpieceInfo
+    {
+        get
         {
             string materialInfo = string.Empty;
             switch (WorkpieceMaterial)
@@ -385,7 +390,8 @@
                     break;
             }
             return $"{materialInfo} заготовка Ø{WorkpieceExternalDiameter.ToPrettyString()}мм{hole}, L-{WorkpieceLength.ToPrettyString()}мм";
-        } }
+        }
+    }
 
     #region Токарка
     public string _StepOver { get; set; }
@@ -415,7 +421,9 @@
     public double PeckingDeepDepth { get => Util.GetDouble(_PeckingDeepDepth); }
     #endregion
 
-    public string ProgramText { get
+    public string ProgramText
+    {
+        get
         {
             if (Type == SequenceType.General && GeneralSequence == GeneralSequences.Limiter)
             {
@@ -457,7 +465,16 @@
                 return Operation.Tapping(Machine, Tool as TappingTool, TapCutSpeed, TapStart, TapEnd);
             }
             return string.Empty;
-        } }
+        }
+    }
+
+    private void OpenToolDialog()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(Tools), Tools);
+        var options = new DialogOptions() { FullScreen = true, CloseButton = true };
+        DialogService.Show<ToolDialog>("Инструмент", parameters, options);
+    }
 
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();

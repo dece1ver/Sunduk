@@ -1,30 +1,39 @@
 ﻿<MudDialog>
-    <TitleContent>Инструмент</TitleContent>
+    <TitleContent>@($"Tools: {Tools.Count} | Turning: {TurningExternalTools.Count} ")</TitleContent>
     <DialogContent>
-        <MudSelect Label="Токарные" T="Tool">
-            @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
-            {
-                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-            }
-        </MudSelect>
-        <MudSelect Label="Сверла" T="Tool">
-            @foreach (var tool in Tools.Where(x => x is DrillingTool))
-            {
-                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-            }
-        </MudSelect>
-        <MudSelect Label="Резьбовые" T="Tool">
-            @foreach (var tool in Tools.Where(x => x is ThreadingExternalTool))
-            {
-                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-            }
-        </MudSelect>
-        <MudSelect Label="Канавочные" T="Tool">
-            @foreach (var tool in Tools.Where(x => x is GroovingExternalTool))
-            {
-                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-            }
-        </MudSelect>
+        
+        <MudTable Dense="true" Items="TurningExternalTools" ReadOnly="false" CanCancelEdit="false" @bind-SelectedItem="selectedTurningExternalTool">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Инструмент для наружного точения</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Позиция</MudTh>
+                <MudTh>Описание</MudTh>
+                <MudTh>Угол кромки</MudTh>
+                <MudTh>Радиус кромки</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                <MudTd DataLabel="Описание">@context.Name</MudTd>
+                <MudTd DataLabel="Угол кромки">@context.Angle.ToPrettyString()</MudTd>
+                <MudTd DataLabel="Радиус кромки">@context.Radius.ToPrettyString()</MudTd>
+            </RowTemplate>
+            <RowEditingTemplate>
+                <MudTd DataLabel="Позиция">
+                    <MudTextField @bind-Value="@context.Position" Required />
+                </MudTd>
+                <MudTd DataLabel="Описание">
+                    <MudTextField @bind-Value="@context.Name" Required />
+                </MudTd>
+                <MudTd DataLabel="Угол кромки">
+                    <MudTextField @bind-Value="@context.Angle" Required />
+                </MudTd>
+                <MudTd DataLabel="Радиус кромки">
+                    <MudTextField @bind-Value="@context.Radius" Required />
+                </MudTd>
+            </RowEditingTemplate>
+        </MudTable>
+
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
@@ -36,6 +45,60 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
     [Parameter] public List<Tool> Tools { get; set; }
+
+    public List<TurningExternalTool> TurningExternalTools { get
+        {
+            List<TurningExternalTool> result = new();
+            foreach (var item in Tools.Where(x => x is TurningExternalTool))
+            {
+                result.Add(item as TurningExternalTool);
+            }
+            return result;
+        }
+        set { }
+    }
+
+    private TurningExternalTool selectedTurningExternalTool = null;
+
+    public List<DrillingTool> DrillingTools
+    {
+        get
+        {
+            List<DrillingTool> result = new();
+            foreach (var item in Tools.Where(x => x is DrillingTool))
+            {
+                result.Add(item as DrillingTool);
+            }
+            return result;
+        }
+    }
+
+    public List<TappingTool> TappingTools
+    {
+        get
+        {
+            List<TappingTool> result = new();
+            foreach (var item in Tools.Where(x => x is TappingTool))
+            {
+                result.Add(item as TappingTool);
+            }
+            return result;
+        }
+    }
+
+    public List<SpecialTool> SpecialTools
+    {
+        get
+        {
+            List<SpecialTool> result = new();
+            foreach (var item in Tools.Where(x => x is SpecialTool))
+            {
+                result.Add(item as SpecialTool);
+            }
+            return result;
+        }
+    }
+
 
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
