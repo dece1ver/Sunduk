@@ -1,6 +1,8 @@
 ﻿using Sunduk.PWA.Infrastructure.Tools;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Sunduk.PWA.Util
 {
@@ -223,7 +225,21 @@ namespace Sunduk.PWA.Util
             return result;
         }
 
-        
+
+        public static string GetToolTable(string program)
+        {
+            List<string> tools = new();
+            foreach (var line in program.Split('\n'))
+            {
+                if (new Regex(@"T(\d+)", RegexOptions.Compiled).IsMatch(line) && line.Contains("("))
+                {
+                    var fLine = "(" + line.Split("(")[1].Trim();
+                    if (!tools.Contains(fLine)) tools.Add(fLine);
+                }
+            }
+            return string.Join("\n", tools);
+        }
+
     }
 
 

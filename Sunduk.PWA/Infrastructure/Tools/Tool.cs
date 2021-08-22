@@ -9,6 +9,6 @@ namespace Sunduk.PWA.Infrastructure.Tools
     public abstract class Tool
     {
         public int Position { get; set; }
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
     }
 }

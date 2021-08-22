@@ -3,22 +3,22 @@
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-2">
     <MudGrid Justify="Justify.SpaceAround">
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="DiameterString" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+            <MudTextField @bind-Value="DiameterString" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="EdgesString" T="string" Label="Зубья" Variant="Variant.Text" Immediate="true" />
+            <MudTextField @bind-Value="EdgesString" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Зубья" Variant="Variant.Text" Immediate="true" />
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="CutSpeedString" @onfocusin="@(() => CalcSpins = true)" T="string" Label="Скорость" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
+            <MudTextField @bind-Value="CutSpeedString" @onfocusin="@(() => CalcSpins = true)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Скорость" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="FeedString" @onfocusin="@(() => CalcMinFeed = true)" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="@FeedUnits" Immediate="true" />
+            <MudTextField @bind-Value="FeedString" @onfocusin="@(() => CalcMinFeed = true)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="@FeedUnits" Immediate="true" />
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="SpindleSpeedString" @onfocusin="@(() => CalcSpins = false)" T="string" Label="Обороты" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="об/мин" Immediate="true" />
+            <MudTextField @bind-Value="SpindleSpeedString" @onfocusin="@(() => CalcSpins = false)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Обороты" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="об/мин" Immediate="true" />
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="MinFeedString" @onfocusin="@(() => CalcMinFeed = false)" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
+            <MudTextField @bind-Value="MinFeedString" @onfocusin="@(() => CalcMinFeed = false)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
         </MudItem>
     </MudGrid>
 

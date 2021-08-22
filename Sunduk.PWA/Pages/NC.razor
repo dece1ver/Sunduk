@@ -43,7 +43,7 @@
         </MudField>
         <MudItem xs="12" sm="12" md="12">
             <MudText>@($"{WorkpieceExternalDiameter} {WorkpieceInternalDiameter} {WorkpieceLength}")</MudText>
-            <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" Text="@ProgramText" Lines="@(ProgramText.Count(x => x == '\n'))" />
+            <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
         </MudItem>
     </MudGrid>
 </MudContainer>
@@ -52,20 +52,25 @@
 
 @code
 {
+    const string TOOL_TABLE = @"<TOOL TABLE>";
     public NC()
     {
         Tools.Add(new SpecialTool(0101, "UPOR"));
-        Tools.Add(new TurningExternalTool(0202, "PROHOD", 80, 0.8));
-        Tools.Add(new TurningExternalTool(0303, "PROHOD", 35, 0.4));
-        Tools.Add(new DrillingTool(0505, "SV HSS", 5, 120));
-        Tools.Add(new DrillingTool(0707, "SV TV", 10, 140));
-        Tools.Add(new GroovingExternalTool(1212, "KANAVA", 3, GroovingExternalTool.Point.Left));
-        Tools.Add(new ThreadingExternalTool(1111, "REZBA", 1.5, 1));
-        Tools.Add(new TappingTool(0909, "METCHIK", 12, 1.75));
-        Tools.Add(new TappingTool(0808, "RASKATNIK", 10, 1.5));
+        Tools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Bar, 80, 0.8));
+        Tools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Face, 100, 0.8));
+        Tools.Add(new TurningExternalTool(0303, TurningExternalTool.Types.Bar, 35, 0.4));
+        Tools.Add(new DrillingTool(0505, DrillingTool.Types.HSS, 5, 120));
+        Tools.Add(new DrillingTool(0707, DrillingTool.Types.Solid, 10, 140));
+        Tools.Add(new DrillingTool(0606, DrillingTool.Types.Insert, 25, 180));
+        Tools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Grooving, 3, GroovingExternalTool.Point.Left));
+        Tools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Cutting, 3, GroovingExternalTool.Point.Right));
+        Tools.Add(new ThreadingExternalTool(1111, 1.5, 1));
+        Tools.Add(new TappingTool(0909, TappingTool.Types.Cutting, 12, 1.75));
+        Tools.Add(new TappingTool(0808, TappingTool.Types.Forming, 10, 1.5));
 
-        Operations.Add(Operation.Header(Machine));
-        Operations.Add(Operation.SafetyString(Machine, 2500));
+        Program.Add(new Sequence() { Name = "Шапка",  Operation = Infrastructure.Templates.Operation.Header(Machine)});
+
+        Program.Add(new Sequence() { Name = "Строка безопасности",  Operation = Infrastructure.Templates.Operation.SafetyString(Machine, 3000)});
     }
 
     private void OpenToolDialog()
@@ -81,6 +86,7 @@
         var parameters = new DialogParameters();
         parameters.Add(nameof(Machine), Machine);
         parameters.Add(nameof(Tools), Tools);
+        parameters.Add(nameof(Program), Program);
         parameters.Add(nameof(WorkpieceExternalDiameter), WorkpieceExternalDiameter);
         parameters.Add(nameof(WorkpieceInternalDiameter), WorkpieceInternalDiameter);
         parameters.Add(nameof(WorkpieceLength), WorkpieceLength);
@@ -94,16 +100,14 @@
     public Materials WorkpieceMaterial { get; set; }
     public Machines Machine { get; set; }
 
-    public string _WorkpieceExternalDiameter { get; set; } = string.Empty;
+    public string _WorkpieceExternalDiameter { get; set; } = "50";
     public double WorkpieceExternalDiameter { get => Util.GetDouble(_WorkpieceExternalDiameter); }
 
     public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
     public double WorkpieceInternalDiameter { get => Util.GetDouble(_WorkpieceInternalDiameter); }
 
-    public string _WorkpieceLength { get; set; } = string.Empty;
+    public string _WorkpieceLength { get; set; } = "50";
     public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
-
-    public string ProgramText { get => Operations.Count > 0 ? string.Concat(Program) : string.Empty; }
 
     public bool ValidWorkpiece
     {
@@ -119,5 +123,17 @@
 
     public List<Sequence> Program { get; set; } = new();
 
-    public List<string> Operations { get; set; } = new();
+    public string ToolTable { get => Util.GetToolTable(ProgramText); }
+
+    public string ProgramText { get
+        {
+            List<string> result = new();
+            foreach (var sequence in Program)
+            {
+                result.Add(sequence.Operation);
+            }
+            return string.Join("\n", result);
+
+        } set { } }
+
 }

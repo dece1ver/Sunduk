@@ -8,12 +8,25 @@ namespace Sunduk.PWA.Infrastructure.Tools
 {
     public class DrillingTool : Tool
     {
+        public enum Types { Insert, Solid, Tip, Center, HSS }
+
+        public Types Type { get; set; }
         public double Diameter { get; set; }
         public double Angle { get; set; }
-        public DrillingTool(int position, string name, double diameter, double angle)
+        public override string Name { get => Type switch
+        {
+            Types.Insert => "KORP",
+            Types.Solid => "TV",
+            Types.Tip => "GOLOVKA",
+            Types.Center => "CENTR",
+            Types.HSS => "HSS",
+            _ => string.Empty,
+        }; }
+
+        public DrillingTool(int position, Types type, double diameter, double angle)
         {
             Position = position;
-            Name = name;
+            Type = type;
             Diameter = diameter;
             Angle = angle;
         }

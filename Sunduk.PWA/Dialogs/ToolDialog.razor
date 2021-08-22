@@ -20,16 +20,19 @@
             </RowTemplate>
             <RowEditingTemplate>
                 <MudTd DataLabel="Позиция">
-                    <MudTextField @bind-Value="@context.Position" Required />
+                    <MudTextField @bind-Value="@context.Position" Format="D4" Required />
                 </MudTd>
                 <MudTd DataLabel="Описание">
-                    <MudTextField @bind-Value="@context.Name" Required />
+                    <MudSelect T="TurningExternalTool.Types" @bind-Value="@context.Type" Required>
+                        <MudSelectItem Value="@TurningExternalTool.Types.Bar">Проходной</MudSelectItem>
+                        <MudSelectItem Value="@TurningExternalTool.Types.Face">Подрезной</MudSelectItem>
+                    </MudSelect>
                 </MudTd>
                 <MudTd DataLabel="Угол кромки">
-                    <MudTextField @bind-Value="@context.Angle" Required />
+                    <MudTextField @bind-Value="@context.Angle" Converter="converter" Required />
                 </MudTd>
                 <MudTd DataLabel="Радиус кромки">
-                    <MudTextField @bind-Value="@context.Radius" Required />
+                    <MudTextField @bind-Value="@context.Radius" Converter="converter" Required />
                 </MudTd>
             </RowEditingTemplate>
         </MudTable>
@@ -45,6 +48,12 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
     [Parameter] public List<Tool> Tools { get; set; }
+
+    Converter<double> converter = new Converter<double>
+    {
+        SetFunc = value => value.ToPrettyString(),
+        GetFunc = text => Util.GetDouble(text),
+    };
 
     public List<TurningExternalTool> TurningExternalTools { get
         {

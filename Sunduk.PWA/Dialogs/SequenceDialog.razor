@@ -269,6 +269,7 @@
 
     [Parameter] public Machines Machine { get; set; }
     [Parameter] public List<Tool> Tools { get; set; }
+    [Parameter] public List<Sequence> Program { get; set; }
     [Parameter] public double WorkpieceExternalDiameter { get; set; }
     [Parameter] public double WorkpieceInternalDiameter { get; set; }
     [Parameter] public double WorkpieceLength { get; set; }
@@ -476,6 +477,64 @@
         DialogService.Show<ToolDialog>("Инструмент", parameters, options);
     }
 
-    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Submit()
+    {
+        Sequence sequence = new();
+        switch (Type)
+        {
+            case SequenceType.General:
+                switch (GeneralSequence)
+                {
+                    case GeneralSequences.Limiter:
+                        sequence.Name = "Упор";
+                        sequence.Operation = Operation.Limiter(Machine, Tool, WorkpieceExternalDiameter);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case SequenceType.ExternalTurning:
+                switch (TurningSequence)
+                {
+                    case TurningSequences.Facing:
+                        sequence.Name = "Торцовка";
+                        sequence.Operation = Operation.Facing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver);
+                        break;
+                    case TurningSequences.RoughFacing:
+                        sequence.Name = "Черновая торцовка";
+                        sequence.Operation = Operation.RoughFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver);
+                        break;
+                    case TurningSequences.FinishFacing:
+                        sequence.Name = "Чистовая торцовка";
+                        sequence.Operation = Operation.FinishFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, ProfStockAllowZ);
+                        break;
+                    case TurningSequences.RoughTurning:
+                        sequence.Name = "Черновое точение";
+                        sequence.Operation = Operation.FinishFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, ProfStockAllowZ);
+                        break;
+                    case TurningSequences.FinishTurning:
+                        sequence.Name = "Чистовое точение";
+                        sequence.Operation = Operation.FinishFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, ProfStockAllowZ);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case SequenceType.InternalTurning:
+                break;
+            case SequenceType.Drilling:
+                break;
+            case SequenceType.Tapping:
+                break;
+            case SequenceType.Threading:
+                break;
+            case SequenceType.Grooving:
+                break;
+            default:
+                break;
+        }
+        Program.Add(sequence);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
     void Cancel() => MudDialog.Cancel();
 }
