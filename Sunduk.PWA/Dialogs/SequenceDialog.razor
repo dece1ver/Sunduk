@@ -473,7 +473,7 @@
     {
         var parameters = new DialogParameters();
         parameters.Add(nameof(Tools), Tools);
-        var options = new DialogOptions() { FullScreen = true, CloseButton = true };
+        var options = new DialogOptions() { FullScreen = true, CloseButton = false };
         DialogService.Show<ToolDialog>("Инструмент", parameters, options);
     }
 

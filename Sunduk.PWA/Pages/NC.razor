@@ -1,5 +1,6 @@
 ﻿@page "/nc"
 @inject IDialogService DialogService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <style>
     .monofield {
@@ -16,16 +17,16 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid>
-        <MudItem xs="10">
+        <MudItem xs="9">
             <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Outlined">
                 <MudSelectItem Value="@(Machines.GS1500)">Goodway GS-1500</MudSelectItem>
                 <MudSelectItem Value="@(Machines.L230A)">Hyundai L230A</MudSelectItem>
             </MudSelect>
         </MudItem>
-        <MudItem xs="2">
-            <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenSequencelDialog" Disabled="@(!ValidWorkpiece)">Создать переход</MudButton>
+        <MudItem xs="3">
+            <MudButton Size="Size.Large" Style="height: 56px; margin-top: 5px;" FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenSequencelDialog" Disabled="@(!ValidWorkpiece)">Создать переход</MudButton>
         </MudItem>
-        <MudField Label="Заготовка" Variant="Variant.Outlined">
+        <MudField Label="Заготовка" Variant="Variant.Outlined" Style="margin: 12px">
             <MudGrid>
                 <MudItem xs="6">
                     <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
@@ -41,8 +42,20 @@
                 </MudItem>
             </MudGrid>
         </MudField>
+        <MudField Label="Деталь" Variant="Variant.Outlined" Style="margin: 12px">
+            <MudGrid>
+                <MudItem xs="12" sm="4">
+                    <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Adornment="Adornment.End" Variant="Variant.Text" Immediate="true"></MudTextField>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudTextField @bind-Value="DetailName" Label="Наименование" Adornment="Adornment.End" Variant="Variant.Text" Immediate="true"></MudTextField>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudTextField @bind-Value="DrawningVersion" Label="Наименование" Adornment="Adornment.End" Variant="Variant.Text" Immediate="true" Converter="Util.DoubleConverter"></MudTextField>
+                </MudItem>
+            </MudGrid>
+        </MudField>
         <MudItem xs="12" sm="12" md="12">
-            <MudText>@($"{WorkpieceExternalDiameter} {WorkpieceInternalDiameter} {WorkpieceLength}")</MudText>
             <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
         </MudItem>
     </MudGrid>
@@ -53,24 +66,30 @@
 @code
 {
     const string TOOL_TABLE = @"<TOOL TABLE>";
-    public NC()
+
+    protected override async Task OnInitializedAsync()
     {
-        Tools.Add(new SpecialTool(0101, "UPOR"));
-        Tools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Bar, 80, 0.8));
-        Tools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Face, 100, 0.8));
-        Tools.Add(new TurningExternalTool(0303, TurningExternalTool.Types.Bar, 35, 0.4));
-        Tools.Add(new DrillingTool(0505, DrillingTool.Types.HSS, 5, 120));
-        Tools.Add(new DrillingTool(0707, DrillingTool.Types.Solid, 10, 140));
-        Tools.Add(new DrillingTool(0606, DrillingTool.Types.Insert, 25, 180));
-        Tools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Grooving, 3, GroovingExternalTool.Point.Left));
-        Tools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Cutting, 3, GroovingExternalTool.Point.Right));
-        Tools.Add(new ThreadingExternalTool(1111, 1.5, 1));
-        Tools.Add(new TappingTool(0909, TappingTool.Types.Cutting, 12, 1.75));
-        Tools.Add(new TappingTool(0808, TappingTool.Types.Forming, 10, 1.5));
+        Tools = await localStorage.GetItemAsync<List<Tool>>(nameof(Tools));
+        await localStorage.SetItemAsync(nameof(Tools), Tools);
 
-        Program.Add(new Sequence() { Name = "Шапка",  Operation = Infrastructure.Templates.Operation.Header(Machine)});
+        if (Tools.Count == 0)
+        {
+            Tools.Add(new SpecialTool(0101, "UPOR"));
+            Tools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Bar, 80, 0.8));
+            Tools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Face, 100, 0.8));
+            Tools.Add(new TurningExternalTool(0303, TurningExternalTool.Types.Bar, 35, 0.4));
+            Tools.Add(new DrillingTool(0505, DrillingTool.Types.HSS, 5, 120));
+            Tools.Add(new DrillingTool(0707, DrillingTool.Types.Solid, 10, 140));
+            Tools.Add(new DrillingTool(0606, DrillingTool.Types.Insert, 25, 180));
+            Tools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Grooving, 3, GroovingExternalTool.Point.Left));
+            Tools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Cutting, 3, GroovingExternalTool.Point.Right));
+            Tools.Add(new ThreadingExternalTool(1111, 1.5, 1));
+            Tools.Add(new TappingTool(0909, TappingTool.Types.Cutting, 12, 1.75));
+            Tools.Add(new TappingTool(0808, TappingTool.Types.Forming, 10, 1.5));
 
-        Program.Add(new Sequence() { Name = "Строка безопасности",  Operation = Infrastructure.Templates.Operation.SafetyString(Machine, 3000)});
+            Program.Add(Header);
+            Program.Add(SafetyString);
+        }
     }
 
     private void OpenToolDialog()
@@ -106,8 +125,19 @@
     public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
     public double WorkpieceInternalDiameter { get => Util.GetDouble(_WorkpieceInternalDiameter); }
 
+    public string DetailNumber { get; set; }
+    public string NcDetailNumber { get => DetailNumber.Translate(); }
+
+    public string DetailName { get; set; }
+    public string NcDetailName { get => $"{DetailName.Translate()}.{DrawningVersion.ToString("F1").Replace(",", ".")}"; }
+
+    public double DrawningVersion { get; set; }
+
     public string _WorkpieceLength { get; set; } = "50";
     public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
+
+    public Sequence Header { get => new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion) }; }
+    public Sequence SafetyString { get => new Sequence { Name = "Строка безопасности", Operation = Operation.SafetyString(Machine, 3000) }; }
 
     public bool ValidWorkpiece
     {
@@ -115,6 +145,16 @@
         {
             if (WorkpieceExternalDiameter > 0 && WorkpieceInternalDiameter < WorkpieceExternalDiameter && WorkpieceLength > 0)
             {
+                if (Program.Contains(Header))
+                {
+                    Program[Program.IndexOf(Header)] = Header;
+                }
+
+                if (Program.Contains(SafetyString))
+                {
+                    Program[Program.IndexOf(SafetyString)] = SafetyString;
+                }
+
                 return true;
             }
             return false;
@@ -125,7 +165,9 @@
 
     public string ToolTable { get => Util.GetToolTable(ProgramText); }
 
-    public string ProgramText { get
+    public string ProgramText
+    {
+        get
         {
             List<string> result = new();
             foreach (var sequence in Program)
@@ -134,6 +176,7 @@
             }
             return string.Join("\n", result);
 
-        } set { } }
-
+        }
+        set { }
+    }
 }

@@ -140,14 +140,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// шапка
         /// </summary>
-        public static string Header(Machines machine)
+        public static string Header(Machines machine, string number, string name, double drawVersion)
         {
             return machine switch
             {
                 Machines.GS1500 =>
                 "%\n" +
-                "<AR00-00-000>(NAME)\n" +
-                "(VER)\n" +
+                $"<{number}>({name})\n" +
+                $"({drawVersion})\n" +
                 "G10L2P1Z-100.B300.(G54)\n" +
                 "G10L2P2Z400.(G55)\n" +
                 "(AUTHOR)(DATE)\n" +
@@ -157,8 +157,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
                 Machines.L230A =>
                 "%\n" +
-                "o0001(AR00-00-000)\n" +
-                "(NAME)(VER)\n" +
+                $"O0001({number})\n" +
+                $"({name})({drawVersion})\n" +
                 "(AUTHOR)\n" +
                 "(0M0S)\n" +
                 "\n" +

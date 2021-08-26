@@ -1,7 +1,9 @@
-﻿<MudDialog>
+﻿@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<MudDialog>
     <TitleContent>@($"Tools: {Tools.Count} | Turning: {TurningExternalTools.Count} ")</TitleContent>
     <DialogContent>
-        
+
         <MudTable Dense="true" Items="TurningExternalTools" ReadOnly="false" CanCancelEdit="false" @bind-SelectedItem="selectedTurningExternalTool">
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Инструмент для наружного точения</MudText>
@@ -29,10 +31,10 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd DataLabel="Угол кромки">
-                    <MudTextField @bind-Value="@context.Angle" Converter="converter" Required />
+                    <MudTextField @bind-Value="@context.Angle" Converter="Util.DoubleConverter" Required />
                 </MudTd>
                 <MudTd DataLabel="Радиус кромки">
-                    <MudTextField @bind-Value="@context.Radius" Converter="converter" Required />
+                    <MudTextField @bind-Value="@context.Radius" Converter="Util.DoubleConverter" Required />
                 </MudTd>
             </RowEditingTemplate>
         </MudTable>
@@ -47,15 +49,29 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-    [Parameter] public List<Tool> Tools { get; set; }
 
-    Converter<double> converter = new Converter<double>
+    private List<Tool> _Tools;
+
+
+    [Parameter]
+    public List<Tool> Tools
     {
-        SetFunc = value => value.ToPrettyString(),
-        GetFunc = text => Util.GetDouble(text),
-    };
+        get { return _Tools; }
+        set
+        {
 
-    public List<TurningExternalTool> TurningExternalTools { get
+            _Tools = value;
+        }
+    }
+
+    private async Task SetTools()
+    {
+        await localStorage.SetItemAsync("Tools", Tools);
+    }
+
+    public List<TurningExternalTool> TurningExternalTools
+    {
+        get
         {
             List<TurningExternalTool> result = new();
             foreach (var item in Tools.Where(x => x is TurningExternalTool))
