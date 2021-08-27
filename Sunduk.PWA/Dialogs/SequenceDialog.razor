@@ -269,7 +269,7 @@
 
     [Parameter] public Machines Machine { get; set; }
     [Parameter] public List<Tool> Tools { get; set; }
-    [Parameter] public List<Sequence> Program { get; set; }
+    [Parameter] public ObservableCollection<Sequence> Program { get; set; }
     [Parameter] public double WorkpieceExternalDiameter { get; set; }
     [Parameter] public double WorkpieceInternalDiameter { get; set; }
     [Parameter] public double WorkpieceLength { get; set; }
@@ -473,7 +473,7 @@
     {
         var parameters = new DialogParameters();
         parameters.Add(nameof(Tools), Tools);
-        var options = new DialogOptions() { FullScreen = true, CloseButton = false };
+        var options = new DialogOptions() { FullScreen = true, CloseButton = false};
         DialogService.Show<ToolDialog>("Инструмент", parameters, options);
     }
 

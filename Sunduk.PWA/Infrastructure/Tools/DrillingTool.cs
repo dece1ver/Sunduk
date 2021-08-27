@@ -1,10 +1,4 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Sunduk.PWA.Infrastructure.Tools
+﻿namespace Sunduk.PWA.Infrastructure.Tools
 {
     public class DrillingTool : Tool
     {
@@ -13,15 +7,18 @@ namespace Sunduk.PWA.Infrastructure.Tools
         public Types Type { get; set; }
         public double Diameter { get; set; }
         public double Angle { get; set; }
-        public override string Name { get => Type switch
+        public override string Name
         {
-            Types.Insert => "KORP",
-            Types.Solid => "TV",
-            Types.Tip => "GOLOVKA",
-            Types.Center => "CENTR",
-            Types.HSS => "HSS",
-            _ => string.Empty,
-        }; }
+            get => Type switch
+            {
+                Types.Insert => "SV KORP",
+                Types.Solid => "SV TV",
+                Types.Tip => "SV GOLOVKA",
+                Types.Center => "CENTR",
+                Types.HSS => "SV HSS",
+                _ => string.Empty,
+            };
+        }
 
         public DrillingTool(int position, Types type, double diameter, double angle)
         {

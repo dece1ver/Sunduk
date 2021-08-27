@@ -2,9 +2,6 @@
 using Sunduk.PWA.Infrastructure.Tools;
 using Sunduk.PWA.Util;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Sunduk.PWA.Infrastructure.Templates
 {
@@ -198,7 +195,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// </summary>
         public static string Limiter(Machines machine, Tool tool, double externalDiameter)
         {
-            if (tool is null || 
+            if (tool is null ||
                 externalDiameter == 0) return string.Empty;
             return machine switch
             {
@@ -270,10 +267,10 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// </summary>
         public static string RoughFacing(Machines machine, Materials material, TurningExternalTool tool, double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, double stepOver)
         {
-            if (tool is null || 
+            if (tool is null ||
                 externalDiameter == 0 ||
                 externalDiameter < internalDiameter ||
-                roughStockAllow < profStockAllow || 
+                roughStockAllow < profStockAllow ||
                 stepOver == 0) return string.Empty;
             return machine switch
             {
@@ -304,7 +301,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        
+
         /// <summary>
         /// Торцовка 
         /// </summary>
@@ -371,7 +368,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// </summary>
         public static string HighSpeedDrilling(Machines machine, Materials material, DrillingTool tool, double startZ, double endZ)
         {
-            if (tool is null || 
+            if (tool is null ||
                 startZ <= endZ) return string.Empty;
             string approach = startZ > 0
                 ? $"G0X-{tool.Diameter.NC()}Z{startZ.NC()}S{DrillCuttingSpeed(material)}M3\n"
@@ -410,7 +407,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public static string PeckDrilling(Machines machine, Materials material, DrillingTool tool, double depth, double startZ, double endZ)
         {
             if (tool is null ||
-                startZ <= endZ || 
+                startZ <= endZ ||
                 depth <= 0) return string.Empty;
             string approach = startZ > 0
                 ? $"G0X-{tool.Diameter.NC()}Z{startZ.NC()}S{DrillCuttingSpeed(material)}M3\n"
@@ -436,7 +433,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{CoolantOn(machine)}\n" +
                 approach +
                 "G74R0.1\n" +
-                $"G74Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()}Q{depth.Microns()}F{(tool.Diameter/100).NC()}\n" +
+                $"G74Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()}Q{depth.Microns()}F{(tool.Diameter / 100).NC()}\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
                 REFERENT_POINT +
@@ -489,12 +486,12 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Нарезание резьбы метчиком
         /// </summary>
-        public static string Tapping(Machines machine, TappingTool tool, double cutSpeed,double startZ, double endZ)
+        public static string Tapping(Machines machine, TappingTool tool, double cutSpeed, double startZ, double endZ)
         {
             if (tool is null ||
                 startZ <= endZ) return string.Empty;
-            string approach = startZ > 0 
-                ? $"G0X0.Z{startZ.NC()}S{(cutSpeed * 1000 / (tool.Diameter * Math.PI)).Round(10)}G97\n" 
+            string approach = startZ > 0
+                ? $"G0X0.Z{startZ.NC()}S{(cutSpeed * 1000 / (tool.Diameter * Math.PI)).Round(10)}G97\n"
                 : $"G0X0.Z{SAFE_APPROACH_DISTANCE.NC()}S{(cutSpeed * 1000 / (tool.Diameter * Math.PI)).Round(10)}G97\nZ{startZ.NC()}\n";
             string exit = startZ > 0
                 ? string.Empty
@@ -540,7 +537,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             int lastPass = Thread.Passes(threadStandart, type, threadPitch)[^1].Microns();
             int firstPass = Thread.Passes(threadStandart, type, threadPitch)[0].Microns();
             int profile = Thread.ProfileHeight(threadStandart, type, threadPitch).Microns();
-            
+
             return machine switch
             {
                 Machines.GS1500 =>

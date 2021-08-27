@@ -59,14 +59,20 @@
         get { return _Tools; }
         set
         {
-
             _Tools = value;
+            _ = SetTools();
         }
     }
 
     private async Task SetTools()
     {
-        await localStorage.SetItemAsync("Tools", Tools);
+        await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+        await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+        await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
+        await localStorage.SetItemAsync(nameof(DrillingTools), DrillingTools);
+        await localStorage.SetItemAsync(nameof(TappingTools), TappingTools);
+        await localStorage.SetItemAsync(nameof(SpecialTools), SpecialTools);
+
     }
 
     public List<TurningExternalTool> TurningExternalTools
@@ -77,6 +83,34 @@
             foreach (var item in Tools.Where(x => x is TurningExternalTool))
             {
                 result.Add(item as TurningExternalTool);
+            }
+            return result;
+        }
+        set { }
+    }
+
+    public List<GroovingExternalTool> GroovingExternalTools
+    {
+        get
+        {
+            List<GroovingExternalTool> result = new();
+            foreach (var item in Tools.Where(x => x is GroovingExternalTool))
+            {
+                result.Add(item as GroovingExternalTool);
+            }
+            return result;
+        }
+        set { }
+    }
+
+    public List<ThreadingExternalTool> ThreadingExternalTools
+    {
+        get
+        {
+            List<ThreadingExternalTool> result = new();
+            foreach (var item in Tools.Where(x => x is ThreadingExternalTool))
+            {
+                result.Add(item as ThreadingExternalTool);
             }
             return result;
         }
@@ -125,6 +159,10 @@
     }
 
 
-    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Submit()
+    {
+        _ = SetTools();
+        MudDialog.Close(DialogResult.Ok(true));
+    }
     void Cancel() => MudDialog.Cancel();
 }

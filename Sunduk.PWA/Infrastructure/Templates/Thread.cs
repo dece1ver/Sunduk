@@ -3,8 +3,6 @@ using Sunduk.PWA.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using static Sunduk.PWA.Dialogs.SequenceDialog;
 
 namespace Sunduk.PWA.Infrastructure.Templates
 {
@@ -334,9 +332,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         } // написать зависимость от шага
 
-        public static double[] Passes(ThreadStandart threadStandart, CuttingType type, double threadPitch) 
+        public static double[] Passes(ThreadStandart threadStandart, CuttingType type, double threadPitch)
             => CalcPasses(Thread.ProfileHeight(threadStandart, type, threadPitch), Thread.PassesCount(threadPitch), PassesOption.Infeed);
-        public static double[] TotalPasses(ThreadStandart threadStandart, CuttingType type, double threadPitch) 
+        public static double[] TotalPasses(ThreadStandart threadStandart, CuttingType type, double threadPitch)
             => CalcPasses(Thread.ProfileHeight(threadStandart, type, threadPitch), Thread.PassesCount(threadPitch), PassesOption.FullPasses);
 
         public static string Profile(ThreadStandart threadStandart) => threadStandart == ThreadStandart.BSPP ? "55" : "60";
@@ -358,7 +356,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
         }
 
-        public static string EndDiameter(ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch) 
+        public static string EndDiameter(ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch)
             => type == CuttingType.External ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() : threadDiameter.NC();
 
         public static bool Valid(double threadDiamer, double threadPitch)

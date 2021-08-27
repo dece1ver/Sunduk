@@ -1,10 +1,4 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Sunduk.PWA.Infrastructure.Tools
+﻿namespace Sunduk.PWA.Infrastructure.Tools
 {
     public class TurningExternalTool : Tool
     {

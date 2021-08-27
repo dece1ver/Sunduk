@@ -56,6 +56,7 @@
             </MudGrid>
         </MudField>
         <MudItem xs="12" sm="12" md="12">
+            @*<MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" Text="@($"Tools: {Tools.Count} | Turning: {TurningExternalTools.Count} | Message:{Message}")" Lines="50" ReadOnly="true" Immediate="true" />*@
             <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
         </MudItem>
     </MudGrid>
@@ -69,27 +70,111 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Tools = await localStorage.GetItemAsync<List<Tool>>(nameof(Tools));
-        await localStorage.SetItemAsync(nameof(Tools), Tools);
-
-        if (Tools.Count == 0)
+        #region Инициализация спец инструмента
+        SpecialTools = await localStorage.GetItemAsync<List<SpecialTool>>(nameof(SpecialTools));
+        if (SpecialTools is null || SpecialTools.Count == 0)
         {
-            Tools.Add(new SpecialTool(0101, "UPOR"));
-            Tools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Bar, 80, 0.8));
-            Tools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Face, 100, 0.8));
-            Tools.Add(new TurningExternalTool(0303, TurningExternalTool.Types.Bar, 35, 0.4));
-            Tools.Add(new DrillingTool(0505, DrillingTool.Types.HSS, 5, 120));
-            Tools.Add(new DrillingTool(0707, DrillingTool.Types.Solid, 10, 140));
-            Tools.Add(new DrillingTool(0606, DrillingTool.Types.Insert, 25, 180));
-            Tools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Grooving, 3, GroovingExternalTool.Point.Left));
-            Tools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Cutting, 3, GroovingExternalTool.Point.Right));
-            Tools.Add(new ThreadingExternalTool(1111, 1.5, 1));
-            Tools.Add(new TappingTool(0909, TappingTool.Types.Cutting, 12, 1.75));
-            Tools.Add(new TappingTool(0808, TappingTool.Types.Forming, 10, 1.5));
-
-            Program.Add(Header);
-            Program.Add(SafetyString);
+            SpecialTools = new();
+            SpecialTools.Add(new SpecialTool(0101, "UPOR"));
+            await localStorage.SetItemAsync(nameof(SpecialTools), SpecialTools);
         }
+        Tools.AddRange(SpecialTools);
+        #endregion
+
+        #region Инициализация токарного инструмента
+        TurningExternalTools = await localStorage.GetItemAsync<List<TurningExternalTool>>(nameof(TurningExternalTools));
+        if (TurningExternalTools is null || TurningExternalTools.Count == 0)
+        {
+            TurningExternalTools = new();
+            TurningExternalTools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Bar, 55, 0.8));
+            TurningExternalTools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Face, 100, 0.8));
+            TurningExternalTools.Add(new TurningExternalTool(0303, TurningExternalTool.Types.Bar, 35, 0.4));
+            await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+        }
+        Tools.AddRange(TurningExternalTools);
+
+        TurningInternalTools = await localStorage.GetItemAsync<List<TurningInternalTool>>(nameof(TurningInternalTools));
+        if (TurningInternalTools is null || TurningInternalTools.Count == 0)
+        {
+            TurningInternalTools = new();
+            TurningInternalTools.Add(new TurningInternalTool(0202, 25, 55, 0.8));
+            TurningInternalTools.Add(new TurningInternalTool(0202, 32, 80, 0.8));
+            TurningInternalTools.Add(new TurningInternalTool(0303, 10, 55, 0.4));
+            await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+        }
+        Tools.AddRange(TurningInternalTools);
+        #endregion
+
+        #region Инициализация канавочного и отрезного инструмента
+
+        GroovingExternalTools = await localStorage.GetItemAsync<List<GroovingExternalTool>>(nameof(GroovingExternalTools));
+        if (GroovingExternalTools is null || GroovingExternalTools.Count == 0)
+        {
+            GroovingExternalTools = new();
+            GroovingExternalTools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Grooving, 3, GroovingExternalTool.Point.Left));
+            GroovingExternalTools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Cutting, 3, GroovingExternalTool.Point.Right));
+            await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+        }
+        Tools.AddRange(GroovingExternalTools);
+
+        GroovingInternalTools = await localStorage.GetItemAsync<List<GroovingInternalTool>>(nameof(GroovingInternalTools));
+        if (GroovingInternalTools is null || GroovingInternalTools.Count == 0)
+        {
+            GroovingInternalTools = new();
+            GroovingInternalTools.Add(new GroovingInternalTool(1212, 20, 3, GroovingInternalTool.Point.Right));
+            GroovingInternalTools.Add(new GroovingInternalTool(1212, 40, 4, GroovingInternalTool.Point.Right));
+            await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
+        }
+        Tools.AddRange(GroovingInternalTools);
+        #endregion
+
+        #region Инициализация резьбового инструмента
+        ThreadingExternalTools = await localStorage.GetItemAsync<List<ThreadingExternalTool>>(nameof(ThreadingExternalTools));
+        if (ThreadingExternalTools is null || TurningExternalTools.Count == 0)
+        {
+            ThreadingExternalTools = new();
+            ThreadingExternalTools.Add(new ThreadingExternalTool(1111, 1.5, 1));
+            await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
+        }
+        Tools.AddRange(ThreadingExternalTools);
+
+        ThreadingInternalTools = await localStorage.GetItemAsync<List<ThreadingInternalTool>>(nameof(ThreadingInternalTools));
+        if (ThreadingInternalTools is null || ThreadingInternalTools.Count == 0)
+        {
+            ThreadingInternalTools = new();
+            ThreadingInternalTools.Add(new ThreadingInternalTool(1111, 16, 1.5, 1));
+            await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
+        }
+        Tools.AddRange(ThreadingInternalTools);
+        #endregion
+
+        #region Инициализация сверел
+        DrillingTools = await localStorage.GetItemAsync<List<DrillingTool>>(nameof(DrillingTools));
+        if (DrillingTools is null || DrillingTools.Count == 0)
+        {
+            DrillingTools = new();
+            DrillingTools.Add(new DrillingTool(0505, DrillingTool.Types.HSS, 5, 120));
+            DrillingTools.Add(new DrillingTool(0707, DrillingTool.Types.Solid, 10, 140));
+            DrillingTools.Add(new DrillingTool(0606, DrillingTool.Types.Insert, 25, 180));
+            await localStorage.SetItemAsync(nameof(DrillingTools), DrillingTools);
+        }
+        Tools.AddRange(DrillingTools);
+        #endregion
+
+        #region Инициализация метчиков
+        TappingTools = await localStorage.GetItemAsync<List<TappingTool>>(nameof(TappingTools));
+        if (TappingTools is null || TappingTools.Count == 0)
+        {
+            TappingTools = new();
+            TappingTools.Add(new TappingTool(0909, TappingTool.Types.Cutting, 12, 1.75));
+            TappingTools.Add(new TappingTool(0808, TappingTool.Types.Forming, 10, 1.5));
+            await localStorage.SetItemAsync(nameof(TappingTools), TappingTools);
+        }
+        Tools.AddRange(TappingTools);
+        #endregion
+
+        Program.Add(Header);
+        Program.Add(SafetyString);
     }
 
     private void OpenToolDialog()
@@ -114,7 +199,25 @@
         DialogService.Show<SequenceDialog>("Переходы", parameters, options);
     }
 
+    public string Message { get; set; }
+
     public List<Tool> Tools { get; set; } = new();
+    //public List<TurningExternalTool> TurningExternalTools { get => Tools.Where(x => x is TurningExternalTool) as List<TurningExternalTool>; set { } }
+    public List<TurningExternalTool> TurningExternalTools { get; set; }
+    public List<TurningInternalTool> TurningInternalTools { get; set; }
+    public List<GroovingExternalTool> GroovingExternalTools { get; set; }
+    public List<GroovingInternalTool> GroovingInternalTools { get; set; }
+    public List<ThreadingExternalTool> ThreadingExternalTools { get; set; }
+    public List<ThreadingInternalTool> ThreadingInternalTools { get; set; }
+    public List<DrillingTool> DrillingTools { get; set; }
+    public List<TappingTool> TappingTools { get; set; }
+    public List<SpecialTool> SpecialTools { get; set; }
+
+    //public List<GroovingExternalTool> GroovingExternalTools { get => Tools.Where(x => x is GroovingExternalTool) as List<GroovingExternalTool>; set { } }
+    //public List<ThreadingExternalTool> ThreadingExternalTools { get => Tools.Where(x => x is ThreadingExternalTool) as List<ThreadingExternalTool>; set { } }
+    //public List<DrillingTool> DrillingTools { get => Tools.Where(x => x is DrillingTool) as List<DrillingTool>; set { } }
+    //public List<TappingTool> TappingTools { get => Tools.Where(x => x is TappingTool) as List<TappingTool>; set { } }
+    //public List<SpecialTool> SpecialTools { get => Tools.Where(x => x is SpecialTool) as List<SpecialTool>; set { } }
 
     public Materials WorkpieceMaterial { get; set; }
     public Machines Machine { get; set; }
@@ -161,7 +264,7 @@
         }
     }
 
-    public List<Sequence> Program { get; set; } = new();
+    public ObservableCollection<Sequence> Program { get; set; } = new();
 
     public string ToolTable { get => Util.GetToolTable(ProgramText); }
 
