@@ -20,12 +20,13 @@
             };
         }
 
-        public DrillingTool(int position, Types type, double diameter, double angle)
+        public DrillingTool(int position, Types type, double diameter, double angle, ToolHand hand = ToolHand.Rigth)
         {
             Position = position;
             Type = type;
             Diameter = diameter;
             Angle = angle;
+            Hand = hand;
         }
     }
 }

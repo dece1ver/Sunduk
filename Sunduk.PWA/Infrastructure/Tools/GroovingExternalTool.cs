@@ -19,12 +19,13 @@
             };
         }
 
-        public GroovingExternalTool(int position, Types type, double width, Point zeroPoint)
+        public GroovingExternalTool(int position, Types type, double width, Point zeroPoint, ToolHand hand = ToolHand.Rigth)
         {
             Position = position;
             Type = type;
             Width = width;
             ZeroPoint = zeroPoint;
+            Hand = hand;
         }
     }
 }

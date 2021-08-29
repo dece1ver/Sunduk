@@ -12,12 +12,13 @@ namespace Sunduk.PWA.Infrastructure.Tools
         public double Angle { get; set; }
         public override string Name => "KANAVA";
 
-        public ThreadingInternalTool(int position, double diameter, double pitch, double angle)
+        public ThreadingInternalTool(int position, double diameter, double pitch, double angle, ToolHand hand = ToolHand.Rigth)
         {
             Position = position;
             Diameter = diameter;
             Pitch = pitch;
             Angle = angle;
+            Hand = hand;
         }
     }
 }

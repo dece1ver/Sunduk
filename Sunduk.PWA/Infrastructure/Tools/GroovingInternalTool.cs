@@ -14,12 +14,13 @@ namespace Sunduk.PWA.Infrastructure.Tools
         public Point ZeroPoint { get; set; }
         public override string Name => "KANAVA";
 
-        public GroovingInternalTool(int position, double diameter, double width, Point zeroPoint)
+        public GroovingInternalTool(int position, double diameter, double width, Point zeroPoint, ToolHand hand = ToolHand.Rigth)
         {
             Position = position;
             Diameter = diameter;
             Width = width;
             ZeroPoint = zeroPoint;
+            Hand = hand;
         }
     }
 }

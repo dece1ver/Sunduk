@@ -46,9 +46,11 @@
             <MudGrid>
                 <MudItem xs="12" sm="4">
                     <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Adornment="Adornment.End" Variant="Variant.Text" Immediate="true"></MudTextField>
+                    <MudTextField @bind-Value="@TESTLIST[0]" Label="Обозначение" Adornment="Adornment.End" Variant="Variant.Text" ReadOnly="true"></MudTextField>
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudTextField @bind-Value="DetailName" Label="Наименование" Adornment="Adornment.End" Variant="Variant.Text" Immediate="true"></MudTextField>
+                    <MudTextField @bind-Value="DetailName" Label="Наименование" Adornment="Adornment.End" Variant="Variant.Text" ReadOnly="true"></MudTextField>
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudTextField @bind-Value="DrawningVersion" Label="Наименование" Adornment="Adornment.End" Variant="Variant.Text" Immediate="true" Converter="Util.DoubleConverter"></MudTextField>
@@ -56,8 +58,8 @@
             </MudGrid>
         </MudField>
         <MudItem xs="12" sm="12" md="12">
-            @*<MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" Text="@($"Tools: {Tools.Count} | Turning: {TurningExternalTools.Count} | Message:{Message}")" Lines="50" ReadOnly="true" Immediate="true" />*@
-            <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
+            @*<MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />*@
+            <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" @bind-Value="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
         </MudItem>
     </MudGrid>
 </MudContainer>
@@ -66,10 +68,14 @@
 
 @code
 {
+    public ObservableCollection<string> TESTLIST { get; set; } = new();
+    public string TEST { get => $"{Util.Translate(DetailNumber)}"; set => TEST = value; }
+
     const string TOOL_TABLE = @"<TOOL TABLE>";
 
     protected override async Task OnInitializedAsync()
     {
+        TESTLIST.Add(TEST);
         #region Инициализация спец инструмента
         SpecialTools = await localStorage.GetItemAsync<List<SpecialTool>>(nameof(SpecialTools));
         if (SpecialTools is null || SpecialTools.Count == 0)
@@ -199,10 +205,8 @@
         DialogService.Show<SequenceDialog>("Переходы", parameters, options);
     }
 
-    public string Message { get; set; }
-
     public List<Tool> Tools { get; set; } = new();
-    //public List<TurningExternalTool> TurningExternalTools { get => Tools.Where(x => x is TurningExternalTool) as List<TurningExternalTool>; set { } }
+
     public List<TurningExternalTool> TurningExternalTools { get; set; }
     public List<TurningInternalTool> TurningInternalTools { get; set; }
     public List<GroovingExternalTool> GroovingExternalTools { get; set; }
@@ -212,12 +216,6 @@
     public List<DrillingTool> DrillingTools { get; set; }
     public List<TappingTool> TappingTools { get; set; }
     public List<SpecialTool> SpecialTools { get; set; }
-
-    //public List<GroovingExternalTool> GroovingExternalTools { get => Tools.Where(x => x is GroovingExternalTool) as List<GroovingExternalTool>; set { } }
-    //public List<ThreadingExternalTool> ThreadingExternalTools { get => Tools.Where(x => x is ThreadingExternalTool) as List<ThreadingExternalTool>; set { } }
-    //public List<DrillingTool> DrillingTools { get => Tools.Where(x => x is DrillingTool) as List<DrillingTool>; set { } }
-    //public List<TappingTool> TappingTools { get => Tools.Where(x => x is TappingTool) as List<TappingTool>; set { } }
-    //public List<SpecialTool> SpecialTools { get => Tools.Where(x => x is SpecialTool) as List<SpecialTool>; set { } }
 
     public Materials WorkpieceMaterial { get; set; }
     public Machines Machine { get; set; }
@@ -239,8 +237,10 @@
     public string _WorkpieceLength { get; set; } = "50";
     public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
 
-    public Sequence Header { get => new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion) }; }
-    public Sequence SafetyString { get => new Sequence { Name = "Строка безопасности", Operation = Operation.SafetyString(Machine, 3000) }; }
+    //public Sequence Header { get => new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion) }; }
+    public string Header => Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion);
+    //public Sequence SafetyString { get => new Sequence { Name = "Строка безопасности", Operation = Operation.SafetyString(Machine, 3000) }; }
+    public string SafetyString => Operation.SafetyString(Machine, 3000);
 
     public bool ValidWorkpiece
     {
@@ -264,22 +264,24 @@
         }
     }
 
-    public ObservableCollection<Sequence> Program { get; set; } = new();
+    //public ObservableCollection<Sequence> Program { get; set; } = new();
+    public List<string> Program { get; set; } = new();
 
     public string ToolTable { get => Util.GetToolTable(ProgramText); }
 
-    public string ProgramText
-    {
-        get
-        {
-            List<string> result = new();
-            foreach (var sequence in Program)
-            {
-                result.Add(sequence.Operation);
-            }
-            return string.Join("\n", result);
+    public string ProgramText { get => string.Join('\n', Program); set { } }
+    //public string ProgramText
+    //{
+    //    get
+    //    {
+    //        List<string> result = new();
+    //        foreach (var sequence in Program)
+    //        {
+    //            result.Add(sequence.Operation);
+    //        }
+    //        return string.Join("\n", result);
 
-        }
-        set { }
-    }
+    //    }
+    //    set { }
+    //}
 }
