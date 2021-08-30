@@ -46,11 +46,9 @@
             <MudGrid>
                 <MudItem xs="12" sm="4">
                     <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Adornment="Adornment.End" Variant="Variant.Text" Immediate="true"></MudTextField>
-                    <MudTextField @bind-Value="@TESTLIST[0]" Label="Обозначение" Adornment="Adornment.End" Variant="Variant.Text" ReadOnly="true"></MudTextField>
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudTextField @bind-Value="DetailName" Label="Наименование" Adornment="Adornment.End" Variant="Variant.Text" Immediate="true"></MudTextField>
-                    <MudTextField @bind-Value="DetailName" Label="Наименование" Adornment="Adornment.End" Variant="Variant.Text" ReadOnly="true"></MudTextField>
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudTextField @bind-Value="DrawningVersion" Label="Наименование" Adornment="Adornment.End" Variant="Variant.Text" Immediate="true" Converter="Util.DoubleConverter"></MudTextField>
@@ -58,8 +56,7 @@
             </MudGrid>
         </MudField>
         <MudItem xs="12" sm="12" md="12">
-            @*<MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />*@
-            <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" @bind-Value="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
+            <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
         </MudItem>
     </MudGrid>
 </MudContainer>
@@ -68,14 +65,12 @@
 
 @code
 {
-    public ObservableCollection<string> TESTLIST { get; set; } = new();
-    public string TEST { get => $"{Util.Translate(DetailNumber)}"; set => TEST = value; }
 
     const string TOOL_TABLE = @"<TOOL TABLE>";
 
     protected override async Task OnInitializedAsync()
     {
-        TESTLIST.Add(TEST);
+
         #region Инициализация спец инструмента
         SpecialTools = await localStorage.GetItemAsync<List<SpecialTool>>(nameof(SpecialTools));
         if (SpecialTools is null || SpecialTools.Count == 0)
@@ -237,10 +232,27 @@
     public string _WorkpieceLength { get; set; } = "50";
     public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
 
-    //public Sequence Header { get => new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion) }; }
-    public string Header => Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion);
-    //public Sequence SafetyString { get => new Sequence { Name = "Строка безопасности", Operation = Operation.SafetyString(Machine, 3000) }; }
-    public string SafetyString => Operation.SafetyString(Machine, 3000);
+    public Sequence Header
+    {
+        get
+        {
+            var result = new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion) };
+            if (Program.Contains(Header) && (Program[Program.IndexOf(Header)] != Header)) Program[Program.IndexOf(Header)] = result;
+            return result;
+        }
+    }
+    //public string Header => Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion);
+    public Sequence SafetyString { get
+        {
+            var result = new Sequence { Name = "Строка безопасности", Operation = Operation.SafetyString(Machine, 3000) };
+            if (Program.Contains(SafetyString) && (Program[Program.IndexOf(SafetyString)] != SafetyString))
+            {
+                Program[Program.IndexOf(SafetyString)] = result;
+            }
+            return result;
+        }
+    }
+    //public string SafetyString => Operation.SafetyString(Machine, 3000);
 
     public bool ValidWorkpiece
     {
@@ -264,24 +276,33 @@
         }
     }
 
-    //public ObservableCollection<Sequence> Program { get; set; } = new();
-    public List<string> Program { get; set; } = new();
+    public List<Sequence> Program
+    {
+        get
+        {
+            //Program.Find(x => x.Name == "Шапка")?.Operation = Header.Operation;
+            return Program;
+        }
+        set
+        {
+            Program = value;
+        }
+    }
 
     public string ToolTable { get => Util.GetToolTable(ProgramText); }
 
-    public string ProgramText { get => string.Join('\n', Program); set { } }
-    //public string ProgramText
-    //{
-    //    get
-    //    {
-    //        List<string> result = new();
-    //        foreach (var sequence in Program)
-    //        {
-    //            result.Add(sequence.Operation);
-    //        }
-    //        return string.Join("\n", result);
+    public string ProgramText
+    {
+        get
+        {
+            List<string> result = new();
+            foreach (var sequence in Program)
+            {
+                result.Add(sequence.Operation);
+            }
+            return string.Join("\n", result);
 
-    //    }
-    //    set { }
-    //}
+        }
+        set { }
+    }
 }
