@@ -222,6 +222,7 @@
     public double WorkpieceInternalDiameter { get => Util.GetDouble(_WorkpieceInternalDiameter); }
 
     public string DetailNumber { get; set; }
+
     public string NcDetailNumber { get => DetailNumber.Translate(); }
 
     public string DetailName { get; set; }
@@ -232,26 +233,9 @@
     public string _WorkpieceLength { get; set; } = "50";
     public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
 
-    public Sequence Header
-    {
-        get
-        {
-            var result = new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion) };
-            if (Program.Contains(Header) && (Program[Program.IndexOf(Header)] != Header)) Program[Program.IndexOf(Header)] = result;
-            return result;
-        }
-    }
+    public Sequence Header => new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion) };
     //public string Header => Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion);
-    public Sequence SafetyString { get
-        {
-            var result = new Sequence { Name = "Строка безопасности", Operation = Operation.SafetyString(Machine, 3000) };
-            if (Program.Contains(SafetyString) && (Program[Program.IndexOf(SafetyString)] != SafetyString))
-            {
-                Program[Program.IndexOf(SafetyString)] = result;
-            }
-            return result;
-        }
-    }
+    public Sequence SafetyString => new Sequence { Name = "Строка безопасности", Operation = Operation.SafetyString(Machine, 3000) };
     //public string SafetyString => Operation.SafetyString(Machine, 3000);
 
     public bool ValidWorkpiece
@@ -260,16 +244,6 @@
         {
             if (WorkpieceExternalDiameter > 0 && WorkpieceInternalDiameter < WorkpieceExternalDiameter && WorkpieceLength > 0)
             {
-                if (Program.Contains(Header))
-                {
-                    Program[Program.IndexOf(Header)] = Header;
-                }
-
-                if (Program.Contains(SafetyString))
-                {
-                    Program[Program.IndexOf(SafetyString)] = SafetyString;
-                }
-
                 return true;
             }
             return false;
