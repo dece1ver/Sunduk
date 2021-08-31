@@ -7,10 +7,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences
 {
     public class HeaderSequence : Sequence
     {
-        public static Machines Machine { get; set; }
-        public static string DetailNumber { get; set; }
-        public static string DetailName { get; set; }
-        public static double DrawVersion { get; set; }
+        public Machines Machine { get; set; }
+        public string DetailNumber { get; set; }
+        public string DetailName { get; set; }
+        public double DrawVersion { get; set; }
 
         public override string Operation => Templates.Operation.Header(Machine, DetailNumber, DetailName, DrawVersion);
 

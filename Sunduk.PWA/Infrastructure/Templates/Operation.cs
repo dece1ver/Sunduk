@@ -133,7 +133,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        #endregionchrome://vivaldi-webui/startpage?section=Speed-dials&activeSpeedDialIndex=0&background-color=#2e2f37
+        #endregion
 
         /// <summary>
         /// шапка

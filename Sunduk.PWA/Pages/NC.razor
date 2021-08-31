@@ -56,6 +56,7 @@
         </MudField>
         <MudItem xs="12" sm="12" md="12">
             <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
+            @*<MudTextField T="string" DisableUnderLine="true" Label="Тест" Class="monofield" Variant="Variant.Text" @bind-Text="@Message" ReadOnly="true" Immediate="true" Lines="50" />*@
         </MudItem>
     </MudGrid>
 </MudContainer>
@@ -66,6 +67,8 @@
 {
 
     const string TOOL_TABLE = @"<TOOL TABLE>";
+
+    public string Message { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -174,8 +177,8 @@
         #endregion
 
         Program = new();
-        Program.Add(Header);
-        Program.Add(SafetyString);
+        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, DrawningVersion));
+        Program.Add(new SafetyStringSequence(Machine, 3000));
     }
 
     private void OpenToolDialog()
@@ -235,9 +238,9 @@
     public string _WorkpieceLength { get; set; } = "50";
     public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
 
-    public Sequence Header => new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion) };
+    //public Sequence Header => new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion) };
     //public string Header => Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion);
-    public Sequence SafetyString => new Sequence { Name = "Строка безопасности", Operation = Operation.SafetyString(Machine, 3000) };
+    //public Sequence SafetyString => new Sequence { Name = "Строка безопасности", Operation = Operation.SafetyString(Machine, 3000) };
     //public string SafetyString => Operation.SafetyString(Machine, 3000);
 
     public bool ValidWorkpiece
@@ -252,17 +255,7 @@
         }
     }
 
-    public List<Sequence> Program { get; set; }
-    public List<Guid> SeqList { get
-        {
-            List<Guid> result = new();
-
-            foreach (var item in Program)
-            {
-                result.Add(item.Id);
-            }
-            return result;
-        } }
+    public ObservableCollection<Sequence> Program { get; set; }
 
     public string ToolTable { get => Util.GetToolTable(ProgramText); }
 
@@ -273,17 +266,68 @@
             if (Program is null) return string.Empty;
 
             List<string> result = new();
-
-            foreach (var seq in Program)
+            Message += "1";
+            for (int i = 0; i < Program.Count; i++)
             {
-                switch (seq)
+                switch (Program[i])
                 {
-                    case HeaderSequence:
-
+                    case HeaderSequence headerSequence:
+                        Message += "header\n";
+                        HeaderSequence newHeaderSequence = Program[i] as HeaderSequence;
+                        newHeaderSequence.Machine = Machine;
+                        newHeaderSequence.DetailNumber = NcDetailNumber;
+                        newHeaderSequence.DetailName = NcDetailName;
+                        newHeaderSequence.DrawVersion = DrawningVersion;
+                        Program[i] = newHeaderSequence;
+                        break;
+                    case SafetyStringSequence safetyStringSequence:
+                        Message += "safe\n";
+                        SafetyStringSequence newSafetyStringSequence = Program[Program.IndexOf(safetyStringSequence)] as SafetyStringSequence;
+                        newSafetyStringSequence.Machine = Machine;
+                        Program[Program.IndexOf(safetyStringSequence)] = newSafetyStringSequence;
+                        break;
+                    case FacingSequence facingSequence:
+                        Message += "face\n";
+                        FacingSequence newFacingSequence = Program[Program.IndexOf(facingSequence)] as FacingSequence;
+                        newFacingSequence.Machine = Machine;
+                        newFacingSequence.Material = WorkpieceMaterial;
+                        Program[Program.IndexOf(facingSequence)] = newFacingSequence;
+                        break;
                     default:
                         break;
                 }
             }
+            //foreach (var seq in Program)
+            //{
+            //    Message += seq.ToString() + "\n";
+            //    switch (seq)
+            //    {
+            //        case HeaderSequence headerSequence:
+            //            Message += "header\n";
+            //            HeaderSequence newHeaderSequence = Program[Program.IndexOf(headerSequence)] as HeaderSequence;
+            //            newHeaderSequence.Machine = Machine;
+            //            newHeaderSequence.DetailNumber = DetailNumber;
+            //            newHeaderSequence.DetailName = DetailName;
+            //            newHeaderSequence.DrawVersion = DrawningVersion;
+            //            Program[Program.IndexOf(headerSequence)] = newHeaderSequence;
+            //            break;
+            //        case SafetyStringSequence safetyStringSequence:
+            //            Message += "safe\n";
+            //            SafetyStringSequence newSafetyStringSequence = Program[Program.IndexOf(safetyStringSequence)] as SafetyStringSequence;
+            //            newSafetyStringSequence.Machine = Machine;
+            //            Program[Program.IndexOf(safetyStringSequence)] = newSafetyStringSequence;
+            //            break;
+            //        case FacingSequence facingSequence:
+            //            Message += "face\n";
+            //            FacingSequence newFacingSequence = Program[Program.IndexOf(facingSequence)] as FacingSequence;
+            //            newFacingSequence.Machine = Machine;
+            //            newFacingSequence.Material = WorkpieceMaterial;
+            //            Program[Program.IndexOf(facingSequence)] = newFacingSequence;
+            //            break;
+            //        default:
+            //            break;
+            //    }
+            //}
 
             //Program[Program.IndexOf(Program.Find(x => x.Name == "Шапка"))] = Header;
             //Program[Program.IndexOf(Program.Find(x => x.Name == "Строка безопасности"))] = SafetyString;
