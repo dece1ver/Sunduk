@@ -26,15 +26,15 @@
         <MudItem xs="3">
             <MudButton Size="Size.Large" Style="height: 56px; margin-top: 5px;" FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenSequencelDialog" Disabled="@(!ValidWorkpiece)">Создать переход</MudButton>
         </MudItem>
-        <MudField Label="Заготовка" Variant="Variant.Outlined" Style="margin: 12px">
+        <MudField Label="Заготовка" Variant="Variant.Outlined" Style="margin: 12px" Margin="Margin.Dense">
             <MudGrid>
-                <MudItem xs="6">
-                    <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
-                    <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"/>
+                    <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"/>
                 </MudItem>
-                <MudItem xs="6">
-                    <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
-                    <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Text">
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"/>
+                    <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Text" Margin="Margin.Dense">
                         <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
                         <MudSelectItem Value="@Materials.Stainless">Нержавеющая сталь</MudSelectItem>
                         <MudSelectItem Value="@Materials.Brass">Бронза</MudSelectItem>
@@ -42,16 +42,15 @@
                 </MudItem>
             </MudGrid>
         </MudField>
-        <MudField Label="Деталь" Variant="Variant.Outlined" Style="margin: 12px">
+        <MudField Label="Деталь" Variant="Variant.Outlined" Style="margin: 12px" Margin="Margin.Dense">
             <MudGrid>
-                <MudItem xs="12" sm="4">
-                    <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Adornment="Adornment.End" Variant="Variant.Text" Immediate="true"></MudTextField>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
+                    <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Text" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense"/>
                 </MudItem>
-                <MudItem xs="12" sm="4">
-                    <MudTextField @bind-Value="DetailName" Label="Наименование" Adornment="Adornment.End" Variant="Variant.Text" Immediate="true"></MudTextField>
-                </MudItem>
-                <MudItem xs="12" sm="4">
-                    <MudTextField @bind-Value="DrawningVersion" Label="Наименование" Adornment="Adornment.End" Variant="Variant.Text" Immediate="true" Converter="Util.DoubleConverter"></MudTextField>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
+                    <MudTextField @bind-Value="DrawningVersion" Label="Версия чертежа" Variant="Variant.Text" Immediate="true" Converter="Util.DoubleConverter" Margin="Margin.Dense" />
                 </MudItem>
             </MudGrid>
         </MudField>
@@ -174,6 +173,7 @@
         Tools.AddRange(TappingTools);
         #endregion
 
+        Program = new();
         Program.Add(Header);
         Program.Add(SafetyString);
     }
@@ -223,10 +223,12 @@
 
     public string DetailNumber { get; set; }
 
-    public string NcDetailNumber { get => DetailNumber.Translate(); }
+    public string NcDetailNumber { get => $"{DetailNumber.Translate()}.{ OperationNumber.ToString("D1").Replace(",", ".")}S"; }
 
     public string DetailName { get; set; }
-    public string NcDetailName { get => $"{DetailName.Translate()}.{DrawningVersion.ToString("F1").Replace(",", ".")}"; }
+    public string NcDetailName { get => $"{DetailName.Translate()}"; }
+
+    public int OperationNumber { get; set; } = 1;
 
     public double DrawningVersion { get; set; }
 
@@ -250,18 +252,17 @@
         }
     }
 
-    public List<Sequence> Program
-    {
-        get
+    public List<Sequence> Program { get; set; }
+    public List<Guid> SeqList { get
         {
-            //Program.Find(x => x.Name == "Шапка")?.Operation = Header.Operation;
-            return Program;
-        }
-        set
-        {
-            Program = value;
-        }
-    }
+            List<Guid> result = new();
+
+            foreach (var item in Program)
+            {
+                result.Add(item.Id);
+            }
+            return result;
+        } }
 
     public string ToolTable { get => Util.GetToolTable(ProgramText); }
 
@@ -269,13 +270,29 @@
     {
         get
         {
+            if (Program is null) return string.Empty;
+
             List<string> result = new();
+
+            foreach (var seq in Program)
+            {
+                switch (seq)
+                {
+                    case HeaderSequence:
+
+                    default:
+                        break;
+                }
+            }
+
+            //Program[Program.IndexOf(Program.Find(x => x.Name == "Шапка"))] = Header;
+            //Program[Program.IndexOf(Program.Find(x => x.Name == "Строка безопасности"))] = SafetyString;
+
             foreach (var sequence in Program)
             {
                 result.Add(sequence.Operation);
             }
             return string.Join("\n", result);
-
         }
         set { }
     }

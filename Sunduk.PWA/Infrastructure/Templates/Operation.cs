@@ -2,6 +2,7 @@
 using Sunduk.PWA.Infrastructure.Tools;
 using Sunduk.PWA.Util;
 using System;
+using System.Globalization;
 
 namespace Sunduk.PWA.Infrastructure.Templates
 {
@@ -132,7 +133,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        #endregion
+        #endregionchrome://vivaldi-webui/startpage?section=Speed-dials&activeSpeedDialIndex=0&background-color=#2e2f37
 
         /// <summary>
         /// шапка
@@ -144,22 +145,22 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machines.GS1500 =>
                 "%\n" +
                 $"<{number}>({name})\n" +
-                $"({drawVersion})\n" +
+                $"({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
                 "G10L2P1Z-100.B300.(G54)\n" +
                 "G10L2P2Z400.(G55)\n" +
                 "(AUTHOR)(DATE)\n" +
                 "(0M0S)\n" +
                 "\n" +
-                "<TOOL TABLE>",
+                "<TOOL TABLE>\n",
 
                 Machines.L230A =>
                 "%\n" +
                 $"O0001({number})\n" +
-                $"({name})({drawVersion})\n" +
+                $"({name})({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
                 "(AUTHOR)\n" +
                 "(0M0S)\n" +
                 "\n" +
-                "<TOOL TABLE>",
+                "<TOOL TABLE>\n",
 
                 _ => string.Empty,
             };

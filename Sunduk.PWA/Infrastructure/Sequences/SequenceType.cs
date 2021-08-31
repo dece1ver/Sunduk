@@ -2,12 +2,16 @@
 {
     public enum SequenceType
     {
-        General,
-        ExternalTurning,
-        InternalTurning,
-        Drilling,
+        Header,
+        SafetyString,
+        Limiter,
+        Facing,
+        RoughFacing,
+        FinishFacing,
+        HighSpeedDrilling,
+        PeckDrilling,
+        PeckDeepDrilling,
         Tapping,
-        Threading,
-        Grooving
+        ThreadCutting,
     }
 }
