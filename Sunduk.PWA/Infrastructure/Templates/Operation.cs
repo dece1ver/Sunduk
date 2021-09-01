@@ -275,7 +275,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G72W{stepOver.NC()}R0.1\n" +
                 $"G72P1Q2F{FeedRough(tool.Radius).NC()}\n" +
                 $"N1G0Z{profStockAllow.NC()}\n" +
-                $"N2G1X{(internalDiameter - (tool.Radius * 2)).NC()}\n" +
+                $"N2G1X{internalDiameter.NC()}\n" +
                 "M59\n" +
                 REFERENT_POINT +
                 "\n",
@@ -287,7 +287,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G72W{stepOver.NC()}R0.1\n" +
                 $"G72P1Q2F{FeedRough(tool.Radius).NC()}\n" +
                 $"N1G0Z{profStockAllow.NC()}\n" +
-                $"N2G1X{(internalDiameter - (tool.Radius * 2)).NC()}\n" +
+                $"N2G1X{internalDiameter.NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 REFERENT_POINT +
                 "\n",
@@ -310,7 +310,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machines.GS1500 =>
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M3\n" +
-                $"G1X{(internalDiameter - (tool.Radius * 2)).NC()}F{FeedFinish(tool.Radius).NC()}\n" +
+                $"G1X{internalDiameter.NC()}F{FeedFinish(tool.Radius).NC()}\n" +
                 "W0.5M59\n" +
                 REFERENT_POINT +
                 "\n",
@@ -319,7 +319,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M3\n" +
-                $"G1X{(internalDiameter - (tool.Radius * 2)).NC()}F{FeedFinish(tool.Radius).NC()}\n" +
+                $"G1X{internalDiameter.NC()}F{FeedFinish(tool.Radius).NC()}\n" +
                 "W0.5M9\n" +
                 REFERENT_POINT +
                 "\n",

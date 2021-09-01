@@ -496,25 +496,58 @@
                 switch (TurningSequence)
                 {
                     case TurningSequences.Facing:
-                        sequence = new FacingSequence(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver );
-                        sequence.Name = "Торцовка";
-                        //sequence.Operation = Operation.Facing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver);
+                        sequence = new FacingSequence(
+                            Machine,
+                            WorkpieceMaterial,
+                            Tool as TurningExternalTool,
+                            WorkpieceExternalDiameter,
+                            WorkpieceInternalDiameter,
+                            RoughStockAllow,
+                            ProfStockAllowZ,
+                            StepOver)
+                        {Name = "Торцовка" };
                         break;
                     case TurningSequences.RoughFacing:
-                        sequence.Name = "Черновая торцовка";
-                        sequence.Operation = Operation.RoughFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver);
+                        sequence = new RoughFacingSequence(
+                            Machine,
+                            WorkpieceMaterial,
+                            Tool as TurningExternalTool,
+                            WorkpieceExternalDiameter,
+                            WorkpieceInternalDiameter,
+                            RoughStockAllow,
+                            ProfStockAllowZ,
+                            StepOver)
+                        {Name = "Черновая торцовка" };
                         break;
                     case TurningSequences.FinishFacing:
-                        sequence.Name = "Чистовая торцовка";
-                        sequence.Operation = Operation.FinishFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, ProfStockAllowZ);
+                        sequence = new FinishFacingSequence(
+                            Machine,
+                            WorkpieceMaterial,
+                            Tool as TurningExternalTool,
+                            WorkpieceExternalDiameter,
+                            WorkpieceInternalDiameter,
+                            ProfStockAllowZ)
+                        { Name = "Чистовая торцовка" };
                         break;
                     case TurningSequences.RoughTurning:
-                        sequence.Name = "Черновое точение";
-                        sequence.Operation = Operation.FinishFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, ProfStockAllowZ);
+                        sequence = new FinishFacingSequence(
+                            Machine,
+                            WorkpieceMaterial,
+                            Tool as TurningExternalTool,
+                            WorkpieceExternalDiameter,
+                            WorkpieceInternalDiameter,
+                            ProfStockAllowZ)
+                        { Name = "Чистовая торцовка" };
                         break;
                     case TurningSequences.FinishTurning:
-                        sequence.Name = "Чистовое точение";
-                        sequence.Operation = Operation.FinishFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, ProfStockAllowZ);
+                        sequence = new FinishFacingSequence(
+                            Machine,
+                            WorkpieceMaterial,
+                            Tool as TurningExternalTool,
+                            WorkpieceExternalDiameter,
+                            WorkpieceInternalDiameter,
+                            ProfStockAllowZ)
+                        { Name = "Чистовая торцовка" };
                         break;
                     default:
                         break;

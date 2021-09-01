@@ -5,13 +5,13 @@
 <style>
     .monofield {
         font-family: Consolas;
-        font-size: 10px;
+        font-size: 8px;
     }
 </style>
 <style>
     .monoitem {
         font-family: Consolas;
-        font-size: 10px;
+        font-size: 8px;
     }
 </style>
 
@@ -55,8 +55,8 @@
             </MudGrid>
         </MudField>
         <MudGrid>
-            <MudItem xs="4" sm="3" md="2">
-                <MudField Label="Список переходов" Variant="Variant.Outlined" Margin="Margin.Dense" Style="margin: 12px">
+            <MudItem xs="5" sm="4" md="2">
+                <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin: 12px">
                     <MudList Clickable="true" Dense="true">
                         @if (Program != null)
                         {
@@ -68,8 +68,8 @@
                     </MudList>
                 </MudField>
             </MudItem>
-            <MudItem xs="8" sm="9" md="10">
-                <MudField Label="Программа" Variant="Variant.Outlined" Margin="Margin.Dense" Style="margin: 12px">
+            <MudItem xs="7" sm="8" md="10">
+                <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin: 12px">
                     <MudTextField T="string" DisableUnderLine="true" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
                 </MudField>
                 @*<MudTextField T="string" DisableUnderLine="true" Label="Тест" Class="monofield" Variant="Variant.Text" @bind-Text="@Message" ReadOnly="true" Immediate="true" Lines="50" />*@
@@ -218,6 +218,7 @@
         parameters.Add(nameof(WorkpieceMaterial), WorkpieceMaterial);
         var options = new DialogOptions() { FullScreen = true, CloseButton = true };
         DialogService.Show<SequenceDialog>("Переходы", parameters, options);
+        _WorkpieceExternalDiameter += string.Empty;
     }
 
     public List<Tool> Tools { get; set; } = new();
@@ -314,6 +315,22 @@
                         newFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
                         newFacingSequence.InternalDiameter = WorkpieceInternalDiameter;
                         Program[i] = newFacingSequence;
+                        break;
+                    case RoughFacingSequence roughFacingSequence:
+                        RoughFacingSequence newRoughFacingSequence = Program[i] as RoughFacingSequence;
+                        newRoughFacingSequence.Machine = Machine;
+                        newRoughFacingSequence.Material = WorkpieceMaterial;
+                        newRoughFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
+                        newRoughFacingSequence.InternalDiameter = WorkpieceInternalDiameter;
+                        Program[i] = newRoughFacingSequence;
+                        break;
+                    case FinishFacingSequence finishFacingSequence:
+                        FinishFacingSequence newFinishFacingSequence = Program[i] as FinishFacingSequence;
+                        newFinishFacingSequence.Machine = Machine;
+                        newFinishFacingSequence.Material = WorkpieceMaterial;
+                        newFinishFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
+                        newFinishFacingSequence.InternalDiameter = WorkpieceInternalDiameter;
+                        Program[i] = newFinishFacingSequence;
                         break;
                     default:
                         break;
