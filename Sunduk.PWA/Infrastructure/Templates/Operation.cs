@@ -149,18 +149,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 "G10L2P1Z-100.B300.(G54)\n" +
                 "G10L2P2Z400.(G55)\n" +
                 "(AUTHOR)(DATE)\n" +
-                "(0M0S)\n" +
-                "\n" +
-                "<TOOL TABLE>\n",
+                "(0M0S)\n",
 
                 Machines.L230A =>
                 "%\n" +
                 $"O0001({number})\n" +
                 $"({name})({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
                 "(AUTHOR)\n" +
-                "(0M0S)\n" +
-                "\n" +
-                "<TOOL TABLE>\n",
+                "(0M0S)\n",
 
                 _ => string.Empty,
             };
@@ -206,8 +202,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 SpindleUnclamp(machine) + "\n" +
                 STOP + "\n" +
                 "W1.\n" +
-                REFERENT_POINT +
-                "\n",
+                REFERENT_POINT,
 
                 Machines.L230A =>
                 $"T{tool.Position.ToolNumber()}({tool.Name})\n" +
@@ -215,8 +210,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 SpindleUnclamp(machine) + "\n" +
                 STOP + "\n" +
                 "W1.\n" +
-                REFERENT_POINT +
-                "\n",
+                REFERENT_POINT,
 
                 _ => string.Empty,
             };
@@ -240,7 +234,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G72W{stepOver.NC()}R0.1\n" +
                 $"G72P1Q2{(profStockAllow > 0 ? "W" + profStockAllow.NC() : string.Empty)}F{FeedRough(tool.Radius).NC()}\n" +
                 "N1G0Z0.\n" +
-                $"N2G1X{(internalDiameter - (tool.Radius * 2)).NC()}\n" +
+                $"N2G1X{internalDiameter.NC()}\n" +
                 $"{(profStockAllow > 0 ? $"G70P1Q2S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
                 $"{CoolantOff(machine)}\n" +
                 REFERENT_POINT +
@@ -253,7 +247,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G72W{stepOver.NC()}R0.1\n" +
                 $"G72P1Q2{(profStockAllow > 0 ? "W" + profStockAllow.NC() : string.Empty)}F{FeedRough(tool.Radius).NC()}\n" +
                 "N1G0Z0.\n" +
-                $"N2G1X{(internalDiameter - (tool.Radius * 2)).NC()}\n" +
+                $"N2G1X{internalDiameter.NC()}\n" +
                 $"{(profStockAllow > 0 ? $"G70P1Q2S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
                 $"{CoolantOff(machine)}\n" +
                 REFERENT_POINT +

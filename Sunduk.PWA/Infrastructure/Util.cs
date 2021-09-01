@@ -1,4 +1,5 @@
 ﻿using MudBlazor;
+using Sunduk.PWA.Infrastructure.Sequences;
 using Sunduk.PWA.Infrastructure.Tools;
 using System;
 using System.Collections.Generic;
@@ -134,6 +135,9 @@ namespace Sunduk.PWA.Util
             if (value is null) return string.Empty;
             value = value.ToUpper()
                 .Replace("ИЙ", "IY")
+                .Replace("ОЙ", "OY")
+                .Replace("ЕЙ", "EY")
+                .Replace("ЫЙ", "IY")
                 .Replace("А", "A")
                 .Replace("Б", "B")
                 .Replace("В", "V")
@@ -312,18 +316,20 @@ namespace Sunduk.PWA.Util
         }
 
 
-        public static string GetToolTable(string program)
+        public static string GetToolTable(List<Sequence> program)
         {
             List<string> tools = new();
-            foreach (var line in program.Split('\n'))
+            foreach (var line in program)
             {
-                if (new Regex(@"T(\d+)", RegexOptions.Compiled).IsMatch(line) && line.Contains("("))
+                var programLine = line.Operation;
+                if (new Regex(@"T(\d+)", RegexOptions.Compiled).IsMatch(programLine) && programLine.Contains("("))
                 {
-                    var fLine = "(" + line.Split("(")[1].Trim();
+                    var fLine = "(" + programLine.Split("(")[1].Split(")")[0] + ")";
                     if (!tools.Contains(fLine)) tools.Add(fLine);
                 }
             }
-            return string.Join("\n", tools);
+            if (tools.Count <= 1) return string.Empty;
+            return $"\n{string.Join("\n", tools)}\n" ;
         }
 
         public static Converter<double> DoubleConverter = new()

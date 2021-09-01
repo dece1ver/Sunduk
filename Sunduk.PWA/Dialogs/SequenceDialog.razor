@@ -483,12 +483,10 @@
         switch (Type)
         {
             case SequenceType.General:
-                sequence = new();
                 switch (GeneralSequence)
                 {
                     case GeneralSequences.Limiter:
-                        sequence.Name = "Упор";
-                        sequence.Operation = Operation.Limiter(Machine, Tool, WorkpieceExternalDiameter);
+                        sequence = new LimiterSequence(Machine, Tool, WorkpieceExternalDiameter) { Name = "Упор"};
                         break;
                     default:
                         break;

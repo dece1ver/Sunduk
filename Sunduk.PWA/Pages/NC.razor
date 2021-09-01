@@ -54,10 +54,27 @@
                 </MudItem>
             </MudGrid>
         </MudField>
-        <MudItem xs="12" sm="12" md="12">
-            <MudTextField T="string" DisableUnderLine="true" Label="Программа" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
-            @*<MudTextField T="string" DisableUnderLine="true" Label="Тест" Class="monofield" Variant="Variant.Text" @bind-Text="@Message" ReadOnly="true" Immediate="true" Lines="50" />*@
-        </MudItem>
+        <MudGrid>
+            <MudItem xs="4" sm="3" md="2">
+                <MudField Label="Список переходов" Variant="Variant.Outlined" Margin="Margin.Dense" Style="margin: 12px">
+                    <MudList Clickable="true" Dense="true">
+                        @if (Program != null)
+                        {
+                            @foreach (var seq in Program)
+                            {
+                                <MudListItem Text="@seq.Name" />
+                            }
+                        }
+                    </MudList>
+                </MudField>
+            </MudItem>
+            <MudItem xs="8" sm="9" md="10">
+                <MudField Label="Программа" Variant="Variant.Outlined" Margin="Margin.Dense" Style="margin: 12px">
+                    <MudTextField T="string" DisableUnderLine="true" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
+                </MudField>
+                @*<MudTextField T="string" DisableUnderLine="true" Label="Тест" Class="monofield" Variant="Variant.Text" @bind-Text="@Message" ReadOnly="true" Immediate="true" Lines="50" />*@
+            </MudItem>
+        </MudGrid>
     </MudGrid>
 </MudContainer>
 
@@ -177,8 +194,8 @@
         #endregion
 
         Program = new();
-        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, DrawningVersion));
-        Program.Add(new SafetyStringSequence(Machine, 3000));
+        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, DrawningVersion, string.Empty) { Name = "Шапка"});
+        Program.Add(new SafetyStringSequence(Machine, 3000) { Name = "Строка безопасности" });
     }
 
     private void OpenToolDialog()
@@ -238,6 +255,7 @@
     public string _WorkpieceLength { get; set; } = "50";
     public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
 
+
     //public Sequence Header => new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion) };
     //public string Header => Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion);
     //public Sequence SafetyString => new Sequence { Name = "Строка безопасности", Operation = Operation.SafetyString(Machine, 3000) };
@@ -255,9 +273,7 @@
         }
     }
 
-    public ObservableCollection<Sequence> Program { get; set; }
-
-    public string ToolTable { get => Util.GetToolTable(ProgramText); }
+    public List<Sequence> Program { get; set; }
 
     public string ProgramText
     {
@@ -272,65 +288,37 @@
                 switch (Program[i])
                 {
                     case HeaderSequence headerSequence:
-                        Message += "header\n";
                         HeaderSequence newHeaderSequence = Program[i] as HeaderSequence;
                         newHeaderSequence.Machine = Machine;
                         newHeaderSequence.DetailNumber = NcDetailNumber;
                         newHeaderSequence.DetailName = NcDetailName;
                         newHeaderSequence.DrawVersion = DrawningVersion;
+                        newHeaderSequence.ToolTable = Util.GetToolTable(Program);
                         Program[i] = newHeaderSequence;
                         break;
                     case SafetyStringSequence safetyStringSequence:
-                        Message += "safe\n";
-                        SafetyStringSequence newSafetyStringSequence = Program[Program.IndexOf(safetyStringSequence)] as SafetyStringSequence;
+                        SafetyStringSequence newSafetyStringSequence = Program[i] as SafetyStringSequence;
                         newSafetyStringSequence.Machine = Machine;
-                        Program[Program.IndexOf(safetyStringSequence)] = newSafetyStringSequence;
+                        Program[i] = newSafetyStringSequence;
+                        break;
+                    case LimiterSequence limiterSequence:
+                        LimiterSequence newlimiterSequence = Program[i] as LimiterSequence;
+                        newlimiterSequence.Machine = Machine;
+                        newlimiterSequence.ExternalDiameter = WorkpieceExternalDiameter;
+                        Program[i] = newlimiterSequence;
                         break;
                     case FacingSequence facingSequence:
-                        Message += "face\n";
-                        FacingSequence newFacingSequence = Program[Program.IndexOf(facingSequence)] as FacingSequence;
+                        FacingSequence newFacingSequence = Program[i] as FacingSequence;
                         newFacingSequence.Machine = Machine;
                         newFacingSequence.Material = WorkpieceMaterial;
-                        Program[Program.IndexOf(facingSequence)] = newFacingSequence;
+                        newFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
+                        newFacingSequence.InternalDiameter = WorkpieceInternalDiameter;
+                        Program[i] = newFacingSequence;
                         break;
                     default:
                         break;
                 }
             }
-            //foreach (var seq in Program)
-            //{
-            //    Message += seq.ToString() + "\n";
-            //    switch (seq)
-            //    {
-            //        case HeaderSequence headerSequence:
-            //            Message += "header\n";
-            //            HeaderSequence newHeaderSequence = Program[Program.IndexOf(headerSequence)] as HeaderSequence;
-            //            newHeaderSequence.Machine = Machine;
-            //            newHeaderSequence.DetailNumber = DetailNumber;
-            //            newHeaderSequence.DetailName = DetailName;
-            //            newHeaderSequence.DrawVersion = DrawningVersion;
-            //            Program[Program.IndexOf(headerSequence)] = newHeaderSequence;
-            //            break;
-            //        case SafetyStringSequence safetyStringSequence:
-            //            Message += "safe\n";
-            //            SafetyStringSequence newSafetyStringSequence = Program[Program.IndexOf(safetyStringSequence)] as SafetyStringSequence;
-            //            newSafetyStringSequence.Machine = Machine;
-            //            Program[Program.IndexOf(safetyStringSequence)] = newSafetyStringSequence;
-            //            break;
-            //        case FacingSequence facingSequence:
-            //            Message += "face\n";
-            //            FacingSequence newFacingSequence = Program[Program.IndexOf(facingSequence)] as FacingSequence;
-            //            newFacingSequence.Machine = Machine;
-            //            newFacingSequence.Material = WorkpieceMaterial;
-            //            Program[Program.IndexOf(facingSequence)] = newFacingSequence;
-            //            break;
-            //        default:
-            //            break;
-            //    }
-            //}
-
-            //Program[Program.IndexOf(Program.Find(x => x.Name == "Шапка"))] = Header;
-            //Program[Program.IndexOf(Program.Find(x => x.Name == "Строка безопасности"))] = SafetyString;
 
             foreach (var sequence in Program)
             {
