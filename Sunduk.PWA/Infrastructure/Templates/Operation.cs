@@ -237,8 +237,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"N2G1X{internalDiameter.NC()}\n" +
                 $"{(profStockAllow > 0 ? $"G70P1Q2S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
                 $"{CoolantOff(machine)}\n" +
-                REFERENT_POINT +
-                "\n",
+                REFERENT_POINT,
 
                 Machines.L230A =>
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
@@ -250,8 +249,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"N2G1X{internalDiameter.NC()}\n" +
                 $"{(profStockAllow > 0 ? $"G70P1Q2S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
                 $"{CoolantOff(machine)}\n" +
-                REFERENT_POINT +
-                "\n",
+                REFERENT_POINT,
 
                 _ => string.Empty,
             };
@@ -277,8 +275,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"N1G0Z{profStockAllow.NC()}\n" +
                 $"N2G1X{internalDiameter.NC()}\n" +
                 "M59\n" +
-                REFERENT_POINT +
-                "\n",
+                REFERENT_POINT,
 
                 Machines.L230A =>
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
@@ -289,8 +286,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"N1G0Z{profStockAllow.NC()}\n" +
                 $"N2G1X{internalDiameter.NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
-                REFERENT_POINT +
-                "\n",
+                REFERENT_POINT,
 
                 _ => string.Empty,
             };
@@ -312,8 +308,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M3\n" +
                 $"G1X{internalDiameter.NC()}F{FeedFinish(tool.Radius).NC()}\n" +
                 "W0.5M59\n" +
-                REFERENT_POINT +
-                "\n",
+                REFERENT_POINT,
 
                 Machines.L230A =>
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
@@ -321,8 +316,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M3\n" +
                 $"G1X{internalDiameter.NC()}F{FeedFinish(tool.Radius).NC()}\n" +
                 "W0.5M9\n" +
-                REFERENT_POINT +
-                "\n",
+                REFERENT_POINT,
 
                 _ => string.Empty,
             };
@@ -521,7 +515,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Нарезание резьбы
         /// </summary>
-        public static string ThreadCutting(Machines machine, ThreadingExternalTool tool, ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ)
+        public static string ThreadCutting(Machines machine, Tool tool, ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ)
         {
             if (tool is null ||
                 threadDiameter <= 0 ||

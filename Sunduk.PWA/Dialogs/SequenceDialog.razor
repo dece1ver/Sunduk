@@ -174,7 +174,7 @@
                         </MudSelect>
                     </MudItem>
 
-                    @if (ThreadingSequence == ThreadingSequences.ThreadCutting)
+                    @if (ThreadingSequence == ThreadingSequences.ThreadCutting && ThreadType == CuttingType.External)
                     {
                         <MudItem xs="4">
                             <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
@@ -191,7 +191,42 @@
                             </MudSelect>
                         </MudItem>
                         <MudItem xs="6">
-                            <MudSelect Label="Тип" T="CuttingType" @bind-Value="ThreadType">
+                            <MudSelect Label="Тип" T="CuttingType" ValueChanged="OnCuttingTypeChanged">
+                                <MudSelectItem Value="@(CuttingType.External)">Наружная</MudSelectItem>
+                                <MudSelectItem Value="@(CuttingType.Internal)">Внутренняя</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTextField Label="Диаметр резьбы" @bind-Value="_ThreadDiameter" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTextField Label="Шаг резьбы" @bind-Value="_ThreadPitch" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTextField Label="Начальная точка" @bind-Value="_ThreadStart" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTextField Label="Конечная точка" @bind-Value="_ThreadEnd" Immediate="true" />
+                        </MudItem>
+                    }
+                    @if (ThreadingSequence == ThreadingSequences.ThreadCutting && ThreadType == CuttingType.Internal)
+                    {
+                        <MudItem xs="4">
+                            <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
+                                @foreach (var tool in Tools.Where(x => x is ThreadingInternalTool))
+                                {
+                                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudSelect Label="Стандарт" T="ThreadStandart" @bind-Value="ThreadStandart">
+                                <MudSelectItem Value="@(ThreadStandart.Metric)">60° Метрическая</MudSelectItem>
+                                <MudSelectItem Value="@(ThreadStandart.BSPP)">55° Трубная цилиндрическая</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudSelect Label="Тип" T="CuttingType" ValueChanged="OnCuttingTypeChanged">
                                 <MudSelectItem Value="@(CuttingType.External)">Наружная</MudSelectItem>
                                 <MudSelectItem Value="@(CuttingType.Internal)">Внутренняя</MudSelectItem>
                             </MudSelect>
@@ -284,6 +319,12 @@
     private void OnThreadingSequenceChanged(ThreadingSequences value)
     {
         ThreadingSequence = value;
+        Tool = null;
+    }
+
+    private void OnCuttingTypeChanged(CuttingType value)
+    {
+        ThreadType = value;
         Tool = null;
     }
 
@@ -422,6 +463,8 @@
     public double PeckingDeepDepth { get => Util.GetDouble(_PeckingDeepDepth); }
     #endregion
 
+
+    #region Примеры
     public string ProgramText
     {
         get
@@ -468,6 +511,7 @@
             return string.Empty;
         }
     }
+    #endregion
 
     private void OpenToolDialog()
     {
@@ -486,7 +530,8 @@
                 switch (GeneralSequence)
                 {
                     case GeneralSequences.Limiter:
-                        sequence = new LimiterSequence(Machine, Tool, WorkpieceExternalDiameter) { Name = $"{Program.Count + 1}. Упор" };
+                        sequence = new LimiterSequence(Machine, Tool, WorkpieceExternalDiameter)
+                        { Name = $"Упор" };
                         break;
                     default:
                         break;
@@ -505,7 +550,7 @@
                             RoughStockAllow,
                             ProfStockAllowZ,
                             StepOver)
-                        {Name = $"{Program.Count + 1}. Торцовка" };
+                        {Name = $"Торцовка" };
                         break;
                     case TurningSequences.RoughFacing:
                         sequence = new RoughFacingSequence(
@@ -517,7 +562,7 @@
                             RoughStockAllow,
                             ProfStockAllowZ,
                             StepOver)
-                        {Name = $"{Program.Count + 1}. Черновая торцовка" };
+                        {Name = $"Черновая торцовка" };
                         break;
                     case TurningSequences.FinishFacing:
                         sequence = new FinishFacingSequence(
@@ -527,7 +572,7 @@
                             WorkpieceExternalDiameter,
                             WorkpieceInternalDiameter,
                             ProfStockAllowZ)
-                        { Name = $"{Program.Count + 1}. Чистовая торцовка" };
+                        { Name = $"Чистовая торцовка" };
                         break;
                     case TurningSequences.RoughTurning:
                         sequence = new FinishFacingSequence(
@@ -537,7 +582,7 @@
                             WorkpieceExternalDiameter,
                             WorkpieceInternalDiameter,
                             ProfStockAllowZ)
-                        { Name = $"{Program.Count + 1}. Чистовая торцовка" };
+                        { Name = $"Чистовая торцовка" };
                         break;
                     case TurningSequences.FinishTurning:
                         sequence = new FinishFacingSequence(
@@ -547,7 +592,7 @@
                             WorkpieceExternalDiameter,
                             WorkpieceInternalDiameter,
                             ProfStockAllowZ)
-                        { Name = $"{Program.Count + 1}. Чистовая торцовка" };
+                        { Name = $"Чистовая торцовка" };
                         break;
                     default:
                         break;
@@ -556,11 +601,70 @@
             case SequenceType.InternalTurning:
                 break;
             case SequenceType.Drilling:
-                break;
-            case SequenceType.Tapping:
+                switch (DrillingSequence)
+                {
+                    case DrillingSequences.HighSpeedDrilling:
+                        sequence = new HighSpeedDrillingSequence(
+                            Machine,
+                            WorkpieceMaterial,
+                            Tool as DrillingTool,
+                            DrillStart,
+                            DrillEnd)
+                        { Name = "Сверление" };
+                        break;
+                    case DrillingSequences.PeckingDrilling:
+                        sequence = new PeckDrillingSequence(
+                            Machine,
+                            WorkpieceMaterial,
+                            Tool as DrillingTool,
+                            PeckingDepth,
+                            DrillStart,
+                            DrillEnd)
+                        { Name = "Сверление с выходом" };
+                        break;
+                    case DrillingSequences.PeckingDeepDrilling:
+                        sequence = new PeckDeepDrillingSequence(
+                            Machine,
+                            WorkpieceMaterial,
+                            Tool as DrillingTool,
+                            PeckingDeepDepth,
+                            DrillStart,
+                            DrillEnd)
+                        { Name = "Глубокое сверление" };
+                        break;
+                    default:
+                        break;
+                }
                 break;
             case SequenceType.Threading:
+                switch (ThreadingSequence)
+                {
+                    case ThreadingSequences.ThreadCutting:
+                        sequence = new ThreadCuttingSequence(
+                            Machine,
+                            Tool,
+                            ThreadStandart,
+                            ThreadType,
+                            ThreadDiameter,
+                            ThreadPitch,
+                            ThreadStart,
+                            ThreadEnd)
+                        { Name = "Точение резьбы" };
+                        break;
+                    case ThreadingSequences.Tapping:
+                        sequence = new TappingSequence(
+                    Machine,
+                    Tool as TappingTool,
+                    TapCutSpeed,
+                    TapStart,
+                    TapEnd)
+                        { Name = "Нарезание резьбы" };
+                        break;
+                    default:
+                        break;
+                }
                 break;
+
             case SequenceType.Grooving:
                 break;
             default:

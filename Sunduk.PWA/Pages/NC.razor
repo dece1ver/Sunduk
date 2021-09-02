@@ -56,26 +56,28 @@
         </MudField>
         <MudGrid>
             <MudItem xs="6" sm="5" md="4">
-                <MudText>@(SelectedSequence?.Text ?? string.Empty)</MudText>
                 <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin-left: 12px">
                     <MudList Clickable="true" Dense="true" @bind-SelectedItem="SelectedSequence" DisableGutters="true">
                         @if (Program != null)
                         {
                             @foreach (var seq in Program)
                             {
-                        <MudListItem Text="@seq.Name">
-                            <MudGrid>
-                                <MudItem>
-                                    <MudText>@seq.Name</MudText>
-                                </MudItem>
-                                <MudItem>
-                                    @if (seq.Name == (SelectedSequence?.Text ?? string.Empty))
-                                    {
-                                        <MudIconButton Icon=""></MudIconButton>
-                                    }
-                                </MudItem>
-                            </MudGrid>
-                        </MudListItem>
+                                <MudListItem Text="@($"{Program.IndexOf(seq) + 1}. {seq.Name}")">
+                                    <MudGrid>
+                                        <MudItem>
+                                            <MudText>@($"{Program.IndexOf(seq) + 1}. {seq.Name}")</MudText>
+                                        </MudItem>
+                                        <MudItem>
+                                            @if (($"{Program.IndexOf(seq) + 1}. {seq.Name}") == (SelectedSequence?.Text ?? string.Empty) && Program.IndexOf(seq) != 0 && Program.IndexOf(seq) != 1)
+                                            {
+                                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                               Style="margin-top: -3px; margin-bottom: -5px; margin-left: 15px" OnClick="(() => OpenEditSequenceDialog(seq))" />
+                                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
+                                                               Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => Program.Remove(seq))" />
+                                            }
+                                        </MudItem>
+                                    </MudGrid>
+                                </MudListItem>
                             }
                         }
                     </MudList>
@@ -207,8 +209,8 @@
         #endregion
 
         Program = new();
-        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, DrawningVersion, string.Empty) { Name = $"{Program.Count + 1}. Шапка"});
-        Program.Add(new SafetyStringSequence(Machine, 3000) { Name = $"{Program.Count + 1}. Строка безопасности" });
+        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, DrawningVersion, string.Empty) { Name = $"Шапка"});
+        Program.Add(new SafetyStringSequence(Machine, 3000) { Name = $"Строка безопасности" });
     }
 
     private void OpenToolDialog()
@@ -218,6 +220,17 @@
         var options = new DialogOptions() { FullScreen = true, CloseButton = true };
         DialogService.Show<ToolDialog>("Инструмент", parameters, options);
     }
+
+    private void OpenEditSequenceDialog(Sequence sequence)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(Tools), Tools);
+        parameters.Add(nameof(Program), Program);
+        parameters.Add(nameof(sequence), sequence);
+        var options = new DialogOptions() { FullScreen = false, CloseButton = false };
+        DialogService.Show<EditSequenceDialog>("Редактировать переход", parameters, options);
+    }
+
 
     private void OpenSequencelDialog()
     {
@@ -289,6 +302,11 @@
 
     public List<Sequence> Program { get; set; }
 
+    private void RemoveSequence(Sequence seq)
+    {
+        Program.Remove(seq);
+    }
+
     public string ProgramText
     {
         get
@@ -344,6 +362,29 @@
                         newFinishFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
                         newFinishFacingSequence.InternalDiameter = WorkpieceInternalDiameter;
                         Program[i] = newFinishFacingSequence;
+                        break;
+                    case HighSpeedDrillingSequence highSpeedDrillingSequence:
+                        HighSpeedDrillingSequence newHighSpeedDrillingSequence = Program[i] as HighSpeedDrillingSequence;
+                        newHighSpeedDrillingSequence.Machine = Machine;
+                        newHighSpeedDrillingSequence.Material = WorkpieceMaterial;
+                        break;
+                    case PeckDrillingSequence peckDrillingSequence:
+                        PeckDrillingSequence newPeckDrillingSequence = Program[i] as PeckDrillingSequence;
+                        newPeckDrillingSequence.Machine = Machine;
+                        newPeckDrillingSequence.Material = WorkpieceMaterial;
+                        break;
+                    case PeckDeepDrillingSequence peckDeepDrillingSequence:
+                        PeckDeepDrillingSequence newPeckDeepDrillingSequence = Program[i] as PeckDeepDrillingSequence;
+                        newPeckDeepDrillingSequence.Machine = Machine;
+                        newPeckDeepDrillingSequence.Material = WorkpieceMaterial;
+                        break;
+                    case TappingSequence tappingSequence:
+                        TappingSequence newTappingSequence = Program[i] as TappingSequence;
+                        newTappingSequence.Machine = Machine;
+                        break;
+                    case ThreadCuttingSequence threadCuttingSequence:
+                        ThreadCuttingSequence newThreadCuttingSequence = Program[i] as ThreadCuttingSequence;
+                        newThreadCuttingSequence.Machine = Machine;
                         break;
                     default:
                         break;
