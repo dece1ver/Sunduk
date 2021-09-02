@@ -486,7 +486,7 @@
                 switch (GeneralSequence)
                 {
                     case GeneralSequences.Limiter:
-                        sequence = new LimiterSequence(Machine, Tool, WorkpieceExternalDiameter) { Name = "Упор"};
+                        sequence = new LimiterSequence(Machine, Tool, WorkpieceExternalDiameter) { Name = $"{Program.Count + 1}. Упор" };
                         break;
                     default:
                         break;
@@ -505,7 +505,7 @@
                             RoughStockAllow,
                             ProfStockAllowZ,
                             StepOver)
-                        {Name = "Торцовка" };
+                        {Name = $"{Program.Count + 1}. Торцовка" };
                         break;
                     case TurningSequences.RoughFacing:
                         sequence = new RoughFacingSequence(
@@ -517,7 +517,7 @@
                             RoughStockAllow,
                             ProfStockAllowZ,
                             StepOver)
-                        {Name = "Черновая торцовка" };
+                        {Name = $"{Program.Count + 1}. Черновая торцовка" };
                         break;
                     case TurningSequences.FinishFacing:
                         sequence = new FinishFacingSequence(
@@ -527,7 +527,7 @@
                             WorkpieceExternalDiameter,
                             WorkpieceInternalDiameter,
                             ProfStockAllowZ)
-                        { Name = "Чистовая торцовка" };
+                        { Name = $"{Program.Count + 1}. Чистовая торцовка" };
                         break;
                     case TurningSequences.RoughTurning:
                         sequence = new FinishFacingSequence(
@@ -537,7 +537,7 @@
                             WorkpieceExternalDiameter,
                             WorkpieceInternalDiameter,
                             ProfStockAllowZ)
-                        { Name = "Чистовая торцовка" };
+                        { Name = $"{Program.Count + 1}. Чистовая торцовка" };
                         break;
                     case TurningSequences.FinishTurning:
                         sequence = new FinishFacingSequence(
@@ -547,7 +547,7 @@
                             WorkpieceExternalDiameter,
                             WorkpieceInternalDiameter,
                             ProfStockAllowZ)
-                        { Name = "Чистовая торцовка" };
+                        { Name = $"{Program.Count + 1}. Чистовая торцовка" };
                         break;
                     default:
                         break;

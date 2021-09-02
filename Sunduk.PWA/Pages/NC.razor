@@ -55,21 +55,34 @@
             </MudGrid>
         </MudField>
         <MudGrid>
-            <MudItem xs="5" sm="4" md="2">
-                <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin: 12px">
-                    <MudList Clickable="true" Dense="true">
+            <MudItem xs="6" sm="5" md="4">
+                <MudText>@(SelectedSequence?.Text ?? string.Empty)</MudText>
+                <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin-left: 12px">
+                    <MudList Clickable="true" Dense="true" @bind-SelectedItem="SelectedSequence" DisableGutters="true">
                         @if (Program != null)
                         {
                             @foreach (var seq in Program)
                             {
-                                <MudListItem Text="@seq.Name" />
+                        <MudListItem Text="@seq.Name">
+                            <MudGrid>
+                                <MudItem>
+                                    <MudText>@seq.Name</MudText>
+                                </MudItem>
+                                <MudItem>
+                                    @if (seq.Name == (SelectedSequence?.Text ?? string.Empty))
+                                    {
+                                        <MudIconButton Icon=""></MudIconButton>
+                                    }
+                                </MudItem>
+                            </MudGrid>
+                        </MudListItem>
                             }
                         }
                     </MudList>
                 </MudField>
             </MudItem>
-            <MudItem xs="7" sm="8" md="10">
-                <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin: 12px">
+            <MudItem xs="6" sm="7" md="8">
+                <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin-right: 12px">
                     <MudTextField T="string" DisableUnderLine="true" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
                 </MudField>
                 @*<MudTextField T="string" DisableUnderLine="true" Label="Тест" Class="monofield" Variant="Variant.Text" @bind-Text="@Message" ReadOnly="true" Immediate="true" Lines="50" />*@
@@ -78,14 +91,14 @@
     </MudGrid>
 </MudContainer>
 
-
-
 @code
 {
 
     const string TOOL_TABLE = @"<TOOL TABLE>";
 
     public string Message { get; set; } = string.Empty;
+
+    public MudListItem SelectedSequence { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -194,8 +207,8 @@
         #endregion
 
         Program = new();
-        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, DrawningVersion, string.Empty) { Name = "Шапка"});
-        Program.Add(new SafetyStringSequence(Machine, 3000) { Name = "Строка безопасности" });
+        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, DrawningVersion, string.Empty) { Name = $"{Program.Count + 1}. Шапка"});
+        Program.Add(new SafetyStringSequence(Machine, 3000) { Name = $"{Program.Count + 1}. Строка безопасности" });
     }
 
     private void OpenToolDialog()
@@ -283,7 +296,7 @@
             if (Program is null) return string.Empty;
 
             List<string> result = new();
-            Message += "1";
+
             for (int i = 0; i < Program.Count; i++)
             {
                 switch (Program[i])
