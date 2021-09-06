@@ -17,23 +17,14 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid>
-        <MudItem xs="9">
-            <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Outlined">
-                <MudSelectItem Value="@(Machines.GS1500)">Goodway GS-1500</MudSelectItem>
-                <MudSelectItem Value="@(Machines.L230A)">Hyundai L230A</MudSelectItem>
-            </MudSelect>
-        </MudItem>
-        <MudItem xs="3">
-            <MudButton Size="Size.Large" Style="height: 56px; margin-top: 5px;" FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenSequencelDialog" Disabled="@(!ValidWorkpiece)">Создать переход</MudButton>
-        </MudItem>
         <MudField Label="Заготовка" Variant="Variant.Outlined" Style="margin: 12px" Margin="Margin.Dense">
             <MudGrid>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"/>
-                    <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"/>
+                    <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
+                    <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"/>
+                    <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
                     <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Text" Margin="Margin.Dense">
                         <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
                         <MudSelectItem Value="@Materials.Stainless">Нержавеющая сталь</MudSelectItem>
@@ -46,7 +37,7 @@
             <MudGrid>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
-                    <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Text" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense"/>
+                    <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Text" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
@@ -54,8 +45,19 @@
                 </MudItem>
             </MudGrid>
         </MudField>
+        <MudItem xs="12" sm="6">
+            <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Outlined" Dense="true">
+                <MudSelectItem Value="@(Machines.GS1500)">Goodway GS-1500</MudSelectItem>
+                <MudSelectItem Value="@(Machines.L230A)">Hyundai L230A</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Outlined" Immediate="true" Margin="Margin.Dense" />
+        </MudItem>
         <MudGrid>
             <MudItem xs="6" sm="5" md="4">
+                <MudButton Size="Size.Large" Style="margin: 12px" FullWidth="true" Variant="Variant.Outlined" 
+                           Color="Color.Primary" OnClick="OpenSequencelDialog" Disabled="@(!ValidWorkpiece)">Добавить переход</MudButton>
                 <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin-left: 12px">
                     <MudList Clickable="true" Dense="true" @bind-SelectedItem="SelectedSequence" DisableGutters="true">
                         @if (Program != null)
@@ -232,7 +234,7 @@
     }
 
 
-    private void OpenSequencelDialog()
+    private async Task OpenSequencelDialog()
     {
         var parameters = new DialogParameters();
         parameters.Add(nameof(Machine), Machine);
@@ -243,8 +245,12 @@
         parameters.Add(nameof(WorkpieceLength), WorkpieceLength);
         parameters.Add(nameof(WorkpieceMaterial), WorkpieceMaterial);
         var options = new DialogOptions() { FullScreen = true, CloseButton = true };
-        DialogService.Show<SequenceDialog>("Переходы", parameters, options);
-        _WorkpieceExternalDiameter += string.Empty;
+        var dialog = DialogService.Show<SequenceDialog>("Переходы", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            Program = Program;
+        }
     }
 
     public List<Tool> Tools { get; set; } = new();
@@ -278,6 +284,8 @@
     public int OperationNumber { get; set; } = 1;
 
     public double DrawningVersion { get; set; }
+
+    public int? SpindleLimit { get; set; }
 
     public string _WorkpieceLength { get; set; } = "50";
     public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
@@ -331,6 +339,7 @@
                     case SafetyStringSequence safetyStringSequence:
                         SafetyStringSequence newSafetyStringSequence = Program[i] as SafetyStringSequence;
                         newSafetyStringSequence.Machine = Machine;
+                        newSafetyStringSequence.SpeedLimit = SpindleLimit;
                         Program[i] = newSafetyStringSequence;
                         break;
                     case LimiterSequence limiterSequence:
@@ -395,7 +404,7 @@
             {
                 result.Add(sequence.Operation);
             }
-            return string.Join("\n", result);
+            return string.Join("\n", result).Trim();
         }
         set { }
     }

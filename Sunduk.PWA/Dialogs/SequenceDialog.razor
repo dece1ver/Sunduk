@@ -294,7 +294,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenToolDialog">Список инструмента</MudButton>
-        <MudButton Size="Size.Large" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Submit">Ok</MudButton>
+        <MudButton Size="Size.Large" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Submit" Disabled="@(string.IsNullOrEmpty(ProgramText))">Ok</MudButton>
     </DialogActions>
 </MudDialog>
 
