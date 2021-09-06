@@ -64,22 +64,45 @@
                         {
                             @foreach (var seq in Program)
                             {
-                                <MudListItem Text="@($"{Program.IndexOf(seq) + 1}. {seq.Name}")">
-                                    <MudGrid>
-                                        <MudItem>
-                                            <MudText>@($"{Program.IndexOf(seq) + 1}. {seq.Name}")</MudText>
-                                        </MudItem>
-                                        <MudItem>
-                                            @if (($"{Program.IndexOf(seq) + 1}. {seq.Name}") == (SelectedSequence?.Text ?? string.Empty) && Program.IndexOf(seq) != 0 && Program.IndexOf(seq) != 1)
-                                            {
-                                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                               Style="margin-top: -3px; margin-bottom: -5px; margin-left: 15px" OnClick="(() => OpenEditSequenceDialog(seq))" />
-                                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
-                                                               Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => Program.Remove(seq))" />
-                                            }
-                                        </MudItem>
-                                    </MudGrid>
-                                </MudListItem>
+                                if (Program.IndexOf(seq) == 0)
+                                {
+                                    <MudListItem Text="@($"{Program.IndexOf(seq) + 1}. {seq.Name}")">
+                                        <MudGrid>
+                                            <MudItem>
+                                                <MudText>@($"{Program.IndexOf(seq) + 1}. {seq.Name}")</MudText>
+                                            </MudItem>
+                                        </MudGrid>
+                                    </MudListItem>
+                                }
+                                if (Program.IndexOf(seq) > 1)
+                                {
+                                    <MudListItem Text="@($"{Program.IndexOf(seq)}. {seq.Name}")">
+                                        <MudGrid>
+                                            <MudItem>
+                                                <MudText>@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
+                                            </MudItem>
+                                            <MudItem>
+                                                @if (($"{Program.IndexOf(seq)}. {seq.Name}") == (SelectedSequence?.Text ?? string.Empty) && Program.IndexOf(seq) != 0 && Program.IndexOf(seq) != 1)
+                                                {
+                                                    @if (Program.IndexOf(seq) != 2)
+                                                    {
+                                                        <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                       Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => MoveUpSequence(seq))" />
+                                                    }
+                                                    @if (Program.IndexOf(seq) != Program.Count - 1)
+                                                    {
+                                                        <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                       Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => MoveDownSequence(seq))" />
+                                                    }
+                                                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                   Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => OpenEditSequenceDialog(seq))" />
+                                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
+                                                                   Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => Program.Remove(seq))" />
+                                                }
+                                            </MudItem>
+                                        </MudGrid>
+                                    </MudListItem>
+                                }
                             }
                         }
                     </MudList>
@@ -223,14 +246,19 @@
         DialogService.Show<ToolDialog>("Инструмент", parameters, options);
     }
 
-    private void OpenEditSequenceDialog(Sequence sequence)
+    private async Task OpenEditSequenceDialog(Sequence sequence)
     {
         var parameters = new DialogParameters();
         parameters.Add(nameof(Tools), Tools);
         parameters.Add(nameof(Program), Program);
         parameters.Add(nameof(sequence), sequence);
         var options = new DialogOptions() { FullScreen = false, CloseButton = false };
-        DialogService.Show<EditSequenceDialog>("Редактировать переход", parameters, options);
+        var dialog = DialogService.Show<EditSequenceDialog>("Редактировать переход", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            Program = Program;
+        }
     }
 
 
@@ -313,6 +341,18 @@
     private void RemoveSequence(Sequence seq)
     {
         Program.Remove(seq);
+    }
+
+    private void MoveUpSequence(Sequence seq)
+    {
+        Program.Swap(Program.IndexOf(seq), Program.IndexOf(seq) - 1);
+        SelectedSequence = new MudListItem { Text= $"{Program.IndexOf(seq) + 1}. {seq.Name}" };
+    }
+
+    private void MoveDownSequence(Sequence seq)
+    {
+        Program.Swap(Program.IndexOf(seq), Program.IndexOf(seq) + 1);
+        SelectedSequence = new MudListItem { Text = $"{Program.IndexOf(seq) + 1}. {seq.Name}" };
     }
 
     public string ProgramText

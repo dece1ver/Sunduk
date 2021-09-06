@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace Sunduk.PWA.Util
@@ -330,6 +331,19 @@ namespace Sunduk.PWA.Util
             }
             if (tools.Count <= 1) return string.Empty;
             return $"\n{string.Join("\n", tools)}\n" ;
+        }
+
+        public static IEnumerable<Type> GetSequenceTypes()
+        {
+            Type seqType = typeof(Sequence);
+            return Assembly.GetAssembly(seqType).GetTypes().Where(type => type.IsSubclassOf(seqType));
+        }
+
+        public static void Swap<T>(this List<T> list, int index1, int index2)
+        {
+            T temp = list[index1];
+            list[index1] = list[index2];
+            list[index2] = temp;
         }
 
         public static Converter<double> DoubleConverter = new()

@@ -173,14 +173,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 REFERENT_POINT_CONSISTENTLY +
                 GOODWAY_RETURN_B +
                 "G40G80\n" +
-                $"G50S{speedLimit ?? 0}\n" +
+                $"G50S{((speedLimit ?? 0) > 4000 ? 4000 : speedLimit ?? 0)}\n" +
                 "G96\n",
 
                 Machines.L230A =>
                 REFERENT_POINT_CONSISTENTLY +
                 "G23\n" +
                 "G40G80G55\n" +
-                $"G50S{speedLimit ?? 0}\n" +
+                $"G50S{((speedLimit ?? 0) > 5000 ? 5000 : speedLimit ?? 0)}\n" +
                 "G96\n",
 
                 _ => string.Empty,
