@@ -10,9 +10,11 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public double ExternalDiameter { get; set; }
         public double InternalDiameter { get; set; }
         public double ProfStockAllow { get; set; }
+        
         public override string Operation => Templates.Operation.FinishFacing(Machine, Material, Tool, ExternalDiameter, InternalDiameter - (Tool.Radius * 2), ProfStockAllow);
 
-        public FinishFacingSequence(Machines machine, Materials material, TurningExternalTool tool, double externalDiameter, double internalDiameter, double profStockAllow)
+        public FinishFacingSequence(Machines machine, Materials material, TurningExternalTool tool, 
+            double externalDiameter, double internalDiameter, double profStockAllow)
         {
             Machine = machine;
             Material = material;

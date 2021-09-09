@@ -16,9 +16,13 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public double RoughStockAllow { get; set; }
         public double ProfStockAllow { get; set; }
         public double StepOver { get; set; }
-        public override string Operation => Templates.Operation.Facing(Machine, Material, Tool, ExternalDiameter, InternalDiameter - (Tool.Radius * 2), RoughStockAllow, ProfStockAllow, StepOver);
+        public (int, int) SeqNumbers { get; set; }
+        public override string Operation => Templates.Operation.Facing(Machine, Material, Tool, 
+            ExternalDiameter, InternalDiameter - (Tool.Radius * 2), 
+            RoughStockAllow, ProfStockAllow, StepOver, SeqNumbers);
 
-        public FacingSequence(Machines machine, Materials material, TurningExternalTool tool, double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, double stepOver)
+        public FacingSequence(Machines machine, Materials material, TurningExternalTool tool, double externalDiameter, double internalDiameter, 
+            double roughStockAllow, double profStockAllow, double stepOver, (int, int) seqNumbers)
         {
             Machine = machine;
             Material = material;
@@ -28,6 +32,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
             RoughStockAllow = roughStockAllow;
             ProfStockAllow = profStockAllow;
             StepOver = stepOver;
+            SeqNumbers = seqNumbers;
         }
     }
 }

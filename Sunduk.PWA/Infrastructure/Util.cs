@@ -351,6 +351,11 @@ namespace Sunduk.PWA.Util
             SetFunc = value => value.ToPrettyString(),
             GetFunc = text => Util.GetDouble(text),
         };
+
+        public static (int seqNo1, int seqNo2) SeqNo(this int count)
+        {
+            return (count * 2 - 1, count * 2);
+        }
     }
 
 

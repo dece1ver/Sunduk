@@ -310,6 +310,7 @@
     [Parameter] public Machines Machine { get; set; }
     [Parameter] public List<Tool> Tools { get; set; }
     [Parameter] public List<Sequence> Program { get; set; }
+    [Parameter] public int CyclesCount { get; set; }
     [Parameter] public double WorkpieceExternalDiameter { get; set; }
     [Parameter] public double WorkpieceInternalDiameter { get; set; }
     [Parameter] public double WorkpieceLength { get; set; }
@@ -481,11 +482,11 @@
 
             if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.Facing)
             {
-                return Operation.Facing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver);
+                return Operation.Facing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.SeqNo());
             }
             if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.RoughFacing)
             {
-                return Operation.RoughFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver);
+                return Operation.RoughFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.SeqNo());
             }
             if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.FinishFacing)
             {
@@ -554,7 +555,8 @@
                             WorkpieceInternalDiameter,
                             RoughStockAllow,
                             ProfStockAllowZ,
-                            StepOver)
+                            StepOver,
+                            CyclesCount.SeqNo())
                         {Name = $"Торцовка" };
                         break;
                     case TurningSequences.RoughFacing:
@@ -566,7 +568,8 @@
                             WorkpieceInternalDiameter,
                             RoughStockAllow,
                             ProfStockAllowZ,
-                            StepOver)
+                            StepOver, 
+                            CyclesCount.SeqNo())
                         {Name = $"Черновая торцовка" };
                         break;
                     case TurningSequences.FinishFacing:

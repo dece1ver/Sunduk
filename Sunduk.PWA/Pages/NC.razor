@@ -2,6 +2,7 @@
 @inject IDialogService DialogService
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
+
 <style>
     .monofield {
         font-family: Consolas;
@@ -46,19 +47,23 @@
             </MudGrid>
         </MudField>
         <MudItem xs="12" sm="6">
-            <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Outlined" Dense="true">
+            <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Outlined" Dense="false">
                 <MudSelectItem Value="@(Machines.GS1500)">Goodway GS-1500</MudSelectItem>
                 <MudSelectItem Value="@(Machines.L230A)">Hyundai L230A</MudSelectItem>
             </MudSelect>
         </MudItem>
-        <MudItem xs="12" sm="6">
-            <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Outlined" Immediate="true" Margin="Margin.Dense" />
+        <MudItem xs="12" sm="3">
+            <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Outlined" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" sm="3">
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" Style="margin-top: 6px; height: 56px"
+                       OnClick="@(async () => await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, "text/plain"))">Скачать программу</MudButton>
         </MudItem>
         <MudGrid>
             <MudItem xs="6" sm="5" md="4">
-                <MudButton Size="Size.Large" Style="margin: 12px" FullWidth="true" Variant="Variant.Outlined" 
+                <MudButton Size="Size.Large" Style="margin: 12px; margin-top: 3px" FullWidth="true" Variant="Variant.Outlined"
                            Color="Color.Primary" OnClick="OpenSequencelDialog" Disabled="@(!ValidWorkpiece)">Добавить переход</MudButton>
-                <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin-left: 12px">
+                <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin-left: 12px; margin-right: -12px">
                     <MudList Clickable="true" Dense="true" @bind-SelectedItem="SelectedSequence" DisableGutters="true">
                         @if (Program != null)
                         {
@@ -120,12 +125,25 @@
 
 @code
 {
+    [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
     const string TOOL_TABLE = @"<TOOL TABLE>";
 
     public string Message { get; set; } = string.Empty;
 
     public MudListItem SelectedSequence { get; set; }
+
+    public int CyclesCount
+    {
+        get
+        {
+            return Program.Where(x =>
+            (x is RoughFacingSequence) ||
+            (x is FacingSequence))
+                .Count() + 1;
+        }
+        set { }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -236,6 +254,7 @@
         Program = new();
         Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, DrawningVersion, string.Empty) { Name = $"Шапка"});
         Program.Add(new SafetyStringSequence(Machine, 3000) { Name = $"Строка безопасности" });
+        CyclesCount = 1;
     }
 
     private void OpenToolDialog()
@@ -268,6 +287,7 @@
         parameters.Add(nameof(Machine), Machine);
         parameters.Add(nameof(Tools), Tools);
         parameters.Add(nameof(Program), Program);
+        parameters.Add(nameof(CyclesCount), CyclesCount);
         parameters.Add(nameof(WorkpieceExternalDiameter), WorkpieceExternalDiameter);
         parameters.Add(nameof(WorkpieceInternalDiameter), WorkpieceInternalDiameter);
         parameters.Add(nameof(WorkpieceLength), WorkpieceLength);
@@ -304,10 +324,10 @@
 
     public string DetailNumber { get; set; }
 
-    public string NcDetailNumber { get => $"{DetailNumber.Translate()}.{ OperationNumber.ToString("D1").Replace(",", ".")}S"; }
+    public string NcDetailNumber { get => $"{(!string.IsNullOrEmpty(DetailNumber) ? DetailNumber.Translate() : "AR000-00-000")}.{ OperationNumber.ToString("D1").Replace(",", ".")}S"; }
 
     public string DetailName { get; set; }
-    public string NcDetailName { get => $"{DetailName.Translate()}"; }
+    public string NcDetailName { get => !string.IsNullOrEmpty(DetailName) ? $"{DetailName.Translate()}" : "DETAIL"; }
 
     public int OperationNumber { get; set; } = 1;
 
@@ -353,6 +373,11 @@
     {
         Program.Swap(Program.IndexOf(seq), Program.IndexOf(seq) + 1);
         SelectedSequence = new MudListItem { Text = $"{Program.IndexOf(seq) + 1}. {seq.Name}" };
+    }
+
+    private void DownloadProgram()
+    {
+
     }
 
     public string ProgramText

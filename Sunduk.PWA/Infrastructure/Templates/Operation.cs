@@ -148,14 +148,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
                 "G10L2P1Z-100.B300.(G54)\n" +
                 "G10L2P2Z400.(G55)\n" +
-                "(AUTHOR)(DATE)\n" +
+                $"(AUTHOR)({DateTime.Now:dd.MM.yy})\n" +
                 "(0M0S)\n",
 
                 Machines.L230A =>
                 "%\n" +
                 $"O0001({number})\n" +
                 $"({name})({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
-                "(AUTHOR)\n" +
+                $"(AUTHOR)({DateTime.Now:dd.MM.yy})\n" +
                 "(0M0S)\n",
 
                 _ => string.Empty,
@@ -178,10 +178,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
                 Machines.L230A =>
                 REFERENT_POINT_CONSISTENTLY +
-                "G23\n" +
                 "G40G80G55\n" +
                 $"G50S{((speedLimit ?? 0) > 5000 ? 5000 : speedLimit ?? 0)}\n" +
-                "G96\n",
+                "G96G23\n",
 
                 _ => string.Empty,
             };
@@ -219,7 +218,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Торцовка 
         /// </summary>
-        public static string Facing(Machines machine, Materials material, TurningExternalTool tool, double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, double stepOver)
+        public static string Facing(Machines machine, Materials material, TurningExternalTool tool, 
+            double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, 
+            double stepOver, (int, int) seqNo)
         {
             if (tool is null ||
                 externalDiameter == 0 ||
@@ -232,10 +233,10 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M3\n" +
                 $"G72W{stepOver.NC()}R0.1\n" +
-                $"G72P1Q2{(profStockAllow > 0 ? "W" + profStockAllow.NC() : string.Empty)}F{FeedRough(tool.Radius).NC()}\n" +
-                "N1G0Z0.\n" +
-                $"N2G1X{internalDiameter.NC()}\n" +
-                $"{(profStockAllow > 0 ? $"G70P1Q2S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
+                $"G72P{seqNo.Item1}Q{seqNo.Item2}{(profStockAllow > 0 ? "W" + profStockAllow.NC() : string.Empty)}F{FeedRough(tool.Radius).NC()}\n" +
+                $"N{seqNo.Item1}G0Z0.\n" +
+                $"N{seqNo.Item2}G1X{internalDiameter.NC()}\n" +
+                $"{(profStockAllow > 0 ? $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
                 $"{CoolantOff(machine)}\n" +
                 REFERENT_POINT,
 
@@ -244,10 +245,10 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{CoolantOn(machine)}\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M3\n" +
                 $"G72W{stepOver.NC()}R0.1\n" +
-                $"G72P1Q2{(profStockAllow > 0 ? "W" + profStockAllow.NC() : string.Empty)}F{FeedRough(tool.Radius).NC()}\n" +
-                "N1G0Z0.\n" +
-                $"N2G1X{internalDiameter.NC()}\n" +
-                $"{(profStockAllow > 0 ? $"G70P1Q2S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
+                $"G72P{seqNo.Item1}Q{seqNo.Item2}{(profStockAllow > 0 ? "W" + profStockAllow.NC() : string.Empty)}F{FeedRough(tool.Radius).NC()}\n" +
+                $"N{seqNo.Item1}G0Z0.\n" +
+                $"N{seqNo.Item2}G1X{internalDiameter.NC()}\n" +
+                $"{(profStockAllow > 0 ? $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
                 $"{CoolantOff(machine)}\n" +
                 REFERENT_POINT,
 
@@ -258,7 +259,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Торцовка черновая
         /// </summary>
-        public static string RoughFacing(Machines machine, Materials material, TurningExternalTool tool, double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, double stepOver)
+        public static string RoughFacing(Machines machine, Materials material, TurningExternalTool tool, 
+            double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, 
+            double stepOver, (int, int) seqNo)
         {
             if (tool is null ||
                 externalDiameter == 0 ||
@@ -271,9 +274,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M3\n" +
                 $"G72W{stepOver.NC()}R0.1\n" +
-                $"G72P1Q2F{FeedRough(tool.Radius).NC()}\n" +
-                $"N1G0Z{profStockAllow.NC()}\n" +
-                $"N2G1X{internalDiameter.NC()}\n" +
+                $"G72P{seqNo.Item1}Q{seqNo.Item2}F{FeedRough(tool.Radius).NC()}\n" +
+                $"N{seqNo.Item1}G0Z{profStockAllow.NC()}\n" +
+                $"N{seqNo.Item2}G1X{internalDiameter.NC()}\n" +
                 "M59\n" +
                 REFERENT_POINT,
 
@@ -282,9 +285,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{CoolantOn(machine)}\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M3\n" +
                 $"G72W{stepOver.NC()}R0.1\n" +
-                $"G72P1Q2F{FeedRough(tool.Radius).NC()}\n" +
-                $"N1G0Z{profStockAllow.NC()}\n" +
-                $"N2G1X{internalDiameter.NC()}\n" +
+                $"G72P{seqNo.Item1}Q{seqNo.Item2}F{FeedRough(tool.Radius).NC()}\n" +
+                $"N{seqNo.Item1}G0Z{profStockAllow.NC()}\n" +
+                $"N{seqNo.Item2}G1X{internalDiameter.NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 REFERENT_POINT,
 
@@ -294,7 +297,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
 
         /// <summary>
-        /// Торцовка 
+        /// Торцовка чистовая
         /// </summary>
         public static string FinishFacing(Machines machine, Materials material, TurningExternalTool tool, double externalDiameter, double internalDiameter, double profStockAllow)
         {
