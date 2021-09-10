@@ -213,6 +213,12 @@ namespace Sunduk.PWA.Util
             return (value * 1000).Round(10);
         }
 
+        /// <summary>
+        /// Описание инструмента в УП
+        /// </summary>
+        /// <param name="tool">Инструмент</param>
+        /// <param name="option">Тип описания: общий, под конкретный станок</param>
+        /// <returns></returns>
         public static string Description(this Tool tool, ToolDescriptionOption option = ToolDescriptionOption.General)
         {
             return tool switch
@@ -317,6 +323,11 @@ namespace Sunduk.PWA.Util
         }
 
 
+        /// <summary>
+        /// Получает таблицу инструмента из текста УП
+        /// </summary>
+        /// <param name="program">Программа в виде списка переходов</param>
+        /// <returns></returns>
         public static string GetToolTable(List<Sequence> program)
         {
             List<string> tools = new();
@@ -333,12 +344,15 @@ namespace Sunduk.PWA.Util
             return $"\n{string.Join("\n", tools)}\n" ;
         }
 
-        public static IEnumerable<Type> GetSequenceTypes()
-        {
-            Type seqType = typeof(Sequence);
-            return Assembly.GetAssembly(seqType).GetTypes().Where(type => type.IsSubclassOf(seqType));
-        }
 
+
+        /// <summary>
+        /// Меняет местами 2 элемента списка
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">Список в котором меняем</param>
+        /// <param name="index1">Индекс первого элемента</param>
+        /// <param name="index2">Индекс второго элемента</param>
         public static void Swap<T>(this List<T> list, int index1, int index2)
         {
             T temp = list[index1];
@@ -346,17 +360,23 @@ namespace Sunduk.PWA.Util
             list[index2] = temp;
         }
 
+        /// <summary>
+        /// Конвертер Double
+        /// </summary>
         public static Converter<double> DoubleConverter = new()
         {
             SetFunc = value => value.ToPrettyString(),
             GetFunc = text => Util.GetDouble(text),
         };
 
+        /// <summary>
+        /// Получает номера строк для циклов УП в зависомости от количества таких переходов
+        /// </summary>
+        /// <param name="count">Количество переходов</param>
+        /// <returns></returns>
         public static (int seqNo1, int seqNo2) SeqNo(this int count)
         {
             return (count * 2 - 1, count * 2);
         }
     }
-
-
 }

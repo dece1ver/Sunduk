@@ -138,8 +138,9 @@
         get
         {
             return Program.Where(x =>
-            (x is RoughFacingSequence) ||
-            (x is FacingSequence))
+            x is RoughFacingSequence ||
+            x is FacingSequence ||
+            x is RoughFacingCycleSequence)
                 .Count() + 1;
         }
         set { }

@@ -34,13 +34,32 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField Label="Общий припуск" @bind-Value="roughFacingSequence.RoughStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
+                        <MudTextField Label="Общий припуск" @bind-Value="RoughStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField Label="Съем" @bind-Value="roughFacingSequence.StepOver" Immediate="true" Converter="Util.DoubleConverter" />
+                        <MudTextField Label="Съем" @bind-Value="StepOver" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField Label="Чистовой припуск по Z" @bind-Value="roughFacingSequence.ProfStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
+                        <MudTextField Label="Чистовой припуск по Z" @bind-Value="ProfStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    break;
+                case RoughFacingCycleSequence roughFacingCycleSequence:
+                    <MudItem xs="12" sm="6">
+                        <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
+                            @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Общий припуск" @bind-Value="RoughStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Съем" @bind-Value="StepOver" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Чистовой припуск по Z" @bind-Value="ProfStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     break;
                 case FinishFacingSequence finishFacingSequence:
@@ -53,7 +72,36 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField Label="Чистовой припуск по Z" @bind-Value="finishFacingSequence.ProfStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
+                        <MudTextField Label="Чистовой припуск по Z" @bind-Value="ProfStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    break;
+                case FinishFacingCycleSequence finishFacingCycleSequence:
+                    <MudItem xs="12" sm="6">
+                        <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
+                            @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudSelect @bind-Value="RepeatableRoughFacingSequence" Label="Черновая торцовка" T="Sequence">
+                            @foreach (var seq in Program.Where(x => (x is RoughFacingSequence || x is FacingSequence)))
+                            {
+                                if (seq is RoughFacingSequence)
+                                {
+                                    <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {(seq as RoughFacingSequence).Name} [{(seq as RoughFacingSequence).Tool.Description()}]")</MudSelectItem>
+                                }
+                                if (seq is RoughFacingCycleSequence)
+                                {
+                                    <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {(seq as RoughFacingCycleSequence).Name} [{(seq as RoughFacingCycleSequence).Tool.Description()}]")</MudSelectItem>
+                                }
+                                if (seq is FacingSequence)
+                                {
+                                    <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {(seq as FacingSequence).Name} [{(seq as FacingSequence).Tool.Description()}]")</MudSelectItem>
+                                }
+                            }
+                        </MudSelect>
                     </MudItem>
                     break;
                 case HighSpeedDrillingSequence highSpeedDrillingSequence:
@@ -141,6 +189,10 @@
                 Tool = finishFacingSequence.Tool;
                 ProfStockAllow = finishFacingSequence.ProfStockAllow;
                 break;
+            case FinishFacingCycleSequence finishFacingCycleSequence:
+                Tool = finishFacingCycleSequence.Tool;
+                RepeatableRoughFacingSequence = finishFacingCycleSequence.RoughSequence;
+                break;
 
             case HighSpeedDrillingSequence highSpeedDrillingSequence:
                 Tool = highSpeedDrillingSequence.Tool;
@@ -172,7 +224,7 @@
     [Parameter] public Sequence sequence { get; set; }
 
     public Tool Tool { get; set; }
-
+    public Sequence RepeatableRoughFacingSequence { get; set; }
     public double RoughStockAllow { get; set; }
     public double ProfStockAllow { get; set; }
     public double StepOver { get; set; }

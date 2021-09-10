@@ -216,8 +216,67 @@ namespace Sunduk.PWA.Infrastructure.Templates
         }
 
         /// <summary>
-        /// Торцовка 
+        /// Торцовка черновая под G70
         /// </summary>
+        /// <param name="machine">Станок</param>
+        /// <param name="material">Материал</param>
+        /// <param name="tool">Инструмент</param>
+        /// <param name="externalDiameter">Наружный диаметр</param>
+        /// <param name="internalDiameter">Внутренний диаметр</param>
+        /// <param name="roughStockAllow">Общий припуск</param>
+        /// <param name="profStockAllow">Припуск под чистовую</param>
+        /// <param name="stepOver">Съем за проход</param>
+        /// <param name="seqNo">Номер перехода с циклом</param>
+        /// <returns></returns>
+        public static string RoughFacingCycle(Machines machine, Materials material, TurningExternalTool tool,
+            double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow,
+            double stepOver, (int, int) seqNo)
+        {
+            if (tool is null ||
+                externalDiameter == 0 ||
+                externalDiameter < internalDiameter ||
+                roughStockAllow < profStockAllow ||
+                stepOver == 0) return string.Empty;
+            return machine switch
+            {
+                Machines.GS1500 =>
+                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M3\n" +
+                $"G72W{stepOver.NC()}R0.1\n" +
+                $"G72P{seqNo.Item1}Q{seqNo.Item2}{(profStockAllow > 0 ? "W" + profStockAllow.NC() : string.Empty)}F{FeedRough(tool.Radius).NC()}\n" +
+                $"N{seqNo.Item1}G0Z0.\n" +
+                $"N{seqNo.Item2}G1X{internalDiameter.NC()}\n" +
+                $"{CoolantOff(machine)}\n" +
+                REFERENT_POINT,
+
+                Machines.L230A =>
+                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                $"{CoolantOn(machine)}\n" +
+                $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M3\n" +
+                $"G72W{stepOver.NC()}R0.1\n" +
+                $"G72P{seqNo.Item1}Q{seqNo.Item2}{(profStockAllow > 0 ? "W" + profStockAllow.NC() : string.Empty)}F{FeedRough(tool.Radius).NC()}\n" +
+                $"N{seqNo.Item1}G0Z0.\n" +
+                $"N{seqNo.Item2}G1X{internalDiameter.NC()}\n" +
+                $"{CoolantOff(machine)}\n" +
+                REFERENT_POINT,
+
+                _ => string.Empty,
+            };
+        }
+
+        /// <summary>
+        /// Торцовка черновая + чистовая
+        /// </summary>
+        /// <param name="machine">Станок</param>
+        /// <param name="material">Материал</param>
+        /// <param name="tool">Инструмент</param>
+        /// <param name="externalDiameter">Наружный диаметр</param>
+        /// <param name="internalDiameter">Внутренний диаметр</param>
+        /// <param name="roughStockAllow">Общий припуск</param>
+        /// <param name="profStockAllow">Припуск под чистовую</param>
+        /// <param name="stepOver">Съем за проход</param>
+        /// <param name="seqNo">Номер перехода с циклом</param>
+        /// <returns></returns>
         public static string Facing(Machines machine, Materials material, TurningExternalTool tool, 
             double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, 
             double stepOver, (int, int) seqNo)
@@ -295,6 +354,122 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
+        /// <summary>
+        /// Чистовая торцовка по G70 после торцовки
+        /// </summary>
+        /// <param name="tool">Инструмент</param>
+        /// <param name="roughFacingSequence">Черновой переход</param>
+        /// <returns></returns>
+        public static string FinishFacingCycleFromFacing(TurningExternalTool tool, FacingSequence roughFacingSequence)
+        {
+            Machines machine = roughFacingSequence.Machine;
+            Materials material = roughFacingSequence.Material;
+            double externalDiameter = roughFacingSequence.ExternalDiameter;
+            double internalDiameter = roughFacingSequence.InternalDiameter;
+            double profStockAllow = roughFacingSequence.RoughStockAllow;
+            (int, int) seqNo = roughFacingSequence.SeqNumbers;
+
+            if (tool is null ||
+                externalDiameter == 0 ||
+                externalDiameter < internalDiameter) return string.Empty;
+            return machine switch
+            {
+                Machines.GS1500 =>
+                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M3\n" +
+                $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
+                $"{CoolantOff(machine)}\n" +
+                REFERENT_POINT,
+
+                Machines.L230A =>
+                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                $"{CoolantOn(machine)}\n" +
+                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M3\n" +
+                $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
+                $"{CoolantOff(machine)}\n" +
+                REFERENT_POINT,
+
+                _ => string.Empty,
+            };
+        }
+
+        /// <summary>
+        /// Чистовая торцовка по G70 после торцовки под G70
+        /// </summary>
+        /// <param name="tool">Инструмент</param>
+        /// <param name="roughFacingSequence">Черновой переход</param>
+        /// <returns></returns>
+        public static string FinishFacingCycleFromRoughCycleFacing(TurningExternalTool tool, RoughFacingCycleSequence roughFacingSequence)
+        {
+            Machines machine = roughFacingSequence.Machine;
+            Materials material = roughFacingSequence.Material;
+            double externalDiameter = roughFacingSequence.ExternalDiameter;
+            double internalDiameter = roughFacingSequence.InternalDiameter;
+            double profStockAllow = roughFacingSequence.RoughStockAllow;
+            (int, int) seqNo = roughFacingSequence.SeqNumbers;
+
+            if (tool is null ||
+                externalDiameter == 0 ||
+                externalDiameter < internalDiameter) return string.Empty;
+            return machine switch
+            {
+                Machines.GS1500 =>
+                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M3\n" +
+                $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
+                $"{CoolantOff(machine)}\n" +
+                REFERENT_POINT,
+
+                Machines.L230A =>
+                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                $"{CoolantOn(machine)}\n" +
+                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M3\n" +
+                $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
+                $"{CoolantOff(machine)}\n" +
+                REFERENT_POINT,
+
+                _ => string.Empty,
+            };
+        }
+
+        /// <summary>
+        /// Чистовая торцовка по G70 после черновой торцовки
+        /// </summary>
+        /// <param name="tool">Инструмент</param>
+        /// <param name="roughFacingSequence">Черновой переход</param>
+        /// <returns></returns>
+        public static string FinishFacingCycleFromRoughFacing(TurningExternalTool tool, RoughFacingSequence roughFacingSequence)
+        {
+            Machines machine = roughFacingSequence.Machine;
+            Materials material = roughFacingSequence.Material;
+            double externalDiameter = roughFacingSequence.ExternalDiameter;
+            double internalDiameter = roughFacingSequence.InternalDiameter;
+            double profStockAllow = roughFacingSequence.RoughStockAllow;
+            (int, int) seqNo = roughFacingSequence.SeqNumbers;
+
+            if (tool is null ||
+                externalDiameter == 0 ||
+                externalDiameter < internalDiameter) return string.Empty;
+            return machine switch
+            {
+                Machines.GS1500 =>
+                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M3\n" +
+                $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
+                $"{CoolantOff(machine)}\n" +
+                REFERENT_POINT,
+
+                Machines.L230A =>
+                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                $"{CoolantOn(machine)}\n" +
+                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M3\n" +
+                $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
+                $"{CoolantOff(machine)}\n" +
+                REFERENT_POINT,
+
+                _ => string.Empty,
+            };
+        }
 
         /// <summary>
         /// Торцовка чистовая

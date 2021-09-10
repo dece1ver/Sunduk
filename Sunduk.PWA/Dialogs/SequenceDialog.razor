@@ -55,11 +55,13 @@
                 case SequenceType.ExternalTurning:
                     <MudItem xs="4">
                         <MudSelect Label="Переход" T="TurningSequences" @bind-Value="TurningSequence">
-                            <MudSelectItem Value="@(TurningSequences.Facing)">Торцевание</MudSelectItem>
                             <MudSelectItem Value="@(TurningSequences.RoughFacing)">Черновое торцевание</MudSelectItem>
                             <MudSelectItem Value="@(TurningSequences.FinishFacing)">Чистовое торцевание</MudSelectItem>
-                            <MudSelectItem Value="@(TurningSequences.RoughTurning)">Черновое точение</MudSelectItem>
-                            <MudSelectItem Value="@(TurningSequences.FinishTurning)">Чистовое точение</MudSelectItem>
+                            <MudSelectItem Value="@(TurningSequences.RoughFacingCycle)">Черновое торцевание (Под G70)</MudSelectItem>
+                            <MudSelectItem Value="@(TurningSequences.FinishFacingCycle)">Чистовое торцевание (G70)</MudSelectItem>
+                            <MudSelectItem Value="@(TurningSequences.Facing)">Торцевание (черновое + чистовое)</MudSelectItem>
+                            <MudSelectItem Value="@(TurningSequences.RoughTurning)">Черновое точение (не написано)</MudSelectItem>
+                            <MudSelectItem Value="@(TurningSequences.FinishTurning)">Чистовое точение (не написано)</MudSelectItem>
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="4">
@@ -70,7 +72,7 @@
                             }
                         </MudSelect>
                     </MudItem>
-                    @if (TurningSequence == TurningSequences.Facing)
+                    @if (TurningSequence == TurningSequences.RoughFacing)
                     {
                         <MudItem xs="4">
                             <MudTextField Label="Общий припуск" @bind-Value="_RoughStockAllow" Immediate="true" />
@@ -82,7 +84,7 @@
                             <MudTextField Label="Чистовой припуск по Z" @bind-Value="_ProfStockAllowZ" Immediate="true" />
                         </MudItem>
                     }
-                    @if (TurningSequence == TurningSequences.RoughFacing)
+                    @if (TurningSequence == TurningSequences.RoughFacingCycle)
                     {
                         <MudItem xs="4">
                             <MudTextField Label="Общий припуск" @bind-Value="_RoughStockAllow" Immediate="true" />
@@ -96,6 +98,40 @@
                     }
                     @if (TurningSequence == TurningSequences.FinishFacing)
                     {
+                        <MudItem xs="4">
+                            <MudTextField Label="Чистовой припуск по Z" @bind-Value="_ProfStockAllowZ" Immediate="true" />
+                        </MudItem>
+                    }
+                    @if (TurningSequence == TurningSequences.FinishFacingCycle)
+                    {
+                        <MudItem xs="12">
+                            <MudSelect @bind-Value="RepeatableRoughFacingSequence" Label="Черновая торцовка" T="Sequence">
+                                @foreach (var seq in Program.Where(x => x is RoughFacingSequence || x is FacingSequence || x is RoughFacingCycleSequence))
+                                {
+                                    if (seq is RoughFacingSequence)
+                                    {
+                                        <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {(seq as RoughFacingSequence).Name} [Z{(seq as RoughFacingSequence).RoughStockAllow.NC()} => Z{(seq as RoughFacingSequence).ProfStockAllow.NC()} -W{(seq as RoughFacingSequence).StepOver.NC()}]")</MudSelectItem>
+                                    }
+                                    if (seq is FacingSequence)
+                                    {
+                                        <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {(seq as FacingSequence).Name} [Z{(seq as FacingSequence).RoughStockAllow.NC()} => Z{(seq as FacingSequence).ProfStockAllow.NC()} -W{(seq as FacingSequence).StepOver.NC()}]")</MudSelectItem>
+                                    }
+                                    if (seq is RoughFacingCycleSequence)
+                                    {
+                                        <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {(seq as RoughFacingCycleSequence).Name} [Z{(seq as RoughFacingCycleSequence).RoughStockAllow.NC()} => Z{(seq as RoughFacingCycleSequence).ProfStockAllow.NC()} -W{(seq as RoughFacingCycleSequence).StepOver.NC()}]")</MudSelectItem>
+                                    }
+                                }
+                            </MudSelect>
+                        </MudItem>
+                    }
+                    @if (TurningSequence == TurningSequences.Facing)
+                    {
+                        <MudItem xs="4">
+                            <MudTextField Label="Общий припуск" @bind-Value="_RoughStockAllow" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudTextField Label="Съем" @bind-Value="_StepOver" Immediate="true" />
+                        </MudItem>
                         <MudItem xs="4">
                             <MudTextField Label="Чистовой припуск по Z" @bind-Value="_ProfStockAllowZ" Immediate="true" />
                         </MudItem>
@@ -316,6 +352,8 @@
     [Parameter] public double WorkpieceLength { get; set; }
     [Parameter] public Materials WorkpieceMaterial { get; set; }
 
+    #region Всякие OnChanged
+
     private void OnSequenceChanged(SequenceType value)
     {
         Type = value;
@@ -333,6 +371,7 @@
         ThreadType = value;
         Tool = null;
     }
+    #endregion
 
 
     #region Типы переходов
@@ -347,9 +386,11 @@
 
     public enum TurningSequences
     {
-        Facing,
         RoughFacing,
         FinishFacing,
+        RoughFacingCycle,
+        FinishFacingCycle,
+        Facing,
         RoughTurning,
         FinishTurning
     }
@@ -382,6 +423,8 @@
     #endregion
 
     public Tool Tool { get; set; }
+
+    public Sequence RepeatableRoughFacingSequence { get; set; }
 
     #region Точение резьбы
     public ThreadStandart ThreadStandart { get; set; }
@@ -442,6 +485,7 @@
     }
 
     #region Токарка
+
     public string _StepOver { get; set; }
     public double StepOver { get => Util.GetDouble(_StepOver); }
 
@@ -453,9 +497,11 @@
 
     public string _ProfStockAllowZ { get; set; }
     public double ProfStockAllowZ { get => Util.GetDouble(_ProfStockAllowZ); }
+
     #endregion
 
     #region Сверловка
+
     public string _DrillStart { get; set; }
     public double DrillStart { get => Util.GetDouble(_DrillStart, numberOption: Util.GetNumberOption.Any); }
 
@@ -467,10 +513,12 @@
 
     public string _PeckingDeepDepth { get; set; } = "2";
     public double PeckingDeepDepth { get => Util.GetDouble(_PeckingDeepDepth); }
+
     #endregion
 
 
     #region Примеры
+
     public string ProgramText
     {
         get
@@ -487,6 +535,20 @@
             if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.RoughFacing)
             {
                 return Operation.RoughFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.SeqNo());
+            }
+            if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.RoughFacingCycle)
+            {
+                return Operation.RoughFacingCycle(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.SeqNo());
+            }
+            if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.FinishFacingCycle)
+            {
+                return RepeatableRoughFacingSequence switch
+                {
+                    RoughFacingSequence => Operation.FinishFacingCycleFromRoughFacing(Tool as TurningExternalTool, RepeatableRoughFacingSequence as RoughFacingSequence),
+                    RoughFacingCycleSequence => Operation.FinishFacingCycleFromRoughCycleFacing(Tool as TurningExternalTool, RepeatableRoughFacingSequence as RoughFacingCycleSequence),
+                    FacingSequence => Operation.FinishFacingCycleFromFacing(Tool as TurningExternalTool, RepeatableRoughFacingSequence as FacingSequence),
+                    _ => string.Empty
+                };
             }
             if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.FinishFacing)
             {
@@ -568,9 +630,22 @@
                             WorkpieceInternalDiameter,
                             RoughStockAllow,
                             ProfStockAllowZ,
-                            StepOver, 
+                            StepOver,
                             CyclesCount.SeqNo())
                         {Name = $"Черновая торцовка" };
+                        break;
+                    case TurningSequences.RoughFacingCycle:
+                        sequence = new RoughFacingCycleSequence(
+                            Machine,
+                            WorkpieceMaterial,
+                            Tool as TurningExternalTool,
+                            WorkpieceExternalDiameter,
+                            WorkpieceInternalDiameter,
+                            RoughStockAllow,
+                            ProfStockAllowZ,
+                            StepOver,
+                            CyclesCount.SeqNo())
+                        { Name = $"Черновая торцовка (Под G70)" };
                         break;
                     case TurningSequences.FinishFacing:
                         sequence = new FinishFacingSequence(
@@ -581,6 +656,31 @@
                             WorkpieceInternalDiameter,
                             ProfStockAllowZ)
                         { Name = $"Чистовая торцовка" };
+                        break;
+                    case TurningSequences.FinishFacingCycle:
+                        switch (RepeatableRoughFacingSequence)
+                        {
+                            case RoughFacingSequence:
+                                sequence = new FinishFacingCycleSequence(
+                                    Tool as TurningExternalTool,
+                                    RepeatableRoughFacingSequence as RoughFacingSequence)
+                                { Name = "Чистовая торцовка (G70)" };
+                                break;
+                            case RoughFacingCycleSequence:
+                                sequence = new FinishFacingCycleSequence(
+                                    Tool as TurningExternalTool,
+                                    RepeatableRoughFacingSequence as RoughFacingCycleSequence)
+                                { Name = "Чистовая торцовка (G70)" };
+                                break;
+                            case FacingSequence:
+                                sequence = new FinishFacingCycleSequence(
+                                    Tool as TurningExternalTool,
+                                    RepeatableRoughFacingSequence as FacingSequence)
+                                { Name = "Чистовая торцовка (G70)" };
+                                break;
+                            default:
+                                break;
+                        }
                         break;
                     case TurningSequences.RoughTurning:
                         sequence = new FinishFacingSequence(
