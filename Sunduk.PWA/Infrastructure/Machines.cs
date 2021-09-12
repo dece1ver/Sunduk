@@ -2,7 +2,7 @@
 {
     public enum Machines
     {
-        GS1500,
-        L230A
+        L230A,
+        GS1500
     }
 }

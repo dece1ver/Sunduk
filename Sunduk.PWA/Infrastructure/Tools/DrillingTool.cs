@@ -4,7 +4,31 @@
     {
         public enum Types { Insert, Solid, Tip, Center, HSS }
 
-        public Types Type { get; set; }
+        private Types _Type;
+        public Types Type { get => _Type; set 
+            {
+                _Type = value;
+                switch (_Type)
+                {
+                    case Types.Insert:
+                        Angle = 180;
+                        break;
+                    case Types.Solid:
+                        Angle = 140;
+                        break;
+                    case Types.Tip:
+                        Angle = 142;
+                        break;
+                    case Types.Center:
+                        Angle = 120;
+                        break;
+                    case Types.HSS:
+                        Angle = 118;
+                        break;
+                    default:
+                        break;
+                }
+            } }
         public double Diameter { get; set; }
         public double Angle { get; set; }
         public override string Name

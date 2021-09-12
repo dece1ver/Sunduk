@@ -51,7 +51,6 @@
   <ItemGroup>
     <Folder Include="wwwroot\img\stuffimages\chamfer\" />
     <Folder Include="wwwroot\img\stuffimages\radius\" />
-    <Folder Include="wwwroot\img\stuffimages\drill\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties wwwroot_4manifest_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>

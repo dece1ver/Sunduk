@@ -335,7 +335,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenToolDialog">Список инструмента</MudButton>
-        <MudButton Size="Size.Large" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Submit" Disabled="@(string.IsNullOrEmpty(ProgramText))">Ok</MudButton>
+        <MudButton Size="Size.Large" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Submit" Disabled="@(string.IsNullOrEmpty(ProgramText))">Добавить</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -585,7 +585,7 @@
     {
         var parameters = new DialogParameters();
         parameters.Add(nameof(Tools), Tools);
-        var options = new DialogOptions() { FullScreen = true, CloseButton = false};
+        var options = new DialogOptions() { FullScreen = true, CloseButton = true};
         DialogService.Show<ToolDialog>("Инструмент", parameters, options);
     }
 

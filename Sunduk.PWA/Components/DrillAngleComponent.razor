@@ -22,13 +22,13 @@
                     @if (CurrentImage == Images.DrillDiameter)
                     {
                         <center>
-                            <img src="/img/stuffimages/chamfer/ext_chamfer_angle.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            <img src="/img/stuffimages/drill/drill_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                     @if (CurrentImage == Images.DrillAngle)
                     {
                         <center>
-                            <img src="/img/stuffimages/chamfer/ext_chamfer_size.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            <img src="/img/stuffimages/drill/drill_angle.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                 </MudCardContent>
@@ -39,8 +39,8 @@
 
 @code 
 {
-    readonly int _imgHeigth = 150;
-    readonly int _imgWidth = 350;
+    readonly int _imgHeigth = 100;
+    readonly int _imgWidth = 250;
 
     public enum Images
     {
