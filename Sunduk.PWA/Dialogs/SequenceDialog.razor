@@ -110,15 +110,15 @@
                                 {
                                     if (seq is RoughFacingSequence)
                                     {
-                                        <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {(seq as RoughFacingSequence).Name} [Z{(seq as RoughFacingSequence).RoughStockAllow.NC()} => Z{(seq as RoughFacingSequence).ProfStockAllow.NC()} -W{(seq as RoughFacingSequence).StepOver.NC()}]")</MudSelectItem>
+                                        <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {seq.Description()}")</MudSelectItem>
                                     }
                                     if (seq is FacingSequence)
                                     {
-                                        <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {(seq as FacingSequence).Name} [Z{(seq as FacingSequence).RoughStockAllow.NC()} => Z{(seq as FacingSequence).ProfStockAllow.NC()} -W{(seq as FacingSequence).StepOver.NC()}]")</MudSelectItem>
+                                        <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {seq.Description()}")</MudSelectItem>
                                     }
                                     if (seq is RoughFacingCycleSequence)
                                     {
-                                        <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {(seq as RoughFacingCycleSequence).Name} [Z{(seq as RoughFacingCycleSequence).RoughStockAllow.NC()} => Z{(seq as RoughFacingCycleSequence).ProfStockAllow.NC()} -W{(seq as RoughFacingCycleSequence).StepOver.NC()}]")</MudSelectItem>
+                                        <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {seq.Description()}")</MudSelectItem>
                                     }
                                 }
                             </MudSelect>
@@ -530,15 +530,15 @@
 
             if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.Facing)
             {
-                return Operation.Facing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.SeqNo());
+                return Operation.Facing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceInternalDiameter : WorkpieceInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.SeqNo());
             }
             if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.RoughFacing)
             {
-                return Operation.RoughFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.SeqNo());
+                return Operation.RoughFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceInternalDiameter : WorkpieceInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.SeqNo());
             }
             if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.RoughFacingCycle)
             {
-                return Operation.RoughFacingCycle(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, WorkpieceInternalDiameter, RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.SeqNo());
+                return Operation.RoughFacingCycle(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceInternalDiameter : WorkpieceInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.SeqNo());
             }
             if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.FinishFacingCycle)
             {

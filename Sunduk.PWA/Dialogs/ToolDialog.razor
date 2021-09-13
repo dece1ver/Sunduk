@@ -3,7 +3,7 @@
 <MudDialog>
     <TitleContent>Редактор инструмента</TitleContent>
     <DialogContent>
-        <MudSwipeArea OnSwipe="OnSwipe">
+        <MudSwipeArea OnSwipe="@OnSwipe">
             <MudTabs>
                 <MudTabPanel Text="Точение наружное">
                     <MudTable Items="TurningExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedTurningExternalTool">

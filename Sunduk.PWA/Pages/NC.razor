@@ -5,14 +5,7 @@
 
 <style>
     .monofield {
-        font-family: Consolas;
-        font-size: 8px;
-    }
-</style>
-<style>
-    .monoitem {
-        font-family: Consolas;
-        font-size: 8px;
+        font-family: 'PT Mono', monospace;
     }
 </style>
 
@@ -60,7 +53,7 @@
                        OnClick="@(async () => await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, "text/plain"))">Скачать программу</MudButton>
         </MudItem>
         <MudGrid>
-            <MudItem xs="6" sm="5" md="4">
+            <MudItem xs="12" sm="5" md="4">
                 <MudButton Style="margin: 12px; margin-top: 3px" FullWidth="true" Variant="Variant.Outlined"
                            Color="Color.Primary" OnClick="OpenSequencelDialog" Disabled="@(!ValidWorkpiece)">Добавить переход</MudButton>
                 <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin-left: 12px; margin-right: -12px">
@@ -113,7 +106,7 @@
                     </MudList>
                 </MudField>
             </MudItem>
-            <MudItem xs="6" sm="7" md="8">
+            <MudItem xs="12" sm="7" md="8">
                 <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin-right: 12px">
                     <MudTextField T="string" DisableUnderLine="true" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
                 </MudField>
