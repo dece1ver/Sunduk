@@ -1,0 +1,58 @@
+﻿@inject IDialogService DialogService
+
+<MudDialog>
+    <DialogContent>
+        <MudContainer>
+            
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Подтвердить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code
+{
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public Machines Machine { get; set; }
+    [Parameter] public Machines _Machine { get; set; }
+    [Parameter] public int? SpindleLimit { get; set; }
+    [Parameter] public int? _SpindleLimit { get; set; }
+    [Parameter] public List<Tool> Tools { get; set; }
+    [Parameter] public double WorkpieceExternalDiameter { get; set; }
+    [Parameter] public double _WorkpieceExternalDiameter { get; set; }
+    [Parameter] public double WorkpieceInternalDiameter { get; set; }
+    [Parameter] public double _WorkpieceInternalDiameter { get; set; }
+    [Parameter] public Materials WorkpieceMaterial { get; set; }
+    [Parameter] public Materials _WorkpieceMaterial { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _Machine = Machine;
+        _SpindleLimit = SpindleLimit;
+        _WorkpieceExternalDiameter = WorkpieceExternalDiameter;
+        _WorkpieceInternalDiameter = WorkpieceInternalDiameter;
+        _WorkpieceMaterial = WorkpieceMaterial;
+    }
+
+    private void OpenToolDialog()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(Tools), Tools);
+        var options = new DialogOptions() { FullScreen = true, CloseButton = true };
+        DialogService.Show<ToolDialog>("Инструмент", parameters, options);
+    }
+
+    void Submit()
+    {
+        Machine = _Machine;
+        SpindleLimit = _SpindleLimit;
+        WorkpieceExternalDiameter = _WorkpieceExternalDiameter;
+        WorkpieceInternalDiameter = _WorkpieceInternalDiameter;
+        WorkpieceMaterial = _WorkpieceMaterial;
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+    void Cancel() => MudDialog.Cancel();
+}

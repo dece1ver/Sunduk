@@ -90,15 +90,15 @@
                             {
                                 if (seq is RoughFacingSequence)
                                 {
-                                    <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {(seq as RoughFacingSequence).Name} [{(seq as RoughFacingSequence).Tool.Description()}]")</MudSelectItem>
+                                    <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {seq.Description()}")</MudSelectItem>
                                 }
                                 if (seq is RoughFacingCycleSequence)
                                 {
-                                    <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {(seq as RoughFacingCycleSequence).Name} [{(seq as RoughFacingCycleSequence).Tool.Description()}]")</MudSelectItem>
+                                    <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {seq.Description()}")</MudSelectItem>
                                 }
                                 if (seq is FacingSequence)
                                 {
-                                    <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {(seq as FacingSequence).Name} [{(seq as FacingSequence).Tool.Description()}]")</MudSelectItem>
+                                    <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {seq.Description()}")</MudSelectItem>
                                 }
                             }
                         </MudSelect>
@@ -158,6 +158,42 @@
                         <MudTextField Label="Конечная точка" @bind-Value="peckDeepDrillingSequence.EndZ" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     break;
+                case ThreadCuttingSequence threadCuttingSequence:
+                    if (threadCuttingSequence.Type == CuttingType.External)
+                    {
+                        <MudItem xs="12" sm="6">
+                            <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
+                                @foreach (var tool in Tools.Where(x => x is ThreadingExternalTool))
+                                {
+                                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                    }
+                    if (threadCuttingSequence.Type == CuttingType.Internal)
+                    {
+                        <MudItem xs="12" sm="6">
+                            <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
+                                @foreach (var tool in Tools.Where(x => x is ThreadingInternalTool))
+                                {
+                                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                    }
+                    <MudItem xs="12" sm="6">
+                        <MudSelect @bind-Value="ThreadType" Label="Тип" T="CuttingType">
+                            <MudSelectItem Value="CuttingType.External">Наружная</MudSelectItem>
+                            <MudSelectItem Value="CuttingType.Internal">Внутренняя</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudSelect @bind-Value="ThreadStandart" Label="Тип" T="ThreadStandart">
+                            <MudSelectItem Value="ThreadStandart.Metric">Метрическая 60°</MudSelectItem>
+                            <MudSelectItem Value="ThreadStandart.BSPP">Трубная 55°</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    break;
                 default:
                     break;
             }
@@ -184,6 +220,12 @@
                 RoughStockAllow = roughFacingSequence.RoughStockAllow;
                 ProfStockAllow = roughFacingSequence.ProfStockAllow;
                 StepOver = roughFacingSequence.StepOver;
+                break;
+            case RoughFacingCycleSequence roughFacingCycleSequence:
+                Tool = roughFacingCycleSequence.Tool;
+                RoughStockAllow = roughFacingCycleSequence.RoughStockAllow;
+                ProfStockAllow = roughFacingCycleSequence.ProfStockAllow;
+                StepOver = roughFacingCycleSequence.StepOver;
                 break;
             case FinishFacingSequence finishFacingSequence:
                 Tool = finishFacingSequence.Tool;
@@ -224,6 +266,7 @@
     [Parameter] public Sequence sequence { get; set; }
 
     public Tool Tool { get; set; }
+
     public Sequence RepeatableRoughFacingSequence { get; set; }
     public double RoughStockAllow { get; set; }
     public double ProfStockAllow { get; set; }
@@ -232,6 +275,10 @@
     public double DrillStart { get; set; }
     public double DrillEnd { get; set; }
     public double DrillDepth { get; set; }
+
+    public CuttingType ThreadType { get; set; }
+    public ThreadStandart ThreadStandart { get; set; }
+    public double ThreadDiameter { get; set; }
 
     void Submit()
     {
