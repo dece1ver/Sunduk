@@ -11,110 +11,116 @@
 </style>
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudExpansionPanel Text="Наладка" Dense="true">
-        <MudGrid Spacing="1">
-            <MudItem xs="12" sm="7" md="9">
-                <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Outlined" Dense="true">
-                    <MudSelectItem Value="@(Machines.GS1500)">Goodway GS-1500</MudSelectItem>
-                    <MudSelectItem Value="@(Machines.L230A)">Hyundai L230A</MudSelectItem>
-                </MudSelect>
-            </MudItem>
-            <MudItem xs="12" sm="5" md="3">
-                <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Outlined" Immediate="true" Margin="Margin.Dense" />
-            </MudItem>
-            <MudItem xs="12" sm="6" md="4">
-                <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"/>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="4">
-                <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"/>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="4">
-                @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
-                <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Text" Dense="true">
-                    <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
-                    <MudSelectItem Value="@Materials.Stainless">Нержавеющая сталь</MudSelectItem>
-                    <MudSelectItem Value="@Materials.Brass">Бронза</MudSelectItem>
-                </MudSelect>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="6">
-                <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"/>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="6">
-                <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"/>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="6">
-                <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Text" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense"/>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="6">
-                <MudTextField @bind-Value="DrawningVersion" Label="Версия чертежа" Variant="Variant.Text" Immediate="true" Converter="Util.DoubleConverter" Margin="Margin.Dense"/>
-            </MudItem>
-        </MudGrid>
-    </MudExpansionPanel>
-
-    <MudIconButton Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Filled.Save" Title="Скачать программу"
-                    OnClick="@(async () => await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, "text/plain"))" />
-
-<MudGrid>
-    <MudItem xs="12" sm="5" md="4">
-        <MudButton Style="margin: 12px; margin-top: 3px" FullWidth="true" Variant="Variant.Outlined"
-                    Color="Color.Primary" OnClick="OpenSequencelDialog" Disabled="@(!ValidWorkpiece)">Добавить переход</MudButton>
-        <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
-            <MudList Clickable="true" Dense="true" @bind-SelectedItem="SelectedSequence" DisableGutters="true">
-                @if (Program != null)
-                {
-                    @foreach (var seq in Program)
+    <MudGrid>
+        <MudItem>
+            <MudExpansionPanel Text="Наладка">
+                <MudGrid Spacing="1">
+                    <MudItem xs="12" sm="7" md="8">
+                        <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Filled" Dense="true">
+                            <MudSelectItem Value="@(Machines.L230A)">Hyundai L230A</MudSelectItem>
+                            <MudSelectItem Value="@(Machines.GS1500)">Goodway GS-1500</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="5" md="4">
+                        <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" sm="12" md="4">
+                        @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
+                        <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Filled" Dense="true">
+                            <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
+                            <MudSelectItem Value="@Materials.Stainless">Нержавеющая сталь</MudSelectItem>
+                            <MudSelectItem Value="@Materials.Brass">Бронза</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="4" md="4">
+                        <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" sm="4" md="4">
+                        <MudTextField @bind-Value="DrawningVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" sm="4" md="4">
+                        <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="5">
+            <MudButtonGroup>
+                <MudIconButton Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.Save" Title="Скачать программу"
+                               OnClick="@(async () => await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, "text/plain"))" />
+                <MudIconButton Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.TableView" Title="Инструмент"
+                               OnClick="OpenToolDialog" />
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary" OnClick="OpenSequencelDialog" EndIcon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)">Добавить переход</MudButton>
+            </MudButtonGroup>
+            <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
+                <MudList Clickable="true" Dense="true" @bind-SelectedItem="SelectedSequence" DisableGutters="true">
+                    @if (Program != null)
                     {
-                        if (Program.IndexOf(seq) == 0)
+                        @foreach (var seq in Program)
                         {
-                            <MudListItem Text="@($"{Program.IndexOf(seq) + 1}. {seq.Name}")">
-                                <MudGrid>
-                                    <MudItem>
-                                        <MudText>@($"{Program.IndexOf(seq) + 1}. {seq.Name}")</MudText>
-                                    </MudItem>
-                                </MudGrid>
-                            </MudListItem>
-                        }
-                        if (Program.IndexOf(seq) > 1)
-                        {
-                            <MudListItem Text="@($"{Program.IndexOf(seq)}. {seq.Name}")">
-                                <MudGrid>
-                                    <MudItem>
-                                        <MudText>@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
-                                    </MudItem>
-                                    <MudItem>
-                                        @if (($"{Program.IndexOf(seq)}. {seq.Name}") == (SelectedSequence?.Text ?? string.Empty) && Program.IndexOf(seq) != 0 && Program.IndexOf(seq) != 1)
-                                        {
-                                            @if (Program.IndexOf(seq) != 2)
+                            if (Program.IndexOf(seq) == 0)
+                            {
+                                <MudListItem Text="@($"{Program.IndexOf(seq) + 1}. {seq.Name}")">
+                                    <MudGrid>
+                                        <MudItem>
+                                            <MudText>@($"{Program.IndexOf(seq) + 1}. {seq.Name}")</MudText>
+                                        </MudItem>
+                                    </MudGrid>
+                                </MudListItem>
+                            }
+                            if (Program.IndexOf(seq) > 1)
+                            {
+                                <MudListItem Text="@($"{Program.IndexOf(seq)}. {seq.Name}")">
+                                    <MudGrid>
+                                        <MudItem>
+                                            <MudText>@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
+                                        </MudItem>
+                                        <MudItem>
+                                            @if (($"{Program.IndexOf(seq)}. {seq.Name}") == (SelectedSequence?.Text ?? string.Empty) && Program.IndexOf(seq) != 0 && Program.IndexOf(seq) != 1)
                                             {
-                                                <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => MoveUpSequence(seq))" />
+                                                @if (Program.IndexOf(seq) != 2)
+                                                {
+                                                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                   Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => MoveUpSequence(seq))" />
+                                                }
+                                                @if (Program.IndexOf(seq) != Program.Count - 1)
+                                                {
+                                                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                   Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => MoveDownSequence(seq))" />
+                                                }
+                                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                               Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => OpenEditSequenceDialog(seq))" />
+                                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
+                                                               Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => Program.Remove(seq))" />
                                             }
-                                            @if (Program.IndexOf(seq) != Program.Count - 1)
-                                            {
-                                                <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => MoveDownSequence(seq))" />
-                                            }
-                                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                            Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => OpenEditSequenceDialog(seq))" />
-                                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
-                                                            Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => Program.Remove(seq))" />
-                                        }
-                                    </MudItem>
-                                </MudGrid>
-                            </MudListItem>
+                                        </MudItem>
+                                    </MudGrid>
+                                </MudListItem>
+                            }
                         }
                     }
-                }
-            </MudList>
-        </MudField>
-    </MudItem>
-    <MudItem xs="12" sm="7" md="8">
-        <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense" Style="margin-right: 12px">
-            <MudTextField T="string" DisableUnderLine="true" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
-        </MudField>
-        @*<MudTextField T="string" DisableUnderLine="true" Label="Тест" Class="monofield" Variant="Variant.Text" @bind-Text="@Message" ReadOnly="true" Immediate="true" Lines="50" />*@
-    </MudItem>
-</MudGrid>
+                </MudList>
+            </MudField>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="7">
+            <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense">
+                <MudTextField T="string" DisableUnderLine="true" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
+            </MudField>
+        </MudItem>
+    </MudGrid>
 </MudContainer>
 
 @code
@@ -247,7 +253,7 @@
         #endregion
 
         Program = new();
-        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, DrawningVersion, string.Empty) { Name = $"Шапка"});
+        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, Author, DrawningVersion, string.Empty) { Name = $"Шапка"});
         Program.Add(new SafetyStringSequence(Machine, 3000) { Name = $"Строка безопасности" });
         CyclesCount = 1;
     }
@@ -340,6 +346,9 @@
     public string DetailName { get; set; }
     public string NcDetailName { get => !string.IsNullOrEmpty(DetailName) ? $"{DetailName.Translate()}" : "DETAIL"; }
 
+    public string Author { get; set; }
+    public string NcAuthor { get => !string.IsNullOrEmpty(Author) ? $"{Author.Translate()}" : "AUTHOR"; }
+
     public int OperationNumber { get; set; } = 1;
 
     public double DrawningVersion { get; set; }
@@ -408,6 +417,7 @@
                         newHeaderSequence.Machine = Machine;
                         newHeaderSequence.DetailNumber = NcDetailNumber;
                         newHeaderSequence.DetailName = NcDetailName;
+                        newHeaderSequence.Author = NcAuthor;
                         newHeaderSequence.DrawVersion = DrawningVersion;
                         newHeaderSequence.ToolTable = Util.GetToolTable(Program);
                         Program[i] = newHeaderSequence;

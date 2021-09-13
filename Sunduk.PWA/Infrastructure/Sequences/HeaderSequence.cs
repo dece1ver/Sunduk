@@ -10,16 +10,18 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public Machines Machine { get; set; }
         public string DetailNumber { get; set; }
         public string DetailName { get; set; }
+        public string Author { get; set; }
         public double DrawVersion { get; set; }
         public string ToolTable { get; set; }
 
-        public override string Operation => $"{Templates.Operation.Header(Machine, DetailNumber, DetailName, DrawVersion)}{ToolTable}";
+        public override string Operation => $"{Templates.Operation.Header(Machine, DetailNumber, DetailName, Author, DrawVersion)}{ToolTable}";
 
-        public HeaderSequence(Machines machine, string number, string name, double drawVersion, string toolTable)
+        public HeaderSequence(Machines machine, string number, string name, string author, double drawVersion, string toolTable)
         {
             Machine = machine;
             DetailNumber = number;
             DetailName = name;
+            Author = author;
             DrawVersion = drawVersion;
             ToolTable = toolTable;
         }

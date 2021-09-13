@@ -138,53 +138,47 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// шапка
         /// </summary>
-        public static string Header(Machines machine, string number, string name, double drawVersion)
+        public static string Header(Machines machine, string number, string name, string author, double drawVersion) => machine switch
         {
-            return machine switch
-            {
-                Machines.GS1500 =>
-                "%\n" +
-                $"<{number}>({name})\n" +
-                $"({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
-                "G10L2P1Z-100.B300.(G54)\n" +
-                "G10L2P2Z400.(G55)\n" +
-                $"(AUTHOR)({DateTime.Now:dd.MM.yy})\n" +
-                "(0M0S)\n",
+            Machines.GS1500 =>
+            "%\n" +
+            $"<{number}>({name})\n" +
+            $"({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
+            "G10L2P1Z-100.B300.(G54)\n" +
+            "G10L2P2Z400.(G55)\n" +
+            $"({author})({DateTime.Now:dd.MM.yy})\n" +
+            "(0M0S)\n",
 
-                Machines.L230A =>
-                "%\n" +
-                $"O0001({number})\n" +
-                $"({name})({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
-                $"(AUTHOR)({DateTime.Now:dd.MM.yy})\n" +
-                "(0M0S)\n",
+            Machines.L230A =>
+            "%\n" +
+            $"O0001({number})\n" +
+            $"({name})({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
+            $"({author})({DateTime.Now:dd.MM.yy})\n" +
+            "(0M0S)\n",
 
-                _ => string.Empty,
-            };
-        }
+            _ => string.Empty,
+        };
 
         /// <summary>
         /// Строка безопасности
         /// </summary>
-        public static string SafetyString(Machines machine, int? speedLimit)
+        public static string SafetyString(Machines machine, int? speedLimit) => machine switch
         {
-            return machine switch
-            {
-                Machines.GS1500 =>
-                REFERENT_POINT_CONSISTENTLY +
-                GOODWAY_RETURN_B +
-                "G40G80\n" +
-                $"G50S{((speedLimit ?? 0) > 4000 ? 4000 : speedLimit ?? 0)}\n" +
-                "G96\n",
+            Machines.GS1500 =>
+            REFERENT_POINT_CONSISTENTLY +
+            GOODWAY_RETURN_B +
+            "G40G80\n" +
+            $"G50S{((speedLimit ?? 0) > 4000 ? 4000 : speedLimit ?? 0)}\n" +
+            "G96\n",
 
-                Machines.L230A =>
-                REFERENT_POINT_CONSISTENTLY +
-                "G40G80G55\n" +
-                $"G50S{((speedLimit ?? 0) > 5000 ? 5000 : speedLimit ?? 0)}\n" +
-                "G96G23\n",
+            Machines.L230A =>
+            REFERENT_POINT_CONSISTENTLY +
+            "G40G80G55\n" +
+            $"G50S{((speedLimit ?? 0) > 5000 ? 5000 : speedLimit ?? 0)}\n" +
+            "G96G23\n",
 
-                _ => string.Empty,
-            };
-        }
+            _ => string.Empty,
+        };
 
         /// <summary>
         /// Упор
