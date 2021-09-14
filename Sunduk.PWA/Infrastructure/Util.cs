@@ -377,7 +377,7 @@ namespace Sunduk.PWA.Util
         public static Converter<double> DoubleConverter = new()
         {
             SetFunc = value => value.ToPrettyString(),
-            GetFunc = text => Util.GetDouble(text),
+            GetFunc = text => Util.GetDouble(text, 0, GetNumberOption.Any),
         };
 
         /// <summary>

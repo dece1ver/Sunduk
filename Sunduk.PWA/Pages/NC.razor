@@ -13,11 +13,10 @@
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid>
         <MudItem>
-            <MudExpansionPanel @bind-IsExpanded="setupPanelisOpen" HideIcon="true">
+            <MudExpansionPanel HideIcon="true">
                 <TitleContent>
                     <div class="d-flex">
                         <MudButtonGroup Variant="Variant.Outlined">
-                            @*<MudIconButton Icon="@Icons.Material.TwoTone.Settings" Title="Наладка" OnClick="(() => setupPanelisOpen = !setupPanelisOpen)" />*@
                             <MudIconButton Icon="@Icons.Material.TwoTone.Save" Title="Скачать программу"
                                            OnClick="@(async () => await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, "text/plain"))" />
                             <MudIconButton Icon="@Icons.Material.TwoTone.TableView" Title="Инструмент" OnClick="OpenToolDialog" />
@@ -130,8 +129,6 @@
 @code
 {
     [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
-
-    private bool setupPanelisOpen;
 
     public string Message { get; set; } = string.Empty;
 
@@ -463,7 +460,6 @@
                     case LimiterSequence limiterSequence:
                         LimiterSequence newlimiterSequence = Program[i] as LimiterSequence;
                         newlimiterSequence.Machine = Machine;
-                        newlimiterSequence.ExternalDiameter = WorkpieceExternalDiameter;
                         Program[i] = newlimiterSequence;
                         break;
                     case FacingSequence facingSequence:

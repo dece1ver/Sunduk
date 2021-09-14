@@ -5,8 +5,21 @@
         <MudGrid Class="mt-2">
             @switch (sequence)
             {
+                case LimiterSequence limiterSequence:
+                    <MudItem xs="12">
+                        <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
+                            @foreach (var tool in Tools)
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField Label="Диаметр подвода" @bind-Value="LimiterApproachDiameter" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    break;
                 case FacingSequence facingSequence:
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12">
                         <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
                             @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
                             {
@@ -14,18 +27,18 @@
                             }
                         </MudSelect>
                     </MudItem>
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12" md="4">
                         <MudTextField Label="Общий припуск" @bind-Value="RoughStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12" md="4">
                         <MudTextField Label="Съем" @bind-Value="StepOver" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12" md="4">
                         <MudTextField Label="Чистовой припуск по Z" @bind-Value="ProfStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     break;
                 case RoughFacingSequence roughFacingSequence:
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12">
                         <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
                             @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
                             {
@@ -33,18 +46,18 @@
                             }
                         </MudSelect>
                     </MudItem>
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12" md="4">
                         <MudTextField Label="Общий припуск" @bind-Value="RoughStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12" md="4">
                         <MudTextField Label="Съем" @bind-Value="StepOver" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12" md="4">
                         <MudTextField Label="Чистовой припуск по Z" @bind-Value="ProfStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     break;
                 case RoughFacingCycleSequence roughFacingCycleSequence:
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12">
                         <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
                             @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
                             {
@@ -52,13 +65,13 @@
                             }
                         </MudSelect>
                     </MudItem>
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12" md="4">
                         <MudTextField Label="Общий припуск" @bind-Value="RoughStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12" md="4">
                         <MudTextField Label="Съем" @bind-Value="StepOver" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12" md="4">
                         <MudTextField Label="Чистовой припуск по Z" @bind-Value="ProfStockAllow" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     break;
@@ -76,7 +89,7 @@
                     </MudItem>
                     break;
                 case FinishFacingCycleSequence finishFacingCycleSequence:
-                    <MudItem xs="12" sm="6">
+                    <MudItem xs="12">
                         <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
                             @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
                             {
@@ -86,7 +99,7 @@
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudSelect @bind-Value="RepeatableRoughFacingSequence" Label="Черновая торцовка" T="Sequence">
-                            @foreach (var seq in Program.Where(x => (x is RoughFacingSequence || x is FacingSequence)))
+                            @foreach (var seq in Program)
                             {
                                 if (seq is RoughFacingSequence)
                                 {
@@ -114,10 +127,10 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField Label="Начальная точка" @bind-Value="highSpeedDrillingSequence.StartZ" Immediate="true" Converter="Util.DoubleConverter" />
+                        <MudTextField Label="Начальная точка" @bind-Value="DrillStart" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField Label="Конечная точка" @bind-Value="highSpeedDrillingSequence.EndZ" Immediate="true" Converter="Util.DoubleConverter" />
+                        <MudTextField Label="Конечная точка" @bind-Value="DrillEnd" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     break;
                 case PeckDrillingSequence peckDrillingSequence:
@@ -130,13 +143,13 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField Label="Глубина" @bind-Value="peckDrillingSequence.Depth" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                        <MudTextField Label="Глубина" @bind-Value="DrillDepth" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField Label="Начальная точка" @bind-Value="peckDrillingSequence.StartZ" Immediate="true" Converter="Util.DoubleConverter" />
+                        <MudTextField Label="Начальная точка" @bind-Value="DrillStart" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField Label="Конечная точка" @bind-Value="peckDrillingSequence.EndZ" Immediate="true" Converter="Util.DoubleConverter" />
+                        <MudTextField Label="Конечная точка" @bind-Value="DrillEnd" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     break;
                 case PeckDeepDrillingSequence peckDeepDrillingSequence:
@@ -149,19 +162,19 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField Label="Глубина" @bind-Value="peckDeepDrillingSequence.Depth" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                        <MudTextField Label="Глубина" @bind-Value="DrillDepth" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField Label="Начальная точка" @bind-Value="peckDeepDrillingSequence.StartZ" Immediate="true" Converter="Util.DoubleConverter" />
+                        <MudTextField Label="Начальная точка" @bind-Value="DrillStart" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField Label="Конечная точка" @bind-Value="peckDeepDrillingSequence.EndZ" Immediate="true" Converter="Util.DoubleConverter" />
+                        <MudTextField Label="Конечная точка" @bind-Value="DrillEnd" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     break;
                 case ThreadCuttingSequence threadCuttingSequence:
                     if (threadCuttingSequence.Type == CuttingType.External)
                     {
-                        <MudItem xs="12" sm="6">
+                        <MudItem xs="12">
                             <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
                                 @foreach (var tool in Tools.Where(x => x is ThreadingExternalTool))
                                 {
@@ -172,7 +185,7 @@
                     }
                     if (threadCuttingSequence.Type == CuttingType.Internal)
                     {
-                        <MudItem xs="12" sm="6">
+                        <MudItem xs="12">
                             <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
                                 @foreach (var tool in Tools.Where(x => x is ThreadingInternalTool))
                                 {
@@ -193,6 +206,18 @@
                             <MudSelectItem Value="ThreadStandart.BSPP">Трубная 55°</MudSelectItem>
                         </MudSelect>
                     </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField Label="Диаметр" @bind-Value="ThreadDiameter" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField Label="Шаг резьбы" @bind-Value="ThreadDiameter" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField Label="Начало" @bind-Value="ThreadStart" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField Label="Конец" @bind-Value="ThreadEnd" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
                     break;
                 default:
                     break;
@@ -209,51 +234,77 @@
     {
         switch (sequence)
         {
+            // упор
+            case LimiterSequence limiterSequence:
+                Tool = limiterSequence.Tool;
+                LimiterApproachDiameter = limiterSequence.ExternalDiameter;
+                break;
+            // торцовка черновая + чистовая
             case FacingSequence facingSequence:
                 Tool = facingSequence.Tool;
                 RoughStockAllow = facingSequence.RoughStockAllow;
                 ProfStockAllow = facingSequence.ProfStockAllow;
                 StepOver = facingSequence.StepOver;
                 break;
+            // торцовка черновая
             case RoughFacingSequence roughFacingSequence:
                 Tool = roughFacingSequence.Tool;
                 RoughStockAllow = roughFacingSequence.RoughStockAllow;
                 ProfStockAllow = roughFacingSequence.ProfStockAllow;
                 StepOver = roughFacingSequence.StepOver;
                 break;
+            // торцовка черновая под G70
             case RoughFacingCycleSequence roughFacingCycleSequence:
                 Tool = roughFacingCycleSequence.Tool;
                 RoughStockAllow = roughFacingCycleSequence.RoughStockAllow;
                 ProfStockAllow = roughFacingCycleSequence.ProfStockAllow;
                 StepOver = roughFacingCycleSequence.StepOver;
                 break;
+            // чистовая торцовка
             case FinishFacingSequence finishFacingSequence:
                 Tool = finishFacingSequence.Tool;
                 ProfStockAllow = finishFacingSequence.ProfStockAllow;
                 break;
+            // чистовая торцовка G70
             case FinishFacingCycleSequence finishFacingCycleSequence:
                 Tool = finishFacingCycleSequence.Tool;
                 RepeatableRoughFacingSequence = finishFacingCycleSequence.RoughSequence;
                 break;
-
+            // высокоскоростное сверление
             case HighSpeedDrillingSequence highSpeedDrillingSequence:
                 Tool = highSpeedDrillingSequence.Tool;
                 DrillStart = highSpeedDrillingSequence.StartZ;
                 DrillEnd = highSpeedDrillingSequence.EndZ;
                 break;
+            // прерывистое сверление
             case PeckDrillingSequence peckDrillingSequence:
                 Tool = peckDrillingSequence.Tool;
                 DrillStart = peckDrillingSequence.StartZ;
                 DrillEnd = peckDrillingSequence.EndZ;
                 DrillDepth = peckDrillingSequence.Depth;
                 break;
+            // сверление в полным выходом
             case PeckDeepDrillingSequence peckDeepDrillingSequence:
                 Tool = peckDeepDrillingSequence.Tool;
                 DrillStart = peckDeepDrillingSequence.StartZ;
                 DrillEnd = peckDeepDrillingSequence.EndZ;
                 DrillDepth = peckDeepDrillingSequence.Depth;
                 break;
-
+            // точение резьбы
+            case ThreadCuttingSequence threadCuttingSequence:
+                Tool = threadCuttingSequence.Tool;
+                ThreadDiameter = threadCuttingSequence.ThreadDiameter;
+                ThreadPitch = threadCuttingSequence.ThreadPitch;
+                ThreadStart = threadCuttingSequence.StartZ;
+                ThreadEnd = threadCuttingSequence.EndZ;
+                break;
+            // нарезание метчиком
+            case TappingSequence tappingSequence:
+                Tool = tappingSequence.Tool;
+                TappingCutSpeed = tappingSequence.CutSpeed;
+                ThreadStart = tappingSequence.StartZ;
+                ThreadEnd = tappingSequence.EndZ;
+                break;
             default:
                 break;
         }
@@ -267,6 +318,10 @@
 
     public Tool Tool { get; set; }
 
+    private bool _valid;
+
+    public double LimiterApproachDiameter { get; set; }
+
     public Sequence RepeatableRoughFacingSequence { get; set; }
     public double RoughStockAllow { get; set; }
     public double ProfStockAllow { get; set; }
@@ -279,43 +334,86 @@
     public CuttingType ThreadType { get; set; }
     public ThreadStandart ThreadStandart { get; set; }
     public double ThreadDiameter { get; set; }
+    public double ThreadPitch { get; set; }
+    public double ThreadStart { get; set; }
+    public double ThreadEnd { get; set; }
+
+    public double TappingCutSpeed { get; set; }
 
     void Submit()
     {
         switch (sequence)
         {
+            // упор
+            case LimiterSequence limiterSequence:
+                limiterSequence.Tool = Tool;
+                limiterSequence.ExternalDiameter = LimiterApproachDiameter;
+                break;
+            // торцовка черновая + чистовая
             case FacingSequence facingSequence:
                 facingSequence.Tool = Tool as TurningExternalTool;
                 facingSequence.RoughStockAllow = RoughStockAllow;
                 facingSequence.ProfStockAllow = ProfStockAllow;
                 facingSequence.StepOver = StepOver;
                 break;
+            // торцовка черновая
             case RoughFacingSequence roughFacingSequence:
                 roughFacingSequence.Tool = Tool as TurningExternalTool;
                 roughFacingSequence.RoughStockAllow = RoughStockAllow;
                 roughFacingSequence.ProfStockAllow = ProfStockAllow;
                 roughFacingSequence.StepOver = StepOver;
                 break;
+            // торцовка черновая под G70
+            case RoughFacingCycleSequence roughFacingCycleSequence:
+                roughFacingCycleSequence.Tool = Tool as TurningExternalTool;
+                roughFacingCycleSequence.RoughStockAllow = RoughStockAllow;
+                roughFacingCycleSequence.ProfStockAllow = ProfStockAllow;
+                roughFacingCycleSequence.StepOver = StepOver;
+                break;
+            // чистовая торцовка
             case FinishFacingSequence finishFacingSequence:
                 finishFacingSequence.Tool = Tool as TurningExternalTool;
                 finishFacingSequence.ProfStockAllow = ProfStockAllow;
                 break;
+            // чистовая торцовка G70
+            case FinishFacingCycleSequence finishFacingCycleSequence:
+                finishFacingCycleSequence.Tool = Tool as TurningExternalTool;
+                finishFacingCycleSequence.RoughSequence = RepeatableRoughFacingSequence;
+                break;
+            // высокоскоростное сверление
             case HighSpeedDrillingSequence highSpeedDrillingSequence:
                 highSpeedDrillingSequence.Tool = Tool as DrillingTool;
                 highSpeedDrillingSequence.StartZ = DrillStart;
                 highSpeedDrillingSequence.EndZ = DrillEnd;
                 break;
+            // прерывистое сверление
             case PeckDrillingSequence peckDrillingSequence:
                 peckDrillingSequence.Tool = Tool as DrillingTool;
                 peckDrillingSequence.StartZ = DrillStart;
                 peckDrillingSequence.EndZ = DrillEnd;
                 peckDrillingSequence.Depth = DrillDepth;
                 break;
+            // сверление в полным выходом
             case PeckDeepDrillingSequence peckDeepDrillingSequence:
                 peckDeepDrillingSequence.Tool = Tool as DrillingTool;
                 peckDeepDrillingSequence.StartZ = DrillStart;
                 peckDeepDrillingSequence.EndZ = DrillEnd;
                 peckDeepDrillingSequence.Depth = DrillDepth;
+                break;
+            // точение резьбы
+            case ThreadCuttingSequence threadCuttingSequence:
+                threadCuttingSequence.Tool = Tool;
+                threadCuttingSequence.ThreadDiameter = ThreadDiameter;
+                threadCuttingSequence.ThreadPitch = ThreadPitch;
+                threadCuttingSequence.StartZ = ThreadStart;
+                threadCuttingSequence.EndZ = ThreadEnd;
+                break;
+            // нарезание метчиком
+            case TappingSequence tappingSequence:
+                tappingSequence.Tool = Tool as TappingTool;
+                tappingSequence.CutSpeed = TappingCutSpeed;
+                tappingSequence.StartZ = ThreadStart;
+                tappingSequence.EndZ = ThreadEnd;
                 break;
             default:
                 break;
