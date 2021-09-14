@@ -385,7 +385,7 @@ namespace Sunduk.PWA.Util
         /// </summary>
         /// <param name="count">Количество переходов</param>
         /// <returns></returns>
-        public static (int seqNo1, int seqNo2) SeqNo(this int count)
+        public static (int seqNo1, int seqNo2) GetCycleRange(this int count)
         {
             return (count * 2 - 1, count * 2);
         }

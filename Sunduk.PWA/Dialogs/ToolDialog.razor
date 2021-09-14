@@ -5,7 +5,7 @@
     <DialogContent>
         <MudSwipeArea OnSwipe="@OnSwipe">
             <MudTabs @ref="tabs">
-                <MudTabPanel Text="Точение наружное">
+                <MudTabPanel Text="Точение наружное" BadgeData="@(TurningExternalTools.Count)">
                     <MudTable Items="TurningExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedTurningExternalTool">
                         <HeaderContent>
                             <MudTh>Позиция</MudTh>
@@ -53,7 +53,7 @@
                     </div>
                 </MudTabPanel>
 
-                <MudTabPanel Text="Точение внутреннее">
+                <MudTabPanel Text="Точение внутреннее" BadgeData="@(TurningInternalTools.Count)">
                     <MudTable Items="TurningInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedTurningInternalTool">
                         <HeaderContent>
                             <MudTh>Позиция</MudTh>
@@ -98,7 +98,7 @@
                     </div>
                 </MudTabPanel>
 
-                <MudTabPanel Text="Канавки и отрезка наружные">
+                <MudTabPanel Text="Канавки и отрезка наружные" BadgeData="@(GroovingExternalTools.Count)">
                     <MudTable Items="GroovingExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedGroovingExternalTool">
                         <HeaderContent>
                             <MudTh>Позиция</MudTh>
@@ -155,7 +155,7 @@
                     </div>
                 </MudTabPanel>
 
-                <MudTabPanel Text="Канавки и отрезка внутренние">
+                <MudTabPanel Text="Канавки и отрезка внутренние" BadgeData="@(GroovingInternalTools.Count)">
                     <MudTable Items="GroovingInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedGroovingInternalTool" >
                         <HeaderContent>
                             <MudTh>Позиция</MudTh>
@@ -203,7 +203,7 @@
                     </div>
                 </MudTabPanel>
 
-                <MudTabPanel Text="Точение наружной резьбы">
+                <MudTabPanel Text="Точение наружной резьбы" BadgeData="@(ThreadingExternalTools.Count)">
                     <MudTable Items="ThreadingExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedThreadingExternalTool">
                         <HeaderContent>
                             <MudTh>Позиция</MudTh>
@@ -243,7 +243,7 @@
                     </div>
                 </MudTabPanel>
 
-                <MudTabPanel Text="Точение внутренней резьбы">
+                <MudTabPanel Text="Точение внутренней резьбы" BadgeData="@(ThreadingInternalTools.Count)">
                     <MudTable Items="ThreadingInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedThreadingInternalTool">
                         <HeaderContent>
                             <MudTh>Позиция</MudTh>
@@ -288,7 +288,7 @@
                     </div>
                 </MudTabPanel>
 
-                <MudTabPanel Text="Сверла">
+                <MudTabPanel Text="Сверла" BadgeData="@(DrillingTools.Count)">
                     <MudTable Items="DrillingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedDrillingTool">
                         <HeaderContent>
                             <MudTh>Позиция</MudTh>
@@ -348,7 +348,7 @@
                     </div>
                 </MudTabPanel>
 
-                <MudTabPanel Text="Метчики">
+                <MudTabPanel Text="Метчики" BadgeData="@(TappingTools.Count)">
                     <MudTable Items="TappingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedTappingTool">
                         <HeaderContent>
                             <MudTh>Позиция</MudTh>
@@ -391,6 +391,7 @@
                             </MudTd>
                         </RowEditingTemplate>
                     </MudTable>
+                    
                     <div class="mt-3 ml-0 d-flex">
                         <div class="d-flex ml-auto align-center">
                             <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTappingTool" />
@@ -403,8 +404,11 @@
         </MudSwipeArea>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Cancel">Подвердить без сохранения</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Submit">Подвердить и сохранить</MudButton>
+        <MudButtonGroup Class="mr-3" Variant="Variant.Outlined" OverrideStyles="false">
+            <MudButton Variant="Variant.Outlined" Class="mr-1" OnClick="Cancel">Подвердить без сохранения</MudButton>
+            <MudButton Color="Color.Primary" Variant="Variant.Outlined" Class="mr-1" OnClick="Submit">Подвердить и сохранить</MudButton>
+        </MudButtonGroup>
+        
     </DialogActions>
 </MudDialog>
 

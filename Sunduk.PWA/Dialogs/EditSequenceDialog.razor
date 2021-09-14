@@ -105,7 +105,7 @@
                     </MudItem>
                     break;
                 case HighSpeedDrillingSequence highSpeedDrillingSequence:
-                    <MudItem xs="4">
+                    <MudItem xs="12">
                         <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
                             @foreach (var tool in Tools.Where(x => x is DrillingTool))
                             {

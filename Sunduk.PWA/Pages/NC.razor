@@ -13,58 +13,64 @@
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid>
         <MudItem>
-            <MudExpansionPanel Text="Наладка">
-                <MudGrid Spacing="1">
-                    <MudItem xs="12" sm="7" md="8">
-                        <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Filled" Dense="true">
-                            <MudSelectItem Value="@(Machines.L230A)">Hyundai L230A</MudSelectItem>
-                            <MudSelectItem Value="@(Machines.GS1500)">Goodway GS-1500</MudSelectItem>
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12" sm="5" md="4">
-                        <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                    </MudItem>
-                    <MudItem xs="12" sm="6" md="6">
-                        <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                    </MudItem>
-                    <MudItem xs="12" sm="6" md="6">
-                        <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                    </MudItem>
-                    <MudItem xs="12" sm="6" md="4">
-                        <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                    </MudItem>
-                    <MudItem xs="12" sm="6" md="4">
-                        <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                    </MudItem>
-                    <MudItem xs="12" sm="12" md="4">
-                        @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
-                        <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Filled" Dense="true">
-                            <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
-                            <MudSelectItem Value="@Materials.Stainless">Нержавеющая сталь</MudSelectItem>
-                            <MudSelectItem Value="@Materials.Brass">Бронза</MudSelectItem>
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12" sm="4" md="4">
-                        <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
-                    </MudItem>
-                    <MudItem xs="12" sm="4" md="4">
-                        <MudTextField @bind-Value="DrawningVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Margin="Margin.Dense" />
-                    </MudItem>
-                    <MudItem xs="12" sm="4" md="4">
-                        <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                    </MudItem>
-                </MudGrid>
+            <MudExpansionPanel @bind-IsExpanded="setupPanelisOpen" HideIcon="true">
+                <TitleContent>
+                    <div class="d-flex">
+                        <MudButtonGroup Variant="Variant.Outlined">
+                            @*<MudIconButton Icon="@Icons.Material.TwoTone.Settings" Title="Наладка" OnClick="(() => setupPanelisOpen = !setupPanelisOpen)" />*@
+                            <MudIconButton Icon="@Icons.Material.TwoTone.Save" Title="Скачать программу"
+                                           OnClick="@(async () => await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, "text/plain"))" />
+                            <MudIconButton Icon="@Icons.Material.TwoTone.TableView" Title="Инструмент" OnClick="OpenToolDialog" />
+                            <MudButton OnClick="OpenSequencelDialog" EndIcon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)">Добавить переход</MudButton>
+                        </MudButtonGroup>
+                        <MudIcon Icon="@Icons.Material.TwoTone.Settings" Class="d-flex ml-auto mt-1" />
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    <MudGrid Spacing="1">
+                        <MudItem xs="12" sm="7" md="8">
+                            <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Filled" Dense="true">
+                                <MudSelectItem Value="@(Machines.L230A)">Hyundai L230A</MudSelectItem>
+                                <MudSelectItem Value="@(Machines.GS1500)">Goodway GS-1500</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="5" md="4">
+                            <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="6">
+                            <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="6">
+                            <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="12" md="4">
+                            @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
+                            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Filled" Dense="true">
+                                <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
+                                <MudSelectItem Value="@Materials.Stainless">Нержавеющая сталь</MudSelectItem>
+                                <MudSelectItem Value="@Materials.Brass">Бронза</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="4" md="4">
+                            <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4" md="4">
+                            <MudTextField @bind-Value="DrawningVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4" md="4">
+                            <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                    </MudGrid>
+                </ChildContent>
             </MudExpansionPanel>
         </MudItem>
-        <MudItem xs="12" sm="6" md="5">
-            <MudButtonGroup>
-                <MudIconButton Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.Save" Title="Скачать программу"
-                               OnClick="@(async () => await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, "text/plain"))" />
-                <MudIconButton Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.TableView" Title="Инструмент"
-                               OnClick="OpenToolDialog" />
-                <MudButton Variant="Variant.Outlined"
-                           Color="Color.Primary" OnClick="OpenSequencelDialog" EndIcon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)">Добавить переход</MudButton>
-            </MudButtonGroup>
+        <MudItem xs="12" sm="6" md="5" xl="4">
             <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
                 <MudList Clickable="true" Dense="true" @bind-SelectedItem="SelectedSequence" DisableGutters="true">
                     @if (Program != null)
@@ -75,9 +81,7 @@
                             {
                                 <MudListItem Text="@($"{Program.IndexOf(seq) + 1}. {seq.Name}")">
                                     <MudGrid>
-                                        <MudItem>
-                                            <MudText>@($"{Program.IndexOf(seq) + 1}. {seq.Name}")</MudText>
-                                        </MudItem>
+                                        <MudText Class="ma-3">@($"{Program.IndexOf(seq) + 1}. {seq.Name}")</MudText>
                                     </MudGrid>
                                 </MudListItem>
                             }
@@ -85,28 +89,28 @@
                             {
                                 <MudListItem Text="@($"{Program.IndexOf(seq)}. {seq.Name}")">
                                     <MudGrid>
-                                        <MudItem>
-                                            <MudText>@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
-                                        </MudItem>
-                                        <MudItem>
+                                        <MudText Class="ma-3 mr-auto">@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
+                                        <div Class="d-inline-flex justify-end py-2 px-3">
                                             @if (($"{Program.IndexOf(seq)}. {seq.Name}") == (SelectedSequence?.Text ?? string.Empty) && Program.IndexOf(seq) != 0 && Program.IndexOf(seq) != 1)
                                             {
+                                            <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -2px; margin-bottom: -2px" >
                                                 @if (Program.IndexOf(seq) != 2)
                                                 {
-                                                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                   Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => MoveUpSequence(seq))" />
+                                                    <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                   OnClick="(() => MoveUpSequence(seq))" />
                                                 }
                                                 @if (Program.IndexOf(seq) != Program.Count - 1)
                                                 {
-                                                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                   Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => MoveDownSequence(seq))" />
+                                                    <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                   OnClick="(() => MoveDownSequence(seq))" />
                                                 }
-                                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                               Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => OpenEditSequenceDialog(seq))" />
-                                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
-                                                               Style="margin-top: -3px; margin-bottom: -5px;" OnClick="(() => Program.Remove(seq))" />
+                                                <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                               OnClick="(() => OpenEditSequenceDialog(seq))" />
+                                                <MudIconButton Icon="@Icons.Material.TwoTone.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
+                                                               OnClick="(() => Program.Remove(seq))" />
+                                            </MudButtonGroup>
                                             }
-                                        </MudItem>
+                                        </div>
                                     </MudGrid>
                                 </MudListItem>
                             }
@@ -115,7 +119,7 @@
                 </MudList>
             </MudField>
         </MudItem>
-        <MudItem xs="12" sm="6" md="7">
+        <MudItem xs="12" sm="6" md="7" xl="8">
             <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense">
                 <MudTextField T="string" DisableUnderLine="true" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
             </MudField>
@@ -127,7 +131,7 @@
 {
     [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
-    const string TOOL_TABLE = @"<TOOL TABLE>";
+    private bool setupPanelisOpen;
 
     public string Message { get; set; } = string.Empty;
 
@@ -306,7 +310,9 @@
         parameters.Add(nameof(Program), Program);
         parameters.Add(nameof(CyclesCount), CyclesCount);
         parameters.Add(nameof(WorkpieceExternalDiameter), WorkpieceExternalDiameter);
+        parameters.Add(nameof(WorkpieceCurrentExternalDiameter), WorkpieceCurrentExternalDiameter);
         parameters.Add(nameof(WorkpieceInternalDiameter), WorkpieceInternalDiameter);
+        parameters.Add(nameof(WorkpieceCurrentInternalDiameter), WorkpieceCurrentInternalDiameter);
         parameters.Add(nameof(WorkpieceLength), WorkpieceLength);
         parameters.Add(nameof(WorkpieceMaterial), WorkpieceMaterial);
         var options = new DialogOptions() { FullScreen = true, CloseButton = true };
@@ -338,6 +344,32 @@
 
     public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
     public double WorkpieceInternalDiameter { get => Util.GetDouble(_WorkpieceInternalDiameter); }
+
+    public double WorkpieceCurrentExternalDiameter { get; set; }
+    public double WorkpieceCurrentInternalDiameter { get => GetCurrentInternalDiameter(Program.Count); }
+
+    private double GetCurrentInternalDiameter(int index)
+    {
+        double diam = WorkpieceInternalDiameter;
+        for (int i = 0; i < index; i++)
+        {
+            switch (Program[i])
+            {
+                case HighSpeedDrillingSequence highSpeedDrillingSequence:
+                    if (highSpeedDrillingSequence.Tool.Diameter > diam) diam = highSpeedDrillingSequence.Tool.Diameter;
+                    break;
+                case PeckDrillingSequence peckDrillingSequence:
+                    if (peckDrillingSequence.Tool.Diameter > diam) diam = peckDrillingSequence.Tool.Diameter;
+                    break;
+                case PeckDeepDrillingSequence peckDeepDrillingSequence:
+                    if (peckDeepDrillingSequence.Tool.Diameter > diam) diam = peckDeepDrillingSequence.Tool.Diameter;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return diam;
+    }
 
     public string DetailNumber { get; set; }
 
@@ -439,7 +471,7 @@
                         newFacingSequence.Machine = Machine;
                         newFacingSequence.Material = WorkpieceMaterial;
                         newFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
-                        newFacingSequence.InternalDiameter = WorkpieceInternalDiameter;
+                        newFacingSequence.InternalDiameter = GetCurrentInternalDiameter(i);
                         Program[i] = newFacingSequence;
                         break;
                     case RoughFacingSequence roughFacingSequence:
@@ -447,16 +479,26 @@
                         newRoughFacingSequence.Machine = Machine;
                         newRoughFacingSequence.Material = WorkpieceMaterial;
                         newRoughFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
-                        newRoughFacingSequence.InternalDiameter = WorkpieceInternalDiameter;
+                        newRoughFacingSequence.InternalDiameter = GetCurrentInternalDiameter(i);
                         Program[i] = newRoughFacingSequence;
+                        break;
+                    case RoughFacingCycleSequence roughFacingCycleSequence:
+                        RoughFacingCycleSequence newRoughFacingCycleSequence = Program[i] as RoughFacingCycleSequence;
+                        newRoughFacingCycleSequence.Machine = Machine;
+                        newRoughFacingCycleSequence.Material = WorkpieceMaterial;
+                        newRoughFacingCycleSequence.ExternalDiameter = WorkpieceExternalDiameter;
+                        newRoughFacingCycleSequence.InternalDiameter = GetCurrentInternalDiameter(i);
+                        Program[i] = newRoughFacingCycleSequence;
                         break;
                     case FinishFacingSequence finishFacingSequence:
                         FinishFacingSequence newFinishFacingSequence = Program[i] as FinishFacingSequence;
                         newFinishFacingSequence.Machine = Machine;
                         newFinishFacingSequence.Material = WorkpieceMaterial;
                         newFinishFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
-                        newFinishFacingSequence.InternalDiameter = WorkpieceInternalDiameter;
+                        newFinishFacingSequence.InternalDiameter = GetCurrentInternalDiameter(i);
                         Program[i] = newFinishFacingSequence;
+                        break;
+                    case FinishFacingCycleSequence finishFacingCycleSequence:
                         break;
                     case HighSpeedDrillingSequence highSpeedDrillingSequence:
                         HighSpeedDrillingSequence newHighSpeedDrillingSequence = Program[i] as HighSpeedDrillingSequence;
