@@ -1,0 +1,58 @@
+﻿<MudDialog>
+    <DialogContent>
+        <div class="ma-0" style="height:500px;width:300px;overflow: auto;">
+            <MudPaper Elevation="0">
+                <MudText Typo="Typo.body1" Align="Align.Left">
+                    Sunduk - <MudLink Href="https://ru.wikipedia.org/wiki/%D0%9F%D1%80%D0%BE%D0%B3%D1%80%D0%B5%D1%81%D1%81%D0%B8%D0%B2%D0%BD%D0%BE%D0%B5_%D0%B2%D0%B5%D0%B1-%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5">прогрессивное веб-приложение</MudLink> <MudLink Href="https://docs.microsoft.com/ru-ru/aspnet/core/blazor/progressive-web-app?view=aspnetcore-5.0&tabs=visual-studio#offline-support">с возможностью автономной работы</MudLink>.
+                </MudText>
+                <MudText Typo="Typo.body2" Align="Align.Left">
+                    Обновления скачиваются в фоновом режиме. Если обновления были скачаны успешно, то после закрытия всех вкладок с приложением они будут установлены. <MudLink Typo="Typo.body2" Href="https://docs.microsoft.com/ru-ru/aspnet/core/blazor/progressive-web-app?view=aspnetcore-5.0&tabs=visual-studio#background-updates">Подробнее.</MudLink>
+                </MudText>
+                <MudDivider DividerType="DividerType.Middle" Class="my-6" />
+                <MudText Typo="Typo.h6" Align="Align.Left">
+                    Changelog
+                </MudText>
+                @foreach (var info in Info)
+                {
+                    <MudText Typo="Typo.body1" Align="Align.Left">
+                        @(info.Date is null ? info.Version : ($" {info.Date:dd.MM.yyyy}: {info.Version}"))
+                    </MudText>
+                    <MudText Typo="Typo.body2" Align="Align.Left">
+                        @for (int i = 0; i < info.Description.Length; i++)
+                        {
+                            <p>
+                                • @info.Description[i]
+                            </p>
+                        }
+                    </MudText>
+                    <br/>
+                }
+            </MudPaper>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Outlined.Done" OnClick="Submit"/>
+    </DialogActions>
+</MudDialog>
+@code 
+{
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Info.Add(new ChangelogInfo(new Version(1,0), null, new string[]{ "Первая версия. Калькулятор режимов. Точение резьбы." }));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 1, 1), new DateTime(2021, 3, 24), new string[]{ "Добавил раздел \"Всякая хрень\", в нем добавил расчет фасок.", "Фиксы дизайна под смартфоны." }));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 1, 3), new DateTime(2021, 3, 29), new string[]{ "Убрал зависимость от локализации браузера.", "Небольшая оптимизация резьбы." }));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 1, 8), new DateTime(2021, 4, 1), new string[]{ "Добавил расчет конуса сверла.", "Диалог с QR-кодом." }));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 2, 2), new DateTime(2021, 4, 4), new string[]{ "Рефактор \"Всякой хрени\".", "Добавил скругления на фаске." }));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 2, 6), new DateTime(2021, 4, 6), new string[]{ "Добавил инструкции по \"установке\" на телефоны.", "Добавил скругления на фаске." }));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 2), new DateTime(2021, 5, 12), new string[]{ "Переписал резьбу: добавил расчеты съемов, проходов. Сделал не фиксированный шаг. " +
+            "Метрическая по ГОСТ 24705-2004. Трубная цилиндрическая по ГОСТ 6357-81.", "Добавил диалог с ченджлогом." }));
+
+        Info.Reverse();
+    }
+
+    public List<ChangelogInfo> Info = new();
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+}
