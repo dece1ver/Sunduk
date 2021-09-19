@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@inject IDialogService DialogService
+@inherits LayoutComponentBase
 
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -12,7 +13,7 @@
         <MudSpacer />
         <MudIconButton Icon="@Icons.Material.Filled.SendToMobile" OnClick="OpenDialog" Color="Color.Inherit" Edge="Edge.End" />
         <MudTooltip Text="@version" Placement="Placement.Start">
-            <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" Color="Color.Inherit" Edge="Edge.End" />
+            <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" OnClick="OpenChangelogDialog" Color="Color.Inherit" Edge="Edge.End" />
         </MudTooltip>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
@@ -57,8 +58,8 @@
                     <MudText Typo="Typo.caption" Align="Align.Center">После чего нужно подтвердить установку.</MudText>
                 </MudPaper>
             </div>
-         }
-        </DialogContent>
+        }
+    </DialogContent>
     <DialogActions>
         <MudText Typo="Typo.caption">Установка:</MudText>
         <MudIconButton Icon="@Icons.Material.Filled.Android" Color="Color.Primary" OnClick="Android"></MudIconButton>
@@ -79,6 +80,14 @@
     private bool applehelp = false;
 
     private void OpenDialog() => visible = true;
+
+    private void OpenChangelogDialog()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions() { FullScreen = false, CloseButton = true };
+        DialogService.Show<ChangelogDialog>("Описание", parameters, options);
+    }
+
     void Submit() => visible = false;
     void Android()
     {
