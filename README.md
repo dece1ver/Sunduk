@@ -1,7 +1,7 @@
 # Sunduk
 PWA со всякими полезными штуками для ЧПУ
 
-https://sunduk.azurewebsites.net/ - нормальная версия  
+https://sunduk.one/ - нормальная версия  
 https://sunduk-test.azurewebsites.net/ - разрабатываемая версия со всякими новыми недописанными фичами
 
 
