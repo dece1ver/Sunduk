@@ -9,16 +9,20 @@
       "url": "icon-512.png"
     },
     {
-      "hash": "sha256-dkiD3ly6OgIgPINY0Qn57QQq\/HR9Weu5uSHvYDAiChQ=",
-      "url": "img\/android-1-1.png"
+      "hash": "sha256-p6w3pcH39uX\/+v4Hpsad8hfh3gFAAhtZbNIthXWhA34=",
+      "url": "img\/android_setup_1.png"
     },
     {
-      "hash": "sha256-UEQ27YU2p5sTfUVmKSV18MmWAANrq+EmtVHJww8sKDY=",
-      "url": "img\/android-1.png"
+      "hash": "sha256-b9BPWah\/1CtXrAn7SZaYrrw5aAE6DFCOsCnhOgLsMW4=",
+      "url": "img\/android_setup_2.png"
     },
     {
-      "hash": "sha256-3DGKWQFRIytqZosJw1wMORrxCHuJShfvsVoAgVsjvGM=",
-      "url": "img\/android-2.png"
+      "hash": "sha256-28dyGe+Z6gGPAxMtwIVr+4cVAnZM5uZBx4ntsvmPL30=",
+      "url": "img\/apple_setup_1.png"
+    },
+    {
+      "hash": "sha256-P6Zmb2FiM7R2RBrrzVRvyQ56sLPZ+76wBtTikcEDTao=",
+      "url": "img\/apple_setup_2.png"
     },
     {
       "hash": "sha256-Dh8be2sQBZqL5khEsl8aHpdpu0dBJqL\/IEXpZOKjlpo=",
@@ -85,7 +89,7 @@
       "url": "img\/stuffimages\/radius\/int_tool_radius.svg"
     },
     {
-      "hash": "sha256-hDzsI1v\/8lUDokUvD+8jMXVFmT6X9weLsmkY1IuROUk=",
+      "hash": "sha256-oAXvuC30wxlpBMivjiRDx0p\/mwZPbvsia0Y1XmdK5rw=",
       "url": "index.html"
     },
     {
@@ -93,8 +97,16 @@
       "url": "manifest.json"
     },
     {
-      "hash": "sha256-S4rv9afPPo9+NH9ljmq2SvjelDD88++6lyRFiCaasYg=",
+      "hash": "sha256-TddPu5njvJKxeh53Lz9JAiZ5yRbcJZ9wQ\/uSz6tBKMk=",
+      "url": "qr.png"
+    },
+    {
+      "hash": "sha256-O8yXdmf6wwa1Rd0+hIZhEdALzJf2L3cMUH4aidAdaAM=",
       "url": "qr.svg"
+    },
+    {
+      "hash": "sha256-8ggzRxdcj8+pGyzAnzQuny8FjqwVDwDpwhgz8eTer9Q=",
+      "url": "v.svg"
     },
     {
       "hash": "sha256-PvlHrby1PYtdX46ITs6pB8iDNqXNcewh8Eoa\/Gm2+GM=",
@@ -213,7 +225,7 @@
       "url": "_framework\/System.IO.Pipelines.dll"
     },
     {
-      "hash": "sha256-HPEOXq\/+zo\/dqUPry\/xU7p\/KFi1yA63NddERTs6dcUw=",
+      "hash": "sha256-Nqr7ew3nwiv6+kgB2dVWrKA4Oia6pE8sv4PMb8ZONOE=",
       "url": "_framework\/Sunduk.dll"
     },
     {
@@ -321,7 +333,7 @@
       "url": "_framework\/System.Private.CoreLib.dll"
     },
     {
-      "hash": "sha256-WUR7qP5yCTDNj9KK480gkaqe+wdflGtIDW+nl6VN57U=",
+      "hash": "sha256-yzoe5EtzabXT5HZY9lE4DhsjOo7m9qDtqwu4NK7NG8g=",
       "url": "_framework\/blazor.boot.json"
     },
     {
@@ -329,5 +341,5 @@
       "url": "_framework\/blazor.webassembly.js"
     }
   ],
-  "version": "yKGPxZ7v"
+  "version": "GspEjrIj"
 };
