@@ -1,4 +1,9 @@
-﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+﻿<style>
+    .monofield {
+        font-family: 'Roboto Mono', monospace;
+    }
+</style>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid>
         <MudItem xs="12" sm="4" md="4" lg="3" xl="3">
             <MudField Label="Тип скругления" Variant="Variant.Outlined" InnerPadding="false">
@@ -30,7 +35,7 @@
             </MudItem>
             <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
                 <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="ExampleLines" Value="@RadiusExample" />
+                    <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@RadiusExample" />
                 </MudItem>
             </MudExpansionPanel>
         }

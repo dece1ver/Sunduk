@@ -3,6 +3,9 @@
     .tl{
         padding: 0px 15px 0px 0px;
     }
+    .monofield{
+        font-family: 'Roboto Mono', monospace;
+    }
 </style>
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-2">
     <MudGrid>
@@ -98,7 +101,7 @@
     </MudExpansionPanel>
     <MudExpansionPanel Text="Пример программы для Fanuc">
         <MudItem xs="12">
-            <MudTextField Variant="Variant.Outlined" Style="font-family: Consolas" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z0. S{SpindleSpeed} M3 G97\n" +
+            <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z0. S{SpindleSpeed} M3 G97\n" +
                                 $"G76 P0201{Thread.Profile(ThreadStandart)} Q{(int)(Passes.Last()*1000)} R0.1\n" +
                                 $"G76 X{EndDiameter} Z-20. P{(int)(Passes.Sum()*1000)} Q{(int)(Passes[0]*1000)} F{ThreadPitch.NC()}")">
             </MudTextField>
