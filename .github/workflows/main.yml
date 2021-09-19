@@ -31,8 +31,8 @@ jobs:
       - name: Publish .NET Core Project
         run: dotnet publish Sunduk.PWA/Sunduk.PWA.csproj -c Release --output release --nologo
         
-      - name: Change base-tag in index.html from / to BlazorGitHubPagesDemo
-        run: sed -i 's/<base href="\/" \/>/<base href="\/Sunduk\/" \/>/g' release/wwwroot/index.html
+      #- name: Change base-tag in index.html from / to BlazorGitHubPagesDemo
+      #  run: sed -i 's/<base href="\/" \/>/<base href="\/Sunduk\/" \/>/g' release/wwwroot/index.html
       
       - name: Add .nojekyll file
         run: touch release/wwwroot/.nojekyll
