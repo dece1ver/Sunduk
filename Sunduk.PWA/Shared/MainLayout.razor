@@ -31,37 +31,33 @@
     <DialogContent>
         @if (!androidhelp && !applehelp)
         {
-            <img src="/qr.svg" asp-append-version="true" width="300" />
+            <img src="/qr.svg" asp-append-version="true" width="300" height="325" />
         }
         @if (androidhelp)
         {
-            <div id="android" class="ma-0" style="height:305px;width:300px;overflow: auto;">
+            <div id="android" class="ma-0" style="height:330px;width:300px;overflow: auto;">
                 <MudPaper Elevation="0">
-                    <MudText Typo="Typo.caption" Align="Align.Center">"Установку" нормально поддерживает только Google Chrome. После сканирования QR-кода и открытия сундука в браузере телефона появится предложение установить.</MudText>
-                    <img src="/img/android-1.png" asp-append-version="true" width="280" />
-                    <MudText Typo="Typo.caption" Align="Align.Center">Если предложения установить нет, то в выпадающем меню также есть пункт "Установить приложение"</MudText>
-                    <img src="/img/android-1-1.png" asp-append-version="true" width="280" />
-                    <MudText Typo="Typo.caption" Align="Align.Center">После чего нужно подтвердить установку.</MudText>
-                    <img src="/img/android-2.png" asp-append-version="true" width="280" />
+                    <MudText Typo="Typo.body2" Align="Align.Center">После сканирования QR-кода и открытия сундука в браузере телефона появится предложение установить.</MudText>
+                    <img src="/img/android_setup_1.png" asp-append-version="true" width="290" />
+                    <MudText Typo="Typo.body2" Align="Align.Center">Если предложения установить нет, то в выпадающем меню также есть пункт "Установить приложение"</MudText>
+                    <img src="/img/android_setup_2.png" asp-append-version="true" width="290" />
                 </MudPaper>
             </div>
         }
         @if (applehelp)
         {
-            <div id="apple" class="ma-0" style="height:305px;width:300px;overflow: auto;">
+            <div id="apple" class="ma-0" style="height:330px;width:300px;overflow: auto;">
                 <MudPaper Elevation="0">
-                    <MudText Typo="Typo.body1" Align="Align.Center">Картинки запилю потом.</MudText>
-                    <MudText Typo="Typo.caption" Align="Align.Center">"Установку" нормально поддерживает Safari и, наверное, Google Chrome. После сканирования QR-кода и открытия сундука в браузере телефона нажимаем "поделиться".</MudText>
-                    <MudDivider />
-                    <MudText Typo="Typo.caption" Align="Align.Center">Листаем и нажимаем "На экран «Домой»"</MudText>
-                    <MudDivider />
-                    <MudText Typo="Typo.caption" Align="Align.Center">После чего нужно подтвердить установку.</MudText>
+                    <MudText Typo="Typo.body2" Align="Align.Center">После сканирования QR-кода и открытия сундука в браузере телефона нажимаем "поделиться".</MudText>
+                    <img src="/img/apple_setup_1.png" asp-append-version="true" width="290" />
+                    <MudText Typo="Typo.body2" Align="Align.Center">Листаем и нажимаем "На экран «Домой»"</MudText>
+                    <img src="/img/apple_setup_2.png" asp-append-version="true" width="290" />
                 </MudPaper>
             </div>
         }
     </DialogContent>
     <DialogActions>
-        <MudText Typo="Typo.caption">Установка:</MudText>
+        <MudText Typo="Typo.body2">Установка:</MudText>
         <MudIconButton Icon="@Icons.Material.Filled.Android" Color="Color.Primary" OnClick="Android"></MudIconButton>
         <MudIconButton Icon="@Icons.Custom.Brands.Apple" Color="Color.Primary" OnClick="Apple" Class="mr-3"></MudIconButton>
         <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="Submit" Class="px-10 mr-4">OK</MudButton>
