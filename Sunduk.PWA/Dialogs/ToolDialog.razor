@@ -3,405 +3,407 @@
 <MudDialog>
     <TitleContent>Редактор инструмента</TitleContent>
     <DialogContent>
-        <MudSwipeArea OnSwipe="@OnSwipe">
-            <MudTabs @ref="tabs">
-                <MudTabPanel Text="Точение наружное" BadgeData="@(TurningExternalTools.Count)">
-                    <MudTable Items="TurningExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedTurningExternalTool">
-                        <HeaderContent>
-                            <MudTh>Позиция</MudTh>
-                            <MudTh>Описание</MudTh>
-                            <MudTh>Угол кромки</MudTh>
-                            <MudTh>Радиус кромки</MudTh>
-                            <MudTh>Исполнение</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
-                            <MudTd DataLabel="Тип">@(context.Type == TurningExternalTool.Types.Bar ? "Проходной" : "Подрезной")</MudTd>
-                            <MudTd DataLabel="Угол кромки">@context.Angle.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Радиус кромки">@context.Radius.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
-                        </RowTemplate>
-                        <RowEditingTemplate>
-                            <MudTd DataLabel="Позиция">
-                                <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Тип">
-                                <MudSelect T="TurningExternalTool.Types" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="@context.Type" Required>
-                                    <MudSelectItem Value="@TurningExternalTool.Types.Bar">Проходной</MudSelectItem>
-                                    <MudSelectItem Value="@TurningExternalTool.Types.Face">Подрезной</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                            <MudTd DataLabel="Угол кромки">
-                                <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Радиус кромки">
-                                <MudTextField @bind-Value="@context.Radius" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Исполнение">
-                                <MudSelect T="Tool.ToolHand" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="@context.Hand" Required>
-                                    <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
-                                    <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                        </RowEditingTemplate>
-                    </MudTable>
-                    <div class="mt-3 ml-0 d-flex">
-                        <div class="d-flex ml-auto align-center">
-                            <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTurningExternalTool"/>
-                            <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveTurningExternalTool"/>
+        <MudContainer Style="overflow-y: scroll; max-height: 500px">
+            <MudSwipeArea OnSwipe="@OnSwipe">
+                <MudTabs @ref="tabs">
+                    <MudTabPanel Text="Точение наружное" BadgeData="@(TurningExternalTools.Count)">
+                        <MudTable Items="TurningExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedTurningExternalTool">
+                            <HeaderContent>
+                                <MudTh>Позиция</MudTh>
+                                <MudTh>Описание</MudTh>
+                                <MudTh>Угол кромки</MudTh>
+                                <MudTh>Радиус кромки</MudTh>
+                                <MudTh>Исполнение</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                                <MudTd DataLabel="Тип">@(context.Type == TurningExternalTool.Types.Bar ? "Проходной" : "Подрезной")</MudTd>
+                                <MudTd DataLabel="Угол кромки">@context.Angle.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Радиус кромки">@context.Radius.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
+                            </RowTemplate>
+                            <RowEditingTemplate>
+                                <MudTd DataLabel="Позиция">
+                                    <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Тип">
+                                    <MudSelect T="TurningExternalTool.Types" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="@context.Type" Required>
+                                        <MudSelectItem Value="@TurningExternalTool.Types.Bar">Проходной</MudSelectItem>
+                                        <MudSelectItem Value="@TurningExternalTool.Types.Face">Подрезной</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                                <MudTd DataLabel="Угол кромки">
+                                    <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Радиус кромки">
+                                    <MudTextField @bind-Value="@context.Radius" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Исполнение">
+                                    <MudSelect T="Tool.ToolHand" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="@context.Hand" Required>
+                                        <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
+                                        <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                            </RowEditingTemplate>
+                        </MudTable>
+                        <div class="mt-3 ml-0 d-flex">
+                            <div class="d-flex ml-auto align-center">
+                                <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTurningExternalTool" />
+                                <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveTurningExternalTool" />
+                            </div>
                         </div>
-                    </div>
-                </MudTabPanel>
+                    </MudTabPanel>
 
-                <MudTabPanel Text="Точение внутреннее" BadgeData="@(TurningInternalTools.Count)">
-                    <MudTable Items="TurningInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedTurningInternalTool">
-                        <HeaderContent>
-                            <MudTh>Позиция</MudTh>
-                            <MudTh>Диаметр</MudTh>
-                            <MudTh>Угол кромки</MudTh>
-                            <MudTh>Радиус кромки</MudTh>
-                            <MudTh>Исполнение</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
-                            <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Угол кромки">@context.Angle.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Радиус кромки">@context.Radius.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
-                        </RowTemplate>
-                        <RowEditingTemplate>
-                            <MudTd DataLabel="Позиция">
-                                <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Диаметр">
-                                <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Угол кромки">
-                                <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Радиус кромки">
-                                <MudTextField @bind-Value="@context.Radius" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Исполнение">
-                                <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                    <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
-                                    <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                        </RowEditingTemplate>
-                    </MudTable>
-                    <div class="mt-3 ml-0 d-flex">
-                        <div class="d-flex ml-auto align-center">
-                            <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTurningInternalTool" />
-                            <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveTurningInternalTool" />
+                    <MudTabPanel Text="Точение внутреннее" BadgeData="@(TurningInternalTools.Count)">
+                        <MudTable Items="TurningInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedTurningInternalTool">
+                            <HeaderContent>
+                                <MudTh>Позиция</MudTh>
+                                <MudTh>Диаметр</MudTh>
+                                <MudTh>Угол кромки</MudTh>
+                                <MudTh>Радиус кромки</MudTh>
+                                <MudTh>Исполнение</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                                <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Угол кромки">@context.Angle.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Радиус кромки">@context.Radius.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
+                            </RowTemplate>
+                            <RowEditingTemplate>
+                                <MudTd DataLabel="Позиция">
+                                    <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Диаметр">
+                                    <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Угол кромки">
+                                    <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Радиус кромки">
+                                    <MudTextField @bind-Value="@context.Radius" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Исполнение">
+                                    <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                        <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
+                                        <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                            </RowEditingTemplate>
+                        </MudTable>
+                        <div class="mt-3 ml-0 d-flex">
+                            <div class="d-flex ml-auto align-center">
+                                <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTurningInternalTool" />
+                                <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveTurningInternalTool" />
+                            </div>
                         </div>
-                    </div>
-                </MudTabPanel>
+                    </MudTabPanel>
 
-                <MudTabPanel Text="Канавки и отрезка наружные" BadgeData="@(GroovingExternalTools.Count)">
-                    <MudTable Items="GroovingExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedGroovingExternalTool">
-                        <HeaderContent>
-                            <MudTh>Позиция</MudTh>
-                            <MudTh>Тип</MudTh>
-                            <MudTh>Ширина</MudTh>
-                            <MudTh>Привязка</MudTh>
-                            <MudTh>Исполнение</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
-                            @if (context.Type == GroovingExternalTool.Types.Grooving)
-                            {<MudTd DataLabel="Тип">Канавочный</MudTd>}
-                            @if (context.Type == GroovingExternalTool.Types.Cutting)
-                            {<MudTd DataLabel="Тип">Отрезной</MudTd>}
-                            @if (context.Type == GroovingExternalTool.Types.Blade)
-                            {<MudTd DataLabel="Тип">Лезвие</MudTd>}
-                            <MudTd DataLabel="Ширина">@context.Width.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Привязка">@(context.ZeroPoint == GroovingExternalTool.Point.Left ? "Как проходной" : "Как отрезной")</MudTd>
-                            <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
-                        </RowTemplate>
-                        <RowEditingTemplate>
-                            <MudTd DataLabel="Позиция">
-                                <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Тип">
-                                <MudSelect T="GroovingExternalTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                    <MudSelectItem Value="@GroovingExternalTool.Types.Grooving">Канавочный</MudSelectItem>
-                                    <MudSelectItem Value="@GroovingExternalTool.Types.Cutting">Отрезной</MudSelectItem>
-                                    <MudSelectItem Value="@GroovingExternalTool.Types.Blade">Лезвие</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                            <MudTd DataLabel="Ширина">
-                                <MudTextField @bind-Value="@context.Width" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Привязка">
-                                <MudSelect T="GroovingExternalTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                    <MudSelectItem Value="@GroovingExternalTool.Point.Left">Как проходной</MudSelectItem>
-                                    <MudSelectItem Value="@GroovingExternalTool.Point.Right">Как отрезной</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                            <MudTd DataLabel="Исполнение">
-                                <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                    <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
-                                    <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                        </RowEditingTemplate>
-                    </MudTable>
-                    <div class="mt-3 ml-0 d-flex">
-                        <div class="d-flex ml-auto align-center">
-                            <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddGroovingExternalTool" />
-                            <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveGroovingExternalTool" />
+                    <MudTabPanel Text="Канавки и отрезка наружные" BadgeData="@(GroovingExternalTools.Count)">
+                        <MudTable Items="GroovingExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedGroovingExternalTool">
+                            <HeaderContent>
+                                <MudTh>Позиция</MudTh>
+                                <MudTh>Тип</MudTh>
+                                <MudTh>Ширина</MudTh>
+                                <MudTh>Привязка</MudTh>
+                                <MudTh>Исполнение</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                                @if (context.Type == GroovingExternalTool.Types.Grooving)
+                                {<MudTd DataLabel="Тип">Канавочный</MudTd>}
+                                @if (context.Type == GroovingExternalTool.Types.Cutting)
+                                {<MudTd DataLabel="Тип">Отрезной</MudTd>}
+                                @if (context.Type == GroovingExternalTool.Types.Blade)
+                                {<MudTd DataLabel="Тип">Лезвие</MudTd>}
+                                <MudTd DataLabel="Ширина">@context.Width.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Привязка">@(context.ZeroPoint == GroovingExternalTool.Point.Left ? "Как проходной" : "Как отрезной")</MudTd>
+                                <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
+                            </RowTemplate>
+                            <RowEditingTemplate>
+                                <MudTd DataLabel="Позиция">
+                                    <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Тип">
+                                    <MudSelect T="GroovingExternalTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                        <MudSelectItem Value="@GroovingExternalTool.Types.Grooving">Канавочный</MudSelectItem>
+                                        <MudSelectItem Value="@GroovingExternalTool.Types.Cutting">Отрезной</MudSelectItem>
+                                        <MudSelectItem Value="@GroovingExternalTool.Types.Blade">Лезвие</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                                <MudTd DataLabel="Ширина">
+                                    <MudTextField @bind-Value="@context.Width" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Привязка">
+                                    <MudSelect T="GroovingExternalTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                        <MudSelectItem Value="@GroovingExternalTool.Point.Left">Как проходной</MudSelectItem>
+                                        <MudSelectItem Value="@GroovingExternalTool.Point.Right">Как отрезной</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                                <MudTd DataLabel="Исполнение">
+                                    <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                        <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
+                                        <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                            </RowEditingTemplate>
+                        </MudTable>
+                        <div class="mt-3 ml-0 d-flex">
+                            <div class="d-flex ml-auto align-center">
+                                <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddGroovingExternalTool" />
+                                <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveGroovingExternalTool" />
+                            </div>
                         </div>
-                    </div>
-                </MudTabPanel>
+                    </MudTabPanel>
 
-                <MudTabPanel Text="Канавки и отрезка внутренние" BadgeData="@(GroovingInternalTools.Count)">
-                    <MudTable Items="GroovingInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedGroovingInternalTool" >
-                        <HeaderContent>
-                            <MudTh>Позиция</MudTh>
-                            <MudTh>Диаметр</MudTh>
-                            <MudTh>Ширина</MudTh>
-                            <MudTh>Привязка</MudTh>
-                            <MudTh>Исполнение</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
-                            <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Ширина">@context.Width.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Привязка">@(context.ZeroPoint == GroovingInternalTool.Point.Left ? "Как расточной" : "Как отрезной")</MudTd>
-                            <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
-                        </RowTemplate>
-                        <RowEditingTemplate>
-                            <MudTd DataLabel="Позиция">
-                                <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Диаметр">
-                                <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Ширина">
-                                <MudTextField @bind-Value="@context.Width" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Привязка">
-                                <MudSelect T="GroovingInternalTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                    <MudSelectItem Value="@GroovingInternalTool.Point.Left">Как расточной</MudSelectItem>
-                                    <MudSelectItem Value="@GroovingInternalTool.Point.Right">Как отрезной</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                            <MudTd DataLabel="Исполнение">
-                                <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                    <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
-                                    <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                        </RowEditingTemplate>
-                    </MudTable>
-                    <div class="mt-3 ml-0 d-flex">
-                        <div class="d-flex ml-auto align-center">
-                            <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddGroovingInternalTool" />
-                            <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveGroovingInternalTool" />
+                    <MudTabPanel Text="Канавки и отрезка внутренние" BadgeData="@(GroovingInternalTools.Count)">
+                        <MudTable Items="GroovingInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedGroovingInternalTool">
+                            <HeaderContent>
+                                <MudTh>Позиция</MudTh>
+                                <MudTh>Диаметр</MudTh>
+                                <MudTh>Ширина</MudTh>
+                                <MudTh>Привязка</MudTh>
+                                <MudTh>Исполнение</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                                <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Ширина">@context.Width.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Привязка">@(context.ZeroPoint == GroovingInternalTool.Point.Left ? "Как расточной" : "Как отрезной")</MudTd>
+                                <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
+                            </RowTemplate>
+                            <RowEditingTemplate>
+                                <MudTd DataLabel="Позиция">
+                                    <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Диаметр">
+                                    <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Ширина">
+                                    <MudTextField @bind-Value="@context.Width" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Привязка">
+                                    <MudSelect T="GroovingInternalTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                        <MudSelectItem Value="@GroovingInternalTool.Point.Left">Как расточной</MudSelectItem>
+                                        <MudSelectItem Value="@GroovingInternalTool.Point.Right">Как отрезной</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                                <MudTd DataLabel="Исполнение">
+                                    <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                        <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
+                                        <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                            </RowEditingTemplate>
+                        </MudTable>
+                        <div class="mt-3 ml-0 d-flex">
+                            <div class="d-flex ml-auto align-center">
+                                <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddGroovingInternalTool" />
+                                <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveGroovingInternalTool" />
+                            </div>
                         </div>
-                    </div>
-                </MudTabPanel>
+                    </MudTabPanel>
 
-                <MudTabPanel Text="Точение наружной резьбы" BadgeData="@(ThreadingExternalTools.Count)">
-                    <MudTable Items="ThreadingExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedThreadingExternalTool">
-                        <HeaderContent>
-                            <MudTh>Позиция</MudTh>
-                            <MudTh>Шаг</MudTh>
-                            <MudTh>Угол опорной пластины</MudTh>
-                            <MudTh>Исполнение</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
-                            <MudTd DataLabel="Шаг">@context.Pitch.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Угол опорной пластины">@context.Angle.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
-                        </RowTemplate>
-                        <RowEditingTemplate>
-                            <MudTd DataLabel="Позиция">
-                                <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Шаг">
-                                <MudTextField @bind-Value="@context.Pitch" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Угол опорной пластины">
-                                <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Исполнение">
-                                <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                    <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
-                                    <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                        </RowEditingTemplate>
-                    </MudTable>
-                    <div class="mt-3 ml-0 d-flex">
-                        <div class="d-flex ml-auto align-center">
-                            <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddThreadingExternalTool" />
-                            <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveThreadingExternalTool" />
+                    <MudTabPanel Text="Точение наружной резьбы" BadgeData="@(ThreadingExternalTools.Count)">
+                        <MudTable Items="ThreadingExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedThreadingExternalTool">
+                            <HeaderContent>
+                                <MudTh>Позиция</MudTh>
+                                <MudTh>Шаг</MudTh>
+                                <MudTh>Угол опорной пластины</MudTh>
+                                <MudTh>Исполнение</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                                <MudTd DataLabel="Шаг">@context.Pitch.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Угол опорной пластины">@context.Angle.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
+                            </RowTemplate>
+                            <RowEditingTemplate>
+                                <MudTd DataLabel="Позиция">
+                                    <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Шаг">
+                                    <MudTextField @bind-Value="@context.Pitch" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Угол опорной пластины">
+                                    <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Исполнение">
+                                    <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                        <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
+                                        <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                            </RowEditingTemplate>
+                        </MudTable>
+                        <div class="mt-3 ml-0 d-flex">
+                            <div class="d-flex ml-auto align-center">
+                                <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddThreadingExternalTool" />
+                                <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveThreadingExternalTool" />
+                            </div>
                         </div>
-                    </div>
-                </MudTabPanel>
+                    </MudTabPanel>
 
-                <MudTabPanel Text="Точение внутренней резьбы" BadgeData="@(ThreadingInternalTools.Count)">
-                    <MudTable Items="ThreadingInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedThreadingInternalTool">
-                        <HeaderContent>
-                            <MudTh>Позиция</MudTh>
-                            <MudTh>Диаметр</MudTh>
-                            <MudTh>Шаг</MudTh>
-                            <MudTh>Угол опорной пластины</MudTh>
-                            <MudTh>Исполнение</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
-                            <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Шаг">@context.Pitch.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Угол опорной пластины">@context.Angle.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
-                        </RowTemplate>
-                        <RowEditingTemplate>
-                            <MudTd DataLabel="Позиция">
-                                <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Диаметр">
-                                <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Шаг">
-                                <MudTextField @bind-Value="@context.Pitch" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Угол опорной пластины">
-                                <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Исполнение">
-                                <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Margin="Margin.Dense" Required>
-                                    <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
-                                    <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                        </RowEditingTemplate>
-                    </MudTable>
-                    <div class="mt-3 ml-0 d-flex">
-                        <div class="d-flex ml-auto align-center">
-                            <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddThreadingInternalTool" />
-                            <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveThreadingInternalTool" />
+                    <MudTabPanel Text="Точение внутренней резьбы" BadgeData="@(ThreadingInternalTools.Count)">
+                        <MudTable Items="ThreadingInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedThreadingInternalTool">
+                            <HeaderContent>
+                                <MudTh>Позиция</MudTh>
+                                <MudTh>Диаметр</MudTh>
+                                <MudTh>Шаг</MudTh>
+                                <MudTh>Угол опорной пластины</MudTh>
+                                <MudTh>Исполнение</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                                <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Шаг">@context.Pitch.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Угол опорной пластины">@context.Angle.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
+                            </RowTemplate>
+                            <RowEditingTemplate>
+                                <MudTd DataLabel="Позиция">
+                                    <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Диаметр">
+                                    <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Шаг">
+                                    <MudTextField @bind-Value="@context.Pitch" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Угол опорной пластины">
+                                    <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Исполнение">
+                                    <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Margin="Margin.Dense" Required>
+                                        <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
+                                        <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                            </RowEditingTemplate>
+                        </MudTable>
+                        <div class="mt-3 ml-0 d-flex">
+                            <div class="d-flex ml-auto align-center">
+                                <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddThreadingInternalTool" />
+                                <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveThreadingInternalTool" />
+                            </div>
                         </div>
-                    </div>
-                </MudTabPanel>
+                    </MudTabPanel>
 
-                <MudTabPanel Text="Сверла" BadgeData="@(DrillingTools.Count)">
-                    <MudTable Items="DrillingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedDrillingTool">
-                        <HeaderContent>
-                            <MudTh>Позиция</MudTh>
-                            <MudTh>Диаметр</MudTh>
-                            <MudTh>Угол</MudTh>
-                            <MudTh>Тип</MudTh>
-                            <MudTh>Исполнение</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
-                            <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Угол">@context.Angle.ToPrettyString()</MudTd>
-                            @if (context.Type == DrillingTool.Types.Solid)
-                            {<MudTd DataLabel="Тип">Твердосплавное</MudTd>}
-                            @if (context.Type == DrillingTool.Types.Insert)
-                            {<MudTd DataLabel="Тип">С пластинами</MudTd>}
-                            @if (context.Type == DrillingTool.Types.Tip)
-                            {<MudTd DataLabel="Тип">С головкой</MudTd>}
-                            @if (context.Type == DrillingTool.Types.HSS)
-                            {<MudTd DataLabel="Тип">Быстрорез</MudTd>}
-                            @if (context.Type == DrillingTool.Types.Center)
-                            {<MudTd DataLabel="Тип">Центровочное</MudTd>}
-                            <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
-                        </RowTemplate>
-                        <RowEditingTemplate>
-                            <MudTd DataLabel="Позиция">
-                                <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Диаметр">
-                                <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Угол">
-                                <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Тип">
-                                <MudSelect T="DrillingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                    <MudSelectItem Value="@DrillingTool.Types.Solid">Твердосплавное</MudSelectItem>
-                                    <MudSelectItem Value="@DrillingTool.Types.Insert">С пластинами</MudSelectItem>
-                                    <MudSelectItem Value="@DrillingTool.Types.Tip">С головкой</MudSelectItem>
-                                    <MudSelectItem Value="@DrillingTool.Types.HSS">Быстрорез</MudSelectItem>
-                                    <MudSelectItem Value="@DrillingTool.Types.Center">Центровочное</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                            <MudTd DataLabel="Исполнение">
-                                <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                    <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
-                                    <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                        </RowEditingTemplate>
-                    </MudTable>
-                    <div class="mt-3 ml-0 d-flex">
-                        <div class="d-flex ml-auto align-center">
-                            <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddDrillingTool" />
-                            <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveDrillingTool" />
+                    <MudTabPanel Text="Сверла" BadgeData="@(DrillingTools.Count)">
+                        <MudTable Items="DrillingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedDrillingTool">
+                            <HeaderContent>
+                                <MudTh>Позиция</MudTh>
+                                <MudTh>Диаметр</MudTh>
+                                <MudTh>Угол</MudTh>
+                                <MudTh>Тип</MudTh>
+                                <MudTh>Исполнение</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                                <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Угол">@context.Angle.ToPrettyString()</MudTd>
+                                @if (context.Type == DrillingTool.Types.Solid)
+                                {<MudTd DataLabel="Тип">Твердосплавное</MudTd>}
+                                @if (context.Type == DrillingTool.Types.Insert)
+                                {<MudTd DataLabel="Тип">С пластинами</MudTd>}
+                                @if (context.Type == DrillingTool.Types.Tip)
+                                {<MudTd DataLabel="Тип">С головкой</MudTd>}
+                                @if (context.Type == DrillingTool.Types.HSS)
+                                {<MudTd DataLabel="Тип">Быстрорез</MudTd>}
+                                @if (context.Type == DrillingTool.Types.Center)
+                                {<MudTd DataLabel="Тип">Центровочное</MudTd>}
+                                <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
+                            </RowTemplate>
+                            <RowEditingTemplate>
+                                <MudTd DataLabel="Позиция">
+                                    <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Диаметр">
+                                    <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Угол">
+                                    <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Тип">
+                                    <MudSelect T="DrillingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                        <MudSelectItem Value="@DrillingTool.Types.Solid">Твердосплавное</MudSelectItem>
+                                        <MudSelectItem Value="@DrillingTool.Types.Insert">С пластинами</MudSelectItem>
+                                        <MudSelectItem Value="@DrillingTool.Types.Tip">С головкой</MudSelectItem>
+                                        <MudSelectItem Value="@DrillingTool.Types.HSS">Быстрорез</MudSelectItem>
+                                        <MudSelectItem Value="@DrillingTool.Types.Center">Центровочное</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                                <MudTd DataLabel="Исполнение">
+                                    <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                        <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
+                                        <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                            </RowEditingTemplate>
+                        </MudTable>
+                        <div class="mt-3 ml-0 d-flex">
+                            <div class="d-flex ml-auto align-center">
+                                <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddDrillingTool" />
+                                <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveDrillingTool" />
+                            </div>
                         </div>
-                    </div>
-                </MudTabPanel>
+                    </MudTabPanel>
 
-                <MudTabPanel Text="Метчики" BadgeData="@(TappingTools.Count)">
-                    <MudTable Items="TappingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedTappingTool">
-                        <HeaderContent>
-                            <MudTh>Позиция</MudTh>
-                            <MudTh>Диаметр</MudTh>
-                            <MudTh>Шаг</MudTh>
-                            <MudTh>Тип</MudTh>
-                            <MudTh>Исполнение</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
-                            <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
-                            <MudTd DataLabel="Шаг">@context.Pitch.ToPrettyString()</MudTd>
-                            @if (context.Type == TappingTool.Types.Cutting)
-                            {<MudTd DataLabel="Тип">Нарезной</MudTd>}
-                            @if (context.Type == TappingTool.Types.Forming)
-                            {<MudTd DataLabel="Тип">Раскатник</MudTd>}
-                            <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
-                        </RowTemplate>
-                        <RowEditingTemplate>
-                            <MudTd DataLabel="Позиция">
-                                <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Диаметр">
-                                <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Шаг">
-                                <MudTextField @bind-Value="@context.Pitch" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
-                            </MudTd>
-                            <MudTd DataLabel="Тип">
-                                <MudSelect T="TappingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                    <MudSelectItem Value="@TappingTool.Types.Cutting">Нарезной</MudSelectItem>
-                                    <MudSelectItem Value="@TappingTool.Types.Forming">Раскатник</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                            <MudTd DataLabel="Исполнение">
-                                <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Required>
-                                    <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
-                                    <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
-                                </MudSelect>
-                            </MudTd>
-                        </RowEditingTemplate>
-                    </MudTable>
-                    
-                    <div class="mt-3 ml-0 d-flex">
-                        <div class="d-flex ml-auto align-center">
-                            <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTappingTool" />
-                            <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveTappingTool" />
+                    <MudTabPanel Text="Метчики" BadgeData="@(TappingTools.Count)">
+                        <MudTable Items="TappingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedTappingTool">
+                            <HeaderContent>
+                                <MudTh>Позиция</MudTh>
+                                <MudTh>Диаметр</MudTh>
+                                <MudTh>Шаг</MudTh>
+                                <MudTh>Тип</MudTh>
+                                <MudTh>Исполнение</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                                <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
+                                <MudTd DataLabel="Шаг">@context.Pitch.ToPrettyString()</MudTd>
+                                @if (context.Type == TappingTool.Types.Cutting)
+                                {<MudTd DataLabel="Тип">Нарезной</MudTd>}
+                                @if (context.Type == TappingTool.Types.Forming)
+                                {<MudTd DataLabel="Тип">Раскатник</MudTd>}
+                                <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
+                            </RowTemplate>
+                            <RowEditingTemplate>
+                                <MudTd DataLabel="Позиция">
+                                    <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Диаметр">
+                                    <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Шаг">
+                                    <MudTextField @bind-Value="@context.Pitch" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                                </MudTd>
+                                <MudTd DataLabel="Тип">
+                                    <MudSelect T="TappingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                        <MudSelectItem Value="@TappingTool.Types.Cutting">Нарезной</MudSelectItem>
+                                        <MudSelectItem Value="@TappingTool.Types.Forming">Раскатник</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                                <MudTd DataLabel="Исполнение">
+                                    <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Required>
+                                        <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
+                                        <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+                                    </MudSelect>
+                                </MudTd>
+                            </RowEditingTemplate>
+                        </MudTable>
+
+                        <div class="mt-3 ml-0 d-flex">
+                            <div class="d-flex ml-auto align-center">
+                                <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTappingTool" />
+                                <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveTappingTool" />
+                            </div>
                         </div>
-                    </div>
-                </MudTabPanel>
+                    </MudTabPanel>
 
-            </MudTabs>
-        </MudSwipeArea>
+                </MudTabs>
+            </MudSwipeArea>
+        </MudContainer>
     </DialogContent>
     <DialogActions>
         <MudButtonGroup Class="mr-3" Variant="Variant.Outlined" OverrideStyles="false">
