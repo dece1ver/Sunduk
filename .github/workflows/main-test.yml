@@ -40,3 +40,4 @@ jobs:
           branch: gh-test-pages
           folder: release/wwwroot
           repository-name: dece1ver/sunduk-test
+          token: ${{ secrets.ACCESS_TOKEN }}
