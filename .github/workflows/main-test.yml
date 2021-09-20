@@ -36,4 +36,4 @@ jobs:
         with:
           branch: gh-test-pages
           folder: release/wwwroot
-          repository-name: sunduk-test
+          repository-name: dece1ver/sunduk-test
