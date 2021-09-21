@@ -1,30 +1,43 @@
 ﻿@page "/calculator"
 
+<style>
+    .monofield {
+        font-family: 'Roboto Mono', monospace;
+    }
+</style>
+
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-2">
     <MudGrid Justify="Justify.SpaceAround">
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="DiameterString" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+            <MudTextField @bind-Value="DiameterString" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Диаметр" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="EdgesString" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Зубья" Variant="Variant.Text" Immediate="true" />
+            <MudTextField @bind-Value="EdgesString" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Зубья" Variant="Variant.Filled" Immediate="true" />
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="CutSpeedString" @onfocusin="@(() => CalcSpins = true)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Скорость" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
+            <MudTextField @bind-Value="CutSpeedString" @onfocusin="@(() => CalcSpins = true)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Скорость" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="FeedString" @onfocusin="@(() => CalcMinFeed = true)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="@FeedUnits" Immediate="true" />
+            <MudTextField @bind-Value="FeedString" @onfocusin="@(() => CalcMinFeed = true)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Подача" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="@FeedUnits" Immediate="true" />
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="SpindleSpeedString" @onfocusin="@(() => CalcSpins = false)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Обороты" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="об/мин" Immediate="true" />
+            <MudTextField @bind-Value="SpindleSpeedString" @onfocusin="@(() => CalcSpins = false)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Обороты" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="об/мин" Immediate="true" />
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="MinFeedString" @onfocusin="@(() => CalcMinFeed = false)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
+            <MudTextField @bind-Value="MinFeedString" @onfocusin="@(() => CalcMinFeed = false)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Подача" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
         </MudItem>
+        @if (!string.IsNullOrEmpty(CalcInfo))
+        {
+            <MudItem xs="12">
+                <MudExpansionPanel Text="Как считать?">
+                    <MudTextField Variant="Variant.Text" Margin="Margin.Dense" Class="monofield" T="string" @bind-Value="@CalcInfo" ReadOnly="true" DisableUnderLine="true" Lines="(CalcInfo.Count(x => x == '\n') + 2)" />
+                </MudExpansionPanel>
+                
+            </MudItem>
+        }
     </MudGrid>
 
-    @*<MudDivider Class="mt-4"/>
-    <MudText>Диаметр: @Diameter | Скорость резания: @CutSpeed | Обороты: @SpindleSpeed | Зубья: @Edges | Подача: @Feed | Подача 2: @MinFeed</MudText>
-    <MudText>Считаем обороты: @CalcSpins | Считаем минутную подачу: @CalcMinFeed</MudText>*@
+    
 
 </MudContainer>
 
@@ -180,5 +193,33 @@
     public double MinFeed { get => Util.GetDouble(MinFeedString); }
 
     #endregion
+
+    public string CalcInfo { get
+        {
+            string text = string.Empty;
+            if (CalcSpins && Diameter > 0 && CutSpeed > 0)
+            {
+                text += $"Обороты: ({CutSpeed.ToPrettyString()} * 1000 ) / (π * {Diameter}) = {Util.ToPrettyString((CutSpeed * 1000) / (Diameter * Math.PI), 0)} об/мин";
+            }
+            if (!CalcSpins && Diameter > 0 && SpindleSpeed > 0)
+            {
+                text += $"Скорость: π * {Diameter} * {SpindleSpeed} / 1000 = {Util.ToPrettyString((Diameter * Math.PI * SpindleSpeed) / 1000, 0)} м/мин";
+            }
+            if (CalcMinFeed && Diameter > 0 && SpindleSpeed > 0 && Feed > 0)
+            {
+                text += Edges == 1 
+                    ? $"\nПодачу: {Feed.ToPrettyString()} * {SpindleSpeed} = {Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0)} мм/мин" 
+                    : $"\nПодачу: {Feed.ToPrettyString()} * {SpindleSpeed} * {Edges} = {Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0)} мм/мин";
+            }
+            if (!CalcMinFeed && Diameter > 0 && SpindleSpeed > 0 && MinFeed > 0)
+            {
+                text += Edges == 1 
+                    ? $"\nПодачу: {MinFeed} / {SpindleSpeed} = {Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3)} {FeedUnits}" 
+                    : $"\nПодачу: {MinFeed} / {SpindleSpeed} * {Edges} = {Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3)} {FeedUnits}";
+            }
+            return text;
+        }
+        set { }
+    }
 
 }
