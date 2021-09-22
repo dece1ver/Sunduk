@@ -17,7 +17,7 @@
                     <div class="d-flex">
                         <MudButtonGroup Variant="Variant.Outlined">
                             <MudIconButton Icon="@Icons.Material.TwoTone.Save" Title="Скачать программу"
-                                           OnClick="@(async () => await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, "text/plain"))" />
+                                           OnClick="DownloadProgram" />
                             <MudIconButton Icon="@Icons.Material.TwoTone.TableView" Title="Инструмент" OnClick="OpenToolDialog" />
                             <MudButton OnClick="OpenSequencelDialog" EndIcon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)">Добавить переход</MudButton>
                         </MudButtonGroup>
@@ -68,7 +68,7 @@
                 </ChildContent>
             </MudExpansionPanel>
         </MudItem>
-        <MudItem xs="12" sm="6" md="5" xl="4">
+        <MudItem xs="12" sm="6">
             <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
                 <MudList Clickable="true" Dense="true" @bind-SelectedItem="SelectedSequence" DisableGutters="true">
                     @if (Program != null)
@@ -117,7 +117,7 @@
                 </MudList>
             </MudField>
         </MudItem>
-        <MudItem xs="12" sm="6" md="7" xl="8">
+        <MudItem xs="12" sm="6">
             <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense">
                 <MudTextField T="string" DisableUnderLine="true" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
             </MudField>
@@ -320,6 +320,21 @@
         }
     }
 
+    private async Task<bool> OpenConfirmDialog(string message)
+    {
+        if (message is null) message = string.Empty;
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(message), message);
+        var options = new DialogOptions() { FullScreen = false, CloseButton = false };
+        var dialog = DialogService.Show<ConfirmDialog>("Подтверждение", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            return true;
+        }
+        return false;
+    }
+
     public List<Tool> Tools { get; set; } = new();
 
     public List<TurningExternalTool> TurningExternalTools { get; set; }
@@ -423,9 +438,10 @@
         SelectedSequence = new MudListItem { Text = $"{Program.IndexOf(seq) + 1}. {seq.Name}" };
     }
 
-    private void DownloadProgram()
+    private async Task DownloadProgram()
     {
-
+        bool resultDialog = await OpenConfirmDialog($"Скачать файл \"{NcDetailNumber}.nc\" ?");
+        if (resultDialog) await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, "text/plain");
     }
 
     public string ProgramText
@@ -527,7 +543,7 @@
             {
                 result.Add(sequence.Operation);
             }
-            return string.Join("\n", result).Trim();
+            return string.Join("\n", result).Trim() + "\nM30\n%";
         }
         set { }
     }
