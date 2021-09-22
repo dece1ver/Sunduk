@@ -139,6 +139,7 @@ namespace Sunduk.PWA.Util
                 .Replace("ОЙ", "OY")
                 .Replace("ЕЙ", "EY")
                 .Replace("ЫЙ", "IY")
+                .Replace("ЬЕ", "YE")
                 .Replace("А", "A")
                 .Replace("Б", "B")
                 .Replace("В", "V")

@@ -199,23 +199,23 @@
             string text = string.Empty;
             if (CalcSpins && Diameter > 0 && CutSpeed > 0)
             {
-                text += $"Обороты: ({CutSpeed.ToPrettyString()} * 1000 ) / (π * {Diameter}) = {Util.ToPrettyString((CutSpeed * 1000) / (Diameter * Math.PI), 0)} об/мин";
+                text += $"Обороты: ({CutSpeed.ToPrettyString()}*1000)/(π*{Diameter}) = {Util.ToPrettyString((CutSpeed * 1000) / (Diameter * Math.PI), 0)} об/мин";
             }
             if (!CalcSpins && Diameter > 0 && SpindleSpeed > 0)
             {
-                text += $"Скорость: π * {Diameter} * {SpindleSpeed} / 1000 = {Util.ToPrettyString((Diameter * Math.PI * SpindleSpeed) / 1000, 0)} м/мин";
+                text += $"Скорость: π*{Diameter}*{SpindleSpeed}/1000 = {Util.ToPrettyString((Diameter * Math.PI * SpindleSpeed) / 1000, 0)} м/мин";
             }
             if (CalcMinFeed && Diameter > 0 && SpindleSpeed > 0 && Feed > 0)
             {
                 text += Edges == 1 
-                    ? $"\nПодачу: {Feed.ToPrettyString()} * {SpindleSpeed} = {Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0)} мм/мин" 
-                    : $"\nПодачу: {Feed.ToPrettyString()} * {SpindleSpeed} * {Edges} = {Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0)} мм/мин";
+                    ? $"\nПодачу: {Feed.ToPrettyString()}*{SpindleSpeed} = {Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0)} мм/мин" 
+                    : $"\nПодачу: {Feed.ToPrettyString()}*{SpindleSpeed}*{Edges} = {Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0)} мм/мин";
             }
             if (!CalcMinFeed && Diameter > 0 && SpindleSpeed > 0 && MinFeed > 0)
             {
                 text += Edges == 1 
-                    ? $"\nПодачу: {MinFeed} / {SpindleSpeed} = {Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3)} {FeedUnits}" 
-                    : $"\nПодачу: {MinFeed} / {SpindleSpeed} * {Edges} = {Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3)} {FeedUnits}";
+                    ? $"\nПодачу: {MinFeed}/{SpindleSpeed} = {Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3)} {FeedUnits}" 
+                    : $"\nПодачу: {MinFeed}/{SpindleSpeed}*{Edges} = {Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3)} {FeedUnits}";
             }
             return text;
         }
