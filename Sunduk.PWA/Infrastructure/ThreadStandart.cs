@@ -3,6 +3,8 @@
     public enum ThreadStandart
     {
         Metric,
-        BSPP
+        BSPP,
+        Trapeziodal,
+
     }
 }

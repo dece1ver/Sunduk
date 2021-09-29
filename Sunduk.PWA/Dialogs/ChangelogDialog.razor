@@ -3,10 +3,10 @@
         <div class="ma-0" style="height:500px;width:300px;overflow: auto;">
             <MudPaper Elevation="0">
                 <MudText Typo="Typo.body1" Align="Align.Left">
-                    Sunduk - <MudLink Href="https://ru.wikipedia.org/wiki/%D0%9F%D1%80%D0%BE%D0%B3%D1%80%D0%B5%D1%81%D1%81%D0%B8%D0%B2%D0%BD%D0%BE%D0%B5_%D0%B2%D0%B5%D0%B1-%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5">прогрессивное веб-приложение</MudLink> <MudLink Href="https://docs.microsoft.com/ru-ru/aspnet/core/blazor/progressive-web-app?view=aspnetcore-5.0&tabs=visual-studio#offline-support">с возможностью автономной работы</MudLink>.
+                    Sunduk - <MudLink Href="@wikiPwaLink">прогрессивное веб-приложение</MudLink> <MudLink Href="@msPwaOfflineSupportLink">с возможностью автономной работы</MudLink>.
                 </MudText>
                 <MudText Typo="Typo.body2" Align="Align.Left">
-                    Обновления скачиваются в фоновом режиме. Если обновления были скачаны успешно, то после закрытия всех вкладок с приложением они будут установлены. <MudLink Typo="Typo.body2" Href="https://docs.microsoft.com/ru-ru/aspnet/core/blazor/progressive-web-app?view=aspnetcore-5.0&tabs=visual-studio#background-updates">Подробнее.</MudLink>
+                    Обновления скачиваются в фоновом режиме. Если обновления были скачаны успешно, то после закрытия всех вкладок с приложением они будут установлены. <MudLink Typo="Typo.body2" Href="@msPwaUpdatesLink">Подробнее.</MudLink>
                 </MudText>
                 <MudDivider DividerType="DividerType.Middle" Class="my-6" />
                 <MudText Typo="Typo.h6" Align="Align.Left">
@@ -31,13 +31,28 @@
         </div>
     </DialogContent>
     <DialogActions>
-        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Primary" Link="https://github.com/dece1ver/Sunduk"></MudIconButton>
+        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Primary" Link="@githubRepoLink"></MudIconButton>
         <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Outlined.Done" OnClick="Submit" />
     </DialogActions>
 </MudDialog>
 @code 
 {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    #region Ссылки
+    private const string wikiPwaLink = @"
+https://ru.wikipedia.org/wiki/%D0%9F%D1%80%D0%BE%D0%B3%D1%80%D0%B5%D1%81%D1%81%D0%B8%D0%B2%D0%BD%D0%BE%D0%B5_%D0%B2%D0%B5%D0%B1-%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5
+";
+    private const string msPwaOfflineSupportLink = @"
+https://docs.microsoft.com/ru-ru/aspnet/core/blazor/progressive-web-app?view=aspnetcore-5.0&tabs=visual-studio#offline-support
+";
+    private const string msPwaUpdatesLink = @"
+https://docs.microsoft.com/ru-ru/aspnet/core/blazor/progressive-web-app?view=aspnetcore-5.0&tabs=visual-studio#background-updates
+";
+    private const string githubRepoLink = @"
+https://github.com/dece1ver/Sunduk
+";
+    #endregion
 
     protected override void OnInitialized()
     {

@@ -48,7 +48,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
         }
 
-        public static readonly ICollection<string> metricTemplates = new HashSet<string> {
+        public static readonly HashSet<string> metricTemplates = new()
+        {
         //"M2x0.4 (Стандартный)", "M2x0.25 (Мелкий)",
         //"M2.5x0.45 (Стандартный)", "M2.5x0.35 (Мелкий)",
         //"M3x0.5 (Стандартный)", "M3x0.35 (Мелкий)",
@@ -154,7 +155,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
             pitch = template.TrimStart('M').Split('x')[1].Split()[0];
         }
 
-        public static readonly IEnumerable<string> bsppTemplates = new HashSet<string> {
+        public static readonly HashSet<string> bsppTemplates = new()
+        {
             "G1/16", "G1/8", "G1/4", "G3/8", "G1/2", "G5/8", "G3/4", "G7/8",
             "G1", "G1⅛", "G1¼", "G1⅜", "G1½", "G1¾",
             "G2", "G2¼", "G2½", "G2¾",
@@ -283,30 +285,89 @@ namespace Sunduk.PWA.Infrastructure.Templates
             }
         }
 
+        public static readonly HashSet<string> trapezoidalTemplates = new()
+        {
+        //"Tr8x2 (Стандартный)", "Tr8x1.5 (Мелкий)",
+        //"Tr9x2 (Стандартный)", "Tr9x1.5 (Мелкий)",
+        //"Tr10x2 (Стандартный)", "Tr10x1.5 (Мелкий)",
+        //"Tr11x3 (Стандартный)", "Tr11x2 (Мелкий)",
+        //"Tr12x3 (Стандартный)", "Tr12x2 (Мелкий)",
+        //"Tr14x3 (Стандартный)", "Tr14x2 (Мелкий)",
+        "Tr16x4 (Стандартный)", "Tr16x2 (Мелкий)",
+        "Tr18x4 (Стандартный)", "Tr18x2 (Мелкий)",
+        "Tr20x4 (Стандартный)", "Tr20x2 (Мелкий)",
+        //"Tr22x8 (Стандартный)", "Tr22x5 (Мелкий)", "Tr22x3 (Мелкий)", "Tr22x2 (Мелкий)",
+        "Tr24x8 (Стандартный)", "Tr24x5 (Мелкий)", "Tr24x3 (Мелкий)", "Tr24x2 (Мелкий)",
+        //"Tr26x8 (Стандартный)", "Tr26x5 (Мелкий)", "Tr26x3 (Мелкий)", "Tr26x2 (Мелкий)",
+        //"Tr28x8 (Стандартный)", "Tr28x5 (Мелкий)", "Tr28x3 (Мелкий)", "Tr28x2 (Мелкий)",
+        "Tr30x10 (Стандартный)", "Tr30x6 (Мелкий)", "Tr30x3 (Мелкий)",
+        //"Tr32x10 (Стандартный)", "Tr32x6 (Мелкий)", "Tr32x3 (Мелкий)",
+        //"Tr34x10 (Стандартный)", "Tr34x6 (Мелкий)", "Tr34x3 (Мелкий)",
+        //"Tr36x10 (Стандартный)", "Tr36x6 (Мелкий)", "Tr36x3 (Мелкий)",
+        //"Tr38x10 (Стандартный)", "Tr38x7 (Мелкий)", "Tr38x6 (Мелкий)", "Tr38x3 (Мелкий)",
+        "Tr40x10 (Стандартный)", "Tr40x7 (Мелкий)", "Tr40x6 (Мелкий)", "Tr40x3 (Мелкий)",
+        //"Tr42x10 (Стандартный)", "Tr42x7 (Мелкий)", "Tr42x6 (Мелкий)", "Tr42x3 (Мелкий)",
+        //"Tr44x12 (Стандартный)", "Tr44x8 (Мелкий)", "Tr44x7 (Мелкий)", "Tr44x3 (Мелкий)",
+        //"Tr46x12 (Стандартный)", "Tr46x8 (Мелкий)", "Tr46x3 (Мелкий)",
+        //"Tr48x12 (Стандартный)", "Tr48x8 (Мелкий)", "Tr48x3 (Мелкий)",
+        "Tr50x12 (Стандартный)", "Tr50x8 (Мелкий)", "Tr50x3 (Мелкий)",
+        //"Tr52x12 (Стандартный)", "Tr52x8 (Мелкий)", "Tr52x3 (Мелкий)",
+        //"Tr55x14 (Стандартный)", "Tr55x12 (Мелкий)", "Tr55x9 (Мелкий)", "Tr55x8 (Мелкий)", "Tr55x3 (Мелкий)",
+        "Tr60x14 (Стандартный)", "Tr60x12 (Мелкий)", "Tr60x9 (Мелкий)", "Tr60x8 (Мелкий)", "Tr60x3 (Мелкий)",
+        //"Tr65x16 (Стандартный)", "Tr65x10 (Мелкий)", "Tr65x4 (Мелкий)",
+        "Tr70x16 (Стандартный)", "Tr70x10 (Мелкий)", "Tr70x4 (Мелкий)",
+        //"Tr75x16 (Стандартный)", "Tr75x10 (Мелкий)", "Tr75x4 (Мелкий)",
+        "Tr80x16 (Стандартный)", "Tr80x10 (Мелкий)", "Tr80x4 (Мелкий)",
+        //"Tr85x20 (Стандартный)", "Tr85x18 (Мелкий)", "Tr85x12 (Мелкий)", "Tr85x5 (Мелкий)", "Tr85x4 (Мелкий)",
+        "Tr90x20 (Стандартный)", "Tr90x18 (Мелкий)", "Tr90x12 (Мелкий)", "Tr90x5 (Мелкий)", "Tr90x4 (Мелкий)",
+        //"Tr95x20 (Стандартный)", "Tr95x18 (Мелкий)", "Tr95x12 (Мелкий)", "Tr95x5 (Мелкий)", "Tr95x4 (Мелкий)",
+        "Tr100x20 (Стандартный)", "Tr100x12 (Мелкий)", "Tr100x5 (Мелкий)", "Tr100x4 (Мелкий)",
+        //"Tr110x20 (Стандартный)", "Tr110x12 (Мелкий)", "Tr110x5 (Мелкий)", "Tr110x4 (Мелкий)",
+};
+
+        public static void GetTrapezoidalValues(string template, out string diameter, out string pitch)
+        {
+            diameter = template.Split("Tr")[1].Split('x')[0];
+            pitch = template.Split("Tr")[1].Split('x')[1].Split()[0];
+        }
+
+        public static double TrapezoidalClearence(double threadPitch)
+        {
+            switch (threadPitch)
+            {
+                case <= 1.5:
+                    return 0.15;
+                case <= 5:
+                    return 0.25;
+                case <= 12:
+                    return 0.5;
+                case <= 40:
+                    return 1;
+                default:
+                    return 0;
+            }
+        }
+
         public static double NominalHeight(ThreadStandart threadStandart, double threadPitch)
         {
-            if (threadStandart == ThreadStandart.Metric)
+            return threadStandart switch
             {
-                return Math.Sqrt(3) / 2 * threadPitch;
-            }
-            else
-            {
-                return 0.960491 * threadPitch;
-            }
+                ThreadStandart.Metric => Math.Sqrt(3) / 2 * threadPitch,
+                ThreadStandart.BSPP => 0.960491 * threadPitch,
+                ThreadStandart.Trapeziodal => 1.866 * threadPitch,
+                _ => 0,
+            };
         }
 
         public static double ProfileHeight(ThreadStandart threadStandart, CuttingType type, double threadPitch)
         {
-
-            if (threadStandart == ThreadStandart.Metric)
+            return threadStandart switch
             {
-                return type == CuttingType.External ? ((17.0 / 24.0) * NominalHeight(threadStandart, threadPitch)) : ((5.0 / 8.0) * NominalHeight(threadStandart, threadPitch));
-            }
-            else
-            {
-                return 0.640327 * threadPitch;
-            }
-
+                ThreadStandart.Metric => type == CuttingType.External ? (17.0 / 24.0 * NominalHeight(threadStandart, threadPitch)) : ((5.0 / 8.0) * NominalHeight(threadStandart, threadPitch)),
+                ThreadStandart.BSPP => 0.640327 * threadPitch,
+                ThreadStandart.Trapeziodal => 0.5 * threadPitch + TrapezoidalClearence(threadPitch),
+                _ => 0,
+            };
         }
 
         public static double Angle(double threadDiameter, double threadPitch)
@@ -334,10 +395,21 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
         public static double[] Passes(ThreadStandart threadStandart, CuttingType type, double threadPitch)
             => CalcPasses(Thread.ProfileHeight(threadStandart, type, threadPitch), Thread.PassesCount(threadPitch), PassesOption.Infeed);
+
         public static double[] TotalPasses(ThreadStandart threadStandart, CuttingType type, double threadPitch)
             => CalcPasses(Thread.ProfileHeight(threadStandart, type, threadPitch), Thread.PassesCount(threadPitch), PassesOption.FullPasses);
 
-        public static string Profile(ThreadStandart threadStandart) => threadStandart == ThreadStandart.BSPP ? "55" : "60";
+
+        public static string Profile(ThreadStandart threadStandart)
+        {
+            return threadStandart switch
+            {
+                ThreadStandart.Metric => "55",
+                ThreadStandart.BSPP => "60",
+                ThreadStandart.Trapeziodal => "30",
+                _ => string.Empty,
+            };
+        }
 
         public static string ApproachDiameter(CuttingType type, double threadDiameter, double threadPitch)
         {
@@ -357,7 +429,20 @@ namespace Sunduk.PWA.Infrastructure.Templates
         }
 
         public static string EndDiameter(ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch)
-            => type == CuttingType.External ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() : threadDiameter.NC();
+        {
+            switch (threadStandart)
+            {
+                case ThreadStandart.Metric:
+                    return type == CuttingType.External ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() : (threadDiameter + threadPitch / 16 / Math.Sin(60.Radians())).NC(3);
+                case ThreadStandart.BSPP:
+                    return type == CuttingType.External ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() : threadDiameter.NC();
+                case ThreadStandart.Trapeziodal:
+                    return type == CuttingType.External ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() : (threadDiameter + TrapezoidalClearence(threadPitch)).NC(3);
+                default:
+                    break;
+            }
+            return type == CuttingType.External ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() : threadDiameter.NC();
+        }
 
         public static bool Valid(double threadDiamer, double threadPitch)
         {
