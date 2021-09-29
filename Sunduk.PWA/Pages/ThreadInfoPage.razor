@@ -10,14 +10,14 @@
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-2">
     <MudGrid>
         <MudItem xs="12" md="6">
-            <MudSelect Label="Стандарт" T="ThreadStandart" Value="ThreadStandart" Variant="Variant.Outlined" ValueChanged="OnStandartChanged">
+            <MudSelect Label="Стандарт" T="ThreadStandart" Value="ThreadStandart" Variant="Variant.Filled" ValueChanged="OnStandartChanged">
                 <MudSelectItem Value="@(ThreadStandart.Metric)">60° Метрическая</MudSelectItem>
                 <MudSelectItem Value="@(ThreadStandart.BSPP)">55° Трубная цилиндрическая</MudSelectItem>
                 <MudSelectItem Value="@(ThreadStandart.Trapeziodal)">30° Трапецеидальная</MudSelectItem>
             </MudSelect>
         </MudItem>
         <MudItem xs="12" md="6">
-            <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Outlined" ValueChanged="OnTemplateChanged">
+            <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" ValueChanged="OnTemplateChanged">
                 @foreach (string item in ThreadTemplates)
                 {
                     <MudSelectItem Value="@(item)">
@@ -27,7 +27,7 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="3" lg="12">
-            <MudField Label="Тип резьбы" Variant="Variant.Outlined" InnerPadding="false">
+            <MudField Label="Тип резьбы" Variant="Variant.Filled" InnerPadding="false">
                 <MudRadioGroup @bind-SelectedOption="@ThreadType">
                     <MudRadio Option="@(CuttingType.External)" Color="Color.Primary">Наружная</MudRadio>
                     <MudRadio Option="@(CuttingType.Internal)" Color="Color.Primary">Внутренняя</MudRadio>
@@ -101,9 +101,9 @@
     </MudExpansionPanel>
     <MudExpansionPanel Text="Пример программы для Fanuc">
         <MudItem xs="12">
-            <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z0. S{SpindleSpeed} M3 G97\n" +
-                                $"G76 P0201{Thread.Profile(ThreadStandart)} Q{(int)(Passes.Last()*1000)} R0.1\n" +
-                                $"G76 X{EndDiameter} Z-20. P{(int)(Passes.Sum()*1000)} Q{(int)(Passes[0]*1000)} F{ThreadPitch.NC()}")">
+            <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z1. S{SpindleSpeed} M3 G97\n" +
+                                $"G76 P0201{Thread.Profile(ThreadStandart)} Q{Passes[^1].Microns()} R0.1\n" +
+                                $"G76 X{EndDiameter} Z-20. P{(int)(Passes.Sum()*1000)} Q{Passes[0].Microns()} F{ThreadPitch.NC()}")">
             </MudTextField>
         </MudItem>
     </MudExpansionPanel>
@@ -212,6 +212,8 @@
             return string.Empty;
         }
     }
+
+    public double EndPointZ { get; set; } = -20;
 
     private void OnStandartChanged(ThreadStandart value)
     {

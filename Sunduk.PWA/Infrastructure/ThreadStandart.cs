@@ -5,6 +5,6 @@
         Metric,
         BSPP,
         Trapeziodal,
-
+        NPT
     }
 }
