@@ -11,7 +11,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public enum PassesOption { FullPasses, Infeed }
 
         /// <summary>
-        /// Считает количество проходов при нарезании резьбы
+        /// Считает проходы при нарезании резьбы
         /// </summary>
         /// <param name="threadDepth">Высота профиля резьбы</param>
         /// <param name="passesCount">Количество проходов</param>
@@ -69,19 +69,19 @@ namespace Sunduk.PWA.Infrastructure.Templates
         //"M17x1.5 (Стандартный)", "M17x1 (Мелкий)",
         "M18x2.5 (Стандартный)", "M18x2 (Мелкий)", "M18x1.5 (Мелкий)", "M18x1 (Мелкий)", "M18x0.75 (Мелкий)", "M18x0.5 (Мелкий)",
         "M20x2.5 (Стандартный)", "M20x2 (Мелкий)", "M20x1.5 (Мелкий)", "M20x1 (Мелкий)", "M20x0.75 (Мелкий)", "M20x0.5 (Мелкий)",
-        "M22x2.5 (Стандартный)", "M22x2 (Мелкий)", "M22x1.5 (Мелкий)", "M22x1 (Мелкий)", "M22x0.75 (Мелкий)", "M22x0.5 (Мелкий)",
+        //"M22x2.5 (Стандартный)", "M22x2 (Мелкий)", "M22x1.5 (Мелкий)", "M22x1 (Мелкий)", "M22x0.75 (Мелкий)", "M22x0.5 (Мелкий)",
         "M24x3 (Стандартный)", "M24x2 (Мелкий)", "M24x1.5 (Мелкий)", "M24x1 (Мелкий)", "M24x0.75 (Мелкий)",
-        "M25x2 (Стандартный)", "M25x1.5 (Мелкий)", "M25x1 (Мелкий)",
+        //"M25x2 (Стандартный)", "M25x1.5 (Мелкий)", "M25x1 (Мелкий)",
         //"M26x1.5 (Стандартный)",
         //"M27x3 (Стандартный)", "M27x2 (Мелкий)", "M27x1.5 (Мелкий)", "M27x1 (Мелкий)", "M27x0.75 (Мелкий)",
         //"M27x2 (Стандартный)", "M27x1.5 (Мелкий)", "M27x1 (Мелкий)",
         "M30x3.5 (Стандартный)", "M30x3 (Мелкий)", "M30x2 (Мелкий)", "M30x1.5 (Мелкий)", "M30x1 (Мелкий)", "M30x0.75 (Мелкий)",
-        "M32x2 (Стандартный)", "M32x1.5 (Мелкий)",
+        //"M32x2 (Стандартный)", "M32x1.5 (Мелкий)",
         "M33x3.5 (Стандартный)", "M33x3 (Мелкий)", "M33x2 (Мелкий)", "M33x1.5 (Мелкий)", "M33x1 (Мелкий)", "M33x0.75 (Мелкий)",
         "M35x1.5 (Стандартный)",
         "M36x4 (Стандартный)", "M36x3 (Мелкий)", "M36x2 (Мелкий)", "M36x1.5 (Мелкий)", "M36x1 (Мелкий)",
         //"M38x1.5 (Стандартный)",
-        "M39x4 (Стандартный)", "M39x3 (Мелкий)", "M39x2 (Мелкий)", "M39x1.5 (Мелкий)", "M39x1 (Мелкий)",
+        //"M39x4 (Стандартный)", "M39x3 (Мелкий)", "M39x2 (Мелкий)", "M39x1.5 (Мелкий)", "M39x1 (Мелкий)",
         "M40x3 (Стандартный)", "M40x2 (Мелкий)", "M40x1.5 (Мелкий)",
         //"M42x4.5 (Стандартный)", "M42x4 (Мелкий)", "M42x3 (Мелкий)", "M42x2 (Мелкий)", "M42x1.5 (Мелкий)", "M42x1 (Мелкий)",
         //"M45x4.5 (Стандартный)", "M45x4 (Мелкий)", "M45x3 (Мелкий)", "M45x2 (Мелкий)", "M45x1.5 (Мелкий)", "M45x1 (Мелкий)",
@@ -151,8 +151,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
         public static void GetMetricValues(string template, out string diameter, out string pitch)
         {
-            diameter = template.TrimStart('M').Split('x')[0];
-            pitch = template.TrimStart('M').Split('x')[1].Split()[0];
+            diameter = template.Split("M")[1].Split('x')[0];
+            pitch = template.Split("M")[1].Split('x')[1].Split()[0];
         }
 
         public static readonly HashSet<string> bsppTemplates = new()
@@ -348,6 +348,50 @@ namespace Sunduk.PWA.Infrastructure.Templates
             }
         }
 
+        public static readonly HashSet<string> nptTemplates = new()
+        {
+            "K1/16",
+            "K1/8",
+            "K1/4",
+            "K3/8",
+            "K1/2",
+            "K3/4",
+            "K1",
+            "K1¼",
+            "K1½",
+            "K2",
+            "K2½",
+            "K3",
+            "K3½",
+            "K4",
+            "K5",
+            "K6",
+            "K8",
+            "K10",
+            "K12"
+        };
+
+        public static void GetNPTValues(string template, out string diameter, out string pitch, out double planeLength, out double threadLength)
+        {
+            switch (template)
+            {
+                case "K1/16":
+                    diameter = "7.895";
+                    pitch = "6.389";
+                    planeLength = 4.064;
+                    threadLength = 6.5;
+                    break;
+                
+                default:
+                    diameter = string.Empty;
+                    pitch = string.Empty;
+                    planeLength = 0;
+                    threadLength = 0;
+                    break;
+            }
+        }
+
+
         public static double NominalHeight(ThreadStandart threadStandart, double threadPitch)
         {
             return threadStandart switch
@@ -363,7 +407,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
         {
             return threadStandart switch
             {
-                ThreadStandart.Metric => type == CuttingType.External ? (17.0 / 24.0 * NominalHeight(threadStandart, threadPitch)) : ((5.0 / 8.0) * NominalHeight(threadStandart, threadPitch)),
+                ThreadStandart.Metric => type == CuttingType.External 
+                ? (17.0 / 24.0 * NominalHeight(threadStandart, threadPitch)) 
+                : ((5.0 / 8.0) * NominalHeight(threadStandart, threadPitch)),
                 ThreadStandart.BSPP => 0.640327 * threadPitch,
                 ThreadStandart.Trapeziodal => 0.5 * threadPitch + TrapezoidalClearence(threadPitch),
                 _ => 0,
@@ -377,8 +423,22 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return result;
         }
 
-        public static int PassesCount(double threadPitch)
+        public static int PassesCount(ThreadStandart threadStandart, double threadPitch)
         {
+            if (threadStandart == ThreadStandart.Trapeziodal)
+            {
+                return threadPitch switch
+                {
+                    <= 1.5 => 6,
+                    <= 2 => 8,
+                    <= 3 => 12,
+                    <= 4 => 13,
+                    <= 5 => 14,
+                    <= 7 => 16,
+                    > 85 => 19,
+                    _ => 0,
+                };
+            }
             return threadPitch switch
             {
                 <= 0.75 => 4,
@@ -394,10 +454,10 @@ namespace Sunduk.PWA.Infrastructure.Templates
         } // написать зависимость от шага
 
         public static double[] Passes(ThreadStandart threadStandart, CuttingType type, double threadPitch)
-            => CalcPasses(Thread.ProfileHeight(threadStandart, type, threadPitch), Thread.PassesCount(threadPitch), PassesOption.Infeed);
+            => CalcPasses(ProfileHeight(threadStandart, type, threadPitch), PassesCount(threadStandart, threadPitch), PassesOption.Infeed);
 
         public static double[] TotalPasses(ThreadStandart threadStandart, CuttingType type, double threadPitch)
-            => CalcPasses(Thread.ProfileHeight(threadStandart, type, threadPitch), Thread.PassesCount(threadPitch), PassesOption.FullPasses);
+            => CalcPasses(ProfileHeight(threadStandart, type, threadPitch), PassesCount(threadStandart, threadPitch), PassesOption.FullPasses);
 
 
         public static string Profile(ThreadStandart threadStandart)
@@ -433,15 +493,20 @@ namespace Sunduk.PWA.Infrastructure.Templates
             switch (threadStandart)
             {
                 case ThreadStandart.Metric:
-                    return type == CuttingType.External ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() : (threadDiameter + threadPitch / 16 / Math.Sin(60.Radians())).NC(3);
+                    return type == CuttingType.External 
+                        ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() 
+                        : (threadDiameter + threadPitch / 16 / Math.Sin(60.Radians())).NC(3);
                 case ThreadStandart.BSPP:
-                    return type == CuttingType.External ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() : threadDiameter.NC();
+                    return type == CuttingType.External 
+                        ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() 
+                        : threadDiameter.NC();
                 case ThreadStandart.Trapeziodal:
-                    return type == CuttingType.External ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() : (threadDiameter + TrapezoidalClearence(threadPitch)).NC(3);
+                    return type == CuttingType.External 
+                        ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() 
+                        : (threadDiameter + 2 * TrapezoidalClearence(threadPitch)).NC(3);
                 default:
-                    break;
+                    return string.Empty;
             }
-            return type == CuttingType.External ? (threadDiameter - (2 * Passes(threadStandart, type, threadPitch).Sum())).NC() : threadDiameter.NC();
         }
 
         public static bool Valid(double threadDiamer, double threadPitch)
