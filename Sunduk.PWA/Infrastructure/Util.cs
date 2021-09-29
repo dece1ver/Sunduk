@@ -82,6 +82,27 @@ namespace Sunduk.PWA.Util
         }
 
         /// <summary>
+        /// Переводит угол в радианы
+        /// </summary>
+        /// <param name="degrees">Угловое значение</param>
+        /// <returns>Радиан</returns>
+        public static double Radians(this double degrees)
+        {
+            return degrees * Math.PI / 180;
+        }
+
+        /// <summary>
+        /// Переводит угол в радианы
+        /// </summary>
+        /// <param name="degrees">Угловое значение</param>
+        /// <returns>Радиан</returns>
+        public static double Radians(this int degrees)
+        {
+            return degrees * Math.PI / 180;
+        }
+
+
+        /// <summary>
         /// Округляет
         /// </summary>
         /// <param name="rounder">Значение округления</param>
@@ -101,16 +122,6 @@ namespace Sunduk.PWA.Util
         {
             if (value < rounder) return (int)value;
             return (int)Math.Round(value / rounder) * rounder;
-        }
-
-        /// <summary>
-        /// Переводит угол в радианы
-        /// </summary>
-        /// <param name="degrees">Угловое значение</param>
-        /// <returns>Радиан</returns>
-        public static double Radians(this double degrees)
-        {
-            return degrees * Math.PI / 180;
         }
 
         /// <summary>
