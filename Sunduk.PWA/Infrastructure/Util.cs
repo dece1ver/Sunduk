@@ -125,6 +125,12 @@ namespace Sunduk.PWA.Util
         }
 
         /// <summary>
+        /// Возвращает шаг в мм для шага в нитках на дюйм (TPI), либо шаг в нитках на дюйм для шага в мм
+        /// </summary>
+        /// <param name="pitch">Шаг в нитках на дюйм / Шаг в мм</param>
+        public static double ThreadConvert(this double pitch) => 25.4 / pitch;
+
+        /// <summary>
         /// Форматирует число в строку подходящую для СЧПУ
         /// </summary>
         /// <param name="value">Число</param>
