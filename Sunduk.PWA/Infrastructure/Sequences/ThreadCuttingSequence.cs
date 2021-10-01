@@ -16,9 +16,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public double ThreadPitch { get; set; }
         public double StartZ { get; set; }
         public double EndZ { get; set; }
-        public override string Operation => Templates.Operation.ThreadCutting(Machine, Tool, ThreadStandart, Type, ThreadDiameter, ThreadPitch, StartZ, EndZ);
+        public double ThreadNPTPlane { get; set; }
+        public override string Operation => Templates.Operation.ThreadCutting(Machine, Tool, ThreadStandart, Type, ThreadDiameter, ThreadPitch, StartZ, EndZ, ThreadNPTPlane);
 
-        public ThreadCuttingSequence(Machines machine, Tool tool, ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ)
+        public ThreadCuttingSequence(Machines machine, Tool tool, ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNPTPlane)
         {
             Machine = machine;
             Tool = tool;
@@ -28,6 +29,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
             ThreadPitch = threadPitch;
             StartZ = startZ;
             EndZ = endZ;
+            ThreadNPTPlane = threadNPTPlane;
         }
     }
 }
