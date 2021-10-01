@@ -754,8 +754,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 threadDiameter <= 0 ||
                 threadPitch <= 0 ||
                 startZ < endZ) return string.Empty;
-            string approachDiameter = Thread.ApproachDiameter(threadStandart, type, threadDiameter, threadPitch, endZ, startZ, threadNPTPlane).NC(3);
-            string endDiameter = Thread.EndDiameter(threadStandart, type, threadDiameter, threadPitch, endZ, startZ, threadNPTPlane).NC(3);
+            string approachDiameter = Thread.ApproachDiameter(threadStandart, type, threadDiameter, threadPitch, endZ, startZ, threadNPTPlane).NC(1);
+            string endDiameter = Thread.EndDiameter(threadStandart, type, threadDiameter, threadPitch, endZ, startZ, threadNPTPlane).NC(2);
             int minStep = Thread.Passes(threadStandart, type, threadPitch)[^2].Microns();
             double lastPass = Thread.Passes(threadStandart, type, threadPitch)[^1];
             int firstPass = Thread.Passes(threadStandart, type, threadPitch)[0].Microns();
@@ -765,13 +765,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
                 threadShift = type switch
                 {
-                    CuttingType.External => $"R-{Thread.IntNPTThreadShift(endZ, startZ).NC(2)} ",
-                    CuttingType.Internal => $"R{Thread.IntNPTThreadShift(endZ, startZ).NC(2)} ",
+                    CuttingType.External => $"R-{Thread.IntNPTThreadShift(endZ, startZ).NC(2)}",
+                    CuttingType.Internal => $"R{Thread.IntNPTThreadShift(endZ, startZ).NC(2)}",
                     _ => string.Empty,
                 };
             }
-            
-            
 
             return machine switch
             {
