@@ -4,12 +4,12 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudThemeProvider Theme="darkTheme" />
+<MudThemeProvider Theme="testTheme" />
 
 <MudLayout>
-    <MudAppBar Dense="true" Elevation="1">
+    <MudAppBar Dense="true" Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudLink Typo="Typo.h5" Href="" Underline="Underline.None">Sunduk</MudLink>
+        <MudLink Typo="Typo.h5" Href="" Underline="Underline.None" Style="font-family: 'Saira Stencil One';">SUNDUK</MudLink>
         <MudSpacer />
         <MudIconButton Icon="@Icons.Material.Filled.SendToMobile" OnClick="OpenDialog" Color="Color.Inherit" Edge="Edge.End" />
         <MudTooltip Text="@version" Placement="Placement.Start">
@@ -105,22 +105,24 @@
 
 
 
-    MudTheme darkTheme = new MudTheme()
+
+
+    MudTheme testTheme = new MudTheme()
     {
         Palette = new Palette()
         {
-            Black = "#27272f",
+            Black = "#2D2D30",
             Primary = "#FF5722",
-            Background = "#32333d",
-            BackgroundGrey = "#27272f",
-            Surface = "#373740",
-            DrawerBackground = "#27272f",
-            DrawerText = "rgba(255,255,255, 0.50)",
-            DrawerIcon = "rgba(255,255,255, 0.50)",
-            AppbarBackground = "#27272f",
-            AppbarText = "rgba(255,255,255, 0.70)",
-            TextPrimary = "rgba(255,255,255, 0.70)",
-            TextSecondary = "rgba(255,255,255, 0.50)",
+            Background = "#1E1E1E",
+            BackgroundGrey = "#2D2D30",
+            Surface = "#252526",
+            DrawerBackground = "#2D2D30",
+            DrawerText = "rgba(255,255,255, 0.60)",
+            DrawerIcon = "rgba(255,255,255, 0.60)",
+            AppbarBackground = "#2D2D30",
+            AppbarText = "rgba(255,255,255, 0.80)",
+            TextPrimary = "rgba(255,255,255, 0.80)",
+            TextSecondary = "rgba(255,255,255, 0.60)",
             ActionDefault = "#adadb1",
             ActionDisabled = "rgba(255,255,255, 0.26)",
             ActionDisabledBackground = "rgba(255,255,255, 0.12)"
