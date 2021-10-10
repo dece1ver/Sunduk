@@ -104,7 +104,7 @@
         <MudItem xs="12">
             <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z{StartPointZ.NC()} S{SpindleSpeed.Round(1000)} M3 G97\n" +
                                 $"G76 P0201{Thread.Profile(ThreadStandart)} Q{Passes[^2].Microns()} R{Passes[^1].NC()}\n" +
-                                $"G76 X{EndDiameter} Z{EndPointZ.NC()} P{(int)(Passes.Sum().Microns())} Q{Passes[0].Microns()}{ThreadShift}F{ThreadPitch.NC()}")">
+                                $"G76 X{EndDiameter} Z{EndPointZ.NC()} P{(int)(Passes.Sum().Microns())} Q{Passes[0].Microns()}{ThreadShift} F{ThreadPitch.NC()}")">
             </MudTextField>
         </MudItem>
     </MudExpansionPanel>
@@ -162,9 +162,9 @@
                 switch (ThreadType)
                 {
                     case CuttingType.External:
-                        return $" R-{Thread.IntNPTThreadShift(EndPointZ, StartPointZ).NC(2)} ";
+                        return $" R-{Thread.IntNPTThreadShift(EndPointZ, StartPointZ).NC(2)}";
                     case CuttingType.Internal:
-                        return $" R{Thread.IntNPTThreadShift(EndPointZ, StartPointZ).NC(2)} ";
+                        return $" R{Thread.IntNPTThreadShift(EndPointZ, StartPointZ).NC(2)}";
                     default:
                         return string.Empty;
                 }

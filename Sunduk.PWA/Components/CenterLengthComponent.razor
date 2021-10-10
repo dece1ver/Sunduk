@@ -1,0 +1,43 @@
+﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+
+        <MudSimpleTable Dense="true" Style="overflow-x: auto;">
+            <thead>
+                <tr>
+                    @foreach (var h in headings)
+                    {
+                        <th>@h</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in rows)
+                {
+                    <tr>
+                        @foreach (var x in row.Split())
+                        {
+                            <td>@x</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </MudSimpleTable>
+
+</MudContainer>
+
+@code {
+    string[] headings = { "Центровка", "Общая глубина, мм", "Глубина конуса, мм" };
+    string[] rows = {
+        "А1 2.27 0.97",
+        "А1.6 3.52 0.48",
+        "А2 4.45 1.95",
+        "А2.5 5.52 2.42",
+        "А3.15 6.97 3.07",
+        "А4 8.9 3.9",
+        "А6.3 13.98 5.98",
+        "А10 22.5 9.7",
+        "А12 26.2 11.6",
+        "А16 34.7 9.7",
+        "А20 44.4 19.4",
+        "А25 56 24",
+    };
+}
