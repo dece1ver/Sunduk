@@ -1,4 +1,6 @@
 ﻿@page "/nc"
+@using MudBlazor.Services
+@implements IDisposable
 @inject IDialogService DialogService
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
@@ -91,22 +93,22 @@
                                         <div Class="d-inline-flex justify-end py-2 px-3">
                                             @if (($"{Program.IndexOf(seq)}. {seq.Name}") == (SelectedSequence?.Text ?? string.Empty) && Program.IndexOf(seq) != 0 && Program.IndexOf(seq) != 1)
                                             {
-                                            <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -2px; margin-bottom: -2px" >
-                                                @if (Program.IndexOf(seq) != 2)
-                                                {
-                                                    <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                   OnClick="(() => MoveUpSequence(seq))" />
-                                                }
-                                                @if (Program.IndexOf(seq) != Program.Count - 1)
-                                                {
-                                                    <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                   OnClick="(() => MoveDownSequence(seq))" />
-                                                }
-                                                <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                               OnClick="(() => OpenEditSequenceDialog(seq))" />
-                                                <MudIconButton Icon="@Icons.Material.TwoTone.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
-                                                               OnClick="(() => Program.Remove(seq))" />
-                                            </MudButtonGroup>
+                                                <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -2px; margin-bottom: -2px">
+                                                    @if (Program.IndexOf(seq) != 2)
+                                                    {
+                                                        <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                       OnClick="(() => MoveUpSequence(seq))" />
+                                                    }
+                                                    @if (Program.IndexOf(seq) != Program.Count - 1)
+                                                    {
+                                                        <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                       OnClick="(() => MoveDownSequence(seq))" />
+                                                    }
+                                                    <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                   OnClick="(() => OpenEditSequenceDialog(seq))" />
+                                                    <MudIconButton Icon="@Icons.Material.TwoTone.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
+                                                                   OnClick="(() => Program.Remove(seq))" />
+                                                </MudButtonGroup>
                                             }
                                         </div>
                                     </MudGrid>
@@ -128,6 +130,38 @@
 @code
 {
     [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+
+    [Inject] IResizeListenerService ResizeListener { get; set; }
+
+    int width = 0;
+    int height = 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            ResizeListener.OnResized += OnResized;
+
+            var size = await ResizeListener.GetBrowserWindowSize();
+            height = size.Height;
+            width = size.Width;
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void OnResized(object sender, BrowserWindowSize size)
+    {
+        width = size.Width;
+        height = size.Height;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ResizeListener.OnResized -= OnResized;
+    }
 
     public string Message { get; set; } = string.Empty;
 
@@ -253,7 +287,7 @@
         #endregion
 
         Program = new();
-        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, Author, DrawningVersion, string.Empty) { Name = $"Шапка"});
+        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, Author, DrawningVersion, string.Empty) { Name = $"Шапка" });
         Program.Add(new SafetyStringSequence(Machine, 3000) { Name = $"Строка безопасности" });
         CyclesCount = 1;
     }
@@ -311,6 +345,7 @@
         parameters.Add(nameof(WorkpieceCurrentInternalDiameter), WorkpieceCurrentInternalDiameter);
         parameters.Add(nameof(WorkpieceLength), WorkpieceLength);
         parameters.Add(nameof(WorkpieceMaterial), WorkpieceMaterial);
+        parameters.Add(nameof(MaxHeightStyle), MaxHeightStyle);
         var options = new DialogOptions() { FullScreen = true, CloseButton = true };
         var dialog = DialogService.Show<SequenceDialog>("Переходы", parameters, options);
         var result = await dialog.Result;
@@ -334,6 +369,8 @@
         }
         return false;
     }
+
+    public string MaxHeightStyle => $"max-height: {height}px; overflow-y: scroll";
 
     public List<Tool> Tools { get; set; } = new();
 
@@ -429,7 +466,7 @@
     private void MoveUpSequence(Sequence seq)
     {
         Program.Swap(Program.IndexOf(seq), Program.IndexOf(seq) - 1);
-        SelectedSequence = new MudListItem { Text= $"{Program.IndexOf(seq) + 1}. {seq.Name}" };
+        SelectedSequence = new MudListItem { Text = $"{Program.IndexOf(seq) + 1}. {seq.Name}" };
     }
 
     private void MoveDownSequence(Sequence seq)
