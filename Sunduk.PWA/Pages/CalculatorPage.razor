@@ -6,7 +6,7 @@
     }
 </style>
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-2">
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-3">
     <MudGrid Justify="Justify.SpaceAround">
         <MudItem xs="6" sm="5" md="5" lg="5">
             <MudTextField @bind-Value="DiameterString" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Диаметр" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
@@ -26,7 +26,7 @@
         <MudItem xs="6" sm="5" md="5" lg="5">
             <MudTextField @bind-Value="MinFeedString" @onfocusin="@(() => CalcMinFeed = false)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Подача" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
         </MudItem>
-        @if (!string.IsNullOrEmpty(CalcInfo))
+        @*@if (!string.IsNullOrEmpty(CalcInfo))
         {
             <MudItem xs="12">
                 <MudExpansionPanel Text="Как считать?">
@@ -34,7 +34,7 @@
                 </MudExpansionPanel>
                 
             </MudItem>
-        }
+        }*@
     </MudGrid>
 
     
