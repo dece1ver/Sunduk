@@ -734,8 +734,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
         {
             return threadStandart switch
             {
-                ThreadStandart.Metric => "55",
-                ThreadStandart.BSPP => "60",
+                ThreadStandart.Metric => "60",
+                ThreadStandart.BSPP => "55",
                 ThreadStandart.Trapeziodal => "30",
                 ThreadStandart.NPT => "60",
                 _ => string.Empty,
