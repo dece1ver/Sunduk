@@ -4,57 +4,42 @@
     }
 </style>
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid>
-        <MudItem xs="12" xl="12">
-            <MudGrid>
-                <MudItem xs="12" sm="4" md="4" lg="3" xl="2">
-                    <MudField Label="Тип фаски" Variant="Variant.Outlined" InnerPadding="false">
+    <MudGrid >
+        <MudItem xs="12" sm="6">
+            <MudGrid Spacing="1">
+                <MudItem xs="12">
+                    <MudField Label="Тип фаски" Variant="Variant.Filled" InnerPadding="false">
                         <MudRadioGroup @bind-SelectedOption="@ChamferType">
                             <MudRadio Option="@Chamfer.External" Color="Color.Primary" @onfocus="SetExternalType">Наружная</MudRadio>
                             <MudRadio Option="@Chamfer.Internal" Color="Color.Primary" @onfocus="SetInternalType">Внутренняя</MudRadio>
                         </MudRadioGroup>
                     </MudField>
                 </MudItem>
-                <MudItem xs="6" sm="4" md="4" lg="5" xl="5">
-                    <MudTextField @bind-Value="_ChamferDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
-                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalPartDiameter : Images.InternalPartDiameter" />
-                    <MudTextField @bind-Value="_Angle" T="string" Label="Угол" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="°" Immediate="true"
-                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferAngle : Images.InternalChamferAngle" />
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_ChamferDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalPartDiameter : Images.InternalPartDiameter" Margin="Margin.Dense" />
                 </MudItem>
-                <MudItem xs="6" sm="4" md="4" lg="4" xl="5">
-                    <MudTextField @bind-Value="_ChamferSize" T="string" Label="Размер фаски" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
-                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferSize : Images.InternalChamferSize" />
-                    <MudTextField @bind-Value="_ChamferInsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
-                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalToolRadius : Images.InternalToolRadius" />
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_Angle" T="string" Label="Угол" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="°" Immediate="true"
+                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferAngle : Images.InternalChamferAngle" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_ChamferSize" T="string" Label="Размер фаски" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferSize : Images.InternalChamferSize" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_ChamferInsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Filled" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="ChamferResult" T="double" Label="Начальный диаметр" Variant="Variant.Filled" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" ReadOnly="true"
+                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense">
+                    </MudTextField>
                 </MudItem>
             </MudGrid>
         </MudItem>
-        @if (ChamferDiameter > 0 && Angle > 0 && ChamferSize > 0)
-        {
-            <MudItem xs="12">
-                <MudField Variant="Variant.Filled">
-                    <MudText>@ResultMessage</MudText>
-                </MudField>
-            </MudItem>
-            <MudExpansionPanel Text="Пример программы для Fanuc">
-                <MudGrid>
-                    <MudItem xs="6" sm="5" md="4" xl="3">
-                        <MudSwitch @bind-Checked="@RoundCorners" Label="Скруглить углы" Color="Color.Primary" />
-                    </MudItem>
-                    <MudItem xs="6" sm="7" md="8" xl="9" Style="margin-top: -2vh">
-                        @if (RoundCorners)
-                        {
-                            <MudTextField @bind-Value="_RoundCorner" T="string" Label="Радиус скругления" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" />
-                        }
-                    </MudItem>
-                </MudGrid>
-                <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@ChamferExample" />
-                </MudItem>
-            </MudExpansionPanel>
-        }
-        <MudItem xs="12" xl="12">
-            <MudCard Outlined="true" Style="margin: 0">
+        <MudItem xs="12" sm="6">
+            <MudCard Outlined="true" Class="mt-1">
                 <MudCardContent>
                     @if (CurrentImage == Images.ExternalChamferAngle)
                     {
@@ -107,13 +92,38 @@
                 </MudCardContent>
             </MudCard>
         </MudItem>
+        @if (ChamferDiameter > 0 && Angle > 0 && ChamferSize > 0)
+        {
+            <MudItem xs="12">
+                <MudField Variant="Variant.Filled">
+                    <MudText>@ResultMessage</MudText>
+                </MudField>
+            </MudItem>
+            <MudExpansionPanel Text="Пример программы для Fanuc">
+                <MudGrid>
+                    <MudItem xs="6" sm="5" md="4" xl="3">
+                        <MudSwitch @bind-Checked="@RoundCorners" Label="Скруглить углы" Color="Color.Primary" />
+                    </MudItem>
+                    <MudItem xs="6" sm="7" md="8" xl="9" Style="margin-top: -2vh">
+                        @if (RoundCorners)
+                        {
+                            <MudTextField @bind-Value="_RoundCorner" T="string" Label="Радиус скругления" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" />
+                        }
+                    </MudItem>
+                </MudGrid>
+                <MudItem xs="12">
+                    <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@ChamferExample" />
+                </MudItem>
+            </MudExpansionPanel>
+        }
+
     </MudGrid>
 </MudContainer>
 
 @code 
 {
-    readonly int _imgHeigth = 150;
-    readonly int _imgWidth = 350;
+    readonly int _imgHeigth = 335;
+    readonly int _imgWidth = 335;
 
     public string ResultMessage
     {
@@ -194,6 +204,7 @@
             }
             return result;
         }
+        set { }
     }
 
     public bool RoundCorners { get; set; } = false;

@@ -50,7 +50,7 @@
                             <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
                         <MudItem xs="12" sm="12" md="4">
-                            <MudText>@SelectedSequence.Text</MudText>
+                            <MudText>@(SelectedSequence?.Text ?? "нет")</MudText>
                             @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
                             <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Filled" Dense="true">
                                 <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
@@ -74,49 +74,43 @@
         <MudItem xs="12" sm="6">
             
             <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
-                <MudList Clickable="true" Dense="true" @bind-SelectedItem="SelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" DisableGutters="false">
-                    <MudListSubheader>
-                        Selected:
-                        <MudChip Color="Color.Secondary">
-                            @(SelectedSequence?.Text ?? "НЕТ") (@(SelectedSequenceIndex?.ToString() ?? "0"))
-                        </MudChip>
-                    </MudListSubheader>
+                <MudList Clickable="true" @bind-SelectedItem="SelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" Dense="true" DisableGutters="false">
                     @if (Program != null)
                     {
-                        @foreach (var seq in Program)
+                        foreach (var seq in Program)
                         {
                             if (Program.IndexOf(seq) == 0)
                             {
-                                <MudListItem Text="@($"{Program.IndexOf(seq) + 1}. {seq.Name}")">
+                                <MudListItem Text="@($"1. {seq.Name}")" Value="1">
                                     <MudGrid>
-                                        <MudText Class="ma-3">@($"{Program.IndexOf(seq) + 1}. {seq.Name}")</MudText>
+                                        <MudText Class="ma-3">@($"1. {seq.Name}")</MudText>
                                     </MudGrid>
                                 </MudListItem>
                             }
                             if (Program.IndexOf(seq) > 1)
                             {
-                                <MudListItem Text="@($"{Program.IndexOf(seq)}. {seq.Name}")">
+                                <MudListItem Text="@($"{Program.IndexOf(seq)}. {seq.Name}")" Value="Program.IndexOf(seq)">
                                     <MudGrid>
                                         <MudText Class="ma-3 mr-auto">@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
                                         <div Class="d-inline-flex justify-end py-2 px-3">
-                                            @if (($"{Program.IndexOf(seq)}. {seq.Name}") == (SelectedSequence?.Text ?? string.Empty) && Program.IndexOf(seq) != 0 && Program.IndexOf(seq) != 1)
+                                            @if ((int)SelectedSequenceIndex == Program.IndexOf(seq))
                                             {
-                                                <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -2px; margin-bottom: -2px">
-                                                    @if (Program.IndexOf(seq) != 2)
-                                                    {
-                                                        <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                       OnClick="(() => MoveUpSequence(seq))" />
-                                                    }
-                                                    @if (Program.IndexOf(seq) != Program.Count - 1)
-                                                    {
-                                                        <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                       OnClick="(() => MoveDownSequence(seq))" />
-                                                    }
-                                                    <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                   OnClick="(() => OpenEditSequenceDialog(seq))" />
-                                                    <MudIconButton Icon="@Icons.Material.TwoTone.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
-                                                                   OnClick="(() => Program.Remove(seq))" />
-                                                </MudButtonGroup>
+                                            <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -2px; margin-bottom: -2px">
+                                                @if (Program.IndexOf(seq) != Program.Count - 1)
+                                                {
+                                                    <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                   OnClick="(() => MoveDownSequence(seq))" />
+                                                }
+                                                @if (Program.IndexOf(seq) != 2)
+                                                {
+                                                    <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                   OnClick="(() => MoveUpSequence(seq))" />
+                                                }
+                                                <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                               OnClick="(() => OpenEditSequenceDialog(seq))" />
+                                                <MudIconButton Icon="@Icons.Material.TwoTone.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
+                                                               OnClick="(() => Program.Remove(seq))" />
+                                            </MudButtonGroup>
                                             }
                                         </div>
                                     </MudGrid>
@@ -173,8 +167,8 @@
 
     public string Message { get; set; } = string.Empty;
 
-    public MudListItem SelectedSequence { get; set; }
-    public object SelectedSequenceIndex { get; set; }
+    public MudListItem SelectedSequence;
+    public object SelectedSequenceIndex = 0;
 
     public int CyclesCount
     {
@@ -474,14 +468,16 @@
 
     private void MoveUpSequence(Sequence seq)
     {
+        int index = Program.IndexOf(seq) - 1;
         Program.Swap(Program.IndexOf(seq), Program.IndexOf(seq) - 1);
-        SelectedSequence = new MudListItem { Text = $"{Program.IndexOf(seq) + 1}. {seq.Name}" };
+        SelectedSequenceIndex = (object)index;
     }
 
     private void MoveDownSequence(Sequence seq)
     {
+        int index = Program.IndexOf(seq) + 1;
         Program.Swap(Program.IndexOf(seq), Program.IndexOf(seq) + 1);
-        SelectedSequence = new MudListItem { Text = $"{Program.IndexOf(seq) + 1}. {seq.Name}" };
+        SelectedSequenceIndex = (object)index;
     }
 
     private async Task DownloadProgram()
