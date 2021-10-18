@@ -50,6 +50,7 @@
                             <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
                         <MudItem xs="12" sm="12" md="4">
+                            <MudText>@SelectedSequence.Text</MudText>
                             @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
                             <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Filled" Dense="true">
                                 <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
@@ -71,8 +72,15 @@
             </MudExpansionPanel>
         </MudItem>
         <MudItem xs="12" sm="6">
+            
             <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
-                <MudList Clickable="true" Dense="true" @bind-SelectedItem="SelectedSequence" DisableGutters="true">
+                <MudList Clickable="true" Dense="true" @bind-SelectedItem="SelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" DisableGutters="false">
+                    <MudListSubheader>
+                        Selected:
+                        <MudChip Color="Color.Secondary">
+                            @(SelectedSequence?.Text ?? "НЕТ") (@(SelectedSequenceIndex?.ToString() ?? "0"))
+                        </MudChip>
+                    </MudListSubheader>
                     @if (Program != null)
                     {
                         @foreach (var seq in Program)
@@ -166,6 +174,7 @@
     public string Message { get; set; } = string.Empty;
 
     public MudListItem SelectedSequence { get; set; }
+    public object SelectedSequenceIndex { get; set; }
 
     public int CyclesCount
     {
