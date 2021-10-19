@@ -61,7 +61,7 @@
             {
                 if (CalcSpins)
                 {
-                    SpindleSpeedString = Util.ToPrettyString((CutSpeed * 1000) / (Diameter * Math.PI));
+                    SpindleSpeedString = Util.ToPrettyString((CutSpeed * 1000) / (Diameter * Math.PI), 0);
                 }
                 else if (!CalcSpins)
                 {
@@ -207,14 +207,14 @@
             }
             if (CalcMinFeed && Diameter > 0 && SpindleSpeed > 0 && Feed > 0)
             {
-                text += Edges == 1 
-                    ? $"\nПодачу: {Feed.ToPrettyString()}*{SpindleSpeed} = {Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0)} мм/мин" 
+                text += Edges == 1
+                    ? $"\nПодачу: {Feed.ToPrettyString()}*{SpindleSpeed} = {Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0)} мм/мин"
                     : $"\nПодачу: {Feed.ToPrettyString()}*{SpindleSpeed}*{Edges} = {Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0)} мм/мин";
             }
             if (!CalcMinFeed && Diameter > 0 && SpindleSpeed > 0 && MinFeed > 0)
             {
-                text += Edges == 1 
-                    ? $"\nПодачу: {MinFeed}/{SpindleSpeed} = {Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3)} {FeedUnits}" 
+                text += Edges == 1
+                    ? $"\nПодачу: {MinFeed}/{SpindleSpeed} = {Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3)} {FeedUnits}"
                     : $"\nПодачу: {MinFeed}/{SpindleSpeed}*{Edges} = {Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3)} {FeedUnits}";
             }
             return text;
