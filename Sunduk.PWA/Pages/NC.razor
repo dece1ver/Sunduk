@@ -50,7 +50,6 @@
                             <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
                         <MudItem xs="12" sm="12" md="4">
-                            <MudText>@(SelectedSequence?.Text ?? "нет")</MudText>
                             @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
                             <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Materials" Variant="Variant.Filled" Dense="true">
                                 <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
