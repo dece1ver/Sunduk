@@ -102,7 +102,7 @@
     </MudExpansionPanel>
     <MudExpansionPanel Text="Пример программы для Fanuc">
         <MudItem xs="12">
-            <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z{StartPointZ.NC()} S{SpindleSpeed.Round(1000)} M3 G97\n" +
+            <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z{StartPointZ.NC()} S{SpindleSpeed.Round(100)} M3 G97\n" +
                                 $"G76 P0201{Thread.Profile(ThreadStandart)} Q{Passes[^2].Microns()} R{Passes[^1].NC()}\n" +
                                 $"G76 X{EndDiameter} Z{EndPointZ.NC()} P{(int)(Passes.Sum().Microns())} Q{Passes[0].Microns()}{ThreadShift} F{ThreadPitch.NC()}")">
             </MudTextField>
