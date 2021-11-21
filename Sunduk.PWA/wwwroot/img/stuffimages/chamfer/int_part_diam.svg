@@ -8,7 +8,7 @@
    version="1.1"
    id="svg43512"
    inkscape:version="1.1 (c68e22c387, 2021-05-23)"
-   sodipodi:docname="C:\Users\K\AppData\Local\Temp\ink_ext_XXXXXX.svgAH3350"
+   sodipodi:docname="6.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -29,14 +29,14 @@
      fit-margin-left="1"
      fit-margin-right="1"
      fit-margin-bottom="1"
-     inkscape:zoom="2"
-     inkscape:cx="138.5"
-     inkscape:cy="128.5"
-     inkscape:window-width="1548"
-     inkscape:window-height="1008"
-     inkscape:window-x="-7"
-     inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:zoom="1"
+     inkscape:cx="13.5"
+     inkscape:cy="250.5"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
      inkscape:current-layer="layer1" />
   <defs
      id="defs43509">
@@ -222,6 +222,20 @@
          d="M 0,0 5,-5 -12.5,0 5,5 Z"
          id="path71280" />
     </marker>
+    <marker
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="marker84771905"
+       inkscape:isstock="true"
+       id="marker84771905-5">
+      <path
+         transform="matrix(0.4,0,0,0.4,4,0)"
+         style="fill:#bfbfbf;fill-rule:evenodd;stroke:#bfbfbf;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path36123-8" />
+    </marker>
   </defs>
   <g
      inkscape:label="Слой 1"
@@ -231,41 +245,41 @@
     <path
        id="path8938"
        style="fill:none;stroke:#bfbfbf;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
-       d="m 31.852951,51.918398 v 22.79203"
+       d="m 23.180383,51.918398 v 22.79203"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 31.456075,74.710398 V 108.81595"
+       d="M 23.577259,74.710398 V 108.81595"
        id="path8940"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 41.349985,84.207058 V 108.81598"
+       d="M 13.683349,84.207058 V 108.81598"
        id="path8942"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
     <path
-       style="fill:#bfbfbf;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Arrow1Mend4201588);marker-end:url(#marker98544167500);fill-opacity:1"
-       d="m 31.456074,103.20711 h 5.941799 3.952111"
+       style="fill:#bfbfbf;fill-opacity:1;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Arrow1Mend4201588);marker-end:url(#marker98544167500)"
+       d="M 23.57726,103.20711 H 17.635461 13.68335"
        id="path8944"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 48.565772,103.20711 H 24.240286 31.456075"
+       d="M 6.467562,103.20711 H 30.793048 23.577259"
        id="path8946"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
     <path
-       style="fill:#ff5722;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker1107568001458);fill-opacity:1"
-       d="m 13.425119,71.081258 1.867584,-6.96995"
+       style="fill:#ff5722;fill-opacity:1;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker1107568001458)"
+       d="m 41.608215,71.081258 -1.867584,-6.96995"
        id="path8948"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
@@ -273,20 +287,20 @@
     <path
        id="path8950"
        style="fill:none;stroke:#bfbfbf;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
-       d="M 41.349987,84.207058 H 71.196042"
+       d="M 13.683347,84.207058 H -16.162708"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#bfbfbf;stroke-width:1.32292;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
-       d="m 31.712562,74.768428 9.496608,9.49666"
+       d="m 23.320772,74.768428 -9.496608,9.49666"
        id="path8952"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#bfbfbf;stroke-width:0.529;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 40.928701,84.546008 58.329744,101.94715"
+       d="M 14.104633,84.546008 -3.29641,101.94715"
        id="path8954"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
@@ -294,13 +308,13 @@
     <path
        id="path8956"
        style="font-variation-settings:'wdth' 100, 'wght' 400;fill:none;fill-rule:evenodd;stroke:#bfbfbf;stroke-width:0.529;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 45.759823,89.344838 a 6.8322388,6.9414746 0 0 0 2.001116,-4.90839 h -6.832238 z"
+       d="m 9.273511,89.344838 a -6.8322388,6.9414746 0 0 1 -2.001116,-4.90839 h 6.832238 z"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
     <path
-       style="fill:#ff5722;stroke:#ff5722;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker11075142513406139);fill-opacity:1"
-       d="m 56.423836,82.585558 7e-6,-21.35545"
+       style="fill:#ff5722;fill-opacity:1;stroke:#ff5722;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker11075142513406139)"
+       d="m -1.390502,82.585558 -7e-6,-21.35545"
        id="path8958"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
@@ -308,6 +322,20 @@
     <path
        id="path8964"
        style="font-variation-settings:'wdth' 100, 'wght' 400;fill:none;fill-rule:evenodd;stroke:#bfbfbf;stroke-width:1.32292;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 14.632287,106.55749 c 0,0 0,0 0,0 l 2.405388,-27.437472 a 6.2468045,6.2468045 0 0 0 -9.345374,-5.95604 l -23.855009,13.7671" />
+       d="m 40.401047,106.55749 c 0,0 0,0 0,0 L 37.995659,79.120018 a -6.2468045,6.2468045 0 0 1 9.345374,-5.95604 l 23.855009,13.7671" />
+    <path
+       style="fill:none;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 23.180383,74.710428 H 6.068941"
+       id="path1153-7"
+       inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#bfbfbf;stroke-width:0.529;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker84771905-5)"
+       d="m 10.089261,73.651706 -10e-6,-21.355321"
+       id="path1169-6"
+       inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
   </g>
 </svg>

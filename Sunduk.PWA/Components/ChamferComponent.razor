@@ -16,25 +16,33 @@
                     </MudField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_ChamferEndDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
-                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalEndDiameter : Images.InternalEndDiameter" Margin="Margin.Dense" />
+                    <MudField Label="Тип расчета" Variant="Variant.Filled" InnerPadding="false">
+                        <MudRadioGroup SelectedOptionChanged="OnCalculationChanged" T="Calculation">
+                            <MudRadio Option="@Calculation.Simplified" Color="Color.Primary">Упрощенный</MudRadio>
+                            <MudRadio Option="@Calculation.Precise" Color="Color.Primary" >Точный</MudRadio>
+                        </MudRadioGroup>
+                    </MudField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_Angle" T="string" Label="Угол" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="°" Immediate="true"
-                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferAngle : Images.InternalChamferAngle" Margin="Margin.Dense" />
+                    <MudTextField @bind-Value="_ChamferEndDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalEndDiameter : Images.InternalEndDiameter" Margin="Margin.Dense" />
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_ChamferSize" @onfocusin="@(() => calcStartDiam = true)" T="string" Label="Глубина фаски" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
                                   @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferSize : Images.InternalChamferSize" Margin="Margin.Dense" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_ChamferInsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Filled" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
-                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense" />
+                    <MudTextField @bind-Value="_Angle" T="string" Label="Угол" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="°" Immediate="true"
+                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferAngle : Images.InternalChamferAngle" Margin="Margin.Dense" />
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_ChamferStartDiameter" @onfocusin="@(() => calcStartDiam = false)" T="string" Label="Начальный диаметр" Variant="Variant.Filled" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
                                   @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalStartDiameter : Images.InternalStartDiameter" Margin="Margin.Dense">
                     </MudTextField>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_ChamferInsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Filled" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                                  @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense" />
                 </MudItem>
             </MudGrid>
         </MudItem>
@@ -56,7 +64,7 @@
                     @if (CurrentImage == Images.ExternalStartDiameter)
                     {
                         <center>
-                            <img src="/img/stuffimages/drill/drill_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            <img src="/img/stuffimages/chamfer/ext_chamfer_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                     @if (CurrentImage == Images.ExternalEndDiameter)
@@ -86,7 +94,7 @@
                     @if (CurrentImage == Images.InternalStartDiameter)
                     {
                         <center>
-                            <img src="/img/stuffimages/drill/drill_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            <img src="/img/stuffimages/chamfer/int_chamfer_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                     @if (CurrentImage == Images.InternalEndDiameter)
@@ -205,6 +213,9 @@
     public enum Chamfer { External, Internal };
     public Chamfer ChamferType { get; set; } = Chamfer.External;
 
+    public enum Calculation { Simplified, Precise };
+    public Calculation CalculationType { get; set; } = Calculation.Simplified;
+
     public enum Images {
         ExternalChamferAngle,
         ExternalChamferSize,
@@ -229,15 +240,15 @@
             _chamferEndDiameter = value;
             if (calcStartDiam && ChamferType == Chamfer.External)
             {
-                _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) - 2 * RadiusShit).ToPrettyString();
+                _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) - 2 * RadiusShift).ToPrettyString();
             }
             else if (calcStartDiam && ChamferType == Chamfer.Internal)
             {
-                _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) + 2 * RadiusShit).ToPrettyString();
+                _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) + 2 * RadiusShift).ToPrettyString();
             }
             else
             {
-                _ChamferSize = Math.Abs((ChamferEndDiameter - ChamferStartDiameter) / 2 * Math.Tan((90 - Angle).Radians()) + RadiusShit).ToPrettyString();
+                _ChamferSize = Math.Abs((ChamferEndDiameter - ChamferStartDiameter) / 2 * Math.Tan((90 - Angle).Radians()) + RadiusShift).ToPrettyString();
             }
         }
     }
@@ -250,10 +261,7 @@
         set
         {
             _chamferStartDiameter = value;
-            if (!calcStartDiam)
-            {
-                _ChamferSize = Math.Abs((ChamferEndDiameter - ChamferStartDiameter) / 2 * Math.Tan((90 - Angle).Radians()) + RadiusShit).ToPrettyString();
-            }
+            CalculateChamferSize();
         }
     }
     public double ChamferStartDiameter { get => Util.GetDouble(_ChamferStartDiameter); }
@@ -265,18 +273,7 @@
         set
         {
             _angle = value;
-            if (calcStartDiam && ChamferType == Chamfer.External)
-            {
-                _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) - 2 * RadiusShit).ToPrettyString();
-            }
-            else if (calcStartDiam && ChamferType == Chamfer.Internal)
-            {
-                _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) + 2 * RadiusShit).ToPrettyString();
-            }
-            else
-            {
-                _ChamferSize = Math.Abs((ChamferEndDiameter - ChamferStartDiameter) / 2 * Math.Tan((90 - Angle).Radians()) + RadiusShit).ToPrettyString();
-            }
+            CalculateAll();
         }
     }
     public double Angle { get => Util.GetDouble(_Angle); }
@@ -288,14 +285,7 @@
         set
         {
             _chamferSize = value;
-            if (calcStartDiam && ChamferType == Chamfer.External)
-            {
-                _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) - 2 * RadiusShit).ToPrettyString();
-            }
-            else if (calcStartDiam && ChamferType == Chamfer.Internal)
-            {
-                _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) + 2 * RadiusShit).ToPrettyString();
-            }
+            CalculateEndDiam();
         }
     }
     public double ChamferSize { get => Util.GetDouble(_ChamferSize); }
@@ -306,18 +296,7 @@
         get { return _chamferInsertRadius; }
         set {
             _chamferInsertRadius = value;
-            if (calcStartDiam && ChamferType == Chamfer.External)
-            {
-                _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) - 2 * RadiusShit).ToPrettyString();
-            }
-            else if (calcStartDiam && ChamferType == Chamfer.Internal)
-            {
-                _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) + 2 * RadiusShit).ToPrettyString();
-            }
-            else
-            {
-                _ChamferSize = Math.Abs((ChamferEndDiameter - ChamferStartDiameter) / 2 * Math.Tan((90 - Angle).Radians()) + RadiusShit).ToPrettyString();
-            }
+            CalculateAll();
         }
     }
     public double ChamferInsertRadius { get => Util.GetDouble(_ChamferInsertRadius); }
@@ -344,13 +323,13 @@
     public bool RoundCorners { get; set; } = false;
     public string _RoundCorner { get; set; } = "0.3";
     public double RoundCorner { get => Util.GetDouble(_RoundCorner); }
-    public double RadiusShit { get
+    public double RadiusShift { get
         {
-            if (calcTrueRadiusShift && calcStartDiam)
+            if (calcStartDiam && CalculationType == Calculation.Precise)
             {
                 return ChamferInsertRadius - ChamferInsertRadius / Math.Tan((90 - (90 - Angle) / 2).Radians());
             }
-            else if (calcTrueRadiusShift && !calcStartDiam)
+            else if (!calcStartDiam && CalculationType == Calculation.Precise)
             {
                 return ChamferInsertRadius - ChamferInsertRadius / Math.Tan((90 - Angle / 2).Radians());
             }
@@ -376,7 +355,7 @@
         if (CurrentImage == Images.ExternalChamferAngle) CurrentImage = Images.InternalChamferAngle;
         if (CurrentImage == Images.ExternalChamferSize) CurrentImage = Images.InternalChamferSize;
         if (CurrentImage == Images.ExternalToolRadius) CurrentImage = Images.InternalToolRadius;
-        if (calcStartDiam) _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) + 2 * RadiusShit).ToPrettyString();
+        CalculateAll();
 
     }
 
@@ -386,6 +365,49 @@
         if (CurrentImage == Images.InternalChamferAngle) CurrentImage = Images.ExternalChamferAngle;
         if (CurrentImage == Images.InternalChamferSize) CurrentImage = Images.ExternalChamferSize;
         if (CurrentImage == Images.InternalToolRadius) CurrentImage = Images.ExternalToolRadius;
-        if (calcStartDiam) _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) - 2 * RadiusShit).ToPrettyString();
+        CalculateAll(); 
     }
+
+    private void CalculateAll()
+    {
+        if (calcStartDiam && ChamferType == Chamfer.External)
+        {
+            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) - 2 * RadiusShift).ToPrettyString();
+        }
+        else if (calcStartDiam && ChamferType == Chamfer.Internal)
+        {
+            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) + 2 * RadiusShift).ToPrettyString();
+        }
+        else
+        {
+            _ChamferSize = Math.Abs((ChamferEndDiameter - ChamferStartDiameter) / 2 * Math.Tan((90 - Angle).Radians()) + RadiusShift).ToPrettyString();
+        }
+    }
+
+    private void CalculateEndDiam()
+    {
+        if (calcStartDiam && ChamferType == Chamfer.External)
+        {
+            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) - 2 * RadiusShift).ToPrettyString();
+        }
+        else if (calcStartDiam && ChamferType == Chamfer.Internal)
+        {
+            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) + 2 * RadiusShift).ToPrettyString();
+        }
+    }
+
+    private void CalculateChamferSize()
+    {
+        if (!calcStartDiam)
+        {
+            _ChamferSize = Math.Abs((ChamferEndDiameter - ChamferStartDiameter) / 2 * Math.Tan((90 - Angle).Radians()) + RadiusShift).ToPrettyString();
+        }
+    }
+
+    private void OnCalculationChanged(Calculation value)
+    {
+        CalculationType = value;
+        CalculateAll();
+    }
+
 }

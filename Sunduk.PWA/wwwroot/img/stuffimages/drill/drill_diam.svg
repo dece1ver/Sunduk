@@ -2,7 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   sodipodi:docname="111.svg"
+   sodipodi:docname="222.svg"
    inkscape:version="1.1 (c68e22c387, 2021-05-23)"
    id="svg918"
    version="1.1"
@@ -26,9 +26,9 @@
      inkscape:snap-smooth-nodes="true"
      inkscape:snap-intersection-paths="false"
      inkscape:snap-center="true"
-     inkscape:zoom="4"
-     inkscape:cx="58.25"
-     inkscape:cy="96.875"
+     inkscape:zoom="1.41"
+     inkscape:cx="58.510638"
+     inkscape:cy="96.808511"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="-8"
@@ -444,21 +444,21 @@
     <path
        id="path1669"
        style="fill:none;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:round;stroke-opacity:1"
-       d="m 114.85335,153.44429 a 6.9698386,7.1399392 0 0 1 -3.48492,-6.18337 6.9698386,7.1399392 0 0 1 3.48492,-6.18337 l 3.48492,6.18337 z" />
+       d="m 78.675588,153.44429 a -6.9698386,7.1399392 0 0 0 3.48492,-6.18337 -6.9698386,7.1399392 0 0 0 -3.48492,-6.18337 l -3.48492,6.18337 z" />
     <path
        id="path1281"
        style="fill:none;stroke:#bfbfbf;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 75.08834,129.93705 h 33.24799 l 10.00194,17.32387 -10.00194,17.32391 H 75.08834" />
+       d="M 118.4406,129.93705 H 85.192608 l -10.00194,17.32387 10.00194,17.32391 H 118.4406" />
     <path
        style="fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#ff5722;stroke-width:0.529166;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker847719059121736499233833868831062722672941966180);marker-end:url(#Arrow1Mend791181699469353350966295141173929492745)"
-       d="m 91.712306,131.61764 4.5e-5,31.43627"
+       d="m 101.81663,131.61764 -4e-5,31.43627"
        id="path1169"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#bfbfbf;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 108.2831,131.05895 9.34568,16.20195 -9.34568,16.20198"
+       d="m 85.245838,131.05895 -9.34568,16.20195 9.34568,16.20198"
        id="path8367" />
   </g>
 </svg>
