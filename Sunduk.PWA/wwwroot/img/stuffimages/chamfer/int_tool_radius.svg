@@ -31,7 +31,7 @@
      fit-margin-bottom="1"
      inkscape:zoom="1"
      inkscape:cx="-52.5"
-     inkscape:cy="176.5"
+     inkscape:cy="96.5"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="-8"
@@ -236,6 +236,34 @@
          d="M 0,0 5,-5 -12.5,0 5,5 Z"
          id="path36123-8" />
     </marker>
+    <marker
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="marker84771905"
+       inkscape:isstock="true"
+       id="marker84771905-5-2">
+      <path
+         transform="matrix(0.4,0,0,0.4,4,0)"
+         style="fill:#bfbfbf;fill-rule:evenodd;stroke:#bfbfbf;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path36123-8-7" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="marker84771905"
+       inkscape:isstock="true"
+       id="marker84771905-5-0">
+      <path
+         transform="matrix(0.4,0,0,0.4,4,0)"
+         style="fill:#bfbfbf;fill-rule:evenodd;stroke:#bfbfbf;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path36123-8-6" />
+    </marker>
   </defs>
   <g
      inkscape:label="Слой 1"
@@ -313,29 +341,32 @@
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
     <path
-       style="fill:#ff5722;fill-opacity:1;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker1107514251340)"
-       d="m -1.390502,82.585558 -7e-6,-21.35545"
-       id="path8958"
-       inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
-       inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300" />
-    <path
        id="path8964"
        style="font-variation-settings:'wdth' 100, 'wght' 400;fill:none;fill-rule:evenodd;stroke:#bfbfbf;stroke-width:1.32292;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 40.401047,106.55749 c 0,0 0,0 0,0 L 37.995659,79.120018 a -6.2468045,6.2468045 0 0 1 9.345374,-5.95604 l 23.855009,13.7671" />
-    <path
-       style="fill:none;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 23.180383,74.710428 H 6.068941"
-       id="path1153-7"
-       inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
-       inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300" />
-    <path
-       style="fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#bfbfbf;stroke-width:0.529;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker84771905-5)"
-       d="m 10.089261,73.651706 -10e-6,-21.355321"
-       id="path1169-6"
-       inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
-       inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300" />
+    <g
+       id="g10854">
+      <path
+         style="fill:none;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 23.577259,74.710398 H 34.580538"
+         id="path1153-7-8"
+         inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
+         inkscape:export-xdpi="300"
+         inkscape:export-ydpi="300" />
+      <path
+         style="fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#bfbfbf;stroke-width:0.529;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker84771905-5-2)"
+         d="m 30.560218,75.76912 10e-6,21.355322"
+         id="path1169-6-00"
+         inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
+         inkscape:export-xdpi="300"
+         inkscape:export-ydpi="300" />
+      <path
+         style="fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#bfbfbf;stroke-width:0.529;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker84771905-5-0)"
+         d="m -13.966248,85.72827 10e-6,21.35532"
+         id="path1169-6-0"
+         inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
+         inkscape:export-xdpi="300"
+         inkscape:export-ydpi="300" />
+    </g>
   </g>
 </svg>

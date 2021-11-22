@@ -28,9 +28,9 @@
      fit-margin-left="1"
      fit-margin-right="1"
      fit-margin-bottom="1"
-     inkscape:zoom="1"
-     inkscape:cx="97.5"
-     inkscape:cy="274.5"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="-20.85965"
+     inkscape:cy="207.53584"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="-8"
@@ -137,6 +137,20 @@
          d="M 0,0 5,-5 -12.5,0 5,5 Z"
          id="path5346" />
     </marker>
+    <marker
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="marker110757682"
+       inkscape:isstock="true"
+       id="marker110757682-2">
+      <path
+         transform="matrix(0.4,0,0,0.4,4,0)"
+         style="fill:#bfbfbf;fill-rule:evenodd;stroke:#bfbfbf;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path3460-0" />
+    </marker>
   </defs>
   <g
      inkscape:label="Слой 1"
@@ -152,7 +166,7 @@
        inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#bfbfbf;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker110757682)"
-       d="M 60.257248,99.920514 V 78.565186"
+       d="m 60.257248,103.18669 v 21.35544"
        id="path3758"
        inkscape:export-filename="C:\Users\V\Desktop\path3043.png"
        inkscape:export-xdpi="300"
