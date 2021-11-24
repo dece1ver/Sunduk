@@ -9,93 +9,97 @@
             <MudField Label="Параметры фаски" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
                 <MudGrid Spacing="0">
                     <MudItem xs="12">
-                            <MudRadioGroup SelectedOptionChanged="OnChamferTypeChanged" T="Chamfer" Class="mb-n2">
-                                <MudRadio Option="@Chamfer.External" Color="Color.Primary">Наружная</MudRadio>
-                                <MudRadio Option="@Chamfer.Internal" Color="Color.Primary">Внутренняя</MudRadio>
-                            </MudRadioGroup>
+                        <MudRadioGroup SelectedOptionChanged="OnChamferTypeChanged" T="Chamfer" Class="mb-n2">
+                            <MudRadio Option="@Chamfer.External" Color="Color.Primary">Наружная</MudRadio>
+                            <MudRadio Option="@Chamfer.Internal" Color="Color.Primary">Внутренняя</MudRadio>
+                        </MudRadioGroup>
                     </MudItem>
                     <MudItem xs="12">
                         <MudTextField @bind-Value="_ChamferEndDiameter" T="string" Label="Конечный диаметр" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
-                                      @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalEndDiameter : Images.InternalEndDiameter" Margin="Margin.Dense" /></MudItem>
+                                      @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalEndDiameter : Images.InternalEndDiameter" Margin="Margin.Dense" />
+                    </MudItem>
                     <MudItem xs="12">
                         <MudTextField @bind-Value="_ChamferSize" @onfocusin="@(() => calcStartDiam = true)" T="string" Label="Глубина" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
-                                      @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferSize : Images.InternalChamferSize" Margin="Margin.Dense" /></MudItem>
+                                      @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferSize : Images.InternalChamferSize" Margin="Margin.Dense" />
+                    </MudItem>
                     <MudItem xs="12">
                         <MudTextField @bind-Value="_Angle" T="string" Label="Угол" Adornment="Adornment.End" AdornmentText="°" Immediate="true"
-                                      @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferAngle : Images.InternalChamferAngle" Margin="Margin.Dense" /></MudItem>
+                                      @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferAngle : Images.InternalChamferAngle" Margin="Margin.Dense" />
+                    </MudItem>
                     <MudItem xs="12">
                         <MudTextField @bind-Value="_ChamferStartDiameter" @onfocusin="@(() => calcStartDiam = false)" T="string" Label="Начальный диаметр" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
-                                      @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalStartDiameter : Images.InternalStartDiameter" Margin="Margin.Dense"/></MudItem>
+                                      @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalStartDiameter : Images.InternalStartDiameter" Margin="Margin.Dense" />
+                    </MudItem>
                 </MudGrid>
             </MudField>
         </MudItem>
         <MudHidden Breakpoint="Breakpoint.Xs">
             <MudItem xs="12" sm="6">
-            <MudCard Elevation="0" Outlined="true" Class="mt-1" >
-                <MudCardContent>
-                    @if (CurrentImage == Images.ExternalChamferAngle)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/chamfer/ext_chamfer_angle.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.ExternalChamferSize)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/chamfer/ext_chamfer_size.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.ExternalStartDiameter)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/chamfer/ext_chamfer_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.ExternalEndDiameter)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/chamfer/ext_part_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.ExternalToolRadius)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/chamfer/ext_tool_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.InternalChamferAngle)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/chamfer/int_chamfer_angle.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.InternalChamferSize)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/chamfer/int_chamfer_size.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.InternalStartDiameter)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/chamfer/int_chamfer_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.InternalEndDiameter)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/chamfer/int_part_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.InternalToolRadius)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/chamfer/int_tool_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
+                <MudCard Elevation="0" Outlined="true" Class="mt-1">
+                    <MudCardContent>
+                        @if (CurrentImage == Images.ExternalChamferAngle)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/chamfer/ext_chamfer_angle.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.ExternalChamferSize)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/chamfer/ext_chamfer_size.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.ExternalStartDiameter)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/chamfer/ext_chamfer_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.ExternalEndDiameter)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/chamfer/ext_part_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.ExternalToolRadius)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/chamfer/ext_tool_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.InternalChamferAngle)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/chamfer/int_chamfer_angle.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.InternalChamferSize)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/chamfer/int_chamfer_size.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.InternalStartDiameter)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/chamfer/int_chamfer_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.InternalEndDiameter)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/chamfer/int_part_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.InternalToolRadius)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/chamfer/int_tool_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
         </MudHidden>
         <MudItem xs="12" sm="12">
             <MudField Label="Расчет" Variant="Variant.Filled" DisableUnderLine="true">
@@ -103,30 +107,31 @@
                     <MudHidden Breakpoint="Breakpoint.Xs">
                         <MudItem xs="12" sm="6" Class="mt-2">
                             <MudTextField @bind-Value="_ChamferInsertRadius" T="string" Label="Радиус пластины" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" Class="mr-3"
-                                @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense">
+                                          @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense">
                             </MudTextField>
                         </MudItem>
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
                         <MudItem xs="12" sm="6">
                             <MudTextField @bind-Value="_ChamferInsertRadius" T="string" Label="Радиус пластины" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
-                                @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense">
+                                          @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense">
                             </MudTextField>
                         </MudItem>
                     </MudHidden>
                     <MudItem xs="12" sm="6">
                         <MudRadioGroup SelectedOptionChanged="OnCalculationChanged" T="Calculation" Class="d-flex justify-center">
                             <MudRadio Option="@Calculation.Simplified" Color="Color.Primary">Упрощенный</MudRadio>
-                            <MudRadio Option="@Calculation.Precise" Color="Color.Primary" >Точный</MudRadio></MudRadioGroup>
-                        </MudItem>
-                    
+                            <MudRadio Option="@Calculation.Precise" Color="Color.Primary">Точный</MudRadio>
+                        </MudRadioGroup>
+                    </MudItem>
+
                 </MudGrid>
             </MudField>
         </MudItem>
-            <MudItem xs="12" sm="12">
-                <MudField Label="Результат" Variant="Variant.Filled" DisableUnderLine="true">
-                    <MudGrid Spacing="1">
-                        <MudItem xs="12" Class="mt-2">
+        <MudItem xs="12" sm="12">
+            <MudField Label="Результат" Variant="Variant.Filled" DisableUnderLine="true">
+                <MudGrid Spacing="1">
+                    <MudItem xs="12" Class="mt-2">
                         @if (ValidResult() && ChamferInsertRadius > 0)
                         {
                             <MudText Typo="Typo.body2">@($"Начальный диаметр с учетом радиуса пластины: {ChamferStartDiamWithShift.ToPrettyString()} мм")</MudText>
@@ -135,8 +140,8 @@
                         {
                             <MudText Typo="Typo.body2">@($"Начальный диаметр с учетом радиуса пластины: -")</MudText>
                         }
-                        </MudItem>
-                        <MudItem xs="12">
+                    </MudItem>
+                    <MudItem xs="12">
                         @if (ValidResult() && ChamferInsertRadius > 0)
                         {
                             <MudText Typo="Typo.body2">@($"Глубина с учетом радиуса пластины: {ChamferSizeWithShift.ToPrettyString()} мм")</MudText>
@@ -145,63 +150,72 @@
                         {
                             <MudText Typo="Typo.body2">@($"Глубина с учетом радиуса пластины: -")</MudText>
                         }
-                        </MudItem>
-                    </MudGrid>
-                </MudField>
-            </MudItem>
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+        </MudItem>
         @if (ValidResult())
         {
             <MudItem xs="12">
                 <MudExpansionPanel Text="Пример программы для Fanuc">
-                <MudGrid>
-                    <MudItem xs="6" sm="5" md="4" xl="3">
-                        <MudSwitch @bind-Checked="@RoundCorners" Label="Скруглить углы" Color="Color.Primary" />
+                    <MudGrid>
+                        <MudItem xs="12" md="4">
+                            <MudRadioGroup T="bool" @bind-SelectedOption="showClassicChamfer" Class="ma-n3">
+                                <MudRadio Option="true" Color="Color.Primary">Обычная</MudRadio>
+                                <MudRadio Option="false" Color="Color.Primary">Обратная</MudRadio>
+                        </MudRadioGroup>
+                        </MudItem>
+                        <MudItem xs="6" md="4">
+                            <MudSwitch @bind-Checked="@RoundCorners" Label="Скруглить углы" Color="Color.Primary" Class="ma-n3"/>
+                        </MudItem>
+                        <MudItem xs="6" md="4">
+                            @if (RoundCorners)
+                            {
+                                <MudTextField @bind-Value="_RoundCorner" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" Class="ma-n3" DisableUnderLine="true"/>
+                            }
+                        </MudItem>
+                    </MudGrid>
+                    <MudItem xs="12">
+                        <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@ChamferExample" />
                     </MudItem>
-                    <MudItem xs="6" sm="7" md="8" xl="9" >
-                        @if (RoundCorners)
-                        {
-                            <MudTextField @bind-Value="_RoundCorner" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" Class="mt-1"/>
-                        }
-                    </MudItem>
-                </MudGrid>
-                <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@ChamferExample" />
-                </MudItem>
-            </MudExpansionPanel>
+                </MudExpansionPanel>
             </MudItem>
         }
     </MudGrid>
 </MudContainer>
 
-@code 
+@code
 {
     readonly int _imgHeigth = 239;
     readonly int _imgWidth = 239;
 
     bool calcStartDiam = true;
+    bool showClassicChamfer = true;
 
     public string ChamferExample
     {
         get
         {
-            if (ChamferEndDiameter > 0 && Angle > 0 && ChamferSize > 0 && !RoundCorners && calcStartDiam)
+            // классическая без скрулгений
+            if (ValidResult() && !RoundCorners && showClassicChamfer)
             {
                 return
                     $"G0 X{(ChamferStartDiamWithShift).NC()} Z1. S180 M3\n" +
                     $"G1 Z0. F0.1\n" +
                     $"X{ChamferEndDiameter.NC()} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{(Angle).NC()}";
             }
-            else if (ChamferEndDiameter > 0 && Angle > 0 && ChamferSize > 0 && !RoundCorners && !calcStartDiam)
+            // обратная без скруглений
+            else if (ValidResult() && !RoundCorners && !showClassicChamfer)
             {
                 switch (ChamferType)
                 {
                     case Chamfer.External:
-                        return 
-                        $"G0 X{(ChamferEndDiameter + 1).NC(1)} Z-{(ChamferSizeWithShift).NC()} Z1. S180 M3\n" +
+                        return
+                        $"G0 X{(ChamferEndDiameter + 1).NC(1)} Z-{(ChamferSizeWithShift).NC()} S180 M3\n" +
                         $"G1 X{ChamferEndDiameter.NC()} F0.1\n" +
                         $"Z0. A-{(Angle).NC()}";
                     case Chamfer.Internal:
-                        return 
+                        return
                         $"G0 X{(ChamferEndDiameter - 1).NC(1)} Z1. S180 M3\n" +
                         $"Z-{(ChamferSizeWithShift).NC()}\n" +
                         $"G1 X{ChamferEndDiameter.NC()} F0.1\n" +
@@ -210,7 +224,8 @@
                         return string.Empty;
                 }
             }
-            else if(ChamferEndDiameter > 0 && Angle > 0 && ChamferSize > 0 && RoundCorners && calcStartDiam)
+            // классическая со скруглениями
+            else if (ValidResult() && RoundCorners && showClassicChamfer)
             {
                 return
                 $"G0 X{(ChamferType == Chamfer.External ? ChamferStartDiamWithShift - 2 * (ChamferInsertRadius + RoundCorner) : ChamferStartDiamWithShift + 2 * (ChamferInsertRadius + RoundCorner)).NC()} Z1. S180 M3\n" +
@@ -219,21 +234,22 @@
                 $"X{ChamferEndDiameter.NC()} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{Angle.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
                 $"W-{(ChamferInsertRadius + RoundCorner).NC()}";
             }
-            else if (ChamferEndDiameter > 0 && Angle > 0 && ChamferSize > 0 && RoundCorners && !calcStartDiam)
+            // обратная со скруглениями
+            else if (ValidResult() && RoundCorners && !showClassicChamfer)
             {
                 switch (ChamferType)
                 {
                     case Chamfer.External:
                         return
-                        $"G0 X{(ChamferEndDiameter + 1).NC(1)} Z-{(ChamferSizeWithShift - (ChamferInsertRadius + RoundCorner)).NC()} S180 M3\n" +
+                        $"G0 X{(ChamferEndDiameter + 1).NC(1)} Z-{(ChamferSizeWithShift + (ChamferInsertRadius + RoundCorner)).NC()} S180 M3\n" +
                         $"G1 X{ChamferEndDiameter.NC()}\n" +
                         $"Z-{ChamferSizeWithShift.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
                         $"Z0. A{Angle.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
                         $"U-{(2 * (ChamferInsertRadius + RoundCorner)).NC()}";
                     case Chamfer.Internal:
-                        return 
-                        $"G0 X{(ChamferEndDiameter + 1).NC(1)} Z1. S180 M3\n" +
-                        $"Z-{ChamferSizeWithShift.NC()}\n" +
+                        return
+                        $"G0 X{(ChamferEndDiameter - 1).NC(1)} Z1. S180 M3\n" +
+                        $"Z-{(ChamferSizeWithShift + (ChamferInsertRadius + RoundCorner)).NC()}\n" +
                         $"G1 X{ChamferEndDiameter.NC()}\n" +
                         $"Z-{ChamferSizeWithShift.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
                         $"Z0. A-{Angle.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
@@ -241,7 +257,6 @@
                     default:
                         return string.Empty;
                 }
-
             }
             return string.Empty;
         }
@@ -252,7 +267,8 @@
     public enum Calculation { Simplified, Precise };
     public Calculation CalculationType { get; set; } = Calculation.Simplified;
 
-    public enum Images {
+    public enum Images
+    {
         ExternalChamferAngle,
         ExternalChamferSize,
         ExternalStartDiameter,
@@ -319,7 +335,8 @@
     public string _ChamferInsertRadius
     {
         get { return _chamferInsertRadius; }
-        set {
+        set
+        {
             _chamferInsertRadius = value;
             CalculateAll();
         }
@@ -348,7 +365,9 @@
     public bool RoundCorners { get; set; } = false;
     public string _RoundCorner { get; set; } = "0.3";
     public double RoundCorner { get => Util.GetDouble(_RoundCorner); }
-    public double RadiusShift { get
+    public double RadiusShift
+    {
+        get
         {
             if (calcStartDiam && CalculationType == Calculation.Precise)
             {
@@ -362,7 +381,9 @@
             {
                 return ChamferInsertRadius * Math.Tan(Angle.Radians()) / 2;
             }
-        } set { } }
+        }
+        set { }
+    }
 
     public int ExampleLines { get => ChamferExample.Count(f => f == '\n') + 1; }
 
@@ -383,7 +404,7 @@
 
     private double ChamferSizeWithShift
     {
-        get 
+        get
         {
             return Math.Abs(ChamferSize + RadiusShift);
         }
@@ -415,7 +436,7 @@
         if (CurrentImage == Images.InternalChamferAngle) CurrentImage = Images.ExternalChamferAngle;
         if (CurrentImage == Images.InternalChamferSize) CurrentImage = Images.ExternalChamferSize;
         if (CurrentImage == Images.InternalToolRadius) CurrentImage = Images.ExternalToolRadius;
-        CalculateAll(); 
+        CalculateAll();
     }
 
     private void CalculateAll()
@@ -462,7 +483,7 @@
 
     private void CalculateChamferSize()
     {
-        if(!calcStartDiam && ValidResult())
+        if (!calcStartDiam && ValidResult())
         {
             _ChamferSize = Math.Abs((ChamferEndDiameter - ChamferStartDiameter) / 2 * Math.Tan((90 - Angle).Radians())).ToPrettyString();
         }
@@ -487,8 +508,8 @@
 
     private bool ValidResult()
     {
-        if (ChamferEndDiameter > 0 
-            && Angle > 0 
+        if (ChamferEndDiameter > 0
+            && Angle > 0
             && Angle < 90
             && (ChamferSize > 0 || ChamferStartDiameter > 0)) return true;
         return false;
