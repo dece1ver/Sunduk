@@ -37,6 +37,18 @@
             <MudItem xs="12" sm="6">
                 <MudCard Elevation="0" Outlined="true" Class="mt-1">
                     <MudCardContent>
+                        @if (CurrentImage == Images.ExternalChamfer)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/chamfer/ext_chamfer.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.InternalChamfer)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/chamfer/int_chamfer.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
                         @if (CurrentImage == Images.ExternalChamferAngle)
                         {
                             <center>
@@ -101,6 +113,8 @@
                 </MudCard>
             </MudItem>
             <div>
+                <img src="/img/stuffimages/chamfer/ext_chamfer.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/int_chamfer.svg" asp-append-version="true" width="0" height="0" />
                 <img src="/img/stuffimages/chamfer/ext_chamfer_angle.svg" asp-append-version="true" width="0" height="0" />
                 <img src="/img/stuffimages/chamfer/ext_chamfer_size.svg" asp-append-version="true" width="0" height="0" />
                 <img src="/img/stuffimages/chamfer/ext_chamfer_diam.svg" asp-append-version="true" width="0" height="0" />
@@ -281,6 +295,8 @@
 
     public enum Images
     {
+        ExternalChamfer,
+        InternalChamfer,
         ExternalChamferAngle,
         ExternalChamferSize,
         ExternalStartDiameter,
@@ -293,7 +309,7 @@
         InternalToolRadius,
     };
     //public enum ImageType { Diameter, ToolRaduis, ChamferAngle, ChamferSize };
-    public Images CurrentImage { get; set; } = Images.ExternalEndDiameter;
+    public Images CurrentImage { get; set; } = Images.ExternalChamfer;
 
     private string _chamferEndDiameter;
     public string _ChamferEndDiameter

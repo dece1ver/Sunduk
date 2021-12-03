@@ -35,7 +35,18 @@
             <MudItem xs="12" sm="6" >
             <MudCard Elevation="0" Outlined="true" Class="mt-1">
                 <MudCardContent>
-                    
+                    @if (CurrentImage == Images.ExternalRadius)
+                    {
+                        <center>
+                            <img src="/img/stuffimages/radius/ext_raduis.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                        </center>
+                    }
+                    @if (CurrentImage == Images.InternalRadius)
+                    {
+                        <center>
+                            <img src="/img/stuffimages/radius/ext_raduis.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                        </center>
+                    }
                     @if (CurrentImage == Images.ExternalRadiusSize)
                     {
                         <center>
@@ -76,6 +87,8 @@
             </MudCard>
         </MudItem>
         <div>
+            <img src="/img/stuffimages/radius/ext_raduis.svg" asp-append-version="true" width="0" height="0" />
+            <img src="/img/stuffimages/radius/int_raduis.svg" asp-append-version="true" width="0" height="0" />
             <img src="/img/stuffimages/radius/ext_part_radius.svg" asp-append-version="true" width="0" height="0" />
             <img src="/img/stuffimages/radius/ext_part_diam.svg" asp-append-version="true" width="0" height="0" />
             <img src="/img/stuffimages/radius/ext_tool_radius.svg" asp-append-version="true" width="0" height="0"/>
@@ -123,6 +136,8 @@
 
     public enum Images
     {
+        ExternalRadius,
+        InternalRadius,
         ExternalRadiusSize,
         ExternalPartDiameter,
         ExternalToolRadius,
@@ -131,7 +146,7 @@
         InternalToolRadius,
     };
     public enum ImageType { Diameter, ToolRaduis, ChamferAngle, ChamferSize };
-    public Images CurrentImage { get; set; }
+    public Images CurrentImage { get; set; } = Images.ExternalRadius;
 
     public string ResultMessage
     {
