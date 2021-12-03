@@ -31,20 +31,6 @@
             
         </MudItem>
 
-        @if (RadiusDiameter > 0 && RadiusSize > 0)
-        {
-            <MudItem xs="12">
-                <MudField Variant="Variant.Filled">
-                    <MudText>@ResultMessage</MudText>
-                </MudField>
-            </MudItem>
-            <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
-                <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@RadiusExample" />
-                </MudItem>
-            </MudExpansionPanel>
-        }
-
         <MudHidden Breakpoint="Breakpoint.Xs">
             <MudItem xs="12" sm="6" >
             <MudCard Elevation="0" Outlined="true" Class="mt-1">
@@ -99,6 +85,32 @@
             <img src="/img/stuffimages/radius/int_tool_radius.svg" asp-append-version="true" width="0" height="0"/>
         </div>
         </MudHidden>
+        <MudItem xs="12">
+            <MudField Label="Результат" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n3">
+                <MudGrid Spacing="1">
+                    <MudItem xs="12" Class="mt-2">
+                        @if (RadiusDiameter > 0 && RadiusSize > 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Начальный диаметр с учетом радиуса пластины: {RadiusResult.ToPrettyString()} мм")</MudText>
+                        }
+                        @if (RadiusDiameter <= 0 && RadiusSize <= 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Начальный диаметр с учетом радиуса пластины: -")</MudText>
+                        }
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+        </MudItem>
+        @if (RadiusDiameter > 0 && RadiusSize > 0)
+        {
+        <MudItem xs="12">
+            <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
+                <MudItem xs="12">
+                    <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@RadiusExample" />
+                </MudItem>
+            </MudExpansionPanel>
+        </MudItem>
+        }
     </MudGrid>
     
     
