@@ -4,28 +4,31 @@
     }
 </style>
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid>
-        <MudItem xs="12" xl="12">
-            <MudGrid>
-                <MudItem xs="12" sm="4" md="4" lg="3" xl="3">
-                    <MudField Label="Тип скругления" Variant="Variant.Outlined" InnerPadding="false">
-                        <MudRadioGroup @bind-SelectedOption="@RadiusType">
+    <MudGrid Spacing="1">
+        <MudItem xs="12" sm="6">
+            <MudField Label="Параметры скругления" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                <MudGrid Spacing="0">
+                    <MudItem xs="12">
+                        <MudRadioGroup @bind-SelectedOption="@RadiusType" Class="mb-n2 d-flex justify-center">
                             <MudRadio Option="@Radius.External" Color="Color.Primary" @onfocus="SetExternalType">Наружное</MudRadio>
                             <MudRadio Option="@Radius.Internal" Color="Color.Primary" @onfocus="SetInternalType">Внутреннее</MudRadio>
                         </MudRadioGroup>
-                    </MudField>
-                </MudItem>
-                <MudItem xs="6" sm="4" md="4" lg="5" xl="5">
-                    <MudTextField @bind-Value="_RadiusDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
-                                  @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalPartDiameter : Images.InternalPartDiameter" />
-                    <MudTextField @bind-Value="_RadiusSize" T="string" Label="Радиус скругления" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
-                                  @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalRadiusSize : Images.InternalRadiusSize" />
-                </MudItem>
-                <MudItem xs="6" sm="4" md="4" lg="4" xl="5">
-                    <MudTextField @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
-                                  @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalToolRadius : Images.InternalToolRadius" />
-                </MudItem>
-            </MudGrid>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_RadiusDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                                      @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalPartDiameter : Images.InternalPartDiameter" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_RadiusSize" T="string" Label="Радиус скругления" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                                      @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalRadiusSize : Images.InternalRadiusSize" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                                      @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense"/>
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+            
         </MudItem>
 
         @if (RadiusDiameter > 0 && RadiusSize > 0)
@@ -42,9 +45,11 @@
             </MudExpansionPanel>
         }
 
-        <MudItem xs="12" xl="12">
-            <MudCard Outlined="true" Style="margin: 0">
+        <MudHidden Breakpoint="Breakpoint.Xs">
+            <MudItem xs="12" sm="6" >
+            <MudCard Elevation="0" Outlined="true" Class="mt-1">
                 <MudCardContent>
+                    
                     @if (CurrentImage == Images.ExternalRadiusSize)
                     {
                         <center>
@@ -84,6 +89,16 @@
                 </MudCardContent>
             </MudCard>
         </MudItem>
+        <div>
+            <img src="/img/stuffimages/radius/ext_part_radius.svg" asp-append-version="true" width="0" height="0" />
+            <img src="/img/stuffimages/radius/ext_part_diam.svg" asp-append-version="true" width="0" height="0" />
+            <img src="/img/stuffimages/radius/ext_tool_radius.svg" asp-append-version="true" width="0" height="0"/>
+            <img src="/img/stuffimages/radius/ext_tool_radius.svg" asp-append-version="true" width="0" height="0"/>
+            <img src="/img/stuffimages/radius/int_part_radius.svg" asp-append-version="true" width="0" height="0"/>
+            <img src="/img/stuffimages/radius/int_part_diam.svg" asp-append-version="true" width="0" height="0"/>
+            <img src="/img/stuffimages/radius/int_tool_radius.svg" asp-append-version="true" width="0" height="0"/>
+        </div>
+        </MudHidden>
     </MudGrid>
     
     
@@ -91,8 +106,8 @@
 
 @code 
 {
-    readonly int _imgHeigth = 150;
-    readonly int _imgWidth = 350;
+    readonly int _imgHeigth = 187;
+    readonly int _imgWidth = 300;
 
     public enum Images
     {

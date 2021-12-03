@@ -9,7 +9,7 @@
             <MudField Label="Параметры фаски" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
                 <MudGrid Spacing="0">
                     <MudItem xs="12">
-                        <MudRadioGroup SelectedOptionChanged="OnChamferTypeChanged" T="Chamfer" Class="mb-n2">
+                        <MudRadioGroup SelectedOptionChanged="OnChamferTypeChanged" T="Chamfer" Class="mb-n2 d-flex justify-center">
                             <MudRadio Option="@Chamfer.External" Color="Color.Primary">Наружная</MudRadio>
                             <MudRadio Option="@Chamfer.Internal" Color="Color.Primary">Внутренняя</MudRadio>
                         </MudRadioGroup>
@@ -100,6 +100,18 @@
                     </MudCardContent>
                 </MudCard>
             </MudItem>
+            <div>
+                <img src="/img/stuffimages/chamfer/ext_chamfer_angle.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/ext_chamfer_size.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/ext_chamfer_diam.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/ext_part_diam.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/ext_tool_radius.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/int_chamfer_angle.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/int_chamfer_size.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/int_chamfer_diam.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/int_part_diam.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/int_tool_radius.svg" asp-append-version="true" width="0" height="0" />
+            </div>
         </MudHidden>
         <MudItem xs="12" sm="12">
             <MudField Label="Расчет" Variant="Variant.Filled" DisableUnderLine="true">
@@ -163,7 +175,7 @@
                             <MudRadioGroup T="bool" @bind-SelectedOption="showClassicChamfer" Class="ma-n3">
                                 <MudRadio Option="true" Color="Color.Primary">Обычная</MudRadio>
                                 <MudRadio Option="false" Color="Color.Primary">Обратная</MudRadio>
-                        </MudRadioGroup>
+                            </MudRadioGroup>
                         </MudItem>
                         <MudItem xs="6" md="4">
                             <MudSwitch @bind-Checked="@RoundCorners" Label="Скруглить углы" Color="Color.Primary" Class="ma-n3"/>
@@ -186,8 +198,8 @@
 
 @code
 {
-    readonly int _imgHeigth = 239;
-    readonly int _imgWidth = 239;
+    readonly int _imgHeigth = 237;
+    readonly int _imgWidth = 300;
 
     bool calcStartDiam = true;
     bool showClassicChamfer = true;
@@ -365,22 +377,28 @@
     public bool RoundCorners { get; set; } = false;
     public string _RoundCorner { get; set; } = "0.3";
     public double RoundCorner { get => Util.GetDouble(_RoundCorner); }
-    public double RadiusShift
+    public double XRadiusShift
     {
         get
         {
-            if (calcStartDiam && CalculationType == Calculation.Precise)
+            if (CalculationType == Calculation.Precise)
             {
-                return ChamferInsertRadius - ChamferInsertRadius / Math.Tan((90 - (90 - Angle) / 2).Radians());
+                return Math.Tan(Angle.Radians()) * (ChamferInsertRadius - ChamferInsertRadius / Math.Tan((90 - Angle / 2).Radians()));
             }
-            else if (!calcStartDiam && CalculationType == Calculation.Precise)
+            return ChamferInsertRadius * Math.Tan(Angle.Radians()) / 2;
+        }
+        set { }
+    }
+
+    public double ZRadiusShift
+    {
+        get
+        {
+            if (CalculationType == Calculation.Precise)
             {
                 return ChamferInsertRadius - ChamferInsertRadius / Math.Tan((90 - Angle / 2).Radians());
             }
-            else
-            {
-                return ChamferInsertRadius * Math.Tan(Angle.Radians()) / 2;
-            }
+            return ChamferInsertRadius * Math.Tan((90 - Angle).Radians()) / 2;
         }
         set { }
     }
@@ -393,11 +411,11 @@
         {
             if (ChamferType == Chamfer.External)
             {
-                return (ChamferStartDiameter - 2 * RadiusShift);
+                return (ChamferStartDiameter - 2 * XRadiusShift);
             }
             else
             {
-                return (ChamferStartDiameter + 2 * RadiusShift);
+                return (ChamferStartDiameter + 2 * XRadiusShift);
             }
         }
     }
@@ -406,7 +424,7 @@
     {
         get
         {
-            return Math.Abs(ChamferSize + RadiusShift);
+            return Math.Abs(ChamferSize + ZRadiusShift);
         }
     }
 
