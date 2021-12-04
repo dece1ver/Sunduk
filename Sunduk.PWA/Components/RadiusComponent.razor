@@ -104,11 +104,21 @@
                     <MudItem xs="12" Class="mt-2">
                         @if (RadiusDiameter > 0 && RadiusSize > 0)
                         {
-                            <MudText Typo="Typo.body2">@($"Начальный диаметр с учетом радиуса пластины: {RadiusResult.ToPrettyString()} мм")</MudText>
+                            <MudText Typo="Typo.body2">@($"Начальный диаметр с учетом радиуса пластины: {RadiusStartDiameter.ToPrettyString()} мм")</MudText>
                         }
                         @if (RadiusDiameter <= 0 && RadiusSize <= 0)
                         {
                             <MudText Typo="Typo.body2">@($"Начальный диаметр с учетом радиуса пластины: -")</MudText>
+                        }
+                    </MudItem>
+                    <MudItem xs="12">
+                        @if (RadiusDiameter > 0 && RadiusSize > 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Глубина с учетом радиуса пластины: {RadiusDepth.ToPrettyString()} мм")</MudText>
+                        }
+                        @if (RadiusDiameter <= 0 && RadiusSize <= 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Глубина с учетом радиуса пластины: -")</MudText>
                         }
                     </MudItem>
                 </MudGrid>
@@ -118,6 +128,12 @@
         {
         <MudItem xs="12">
             <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
+                <MudItem xs="12" md="4">
+                            <MudRadioGroup T="bool" @bind-SelectedOption="showClassicRadius" Class="ma-n3">
+                                <MudRadio Option="true" Color="Color.Primary">Обычная</MudRadio>
+                                <MudRadio Option="false" Color="Color.Primary">Обратная</MudRadio>
+                            </MudRadioGroup>
+                        </MudItem>
                 <MudItem xs="12">
                     <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@RadiusExample" />
                 </MudItem>
@@ -134,6 +150,8 @@
     readonly int _imgHeigth = 187;
     readonly int _imgWidth = 300;
 
+    bool showClassicRadius = true;
+
     public enum Images
     {
         ExternalRadius,
@@ -148,29 +166,31 @@
     public enum ImageType { Diameter, ToolRaduis, ChamferAngle, ChamferSize };
     public Images CurrentImage { get; set; } = Images.ExternalRadius;
 
-    public string ResultMessage
-    {
-        get
-        {
-            if (RadiusDiameter > 0 && RadiusSize > 0)
-            {
-                return $"Начальный диаметр скругления с учетом радиуса пластины: {Util.ToPrettyString(RadiusResult)} мм";
-            }
-            return string.Empty;
-        }
-    }
-
     public string RadiusExample
     {
         get
         {
             if (RadiusDiameter > 0 && RadiusSize > 0)
             {
-                return
-                    $"G0 X{RadiusResult.NC()} Z1. S180 M3\n" +
+                if(showClassicRadius)
+                {
+                    return
+                    $"G0 X{RadiusStartDiameter.NC()} Z1. S180 M3\n" +
                     $"G1 Z0. F0.1\n" +
-                    $"X{RadiusDiameter.NC()} R{(RadiusSize + InsertRadius).NC()}\n" +
-                    $"W-{(RadiusSize + InsertRadius).NC()}";
+                    $"X{RadiusDiameter.NC()} R{RadiusDepth.NC()}\n" +
+                    $"W-{RadiusDepth.NC()}";
+                }
+
+                return RadiusType == Radius.External
+                ? $"G0 X{(RadiusDiameter + 1).NC()} Z-{RadiusDepth.NC()} S180 M3\n" +
+                  $"G1 X{RadiusDiameter.NC()} F0.1\n" +
+                  $"Z0. R{RadiusDepth.NC()}\n" +
+                  $"U-{(2 * RadiusDepth).NC()}"
+                : $"G0 X{(RadiusDiameter - 1).NC()} Z1. S180 M3\n" +
+                  $"Z-{RadiusDepth.NC()}\n" +
+                  $"G1 X{RadiusDiameter.NC()} F0.1\n" +
+                  $"Z0. R{RadiusDepth.NC()}\n" +
+                  $"U-{(2 * RadiusDepth).NC()}";
             }
             return string.Empty;
         }
@@ -187,23 +207,19 @@
     public string _InsertRadius { get; set; } = string.Empty;
     public double InsertRadius { get => Util.GetDouble(_InsertRadius); }
 
-    public double RadiusResult
+    public double RadiusStartDiameter
     {
         get
         {
-            double result;
             if (RadiusType == Radius.External)
             {
-                result = RadiusDiameter - (2 * (RadiusSize + InsertRadius) );
+                return RadiusDiameter - (2 * (RadiusSize + InsertRadius) );
             }
-            else
-            {
-                result = RadiusDiameter + (2 * (RadiusSize + InsertRadius));
-
-            }
-            return result;
+            return RadiusDiameter + (2 * (RadiusSize + InsertRadius));
         }
     }
+
+    public double RadiusDepth { get => RadiusSize + InsertRadius; }
 
     public int ExampleLines { get => RadiusExample.Count(f => f == '\n') + 1; }
 
