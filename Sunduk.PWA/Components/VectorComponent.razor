@@ -1,10 +1,12 @@
-﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+﻿@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="4">
-            <MudCard Outlined="true">
-                <MudCardHeader>
+            <MudCard Outlined="true" @onclick="@(() => Snackbar.Add($"Это вектор 4"))">
+@*                <MudCardHeader>
                     <MudText Typo="Typo.caption">Вектор 4</MudText>
-                </MudCardHeader>
+                </MudCardHeader>*@
                 <MudCardContent Class="pa-0">
                     <center>
                         <img src="/img/stuffimages/tool_vectors/vector_4.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
@@ -13,10 +15,10 @@
             </MudCard>
         </MudItem>
         <MudItem xs="4">
-            <MudCard Outlined="true">
-                <MudCardHeader>
+            <MudCard Outlined="true" @onclick="@(() => Snackbar.Add($"Это вектор 8"))">
+@*                <MudCardHeader>
                     <MudText Typo="Typo.caption">Вектор 8</MudText>
-                </MudCardHeader>
+                </MudCardHeader>*@
                 <MudCardContent Class="pa-0">
                     <center>
                         <img src="/img/stuffimages/tool_vectors/vector_8.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
@@ -25,10 +27,10 @@
             </MudCard>
         </MudItem>
         <MudItem xs="4">
-            <MudCard Outlined="true">
-                <MudCardHeader>
+            <MudCard Outlined="true" @onclick="@(() => Snackbar.Add($"Это вектор 3"))">
+@*                <MudCardHeader>
                     <MudText Typo="Typo.caption">Вектор 3</MudText>
-                </MudCardHeader>
+                </MudCardHeader>*@
                 <MudCardContent Class="pa-0">
                     <center>
                         <img src="/img/stuffimages/tool_vectors/vector_3.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
@@ -38,10 +40,10 @@
         </MudItem>
 
         <MudItem xs="4">
-            <MudCard Outlined="true">
-                <MudCardHeader>
+            <MudCard Outlined="true" @onclick="@(() => Snackbar.Add($"Это вектор 6"))">
+@*                <MudCardHeader>
                     <MudText Typo="Typo.caption">Вектор 6</MudText>
-                </MudCardHeader>
+                </MudCardHeader>*@
                 <MudCardContent Class="pa-0">
                     <center>
                         <img src="/img/stuffimages/tool_vectors/vector_5.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
@@ -50,10 +52,10 @@
             </MudCard>
         </MudItem>
         <MudItem xs="4">
-            <MudCard Outlined="true">
-                <MudCardHeader>
+            <MudCard Outlined="true" @onclick="@(() => Snackbar.Add($"Это вектор 0 / 9"))">
+@*                <MudCardHeader>
                     <MudText Typo="Typo.caption">Вектор 0 / 9</MudText>
-                </MudCardHeader>
+                </MudCardHeader>*@
                 <MudCardContent Class="pa-0">
                     <center>
                         <img src="/img/stuffimages/tool_vectors/vector_0-9.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
@@ -62,10 +64,10 @@
             </MudCard>
         </MudItem>
         <MudItem xs="4">
-            <MudCard Outlined="true">
-                <MudCardHeader>
+            <MudCard Outlined="true" @onclick="@(() => Snackbar.Add($"Это вектор 7"))">
+@*                <MudCardHeader>
                     <MudText Typo="Typo.caption">Вектор 7</MudText>
-                </MudCardHeader>
+                </MudCardHeader>*@
                 <MudCardContent Class="pa-0">
                     <center>
                         <img src="/img/stuffimages/tool_vectors/vector_7.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
@@ -75,10 +77,10 @@
         </MudItem>
 
         <MudItem xs="4">
-            <MudCard Outlined="true">
-                <MudCardHeader>
+            <MudCard Outlined="true" @onclick="@(() => Snackbar.Add($"Это вектор 1"))">
+@*                <MudCardHeader>
                     <MudText Typo="Typo.caption">Вектор 1</MudText>
-                </MudCardHeader>
+                </MudCardHeader>*@
                 <MudCardContent Class="pa-0">
                     <center>
                         <img src="/img/stuffimages/tool_vectors/vector_1.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
@@ -87,10 +89,10 @@
             </MudCard>
         </MudItem>
         <MudItem xs="4">
-            <MudCard Outlined="true">
-                <MudCardHeader>
+            <MudCard Outlined="true" @onclick="@(() => Snackbar.Add($"Это вектор 6"))">
+@*                <MudCardHeader>
                     <MudText Typo="Typo.caption">Вектор 6</MudText>
-                </MudCardHeader>
+                </MudCardHeader>*@
                 <MudCardContent Class="pa-0">
                     <center>
                         <img src="/img/stuffimages/tool_vectors/vector_6.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
@@ -99,10 +101,10 @@
             </MudCard>
         </MudItem>
         <MudItem xs="4">
-            <MudCard Outlined="true">
-                <MudCardHeader>
+            <MudCard Outlined="true" @onclick="@(() => Snackbar.Add($"Это вектор 2"))">
+@*                <MudCardHeader>
                     <MudText Typo="Typo.caption">Вектор 2</MudText>
-                </MudCardHeader>
+                </MudCardHeader>*@
                 <MudCardContent Class="pa-0">
                     <center>
                         <img src="/img/stuffimages/tool_vectors/vector_2.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
@@ -117,4 +119,6 @@
 {
     readonly int _imgHeigth = 100;
     readonly int _imgWidth = 100;
+
+    int? vector;
 }
