@@ -6,7 +6,8 @@
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="6">
-            <MudField Label="Параметры фаски" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+            <MudField Label="Параметры фаски" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1"
+            @onfocusout="(() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamfer : Images.InternalChamfer)">
                 <MudGrid Spacing="0">
                     <MudItem xs="12">
                         <MudRadioGroup SelectedOptionChanged="OnChamferTypeChanged" T="Chamfer" Class="mb-n2 d-flex justify-center">
@@ -40,95 +41,96 @@
                         @if (CurrentImage == Images.ExternalChamfer)
                         {
                             <center>
-                                <img src="/img/stuffimages/chamfer/ext_chamfer.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/chamfer/ext_chamfer_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                             </center>
                         }
                         @if (CurrentImage == Images.InternalChamfer)
                         {
                             <center>
-                                <img src="/img/stuffimages/chamfer/int_chamfer.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/chamfer/int_chamfer_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                             </center>
                         }
                         @if (CurrentImage == Images.ExternalChamferAngle)
                         {
                             <center>
-                                <img src="/img/stuffimages/chamfer/ext_chamfer_angle.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/chamfer/ext_chamfer_angle_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                             </center>
                         }
                         @if (CurrentImage == Images.ExternalChamferSize)
                         {
                             <center>
-                                <img src="/img/stuffimages/chamfer/ext_chamfer_size.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/chamfer/ext_chamfer_size_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                             </center>
                         }
                         @if (CurrentImage == Images.ExternalStartDiameter)
                         {
                             <center>
-                                <img src="/img/stuffimages/chamfer/ext_chamfer_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/chamfer/ext_chamfer_diam_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                             </center>
                         }
                         @if (CurrentImage == Images.ExternalEndDiameter)
                         {
                             <center>
-                                <img src="/img/stuffimages/chamfer/ext_part_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/chamfer/ext_part_diam_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                             </center>
                         }
                         @if (CurrentImage == Images.ExternalToolRadius)
                         {
                             <center>
-                                <img src="/img/stuffimages/chamfer/ext_tool_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/chamfer/ext_tool_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                             </center>
                         }
                         @if (CurrentImage == Images.InternalChamferAngle)
                         {
                             <center>
-                                <img src="/img/stuffimages/chamfer/int_chamfer_angle.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/chamfer/int_chamfer_angle_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                             </center>
                         }
                         @if (CurrentImage == Images.InternalChamferSize)
                         {
                             <center>
-                                <img src="/img/stuffimages/chamfer/int_chamfer_size.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/chamfer/int_chamfer_size_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                             </center>
                         }
                         @if (CurrentImage == Images.InternalStartDiameter)
                         {
                             <center>
-                                <img src="/img/stuffimages/chamfer/int_chamfer_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/chamfer/int_chamfer_diam_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                             </center>
                         }
                         @if (CurrentImage == Images.InternalEndDiameter)
                         {
                             <center>
-                                <img src="/img/stuffimages/chamfer/int_part_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/chamfer/int_part_diam_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                             </center>
                         }
                         @if (CurrentImage == Images.InternalToolRadius)
                         {
                             <center>
-                                <img src="/img/stuffimages/chamfer/int_tool_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/chamfer/int_tool_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                             </center>
                         }
                     </MudCardContent>
                 </MudCard>
             </MudItem>
             <div>
-                <img src="/img/stuffimages/chamfer/ext_chamfer.svg" asp-append-version="true" width="0" height="0" />
-                <img src="/img/stuffimages/chamfer/int_chamfer.svg" asp-append-version="true" width="0" height="0" />
-                <img src="/img/stuffimages/chamfer/ext_chamfer_angle.svg" asp-append-version="true" width="0" height="0" />
-                <img src="/img/stuffimages/chamfer/ext_chamfer_size.svg" asp-append-version="true" width="0" height="0" />
-                <img src="/img/stuffimages/chamfer/ext_chamfer_diam.svg" asp-append-version="true" width="0" height="0" />
-                <img src="/img/stuffimages/chamfer/ext_part_diam.svg" asp-append-version="true" width="0" height="0" />
-                <img src="/img/stuffimages/chamfer/ext_tool_radius.svg" asp-append-version="true" width="0" height="0" />
-                <img src="/img/stuffimages/chamfer/int_chamfer_angle.svg" asp-append-version="true" width="0" height="0" />
-                <img src="/img/stuffimages/chamfer/int_chamfer_size.svg" asp-append-version="true" width="0" height="0" />
-                <img src="/img/stuffimages/chamfer/int_chamfer_diam.svg" asp-append-version="true" width="0" height="0" />
-                <img src="/img/stuffimages/chamfer/int_part_diam.svg" asp-append-version="true" width="0" height="0" />
-                <img src="/img/stuffimages/chamfer/int_tool_radius.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/ext_chamfer_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/int_chamfer_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/ext_chamfer_angle_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/ext_chamfer_size_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/ext_chamfer_diam_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/ext_part_diam_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/ext_tool_radius_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/int_chamfer_angle_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/int_chamfer_size_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/int_chamfer_diam_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/int_part_diam_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/chamfer/int_tool_radius_n.svg" asp-append-version="true" width="0" height="0" />
             </div>
         </MudHidden>
         <MudItem xs="12" sm="12">
-            <MudField Label="Расчет" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n3">
+            <MudField Label="Расчет" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n1"
+            @onfocusout="(() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamfer : Images.InternalChamfer)">
                 <MudGrid Spacing="1">
                     <MudHidden Breakpoint="Breakpoint.Xs">
                         <MudItem xs="12" sm="6" Class="mt-2">
@@ -213,7 +215,7 @@
 @code
 {
     readonly int _imgHeigth = 237;
-    readonly int _imgWidth = 300;
+    readonly int _imgWidth = 250;
 
     bool calcStartDiam = true;
     bool showClassicChamfer = true;
@@ -452,26 +454,28 @@
     //    }
     //}
 
-    private void SetInternalType()
-    {
-        if (CurrentImage == Images.ExternalEndDiameter) CurrentImage = Images.InternalEndDiameter;
-        if (CurrentImage == Images.ExternalStartDiameter) CurrentImage = Images.InternalStartDiameter;
-        if (CurrentImage == Images.ExternalChamferAngle) CurrentImage = Images.InternalChamferAngle;
-        if (CurrentImage == Images.ExternalChamferSize) CurrentImage = Images.InternalChamferSize;
-        if (CurrentImage == Images.ExternalToolRadius) CurrentImage = Images.InternalToolRadius;
-        CalculateAll();
+    //private void SetInternalType()
+    //{
+    //    CurrentImage = Images.InternalChamfer;
+    //    //if (CurrentImage == Images.ExternalEndDiameter) CurrentImage = Images.InternalEndDiameter;
+    //    //if (CurrentImage == Images.ExternalStartDiameter) CurrentImage = Images.InternalStartDiameter;
+    //    //if (CurrentImage == Images.ExternalChamferAngle) CurrentImage = Images.InternalChamferAngle;
+    //    //if (CurrentImage == Images.ExternalChamferSize) CurrentImage = Images.InternalChamferSize;
+    //    //if (CurrentImage == Images.ExternalToolRadius) CurrentImage = Images.InternalToolRadius;
+    //    CalculateAll();
 
-    }
+    //}
 
-    private void SetExternalType()
-    {
-        if (CurrentImage == Images.InternalEndDiameter) CurrentImage = Images.ExternalEndDiameter;
-        if (CurrentImage == Images.InternalStartDiameter) CurrentImage = Images.ExternalStartDiameter;
-        if (CurrentImage == Images.InternalChamferAngle) CurrentImage = Images.ExternalChamferAngle;
-        if (CurrentImage == Images.InternalChamferSize) CurrentImage = Images.ExternalChamferSize;
-        if (CurrentImage == Images.InternalToolRadius) CurrentImage = Images.ExternalToolRadius;
-        CalculateAll();
-    }
+    //private void SetExternalType()
+    //{
+    //    CurrentImage = Images.ExternalChamfer;
+    //    //if (CurrentImage == Images.InternalEndDiameter) CurrentImage = Images.ExternalEndDiameter;
+    //    //if (CurrentImage == Images.InternalStartDiameter) CurrentImage = Images.ExternalStartDiameter;
+    //    //if (CurrentImage == Images.InternalChamferAngle) CurrentImage = Images.ExternalChamferAngle;
+    //    //if (CurrentImage == Images.InternalChamferSize) CurrentImage = Images.ExternalChamferSize;
+    //    //if (CurrentImage == Images.InternalToolRadius) CurrentImage = Images.ExternalToolRadius;
+    //    CalculateAll();
+    //}
 
     private void CalculateAll()
     {
@@ -536,8 +540,9 @@
     private void OnChamferTypeChanged(Chamfer value)
     {
         ChamferType = value;
-        if (ChamferType == Chamfer.External) SetExternalType();
-        if (ChamferType == Chamfer.Internal) SetInternalType();
+        if (ChamferType == Chamfer.External) CurrentImage = Images.ExternalChamfer;
+        if (ChamferType == Chamfer.Internal) CurrentImage = Images.InternalChamfer;
+        CalculateAll();
     }
 
     private bool ValidResult()
