@@ -28,7 +28,7 @@ namespace Sunduk.PWA
                 config.SnackbarConfiguration.VisibleStateDuration = 3000;
                 config.SnackbarConfiguration.HideTransitionDuration = 200;
                 config.SnackbarConfiguration.ShowTransitionDuration = 200;
-                config.SnackbarConfiguration.SnackbarVariant = Variant.Outlined;
+                config.SnackbarConfiguration.SnackbarVariant = Variant.Text;
             });
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddBlazorDownloadFile();
