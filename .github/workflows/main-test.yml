@@ -24,8 +24,8 @@ jobs:
       - name: Setup .NET 5
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '5.x.x'
-          include-prerelease: false
+          dotnet-version: '6.x.x'
+          include-prerelease: true
 
       # Публикуем
       - name: Publish .NET Core Project
