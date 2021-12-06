@@ -1,4 +1,4 @@
-﻿@page "/nc"
+﻿@page "/sunducam"
 @using MudBlazor.Services
 @implements IDisposable
 @inject IDialogService DialogService
@@ -482,7 +482,7 @@
     private async Task DownloadProgram()
     {
         bool resultDialog = await OpenConfirmDialog($"Скачать файл \"{NcDetailNumber}.nc\" ?");
-        if (resultDialog) await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, "text/plain");
+        if (resultDialog) await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, System.Text.Encoding.UTF8,"text/plain");
     }
 
     public string ProgramText
