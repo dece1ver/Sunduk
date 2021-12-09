@@ -1,0 +1,40 @@
+﻿@page "/knowledge"
+@using Sunduk.PWA.Components.Knowledge;
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudGrid>
+        <MudItem xs=12 sm=6 md=4>
+            <MudField Variant="Variant.Filled" DisableUnderLine="true" Label="Содержание">
+                <MudList Clickable="true" @bind-SelectedItem="selectedItem" @bind-SelectedValue="selectedValue">
+                    <MudListItem Icon="@Icons.Material.Filled.Info" Text="О разделе" Value="1"/>
+                    <MudListItem Icon="@Icons.Material.Filled.Folder" Text="Программирование" InitiallyExpanded="true">
+                        <NestedList>
+                            <MudListItem Icon="@Icons.Material.Filled.Info" Value="2">
+                                Общая информация
+                            </MudListItem>
+                            <MudListItem Icon="@Icons.Material.Filled.Info">
+                                Заглушка
+                            </MudListItem>
+                        </NestedList>
+                    </MudListItem>
+                </MudList>
+            </MudField>
+        </MudItem>
+        <MudItem xs=12 sm=6 md=8>
+            <MudField Variant="Variant.Filled" DisableUnderLine="true" Label="Информация" Class="px-0">
+                @switch (selectedValue ?? 0)
+            {
+                case 1: <AboutKnowledgeComponent/> break;
+                case 2: <GeneralPrograming/> break;
+            }
+            </MudField>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+
+@code 
+{
+    MudListItem selectedItem;
+    object selectedValue = 1;
+}
