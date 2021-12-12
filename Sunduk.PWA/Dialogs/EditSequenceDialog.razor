@@ -8,7 +8,7 @@
                 case LimiterSequence limiterSequence:
                     <MudItem xs="12">
                         <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
-                            @foreach (var tool in Tools)
+                            @foreach (var tool in Tools.Where(x => x is Tool))
                             {
                                 <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                             }
