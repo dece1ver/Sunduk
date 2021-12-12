@@ -1,6 +1,6 @@
 ﻿@page "/sunducam"
-@implements IDisposable
 @inject IDialogService DialogService
+@implements IAsyncDisposable
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @using MudBlazor.Services
 
@@ -133,37 +133,48 @@
 {
     [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
-    [Inject] IResizeListenerService ResizeListener { get; set; }
+    [Inject] IResizeService ResizeService { get; set; }
 
-    int width = 0;
-    int height = 0;
+
+    int Width { get; set; } = 0;
+    int Height { get; set; } = 0;
+
+    private Guid _subscriptionId;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            ResizeListener.OnResized += OnResized;
+            _subscriptionId = await ResizeService.Subscribe((size) =>
+            {
+                Width = size.Width;
+                Height = size.Height;
+                InvokeAsync(StateHasChanged);
+            }, new ResizeOptions
+			{
+				ReportRate = 50,
+				NotifyOnBreakpointOnly = false,
+			});
 
-            var size = await ResizeListener.GetBrowserWindowSize();
-            height = size.Height;
-            width = size.Width;
+            var size = await ResizeService.GetBrowserWindowSize();
+            Height = size.Height;
+            Width = size.Width;
             StateHasChanged();
         }
 
         await base.OnAfterRenderAsync(firstRender);
     }
 
+
+
     private void OnResized(object sender, BrowserWindowSize size)
     {
-        width = size.Width;
-        height = size.Height;
+        Width = size.Width;
+        Height = size.Height;
         InvokeAsync(StateHasChanged);
     }
 
-    public void Dispose()
-    {
-        ResizeListener.OnResized -= OnResized;
-    }
+    public async ValueTask DisposeAsync() => await ResizeService.Unsubscribe(_subscriptionId);
 
     public string Message { get; set; } = string.Empty;
 
@@ -315,7 +326,7 @@
     {
         var parameters = new DialogParameters();
         parameters.Add(nameof(Tools), Tools);
-        var options = new DialogOptions() { FullScreen = true, CloseButton = true };
+        var options = new DialogOptions() { FullScreen = false, CloseButton = true };
         DialogService.Show<ToolDialog>("Инструмент", parameters, options);
     }
 
@@ -348,8 +359,7 @@
         parameters.Add(nameof(WorkpieceCurrentInternalDiameter), WorkpieceCurrentInternalDiameter);
         parameters.Add(nameof(WorkpieceLength), WorkpieceLength);
         parameters.Add(nameof(WorkpieceMaterial), WorkpieceMaterial);
-        parameters.Add(nameof(MaxHeightStyle), MaxHeightStyle);
-        var options = new DialogOptions() { FullScreen = true, CloseButton = true };
+        var options = new DialogOptions() { FullScreen = false, CloseButton = true };
         var dialog = DialogService.Show<SequenceDialog>("Переходы", parameters, options);
         var result = await dialog.Result;
         if (!result.Cancelled)
@@ -373,7 +383,7 @@
         return false;
     }
 
-    public string MaxHeightStyle => $"max-height: {height}px; overflow-y: scroll";
+    public string MaxHeightStyle => $"max-height: {Height}px; overflow-y: scroll";
 
     public List<Tool> Tools { get; set; } = new();
 

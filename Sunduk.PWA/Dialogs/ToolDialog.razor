@@ -3,7 +3,7 @@
 <MudDialog DisableSidePadding="true">
     <TitleContent>Редактор инструмента</TitleContent>
     <DialogContent>
-        <div Style="overflow-y: scroll; max-height: 500px; width: 100%;">
+        <div Style=@($"overflow-y: scroll; max-height: {100+100}px; width: {300+100}px;")>
             <MudSwipeArea OnSwipe="@OnSwipe">
                 <MudTabs @ref="tabs" Elevation="0">
                     <MudTabPanel Text="Точение наружное" Style="font-size: x-small">
