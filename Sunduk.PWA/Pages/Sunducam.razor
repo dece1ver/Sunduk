@@ -326,7 +326,7 @@
     {
         var parameters = new DialogParameters();
         parameters.Add(nameof(Tools), Tools);
-        var options = new DialogOptions() { FullScreen = false, CloseButton = true };
+        var options = new DialogOptions() { FullScreen = true, CloseButton = true };
         DialogService.Show<ToolDialog>("Инструмент", parameters, options);
     }
 
@@ -336,7 +336,7 @@
         parameters.Add(nameof(Tools), Tools);
         parameters.Add(nameof(Program), Program);
         parameters.Add(nameof(sequence), sequence);
-        var options = new DialogOptions() { FullScreen = false, CloseButton = false };
+        var options = new DialogOptions() { FullScreen = true, CloseButton = false };
         var dialog = DialogService.Show<EditSequenceDialog>("Редактировать переход", parameters, options);
         var result = await dialog.Result;
         if (!result.Cancelled)
