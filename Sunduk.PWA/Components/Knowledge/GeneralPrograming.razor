@@ -69,26 +69,42 @@
     <MudSimpleTable Hover="true" Dense="true" Outlined=true Square=true Elevation=0>
         <thead>
             <tr>
-                @foreach (var h in headings)
-                {
-                    <th>@h</th>
-                }
+                <th>Код</th>
+                <th>Описание</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var row in rows)
-            {
-                <tr>
-                    <td>@row.code</td>
-                    <td>@row.description</td>
-                </tr>
-            }
+            <tr>
+                <td><MudLink Href="/knowledge/programming-g00">G00</MudLink></td>
+                <td>Ускоренное перемещение – перемещение по прямой линии на ускоренной подаче</td>
+            </tr>
+            <tr>
+                <td><MudLink Href="/knowledge/programming-g00">G01</MudLink></td>
+                <td>Линейная <MudLink Typo=Typo.body2 @onclick="(() => _linearInterpolationPopover = !_linearInterpolationPopover)">интерполяция</MudLink> – перемещение по прямой линии на указанной подаче</td>
+                <MudPopover Open="_linearInterpolationPopover" Fixed="true" Paper=false AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopLeft">
+                    <MudPaper Outlined="true" Class="px-4 py-8">
+                        <MudText>В данном контексте интерполяция обозначает движение инструмента по прямой линии или дуге.</MudText>
+                    </MudPaper>
+                </MudPopover>
+            </tr>
+            <tr>
+                <td><MudLink Href="/knowledge/programming-g00">G01</MudLink></td>
+                <td>Линейная <MudLink Typo=Typo.body2 @onclick="(() => mbox.Show())">интерполяция</MudLink> – перемещение по прямой линии на указанной подаче</td>
+                <MudMessageBox @ref="mbox" Title="Интерполяция">
+                    <MessageContent>
+                        В данном контексте интерполяция обозначает движение инструмента по прямой линии или дуге.
+                    </MessageContent>
+                </MudMessageBox>
+            </tr>
         </tbody>
     </MudSimpleTable>
 </MudField>
 
 @code 
 {
+    bool _linearInterpolationPopover = false;
+    MudMessageBox mbox { get; set; }
+
     string info1 =
         "\nПрограммирование обработки на станках с числовым программным управлением (ЧПУ) осуществляется на языке, который обычно называют языком ИСО (ISO) 7 бит, " +
         "или языком G и М кодов. Коды с адресом G называемые подготовительными, а коды с адресом М - вспомогательными.\n" +
@@ -99,10 +115,6 @@
         "\nG-коды разделяют на модальные, и немодальные (однократные).\n" + 
         "Например: существует группа G-кодов отвечающая за осевое перемещение: G00, G01, G02, G03 - эти коды модальные и каждый из них будет работать пока не будет заменен другим, из этой же группы. " +
         "Также существует немодальный код G04 - останавливающий выполнение УП на определенное время, он будет работать только в пределах одного блока." +
-        "";
-
-    string info3 =
-        "\nПод интерполяцией в данном контексте подразумевается движение инструмента по прямой линии или дуге." + 
         "";
 
     string[] headings = { "Код", "Описание" };

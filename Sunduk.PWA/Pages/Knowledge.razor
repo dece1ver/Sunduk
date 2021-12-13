@@ -13,8 +13,8 @@
                             <MudListItem Icon="@Icons.Material.Filled.Info" Value="@("general-programming")">
                                 Общая информация
                             </MudListItem>
-                            <MudListItem Icon="@Icons.Material.Filled.Info">
-                                Заглушка
+                            <MudListItem Icon="@Icons.Material.Filled.Info" Value="@("programming-g00")">
+                                G00
                             </MudListItem>
                         </NestedList>
                     </MudListItem>
@@ -27,6 +27,7 @@
             {
                 case "about": <AboutKnowledgeComponent/> break;
                 case "general-programming": <GeneralPrograming/> break;
+                case "programming-g00": <ProgrammingG00/> break;
             }
             </MudField>
         </MudItem>
