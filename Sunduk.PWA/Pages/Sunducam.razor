@@ -336,7 +336,7 @@
         parameters.Add(nameof(Tools), Tools);
         parameters.Add(nameof(Program), Program);
         parameters.Add(nameof(sequence), sequence);
-        var options = new DialogOptions() { FullScreen = true, CloseButton = false };
+        var options = new DialogOptions() { FullScreen = false, CloseButton = false };
         var dialog = DialogService.Show<EditSequenceDialog>("Редактировать переход", parameters, options);
         var result = await dialog.Result;
         if (!result.Cancelled)
@@ -359,7 +359,7 @@
         parameters.Add(nameof(WorkpieceCurrentInternalDiameter), WorkpieceCurrentInternalDiameter);
         parameters.Add(nameof(WorkpieceLength), WorkpieceLength);
         parameters.Add(nameof(WorkpieceMaterial), WorkpieceMaterial);
-        var options = new DialogOptions() { FullScreen = false, CloseButton = true };
+        var options = new DialogOptions() { FullScreen = true, CloseButton = true };
         var dialog = DialogService.Show<SequenceDialog>("Переходы", parameters, options);
         var result = await dialog.Result;
         if (!result.Cancelled)
