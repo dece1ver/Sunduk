@@ -4,86 +4,143 @@
     }
 </style>
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid>
-        <MudItem xs="12" xl="12">
-            <MudGrid>
-                <MudItem xs="12" sm="4" md="4" lg="3" xl="3">
-                    <MudField Label="Тип скругления" Variant="Variant.Outlined" InnerPadding="false">
-                        <MudRadioGroup @bind-SelectedOption="@RadiusType">
-                            <MudRadio Option="@Radius.External" Color="Color.Primary" @onfocus="SetExternalType">Наружное</MudRadio>
-                            <MudRadio Option="@Radius.Internal" Color="Color.Primary" @onfocus="SetInternalType">Внутреннее</MudRadio>
+    <MudGrid Spacing="1">
+        <MudItem xs="12" sm="6">
+            <MudField Label="Параметры скругления" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1"
+            @onfocusout="(() => CurrentImage = RadiusType == Radius.External ? Images.ExternalRadius : Images.InternalRadius)">
+                <MudGrid Spacing="0">
+                    <MudItem xs="12">
+                        <MudRadioGroup SelectedOptionChanged="OnRadiusTypeChanged" T="Radius"  Class="mb-n2 d-flex justify-center">
+                            <MudRadio Option="@Radius.External" Color="Color.Primary">Наружное</MudRadio>
+                            <MudRadio Option="@Radius.Internal" Color="Color.Primary">Внутреннее</MudRadio>
                         </MudRadioGroup>
-                    </MudField>
-                </MudItem>
-                <MudItem xs="6" sm="4" md="4" lg="5" xl="5">
-                    <MudTextField @bind-Value="_RadiusDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
-                                  @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalPartDiameter : Images.InternalPartDiameter" />
-                    <MudTextField @bind-Value="_RadiusSize" T="string" Label="Радиус скругления" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
-                                  @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalRadiusSize : Images.InternalRadiusSize" />
-                </MudItem>
-                <MudItem xs="6" sm="4" md="4" lg="4" xl="5">
-                    <MudTextField @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
-                                  @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalToolRadius : Images.InternalToolRadius" />
-                </MudItem>
-            </MudGrid>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_RadiusDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                                      @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalPartDiameter : Images.InternalPartDiameter" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_RadiusSize" T="string" Label="Радиус скругления" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                                      @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalRadiusSize : Images.InternalRadiusSize" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                                      @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense"/>
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+            
         </MudItem>
 
-        @if (RadiusDiameter > 0 && RadiusSize > 0)
-        {
-            <MudItem xs="12">
-                <MudField Variant="Variant.Filled">
-                    <MudText>@ResultMessage</MudText>
-                </MudField>
-            </MudItem>
-            <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
-                <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@RadiusExample" />
-                </MudItem>
-            </MudExpansionPanel>
-        }
-
-        <MudItem xs="12" xl="12">
-            <MudCard Outlined="true" Style="margin: 0">
+        <MudHidden Breakpoint="Breakpoint.Xs">
+            <MudItem xs="12" sm="6" >
+            <MudCard Elevation="0" Outlined="true" Class="mt-1">
                 <MudCardContent>
+                    @if (CurrentImage == Images.ExternalRadius)
+                    {
+                        <center>
+                            <img src="/img/stuffimages/radius/ext_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                        </center>
+                    }
+                    @if (CurrentImage == Images.InternalRadius)
+                    {
+                        <center>
+                            <img src="/img/stuffimages/radius/int_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                        </center>
+                    }
                     @if (CurrentImage == Images.ExternalRadiusSize)
                     {
                         <center>
-                            <img src="/img/stuffimages/radius/ext_part_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            <img src="/img/stuffimages/radius/ext_part_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                     @if (CurrentImage == Images.ExternalPartDiameter)
                     {
                         <center>
-                            <img src="/img/stuffimages/radius/ext_part_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            <img src="/img/stuffimages/radius/ext_part_diam_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                     @if (CurrentImage == Images.ExternalToolRadius)
                     {
                         <center>
-                            <img src="/img/stuffimages/radius/ext_tool_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            <img src="/img/stuffimages/radius/ext_tool_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                     @if (CurrentImage == Images.InternalRadiusSize)
                     {
                         <center>
-                            <img src="/img/stuffimages/radius/int_part_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            <img src="/img/stuffimages/radius/int_part_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                     @if (CurrentImage == Images.InternalPartDiameter)
                     {
                         <center>
-                            <img src="/img/stuffimages/radius/int_part_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            <img src="/img/stuffimages/radius/int_part_diam_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                     @if (CurrentImage == Images.InternalToolRadius)
                     {
                         <center>
-                            <img src="/img/stuffimages/radius/int_tool_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            <img src="/img/stuffimages/radius/int_tool_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                 </MudCardContent>
             </MudCard>
         </MudItem>
+        <div>
+            <img src="/img/stuffimages/radius/ext_radius_n.svg" asp-append-version="true" width="0" height="0" />
+            <img src="/img/stuffimages/radius/int_radius_n.svg" asp-append-version="true" width="0" height="0" />
+            <img src="/img/stuffimages/radius/ext_part_radius_n.svg" asp-append-version="true" width="0" height="0" />
+            <img src="/img/stuffimages/radius/ext_part_diam_n.svg" asp-append-version="true" width="0" height="0" />
+            <img src="/img/stuffimages/radius/ext_tool_radius_n.svg" asp-append-version="true" width="0" height="0"/>
+            <img src="/img/stuffimages/radius/ext_tool_radius_n.svg" asp-append-version="true" width="0" height="0"/>
+            <img src="/img/stuffimages/radius/int_part_radius_n.svg" asp-append-version="true" width="0" height="0"/>
+            <img src="/img/stuffimages/radius/int_part_diam_n.svg" asp-append-version="true" width="0" height="0"/>
+            <img src="/img/stuffimages/radius/int_tool_radius_n.svg" asp-append-version="true" width="0" height="0"/>
+        </div>
+        </MudHidden>
+        <MudItem xs="12">
+            <MudField Label="Результат" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n1">
+                <MudGrid Spacing="1">
+                    <MudItem xs="12" Class="mt-2">
+                        @if (RadiusDiameter > 0 && RadiusSize > 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Начальный диаметр с учетом радиуса пластины: {RadiusStartDiameter.ToPrettyString()} мм")</MudText>
+                        }
+                        @if (RadiusDiameter <= 0 && RadiusSize <= 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Начальный диаметр с учетом радиуса пластины: -")</MudText>
+                        }
+                    </MudItem>
+                    <MudItem xs="12">
+                        @if (RadiusDiameter > 0 && RadiusSize > 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Глубина с учетом радиуса пластины: {RadiusDepth.ToPrettyString()} мм")</MudText>
+                        }
+                        @if (RadiusDiameter <= 0 && RadiusSize <= 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Глубина с учетом радиуса пластины: -")</MudText>
+                        }
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+        </MudItem>
+        @if (RadiusDiameter > 0 && RadiusSize > 0)
+        {
+        <MudItem xs="12">
+            <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
+                <MudItem xs="12" md="4">
+                            <MudRadioGroup T="bool" @bind-SelectedOption="showClassicRadius" Class="ma-n3">
+                                <MudRadio Option="true" Color="Color.Primary">Обычное</MudRadio>
+                                <MudRadio Option="false" Color="Color.Primary">Обратное</MudRadio>
+                            </MudRadioGroup>
+                        </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@RadiusExample" />
+                </MudItem>
+            </MudExpansionPanel>
+        </MudItem>
+        }
     </MudGrid>
     
     
@@ -91,11 +148,15 @@
 
 @code 
 {
-    readonly int _imgHeigth = 150;
-    readonly int _imgWidth = 350;
+    readonly int _imgHeigth = 187;
+    readonly int _imgWidth = 250;
+
+    bool showClassicRadius = true;
 
     public enum Images
     {
+        ExternalRadius,
+        InternalRadius,
         ExternalRadiusSize,
         ExternalPartDiameter,
         ExternalToolRadius,
@@ -104,19 +165,7 @@
         InternalToolRadius,
     };
     public enum ImageType { Diameter, ToolRaduis, ChamferAngle, ChamferSize };
-    public Images CurrentImage { get; set; }
-
-    public string ResultMessage
-    {
-        get
-        {
-            if (RadiusDiameter > 0 && RadiusSize > 0)
-            {
-                return $"Начальный диаметр скругления с учетом радиуса пластины: {Util.ToPrettyString(RadiusResult)} мм";
-            }
-            return string.Empty;
-        }
-    }
+    public Images CurrentImage { get; set; } = Images.ExternalRadius;
 
     public string RadiusExample
     {
@@ -124,11 +173,25 @@
         {
             if (RadiusDiameter > 0 && RadiusSize > 0)
             {
-                return
-                    $"G0 X{RadiusResult.NC()} Z1. S180 M3\n" +
+                if(showClassicRadius)
+                {
+                    return
+                    $"G0 X{RadiusStartDiameter.NC()} Z1. S180 M3\n" +
                     $"G1 Z0. F0.1\n" +
-                    $"X{RadiusDiameter.NC()} R{(RadiusSize + InsertRadius).NC()}\n" +
-                    $"W-{(RadiusSize + InsertRadius).NC()}";
+                    $"X{RadiusDiameter.NC()} R{RadiusDepth.NC()}\n" +
+                    $"W-{RadiusDepth.NC()}";
+                }
+
+                return RadiusType == Radius.External
+                ? $"G0 X{(RadiusDiameter + 1).NC()} Z-{RadiusDepth.NC()} S180 M3\n" +
+                  $"G1 X{RadiusDiameter.NC()} F0.1\n" +
+                  $"Z0. R{RadiusDepth.NC()}\n" +
+                  $"U-{(2 * RadiusDepth).NC()}"
+                : $"G0 X{(RadiusDiameter - 1).NC()} Z1. S180 M3\n" +
+                  $"Z-{RadiusDepth.NC()}\n" +
+                  $"G1 X{RadiusDiameter.NC()} F0.1\n" +
+                  $"Z0. R{RadiusDepth.NC()}\n" +
+                  $"U-{(2 * RadiusDepth).NC()}";
             }
             return string.Empty;
         }
@@ -145,38 +208,42 @@
     public string _InsertRadius { get; set; } = string.Empty;
     public double InsertRadius { get => Util.GetDouble(_InsertRadius); }
 
-    public double RadiusResult
+    public double RadiusStartDiameter
     {
         get
         {
-            double result;
             if (RadiusType == Radius.External)
             {
-                result = RadiusDiameter - (2 * (RadiusSize + InsertRadius) );
+                return RadiusDiameter - (2 * (RadiusSize + InsertRadius) );
             }
-            else
-            {
-                result = RadiusDiameter + (2 * (RadiusSize + InsertRadius));
-
-            }
-            return result;
+            return RadiusDiameter + (2 * (RadiusSize + InsertRadius));
         }
     }
+
+    public double RadiusDepth { get => RadiusSize + InsertRadius; }
 
     public int ExampleLines { get => RadiusExample.Count(f => f == '\n') + 1; }
 
 
-    private void SetInternalType()
+    //private void SetInternalType()
+    //{
+    //    //if (CurrentImage == Images.ExternalPartDiameter) CurrentImage = Images.InternalPartDiameter;
+    //    //if (CurrentImage == Images.ExternalRadiusSize) CurrentImage = Images.InternalRadiusSize;
+    //    //if (CurrentImage == Images.ExternalToolRadius) CurrentImage = Images.InternalToolRadius;
+    //}
+
+    //private void SetExternalType()
+    //{
+    //    //if (CurrentImage == Images.InternalPartDiameter) CurrentImage = Images.ExternalPartDiameter;
+    //    //if (CurrentImage == Images.InternalRadiusSize) CurrentImage = Images.ExternalRadiusSize;
+    //    //if (CurrentImage == Images.InternalToolRadius) CurrentImage = Images.ExternalToolRadius;
+    //}
+
+    private void OnRadiusTypeChanged(Radius value)
     {
-        if (CurrentImage == Images.ExternalPartDiameter) CurrentImage = Images.InternalPartDiameter;
-        if (CurrentImage == Images.ExternalRadiusSize) CurrentImage = Images.InternalRadiusSize;
-        if (CurrentImage == Images.ExternalToolRadius) CurrentImage = Images.InternalToolRadius;
+        RadiusType = value;
+        if (RadiusType == Radius.External) CurrentImage = Images.ExternalRadius;
+        if (RadiusType == Radius.Internal) CurrentImage = Images.InternalRadius;
     }
 
-    private void SetExternalType()
-    {
-        if (CurrentImage == Images.InternalPartDiameter) CurrentImage = Images.ExternalPartDiameter;
-        if (CurrentImage == Images.InternalRadiusSize) CurrentImage = Images.ExternalRadiusSize;
-        if (CurrentImage == Images.InternalToolRadius) CurrentImage = Images.ExternalToolRadius;
-    }
 }

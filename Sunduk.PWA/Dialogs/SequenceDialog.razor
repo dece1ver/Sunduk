@@ -3,7 +3,7 @@
 <MudDialog>
     <TitleContent>Добавление перехода</TitleContent>
     <DialogContent>
-        <MudContainer Style="@MaxHeightStyle">
+        <MudContainer>
             @*<MudField Label="Заготовка" Variant="Variant.Outlined">@WorkpieceInfo</MudField>*@
             <MudGrid Class="mt-2">
                 <MudItem xs="12" md="4">
@@ -43,7 +43,7 @@
                         </MudItem>
                         <MudItem xs="12" md="4">
                             <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
-                                @foreach (var tool in Tools)
+                                @foreach (var tool in Tools.Where(x => x is Tool))
                                 {
                                     <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                                 }
@@ -413,8 +413,6 @@
         [Parameter] public double WorkpieceCurrentInternalDiameter { get; set; }
         [Parameter] public double WorkpieceLength { get; set; }
         [Parameter] public Materials WorkpieceMaterial { get; set; }
-        [Parameter] public string MaxHeightStyle { get; set; }
-
 
 
     #region Всякие OnChanged

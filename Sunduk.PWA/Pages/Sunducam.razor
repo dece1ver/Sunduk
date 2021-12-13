@@ -1,0 +1,602 @@
+﻿@page "/sunducam"
+@inject IDialogService DialogService
+@implements IAsyncDisposable
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@using MudBlazor.Services
+
+
+<style>
+    .monofield {
+        font-family: 'Roboto Mono', monospace;
+    }
+</style>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudGrid>
+        <MudItem>
+            <MudExpansionPanel HideIcon="true">
+                <TitleContent>
+                    <div class="d-flex">
+                        <MudButtonGroup Variant="Variant.Outlined">
+                            <MudIconButton Icon="@Icons.Material.TwoTone.Save" Title="Скачать программу"
+                                           OnClick="DownloadProgram" />
+                            <MudIconButton Icon="@Icons.Material.TwoTone.TableView" Title="Инструмент" OnClick="OpenToolDialog" />
+                            <MudButton OnClick="OpenSequencelDialog" EndIcon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)">Добавить переход</MudButton>
+                        </MudButtonGroup>
+                        <MudIcon Icon="@Icons.Material.TwoTone.Settings" Class="d-flex ml-auto mt-1" />
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    <MudGrid Spacing="1">
+                        <MudItem xs="12" sm="7" md="8">
+                            <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Filled" Dense="true">
+                                <MudSelectItem Value="@(Machines.L230A)">Hyundai L230A</MudSelectItem>
+                                <MudSelectItem Value="@(Machines.GS1500)">Goodway GS-1500</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="12" md="4">
+                            @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
+                            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал детали" T="Materials" Variant="Variant.Filled" Dense="true">
+                                <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
+                                <MudSelectItem Value="@Materials.Stainless">Нержавеющая сталь</MudSelectItem>
+                                <MudSelectItem Value="@Materials.Brass">Бронза</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="6">
+                            <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="6">
+                            <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="5" md="4">
+                            <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        
+                        <MudItem xs="12" sm="4" md="4">
+                            <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4" md="4">
+                            <MudTextField @bind-Value="DrawningVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4" md="4">
+                            <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                    </MudGrid>
+                </ChildContent>
+            </MudExpansionPanel>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            
+            <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
+                <MudList Clickable="true" @bind-SelectedItem="SelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" Dense="true" DisableGutters="false">
+                    @if (Program != null)
+                    {
+                        foreach (var seq in Program)
+                        {
+                            if (Program.IndexOf(seq) == 0)
+                            {
+                                <MudListItem Text="@($"1. {seq.Name}")" Value="1">
+                                    <MudGrid>
+                                        <MudText Class="ma-3">@($"1. {seq.Name}")</MudText>
+                                    </MudGrid>
+                                </MudListItem>
+                            }
+                            if (Program.IndexOf(seq) > 1)
+                            {
+                                <MudListItem Text="@($"{Program.IndexOf(seq)}. {seq.Name}")" Value="Program.IndexOf(seq)">
+                                    <MudGrid>
+                                        <MudText Class="ma-3 mr-auto">@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
+                                        <div Class="d-inline-flex justify-end py-2 px-3">
+                                            @if ((int)SelectedSequenceIndex == Program.IndexOf(seq))
+                                            {
+                                            <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -2px; margin-bottom: -2px">
+                                                @if (Program.IndexOf(seq) != Program.Count - 1)
+                                                {
+                                                    <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                   OnClick="(() => MoveDownSequence(seq))" />
+                                                }
+                                                @if (Program.IndexOf(seq) != 2)
+                                                {
+                                                    <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                   OnClick="(() => MoveUpSequence(seq))" />
+                                                }
+                                                <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                               OnClick="(() => OpenEditSequenceDialog(seq))" />
+                                                <MudIconButton Icon="@Icons.Material.TwoTone.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
+                                                               OnClick="(() => Program.Remove(seq))" />
+                                            </MudButtonGroup>
+                                            }
+                                        </div>
+                                    </MudGrid>
+                                </MudListItem>
+                            }
+                        }
+                    }
+                </MudList>
+            </MudField>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense">
+                <MudTextField T="string" DisableUnderLine="true" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
+            </MudField>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code
+{
+    [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+
+    [Inject] IResizeService ResizeService { get; set; }
+
+
+    int Width { get; set; } = 0;
+    int Height { get; set; } = 0;
+
+    private Guid _subscriptionId;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _subscriptionId = await ResizeService.Subscribe((size) =>
+            {
+                Width = size.Width;
+                Height = size.Height;
+                InvokeAsync(StateHasChanged);
+            }, new ResizeOptions
+			{
+				ReportRate = 50,
+				NotifyOnBreakpointOnly = false,
+			});
+
+            var size = await ResizeService.GetBrowserWindowSize();
+            Height = size.Height;
+            Width = size.Width;
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+
+
+    private void OnResized(object sender, BrowserWindowSize size)
+    {
+        Width = size.Width;
+        Height = size.Height;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync() => await ResizeService.Unsubscribe(_subscriptionId);
+
+    public string Message { get; set; } = string.Empty;
+
+    public MudListItem SelectedSequence;
+    public object SelectedSequenceIndex = 0;
+
+    public int CyclesCount
+    {
+        get
+        {
+            return Program.Where(x =>
+            x is RoughFacingSequence ||
+            x is FacingSequence ||
+            x is RoughFacingCycleSequence)
+                .Count() + 1;
+        }
+        set { }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        #region Инициализация спец инструмента
+        SpecialTools = await localStorage.GetItemAsync<List<SpecialTool>>(nameof(SpecialTools));
+        if (SpecialTools is null || SpecialTools.Count == 0)
+        {
+            SpecialTools = new();
+            SpecialTools.Add(new SpecialTool(0101, "UPOR"));
+            await localStorage.SetItemAsync(nameof(SpecialTools), SpecialTools);
+        }
+        Tools.AddRange(SpecialTools);
+        #endregion
+
+        #region Инициализация токарного инструмента
+        TurningExternalTools = await localStorage.GetItemAsync<List<TurningExternalTool>>(nameof(TurningExternalTools));
+        if (TurningExternalTools is null || TurningExternalTools.Count == 0)
+        {
+            TurningExternalTools = new();
+            TurningExternalTools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Bar, 55, 0.8));
+            TurningExternalTools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Face, 100, 0.8));
+            TurningExternalTools.Add(new TurningExternalTool(0303, TurningExternalTool.Types.Bar, 35, 0.4));
+            await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+        }
+        Tools.AddRange(TurningExternalTools);
+
+        TurningInternalTools = await localStorage.GetItemAsync<List<TurningInternalTool>>(nameof(TurningInternalTools));
+        if (TurningInternalTools is null || TurningInternalTools.Count == 0)
+        {
+            TurningInternalTools = new();
+            TurningInternalTools.Add(new TurningInternalTool(0202, 25, 55, 0.8));
+            TurningInternalTools.Add(new TurningInternalTool(0202, 32, 80, 0.8));
+            TurningInternalTools.Add(new TurningInternalTool(0303, 10, 55, 0.4));
+            await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+        }
+        Tools.AddRange(TurningInternalTools);
+        #endregion
+
+        #region Инициализация канавочного и отрезного инструмента
+
+        GroovingExternalTools = await localStorage.GetItemAsync<List<GroovingExternalTool>>(nameof(GroovingExternalTools));
+        if (GroovingExternalTools is null || GroovingExternalTools.Count == 0)
+        {
+            GroovingExternalTools = new();
+            GroovingExternalTools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Grooving, 3, GroovingExternalTool.Point.Left));
+            GroovingExternalTools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Cutting, 3, GroovingExternalTool.Point.Right));
+            await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+        }
+        Tools.AddRange(GroovingExternalTools);
+
+        GroovingInternalTools = await localStorage.GetItemAsync<List<GroovingInternalTool>>(nameof(GroovingInternalTools));
+        if (GroovingInternalTools is null || GroovingInternalTools.Count == 0)
+        {
+            GroovingInternalTools = new();
+            GroovingInternalTools.Add(new GroovingInternalTool(1212, 20, 3, GroovingInternalTool.Point.Right));
+            GroovingInternalTools.Add(new GroovingInternalTool(1212, 40, 4, GroovingInternalTool.Point.Right));
+            await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
+        }
+        Tools.AddRange(GroovingInternalTools);
+        #endregion
+
+        #region Инициализация резьбового инструмента
+        ThreadingExternalTools = await localStorage.GetItemAsync<List<ThreadingExternalTool>>(nameof(ThreadingExternalTools));
+        if (ThreadingExternalTools is null || TurningExternalTools.Count == 0)
+        {
+            ThreadingExternalTools = new();
+            ThreadingExternalTools.Add(new ThreadingExternalTool(1111, 1.5, 1));
+            await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
+        }
+        Tools.AddRange(ThreadingExternalTools);
+
+        ThreadingInternalTools = await localStorage.GetItemAsync<List<ThreadingInternalTool>>(nameof(ThreadingInternalTools));
+        if (ThreadingInternalTools is null || ThreadingInternalTools.Count == 0)
+        {
+            ThreadingInternalTools = new();
+            ThreadingInternalTools.Add(new ThreadingInternalTool(1111, 16, 1.5, 1));
+            await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
+        }
+        Tools.AddRange(ThreadingInternalTools);
+        #endregion
+
+        #region Инициализация сверел
+        DrillingTools = await localStorage.GetItemAsync<List<DrillingTool>>(nameof(DrillingTools));
+        if (DrillingTools is null || DrillingTools.Count == 0)
+        {
+            DrillingTools = new();
+            DrillingTools.Add(new DrillingTool(0505, DrillingTool.Types.HSS, 5, 120));
+            DrillingTools.Add(new DrillingTool(0707, DrillingTool.Types.Solid, 10, 140));
+            DrillingTools.Add(new DrillingTool(0606, DrillingTool.Types.Insert, 25, 180));
+            await localStorage.SetItemAsync(nameof(DrillingTools), DrillingTools);
+        }
+        Tools.AddRange(DrillingTools);
+        #endregion
+
+        #region Инициализация метчиков
+        TappingTools = await localStorage.GetItemAsync<List<TappingTool>>(nameof(TappingTools));
+        if (TappingTools is null || TappingTools.Count == 0)
+        {
+            TappingTools = new();
+            TappingTools.Add(new TappingTool(0909, TappingTool.Types.Cutting, 12, 1.75));
+            TappingTools.Add(new TappingTool(0808, TappingTool.Types.Forming, 10, 1.5));
+            await localStorage.SetItemAsync(nameof(TappingTools), TappingTools);
+        }
+        Tools.AddRange(TappingTools);
+        #endregion
+
+        Program = new();
+        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, Author, DrawningVersion, string.Empty) { Name = $"Шапка" });
+        Program.Add(new SafetyStringSequence(Machine, 3000) { Name = $"Строка безопасности" });
+        CyclesCount = 1;
+    }
+
+    private void OpenSetupDialog()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(Machine), Machine);
+        parameters.Add(nameof(SpindleLimit), SpindleLimit);
+        parameters.Add(nameof(Tools), Tools);
+        parameters.Add(nameof(WorkpieceExternalDiameter), WorkpieceExternalDiameter);
+        parameters.Add(nameof(WorkpieceInternalDiameter), WorkpieceInternalDiameter);
+        parameters.Add(nameof(WorkpieceLength), WorkpieceLength);
+        parameters.Add(nameof(WorkpieceMaterial), WorkpieceMaterial);
+        parameters.Add(nameof(DetailNumber), DetailNumber);
+        parameters.Add(nameof(DetailName), DetailName);
+        var options = new DialogOptions() { FullScreen = true, CloseButton = true };
+        DialogService.Show<SetupDialog>("Наладка", parameters, options);
+    }
+
+    private void OpenToolDialog()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(Tools), Tools);
+        var options = new DialogOptions() { FullScreen = true, CloseButton = true };
+        DialogService.Show<ToolDialog>("Инструмент", parameters, options);
+    }
+
+    private async Task OpenEditSequenceDialog(Sequence sequence)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(Tools), Tools);
+        parameters.Add(nameof(Program), Program);
+        parameters.Add(nameof(sequence), sequence);
+        var options = new DialogOptions() { FullScreen = true, CloseButton = false };
+        var dialog = DialogService.Show<EditSequenceDialog>("Редактировать переход", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            Program = Program;
+        }
+    }
+
+
+    private async Task OpenSequencelDialog()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(Machine), Machine);
+        parameters.Add(nameof(Tools), Tools);
+        parameters.Add(nameof(Program), Program);
+        parameters.Add(nameof(CyclesCount), CyclesCount);
+        parameters.Add(nameof(WorkpieceExternalDiameter), WorkpieceExternalDiameter);
+        parameters.Add(nameof(WorkpieceCurrentExternalDiameter), WorkpieceCurrentExternalDiameter);
+        parameters.Add(nameof(WorkpieceInternalDiameter), WorkpieceInternalDiameter);
+        parameters.Add(nameof(WorkpieceCurrentInternalDiameter), WorkpieceCurrentInternalDiameter);
+        parameters.Add(nameof(WorkpieceLength), WorkpieceLength);
+        parameters.Add(nameof(WorkpieceMaterial), WorkpieceMaterial);
+        var options = new DialogOptions() { FullScreen = false, CloseButton = true };
+        var dialog = DialogService.Show<SequenceDialog>("Переходы", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            Program = Program;
+        }
+    }
+
+    private async Task<bool> OpenConfirmDialog(string message)
+    {
+        if (message is null) message = string.Empty;
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(message), message);
+        var options = new DialogOptions() { FullScreen = false, CloseButton = false };
+        var dialog = DialogService.Show<ConfirmDialog>("Подтверждение", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public string MaxHeightStyle => $"max-height: {Height}px; overflow-y: scroll";
+
+    public List<Tool> Tools { get; set; } = new();
+
+    public List<TurningExternalTool> TurningExternalTools { get; set; }
+    public List<TurningInternalTool> TurningInternalTools { get; set; }
+    public List<GroovingExternalTool> GroovingExternalTools { get; set; }
+    public List<GroovingInternalTool> GroovingInternalTools { get; set; }
+    public List<ThreadingExternalTool> ThreadingExternalTools { get; set; }
+    public List<ThreadingInternalTool> ThreadingInternalTools { get; set; }
+    public List<DrillingTool> DrillingTools { get; set; }
+    public List<TappingTool> TappingTools { get; set; }
+    public List<SpecialTool> SpecialTools { get; set; }
+
+    public Materials WorkpieceMaterial { get; set; }
+    public Machines Machine { get; set; }
+
+    public string _WorkpieceExternalDiameter { get; set; } = "50";
+    public double WorkpieceExternalDiameter { get => Util.GetDouble(_WorkpieceExternalDiameter); }
+
+    public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
+    public double WorkpieceInternalDiameter { get => Util.GetDouble(_WorkpieceInternalDiameter); }
+
+    public double WorkpieceCurrentExternalDiameter { get; set; }
+    public double WorkpieceCurrentInternalDiameter { get => GetCurrentInternalDiameter(Program.Count); }
+
+    private double GetCurrentInternalDiameter(int index)
+    {
+        double diam = WorkpieceInternalDiameter;
+        for (int i = 0; i < index; i++)
+        {
+            switch (Program[i])
+            {
+                case HighSpeedDrillingSequence highSpeedDrillingSequence:
+                    if (highSpeedDrillingSequence.Tool.Diameter > diam) diam = highSpeedDrillingSequence.Tool.Diameter;
+                    break;
+                case PeckDrillingSequence peckDrillingSequence:
+                    if (peckDrillingSequence.Tool.Diameter > diam) diam = peckDrillingSequence.Tool.Diameter;
+                    break;
+                case PeckDeepDrillingSequence peckDeepDrillingSequence:
+                    if (peckDeepDrillingSequence.Tool.Diameter > diam) diam = peckDeepDrillingSequence.Tool.Diameter;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return diam;
+    }
+
+    public string DetailNumber { get; set; }
+
+    public string NcDetailNumber { get => $"{(!string.IsNullOrEmpty(DetailNumber) ? DetailNumber.Translate() : "AR000-00-000")}.{ OperationNumber.ToString("D1").Replace(",", ".")}S"; }
+
+    public string DetailName { get; set; }
+    public string NcDetailName { get => !string.IsNullOrEmpty(DetailName) ? $"{DetailName.Translate()}" : "DETAIL"; }
+
+    public string Author { get; set; }
+    public string NcAuthor { get => !string.IsNullOrEmpty(Author) ? $"{Author.Translate()}" : "AUTHOR"; }
+
+    public int OperationNumber { get; set; } = 1;
+
+    public double DrawningVersion { get; set; }
+
+    public int? SpindleLimit { get; set; }
+
+    public string _WorkpieceLength { get; set; } = "50";
+    public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
+
+
+    //public Sequence Header => new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion) };
+    //public string Header => Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion);
+    //public Sequence SafetyString => new Sequence { Name = "Строка безопасности", Operation = Operation.SafetyString(Machine, 3000) };
+    //public string SafetyString => Operation.SafetyString(Machine, 3000);
+
+    public bool ValidWorkpiece
+    {
+        get
+        {
+            if (WorkpieceExternalDiameter > 0 && WorkpieceInternalDiameter < WorkpieceExternalDiameter && WorkpieceLength > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public List<Sequence> Program { get; set; }
+
+    private void RemoveSequence(Sequence seq)
+    {
+        Program.Remove(seq);
+    }
+
+    private void MoveUpSequence(Sequence seq)
+    {
+        int index = Program.IndexOf(seq) - 1;
+        Program.Swap(Program.IndexOf(seq), Program.IndexOf(seq) - 1);
+        SelectedSequenceIndex = (object)index;
+    }
+
+    private void MoveDownSequence(Sequence seq)
+    {
+        int index = Program.IndexOf(seq) + 1;
+        Program.Swap(Program.IndexOf(seq), Program.IndexOf(seq) + 1);
+        SelectedSequenceIndex = (object)index;
+    }
+
+    private async Task DownloadProgram()
+    {
+        bool resultDialog = await OpenConfirmDialog($"Скачать файл \"{NcDetailNumber}.nc\" ?");
+        if (resultDialog) await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, System.Text.Encoding.UTF8,"text/plain");
+    }
+
+    public string ProgramText
+    {
+        get
+        {
+            if (Program is null) return string.Empty;
+
+            List<string> result = new();
+
+            for (int i = 0; i < Program.Count; i++)
+            {
+                switch (Program[i])
+                {
+                    case HeaderSequence headerSequence:
+                        HeaderSequence newHeaderSequence = Program[i] as HeaderSequence;
+                        newHeaderSequence.Machine = Machine;
+                        newHeaderSequence.DetailNumber = NcDetailNumber;
+                        newHeaderSequence.DetailName = NcDetailName;
+                        newHeaderSequence.Author = NcAuthor;
+                        newHeaderSequence.DrawVersion = DrawningVersion;
+                        newHeaderSequence.ToolTable = Util.GetToolTable(Program);
+                        Program[i] = newHeaderSequence;
+                        break;
+                    case SafetyStringSequence safetyStringSequence:
+                        SafetyStringSequence newSafetyStringSequence = Program[i] as SafetyStringSequence;
+                        newSafetyStringSequence.Machine = Machine;
+                        newSafetyStringSequence.SpeedLimit = SpindleLimit;
+                        Program[i] = newSafetyStringSequence;
+                        break;
+                    case LimiterSequence limiterSequence:
+                        LimiterSequence newlimiterSequence = Program[i] as LimiterSequence;
+                        newlimiterSequence.Machine = Machine;
+                        Program[i] = newlimiterSequence;
+                        break;
+                    case FacingSequence facingSequence:
+                        FacingSequence newFacingSequence = Program[i] as FacingSequence;
+                        newFacingSequence.Machine = Machine;
+                        newFacingSequence.Material = WorkpieceMaterial;
+                        newFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
+                        newFacingSequence.InternalDiameter = GetCurrentInternalDiameter(i);
+                        Program[i] = newFacingSequence;
+                        break;
+                    case RoughFacingSequence roughFacingSequence:
+                        RoughFacingSequence newRoughFacingSequence = Program[i] as RoughFacingSequence;
+                        newRoughFacingSequence.Machine = Machine;
+                        newRoughFacingSequence.Material = WorkpieceMaterial;
+                        newRoughFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
+                        newRoughFacingSequence.InternalDiameter = GetCurrentInternalDiameter(i);
+                        Program[i] = newRoughFacingSequence;
+                        break;
+                    case RoughFacingCycleSequence roughFacingCycleSequence:
+                        RoughFacingCycleSequence newRoughFacingCycleSequence = Program[i] as RoughFacingCycleSequence;
+                        newRoughFacingCycleSequence.Machine = Machine;
+                        newRoughFacingCycleSequence.Material = WorkpieceMaterial;
+                        newRoughFacingCycleSequence.ExternalDiameter = WorkpieceExternalDiameter;
+                        newRoughFacingCycleSequence.InternalDiameter = GetCurrentInternalDiameter(i);
+                        Program[i] = newRoughFacingCycleSequence;
+                        break;
+                    case FinishFacingSequence finishFacingSequence:
+                        FinishFacingSequence newFinishFacingSequence = Program[i] as FinishFacingSequence;
+                        newFinishFacingSequence.Machine = Machine;
+                        newFinishFacingSequence.Material = WorkpieceMaterial;
+                        newFinishFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
+                        newFinishFacingSequence.InternalDiameter = GetCurrentInternalDiameter(i);
+                        Program[i] = newFinishFacingSequence;
+                        break;
+                    case FinishFacingCycleSequence finishFacingCycleSequence:
+                        break;
+                    case HighSpeedDrillingSequence highSpeedDrillingSequence:
+                        HighSpeedDrillingSequence newHighSpeedDrillingSequence = Program[i] as HighSpeedDrillingSequence;
+                        newHighSpeedDrillingSequence.Machine = Machine;
+                        newHighSpeedDrillingSequence.Material = WorkpieceMaterial;
+                        break;
+                    case PeckDrillingSequence peckDrillingSequence:
+                        PeckDrillingSequence newPeckDrillingSequence = Program[i] as PeckDrillingSequence;
+                        newPeckDrillingSequence.Machine = Machine;
+                        newPeckDrillingSequence.Material = WorkpieceMaterial;
+                        break;
+                    case PeckDeepDrillingSequence peckDeepDrillingSequence:
+                        PeckDeepDrillingSequence newPeckDeepDrillingSequence = Program[i] as PeckDeepDrillingSequence;
+                        newPeckDeepDrillingSequence.Machine = Machine;
+                        newPeckDeepDrillingSequence.Material = WorkpieceMaterial;
+                        break;
+                    case TappingSequence tappingSequence:
+                        TappingSequence newTappingSequence = Program[i] as TappingSequence;
+                        newTappingSequence.Machine = Machine;
+                        break;
+                    case ThreadCuttingSequence threadCuttingSequence:
+                        ThreadCuttingSequence newThreadCuttingSequence = Program[i] as ThreadCuttingSequence;
+                        newThreadCuttingSequence.Machine = Machine;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            foreach (var sequence in Program)
+            {
+                result.Add(sequence.Operation);
+            }
+            return string.Join("\n", result).Trim() + "\nM30\n%";
+        }
+        set { }
+    }
+}

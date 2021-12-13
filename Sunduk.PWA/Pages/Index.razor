@@ -1,6 +1,6 @@
 ﻿@page "/"
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid Spacing="1" Class="pa-1">
+    <MudGrid Spacing="1" Class="pa-1" Justify="Justify.FlexStart">
         <MudItem >
             <MudLink Href="/calculator" Underline="Underline.None">
                 <MudPaper Class="pa-6">
@@ -15,7 +15,7 @@
         </MudItem>
 
         @*<MudItem>
-            <MudLink Href="/nc" Underline="Underline.None">
+            <MudLink Href="/sunducam" Underline="Underline.None">
                 <MudPaper Class="pa-6">
                     <MudGrid Justify="Justify.Center">
                         <MudIcon Size="Size.Large" Icon="fas fa-digital-tachograph" />
@@ -74,6 +74,19 @@
                     </MudGrid>
                     <MudGrid Justify="Justify.Center">
                         <MudText Typo="Typo.body2" Class="mt-4">Расчеты времени</MudText>
+                    </MudGrid>
+                </MudPaper>
+            </MudLink>
+        </MudItem>
+
+        <MudItem>
+            <MudLink Href="/knowledge/about" Underline="Underline.None">
+                <MudPaper Class="pa-6">
+                    <MudGrid Justify="Justify.Center">
+                        <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Info" />
+                    </MudGrid>
+                    <MudGrid Justify="Justify.Center">
+                        <MudText Typo="Typo.body2" Class="mt-4">База знаний</MudText>
                     </MudGrid>
                 </MudPaper>
             </MudLink>

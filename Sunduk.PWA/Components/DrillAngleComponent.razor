@@ -1,12 +1,14 @@
 ﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid Justify="Justify.SpaceAround">
-        <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="_DrillDiameter" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" 
-                          @onfocus="() => CurrentImage = Images.DrillDiameter"/>
+    <MudGrid>
+        <MudItem xs="6">
+            <MudTextField @bind-Value="_DrillDiameter" T="string" Label="Диаметр" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" 
+                          @onfocus="() => CurrentImage = Images.DrillDiameter"
+                          @onfocusout="() => CurrentImage = Images.Drill"/>
         </MudItem>
-        <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="_DrillAngle" T="string" Label="Угол" Variant="Variant.Text" Immediate="true"
-                          @onfocus="() => CurrentImage = Images.DrillAngle"/>
+        <MudItem xs="6">
+            <MudTextField @bind-Value="_DrillAngle" T="string" Label="Угол" Variant="Variant.Filled" Immediate="true"
+                          @onfocus="() => CurrentImage = Images.DrillAngle"
+                          @onfocusout="() => CurrentImage = Images.Drill"/>
         </MudItem>
         @if (DrillDiameter > 0 && DrillAngle > 0 && DrillAngle < 180)
         {
@@ -19,19 +21,30 @@
         <MudItem xs="12" xl="12">
             <MudCard Outlined="true" Style="margin: 0">
                 <MudCardContent>
+                    @if (CurrentImage == Images.Drill)
+                    {
+                        <center>
+                            <img src="/img/stuffimages/drill/drill_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                        </center>
+                    }
                     @if (CurrentImage == Images.DrillDiameter)
                     {
                         <center>
-                            <img src="/img/stuffimages/drill/drill_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            <img src="/img/stuffimages/drill/drill_diam_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                     @if (CurrentImage == Images.DrillAngle)
                     {
                         <center>
-                            <img src="/img/stuffimages/drill/drill_angle.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            <img src="/img/stuffimages/drill/drill_angle_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                 </MudCardContent>
+                <div>
+                    <img src="/img/stuffimages/drill/drill_n.svg" asp-append-version="true" width="0" height="0" />
+                    <img src="/img/stuffimages/drill/drill_diam_n.svg" asp-append-version="true" width="0" height="0" />
+                    <img src="/img/stuffimages/drill/drill_angle_n.svg" asp-append-version="true" width="0" height="0" />
+                </div>
             </MudCard>
         </MudItem>
     </MudGrid>
@@ -44,11 +57,12 @@
 
     public enum Images
     {
+        Drill,
         DrillDiameter,
         DrillAngle
     };
     public enum ImageType { Diameter, ToolRaduis, ChamferAngle, ChamferSize };
-    public Images CurrentImage { get; set; } = Images.DrillDiameter;
+    public Images CurrentImage { get; set; } = Images.Drill;
 
     public string _DrillDiameter { get; set; }
     public double DrillDiameter { get => Util.GetDouble(_DrillDiameter); }

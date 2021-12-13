@@ -1,0 +1,121 @@
+﻿<style>
+    .ex{padding-right: 20px; font-family: 'Roboto Mono', monospace; font-size: x-small;}
+</style>
+<style>
+    .desc{font-style: italic; font-size: x-small;}
+</style>
+
+<MudText Typo="Typo.body2">@info1</MudText>
+<MudField Variant=Variant.Filled Label="Пример УП" DisableUnderLine=true>
+    <table>
+        <tbody>
+            <tr>
+                <td class=ex>O0001;</td>
+                <td class=desc>блок с номером УП</td>
+            </tr>
+            <tr>
+                <td class=ex>.....;</td>
+                <td class=desc>любой блок обработки</td>
+            </tr>
+            <tr>
+                <td class=ex>.....;</td>
+                <td class=desc>любой блок обработки</td>
+            </tr>
+            <tr>
+                <td class=ex>.....;</td>
+                <td class=desc>любой блок обработки</td>
+            </tr>
+            <tr>
+                <td class=ex>M30;</td>
+                <td class=desc>блок с командой окончания УП</td>
+            </tr>
+        </tbody>
+    </table>
+</MudField>
+
+<MudText Typo="Typo.body2">@info2</MudText>
+<MudField Variant=Variant.Filled Label="Пример УП с модальными кодами" DisableUnderLine=true>
+    <table>
+        <tbody>
+            <tr>
+                <td class=ex>G01 X_;</td>
+                <td class=desc>включение и работа по модальному коду G01</td>
+            </tr>
+            <tr>
+                <td class=ex>X_;</td>
+                <td class=desc>продолжается работа по модальному коду G01</td>
+            </tr>
+            <tr>
+                <td class=ex>Z_;</td>
+                <td class=desc>продолжается работа по модальному коду G01</td>
+            </tr>
+            <tr>
+                <td class=ex>G00 X_;</td>
+                <td class=desc>включение и работа по модальному коду G00</td>
+            </tr>
+            <tr>
+                <td class=ex>G04 X_;</td>
+                <td class=desc>включение и работа по немодальному коду G04</td>
+            </tr>
+            <tr>
+                <td class=ex>X_;</td>
+                <td class=desc>продолжается работа по модальному коду G00</td>
+            </tr>
+        </tbody>
+    </table>
+</MudField>
+
+<MudField Variant=Variant.Filled Label="Базовые коды программирования" DisableUnderLine=true>
+    <MudSimpleTable Hover="true" Dense="true" Outlined=true Square=true Elevation=0>
+        <thead>
+            <tr>
+                <th>Код</th>
+                <th>Описание</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><MudLink Href="/knowledge/programming-g00">G00</MudLink></td>
+                <td>Ускоренное перемещение – перемещение по прямой линии на ускоренной подаче</td>
+            </tr>
+
+            <tr>
+                <td><MudLink Href="/knowledge/programming-g01">G01</MudLink></td>
+                <td>Линейная <MudLink Typo=Typo.body2 @onclick="(() => mbox.Show())">интерполяция</MudLink> – перемещение по прямой линии на указанной подаче</td>
+                <MudMessageBox @ref="mbox" Title="Интерполяция">
+                    <MessageContent>
+                        В данном контексте интерполяция обозначает движение инструмента по прямой линии или дуге.
+                    </MessageContent>
+                </MudMessageBox>
+            </tr>
+        </tbody>
+    </MudSimpleTable>
+</MudField>
+
+@code 
+{
+    bool _linearInterpolationPopover = false;
+    MudMessageBox mbox { get; set; }
+
+    string info1 =
+        "\nПрограммирование обработки на станках с числовым программным управлением (ЧПУ) осуществляется на языке, который обычно называют языком ИСО (ISO) 7 бит, " +
+        "или языком G и М кодов. Коды с адресом G называемые подготовительными, а коды с адресом М - вспомогательными.\n" +
+        "Набор команд, по которым происходит обработка, называется управляющей программой (УП). В свою очередь, управляющая программа состоит из блоков, " +
+        "которые представляют собой набор различных кодов (G-кодов, M-кодов и пр), каждый блок завершается символом конца блока (EOB - End Of Block)";
+
+    string info2 = 
+        "\nG-коды разделяют на модальные, и немодальные (однократные).\n" + 
+        "Например: существует группа G-кодов отвечающая за осевое перемещение: G00, G01, G02, G03 - эти коды модальные и каждый из них будет работать пока не будет заменен другим, из этой же группы. " +
+        "Также существует немодальный код G04 - останавливающий выполнение УП на определенное время, он будет работать только в пределах одного блока." +
+        "";
+
+    string[] headings = { "Код", "Описание" };
+    (string code, string description)[] rows = {
+        ("G00","Ускоренное перемещение – перемещение по прямой линии на ускоренной подаче"),
+        ("G01","Линейная интерполяция – перемещение по прямой линии на указанной подаче"),
+        ("G02","Круговая интерполяция по часовой стрелке – перемещение на подаче по дуге по часовой стрелке"),
+        ("G03","Круговая интерполяция против часовой стрелки – перемещение на подаче по дуге против часовой стрелки"),
+        ("G04","Задержка выполнения управляющией программы"),
+        ("G10","Задержка выполнения управляющией программы"),
+    };
+}
