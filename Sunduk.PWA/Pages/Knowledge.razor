@@ -7,14 +7,17 @@
         <MudItem xs=12 sm=5 md=4 >
             <MudField Variant="Variant.Filled" DisableUnderLine="true" Label="Содержание" InnerPadding="false">
                 <MudList Clickable="true" @bind-SelectedItem="selectedItem" @bind-SelectedValue="Article">
-                    <MudListItem Icon="@Icons.Material.Filled.Info" Text="О разделе" Value="@("about")"/>
-                    <MudListItem Icon="@Icons.Material.Filled.Folder" Text="Программирование">
+                    <MudListItem Icon="@Icons.Material.Filled.Info" Text="О разделе" Value="@("about")" Href="/knowledge/about"/>
+                    <MudListItem Icon="@Icons.Material.Filled.Folder" Text="Программирование Fanuc">
                         <NestedList>
-                            <MudListItem Icon="@Icons.Material.Filled.Info" Value="@("general-programming")">
+                            <MudListItem Icon="@Icons.Material.Filled.Info" Value="@("general-programming")" Href="/knowledge/general-programming">
                                 Общая информация
                             </MudListItem>
-                            <MudListItem Icon="@Icons.Material.Filled.Info" Value="@("programming-g00")">
+                            <MudListItem Icon="@Icons.Material.Filled.Info" Value="@("programming-g00")" Href="/knowledge/programming-g00">
                                 G00
+                            </MudListItem>
+                            <MudListItem Icon="@Icons.Material.Filled.Info" Value="@("programming-g01")" Href="/knowledge/programming-g01">
+                                G01
                             </MudListItem>
                         </NestedList>
                     </MudListItem>
@@ -28,6 +31,7 @@
                 case "about": <AboutKnowledgeComponent/> break;
                 case "general-programming": <GeneralPrograming/> break;
                 case "programming-g00": <ProgrammingG00/> break;
+                case "programming-g01": <ProgrammingG01/> break;
             }
             </MudField>
         </MudItem>
