@@ -43,7 +43,7 @@
                         </MudItem>
                         <MudItem xs="12" md="4">
                             <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
-                                @foreach (var tool in Tools)
+                                @foreach (var tool in Tools.Where(x => x is Tool))
                                 {
                                     <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                                 }
