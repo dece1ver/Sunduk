@@ -5,7 +5,11 @@
     .desc{font-style: italic; font-size: x-small;}
 </style>
 
-<MudText Typo=Typo.body2>@description</MudText>
+<MudText Typo=Typo.body2>
+    Команда G00 перемещает инструмент на позицию, указанную относительно системы координат заготовки на скорости ускоренного подвода. 
+    Указание позиции допускается в <MudLink Typo=Typo.body2 @onclick="(()=>absMbox.Show())">абсолютных</MudLink> и <MudLink Typo=Typo.body2 @onclick="(()=>incMbox.Show())">относительных</MudLink> значениях. 
+    Скорость ускоренного подвода для каждой оси задается в параметре системы ЧПУ №1420 и не может задаваться в адресе F.
+</MudText>
 <MudField Variant=Variant.Filled Label="Пример УП" DisableUnderLine=true>
     <table>
         <tbody>
@@ -17,11 +21,20 @@
     </table>
 </MudField>
 
+<MudMessageBox @ref="absMbox" Title="Абсолютное перемещение">
+    <MessageContent>
+        При программировании в абсолютных значениях указываются координаты относительно центра системы координат заготовки.
+    </MessageContent>
+</MudMessageBox>
+<MudMessageBox @ref="incMbox" Title="Относительное перемещение">
+    <MessageContent>
+        При программировании в относительных/инкрементных значениях указываются координаты относительно текущего положения инструмента.
+    </MessageContent>
+</MudMessageBox>
 
 @code 
 {
-    string description = 
-    "Команда G00 перемещает инструмент на позицию, указанную относительно системы координат заготовки на скорости ускоренного подвода. Указание позиции допускается в абсолютных и относительных значениях. " + 
-    "Скорость ускоренного подвода для каждой оси задается в параметре системы ЧПУ №1420 и не может задаваться в адресе F." +
-    "";
+    MudMessageBox absMbox { get; set; }
+    MudMessageBox incMbox { get; set; }
+
 }
