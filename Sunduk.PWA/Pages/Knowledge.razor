@@ -4,27 +4,32 @@
 
 <MudContainer MaxWidth=MaxWidth.False Class="mt-2">
     <MudGrid Spacing=1>
-        <MudItem xs=12 sm=5 md=4 >
+        <MudItem xs=12 sm=5 lg=4 >
             <MudField Variant="Variant.Filled" DisableUnderLine="true" Label="Содержание" InnerPadding="false">
-                <MudList Clickable="true" @bind-SelectedItem="selectedItem" @bind-SelectedValue="Article">
-                    <MudListItem Icon="@Icons.Material.Filled.Info" Text="О разделе" Value="@("about")" Href="/knowledge/about"/>
-                    <MudListItem Icon="@Icons.Material.Filled.Folder" Text="Программирование Fanuc">
+                <MudList Dense=true Clickable="true" @bind-SelectedItem="selectedItem" @bind-SelectedValue="Article">
+                    <MudListItem Dense=true DisableGutters=true Icon="@Icons.Material.Filled.Info" Value="@("about")" Href="/knowledge/about">
+                        <MudText Class="mx-n4" Typo=Typo.body2>О разделе</MudText>
+                    </MudListItem>
+                    <MudListItem Dense=true Icon="@Icons.Material.Filled.Folder">
+                        <ChildContent>
+                             <MudText Class="mx-n4" Typo=Typo.body2>Программирование Fanuc</MudText>
+                        </ChildContent>
                         <NestedList>
-                            <MudListItem Icon="@Icons.Material.Filled.Info" Value="@("general-programming")" Href="/knowledge/general-programming">
-                                Общая информация
+                            <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("general-programming")" Href="/knowledge/general-programming">
+                                <MudText Class="mx-n4" Typo=Typo.body2>Общая информация</MudText>
                             </MudListItem>
-                            <MudListItem Icon="@Icons.Material.Filled.Info" Value="@("programming-g00")" Href="/knowledge/programming-g00">
-                                G00
+                            <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("programming-g00")" Href="/knowledge/programming-g00">
+                                <MudText Class="mx-n4" Typo=Typo.body2>G00</MudText>
                             </MudListItem>
-                            <MudListItem Icon="@Icons.Material.Filled.Info" Value="@("programming-g01")" Href="/knowledge/programming-g01">
-                                G01
+                            <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("programming-g01")" Href="/knowledge/programming-g01">
+                                <MudText Class="mx-n4" Typo=Typo.body2>G01</MudText>
                             </MudListItem>
                         </NestedList>
                     </MudListItem>
                 </MudList>
             </MudField>
         </MudItem>
-        <MudItem xs=12 sm=7 md=8>
+        <MudItem xs=12 sm=7 lg=8>
             <MudField Variant="Variant.Filled" DisableUnderLine="true" Label="Информация">
                 @switch (Article?.ToString())
             {

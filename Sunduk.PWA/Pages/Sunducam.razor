@@ -11,8 +11,8 @@
     }
 </style>
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3 mx-n3">
+    <MudGrid Spacing=1>
         <MudItem>
             <MudExpansionPanel HideIcon="true">
                 <TitleContent>
@@ -74,7 +74,7 @@
         <MudItem xs="12" sm="6">
             
             <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
-                <MudList Clickable="true" @bind-SelectedItem="SelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" Dense="true" DisableGutters="false">
+                <MudList Clickable="true" @bind-SelectedItem="SelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" Dense="true" DisableGutters=true>
                     @if (Program != null)
                     {
                         foreach (var seq in Program)
@@ -83,7 +83,7 @@
                             {
                                 <MudListItem Text="@($"1. {seq.Name}")" Value="1">
                                     <MudGrid>
-                                        <MudText Class="ma-3">@($"1. {seq.Name}")</MudText>
+                                        <MudText Class="ma-3" Typo=Typo.body2>@($"1. {seq.Name}")</MudText>
                                     </MudGrid>
                                 </MudListItem>
                             }
@@ -91,11 +91,11 @@
                             {
                                 <MudListItem Text="@($"{Program.IndexOf(seq)}. {seq.Name}")" Value="Program.IndexOf(seq)">
                                     <MudGrid>
-                                        <MudText Class="ma-3 mr-auto">@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
+                                        <MudText Class="ma-3 mr-auto" Typo=Typo.body2>@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
                                         <div Class="d-inline-flex justify-end py-2 px-3">
                                             @if ((int)SelectedSequenceIndex == Program.IndexOf(seq))
                                             {
-                                            <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -2px; margin-bottom: -2px">
+                                            <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -3px; margin-bottom: -3px">
                                                 @if (Program.IndexOf(seq) != Program.Count - 1)
                                                 {
                                                     <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
