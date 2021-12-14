@@ -1,38 +1,98 @@
-﻿<style>
-    .ex{padding-right: 20px; font-family: 'Roboto Mono', monospace; font-size: x-small;}
+﻿@using MudBlazor.Services
+@implements IAsyncDisposable
+
+<style>
+    .ex{padding-right: @PaddingRight; font-family: 'Roboto Mono', monospace; font-size: @FontSize;}
 </style>
 <style>
-    .desc{font-style: italic; font-size: x-small;}
+    .desc{font-size: @FontSize; font-style: italic; font-weight: lighter}
 </style>
 
-<MudText Typo=Typo.body2>@description</MudText>
+
+<MudText Typo=Typo.body2>
+    Команда G01 подает инструмент вдоль прямой линии по координатам указанным относительно центра системы координат заготовки. 
+    Указание позиции допускается в <MudLink Typo=Typo.body2 @onclick="(()=>absMbox.Show())">абсолютных</MudLink> и <MudLink Typo=Typo.body2 @onclick="(()=>incMbox.Show())">относительных</MudLink> значениях.
+    Скорость подачи задается кодом F и действует до ввода нового значения, нет необходимости задавать её в каждом блоке.
+    Скорость подачи, заданная F-кодом, измеряется вдоль траектории движения инструмента, следовательно при движении по нескольким осям одновременно,
+    скорость подачи для каждой оси пересчитывается для поддержания необходимой общей скорости подачи.
+    Если F-код не задан, скорость подачи считается равной нулю.
+</MudText>
 <MudField Variant=Variant.Filled Label="Пример УП" DisableUnderLine=true>
     <table>
         <tbody>
             <tr>
                 <td class=ex>G01 X_ F_;</td>
-                <td class=desc>Движение инструмента на подаче F_ до координаты X_</td>
+                <td class=desc>lвижение инструмента на подаче F_ до координаты X_</td>
             </tr>
         </tbody>
     </table>
 </MudField>
-<MudText Typo=Typo.body2>@advancedDescription</MudText>
+<MudText Typo=Typo.body2>
+    Скорость подачи для линейных осей указывается в мм/об, либо в мм/мин, а для осей вращения в град/мин.
+    На токарных станках в оснвном используется подача в мм/об (детали), она включается G-кодом G99, а G98 включает подачу в мм/мин.
+    На фрезерных станках в оснвном используется подача в мм/мин, она включается G-кодом G94, а G95 включает подачу в мм/об (инструмента).
+    скорость подачи для каждой оси пересчитывается для поддержания необходимой общей скорости подачи.
+</MudText>
 
-
+<MudMessageBox @ref="absMbox" Title="Абсолютное перемещение">
+    <MessageContent>
+        При программировании в абсолютных значениях указываются координаты относительно центра системы координат заготовки.
+    </MessageContent>
+</MudMessageBox>
+<MudMessageBox @ref="incMbox" Title="Относительное перемещение">
+    <MessageContent>
+        При программировании в относительных/инкрементных значениях указываются координаты относительно текущего положения инструмента.
+    </MessageContent>
+</MudMessageBox>
 @code 
 {
-    string description = 
-    "Команда G01 подает инструмент вдоль прямой линии по координатам указанным относительно центра системы координат заготовки. Указание позиции допускается в абсолютных и относительных значениях. " + 
-    "Скорость подачи задается кодом F и действует до ввода нового значения, нет необходимости задавать её в каждом блоке. " +
-    "Скорость подачи, заданная F-кодом, измеряется вдоль траектории движения инструмента, следовательно при движении по нескольким осям одновременно, " + 
-    "скорость подачи для каждой оси пересчитывается для поддержания необходимой общей скорости подачи. " + 
-    "Если F-код не задан, скорость подачи считается равной нулю. " +
-    "";
+    [Inject] IBreakpointService BreakpointListener { get; set; }
 
-    string advancedDescription = 
-    "Скорость подачи для линейных осей указывается в мм/об, либо в мм/мин, а для осей вращения в град/мин. " + 
-    "На токарных станках в оснвном используется подача в мм/об (детали), она включается G-кодом G99, а G98 включает подачу в мм/мин. " +
-    "На фрезерных станках в оснвном используется подача в мм/мин, она включается G-кодом G94, а G95 включает подачу в мм/об (инструмента). " + 
-    "скорость подачи для каждой оси пересчитывается для поддержания необходимой общей скорости подачи. " + 
-    "";
+    private Guid _subscriptionId;
+    private Breakpoint breakpoint;
+
+    public string FontSize { get
+        {
+            switch (breakpoint)
+            {
+                case Breakpoint.Xs: return "xx-small";
+                case Breakpoint.Sm: return "x-small";
+                default: return "medium";
+            }
+        } }
+
+    public string PaddingRight { get
+        {
+            switch (breakpoint)
+            {
+                case Breakpoint.Xs: return "10px";
+                case Breakpoint.Sm: return "15px";
+                default: return "25px";
+            }
+        } }
+
+    MudMessageBox absMbox { get; set; }
+    MudMessageBox incMbox { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			var subscriptionResult = await BreakpointListener.Subscribe((breakpoint) =>
+			{
+				InvokeAsync(StateHasChanged);
+			}, new ResizeOptions
+			{
+				ReportRate = 250,
+				NotifyOnBreakpointOnly = true,
+			});
+
+			breakpoint = subscriptionResult.Breakpoint;
+			_subscriptionId = subscriptionResult.SubscriptionId;
+			StateHasChanged();
+		}
+
+		await base.OnAfterRenderAsync(firstRender);
+	}
+	public async ValueTask DisposeAsync() => await BreakpointListener.Unsubscribe(_subscriptionId);
 }
