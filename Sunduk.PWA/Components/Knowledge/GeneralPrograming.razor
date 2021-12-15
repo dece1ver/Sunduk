@@ -8,8 +8,13 @@
     .desc{font-size: @FontSize; font-style: italic; font-weight: lighter}
 </style>
 
+<MudText Typo="Typo.body2">
+    Программирование обработки на станках с числовым программным управлением (ЧПУ) Fanuc, осуществляется на языке <MudLink Typo=Typo.body2 @onclick="(() => gCodeMbox.Show())">G-кодов</MudLink>. 
+    Набор команд, по которым происходит обработка, называется управляющей программой (УП). Управляющая программа состоит из блоков (строк), 
+    которые могут иметь одну, или несколько команд (G-кодов, M-кодов и пр), каждый блок завершается символом конца блока (EOB - End Of Block).
+    Любая УП дожна начинаться с блока с <MudLink Typo=Typo.body2 @onclick="(() => programNumberMbox.Show())">номером УП</MudLink> и заканчиваться командой завершения.
+</MudText>
 
-<MudText Typo="Typo.body2">@info1</MudText>
 <MudField Variant=Variant.Filled Label="Пример УП" DisableUnderLine=true>
     <table>
         <tbody>
@@ -37,7 +42,53 @@
     </table>
 </MudField>
 
+<MudText Typo="Typo.body2">
+    Команды УП контролируют все функции обработки, включая:<br/>
+    &nbsp;&nbsp;* Выбор инструмента;<br/>
+    &nbsp;&nbsp;* Установка направления и частоты вращения шпинделя;<br/>
+    &nbsp;&nbsp;* Выбор скорость подачи;<br/>
+    &nbsp;&nbsp;* Позиционирование подвижных органов станка.<br/>
+</MudText>
+
+<MudText Typo="Typo.body2">
+    Все блоки УП, кроме первого, могут иметь (необязательно) явно указанный номер, начинающийся с буквы N. Эти номера являются метками для перехода/возврата к конкретным блокам и они могут иметь любую очередность. 
+    Не рекомендуется применять одинаковые номера блоков в пределах одной УП.
+</MudText>
+<MudField Variant=Variant.Filled Label="Пример допустимой нумерации" DisableUnderLine=true>
+    <table>
+        <tbody>
+            <tr>
+                <td class=ex>O0001;</td>
+                <td class=desc>блок с номером УП</td>
+            </tr>
+            <tr>
+                <td class=ex>N1 ..;</td>
+                <td class=desc>любой блок обработки</td>
+            </tr>
+            <tr>
+                <td class=ex>N8 ..;</td>
+                <td class=desc>любой блок обработки</td>
+            </tr>
+            <tr>
+                <td class=ex>.....;</td>
+                <td class=desc>любой блок обработки</td>
+            </tr>
+            <tr>
+                <td class=ex>N2 M30;</td>
+                <td class=desc>блок с командой окончания УП</td>
+            </tr>
+        </tbody>
+    </table>
+</MudField>
+
+<MudText Typo="Typo.body2">
+    Если не брать во внимание подготовительные коды отвечающие за выбор инструмента, вращение шпинделя, 
+    то обработка по УП представляет собой движение рабочих органов станка по указанным координатам, описывающим траеторию движения инструмента.
+    Принято указывать координы относительно заранее определенной <MudLink Typo=Typo.body2 @onclick="(() => coordinateSystemMbox.Show())">системы координат заготовки</MudLink> (нулевой точки детали). 
+</MudText>
+<MudDivider/>
 <MudText Typo="Typo.body2">@info2</MudText>
+
 <MudField Variant=Variant.Filled Label="Пример УП с модальными кодами" DisableUnderLine=true>
     <table>
         <tbody>
@@ -85,16 +136,41 @@
 
             <tr>
                 <td><MudLink Href="/knowledge/programming-g01">G01</MudLink></td>
-                <td>Линейная <MudLink Typo=Typo.body2 @onclick="(() => mbox.Show())">интерполяция</MudLink> – перемещение по прямой линии на указанной подаче</td>
-                <MudMessageBox @ref="mbox" Title="Интерполяция">
-                    <MessageContent>
-                        В данном контексте интерполяция обозначает движение инструмента по прямой линии или дуге.
-                    </MessageContent>
-                </MudMessageBox>
+                <td>Линейная <MudLink Typo=Typo.body2 @onclick="(() => interpolationMbox.Show())">интерполяция</MudLink> – перемещение по прямой линии на указанной подаче</td>
+                
             </tr>
         </tbody>
     </MudSimpleTable>
 </MudField>
+
+
+<MudMessageBox @ref="gCodeMbox" Title="Язык G-кодов">
+    <MessageContent>
+        G-код — наиболее распространенный и широко используемый язык программирования устройств с ЧПУ, также известный как ИСО 7-бит. 
+        Производители систем ЧПУ используют G-код в качестве базового языка программирования, дополнительно расширяя его по своему усмотрению.
+    </MessageContent>
+</MudMessageBox>
+
+<MudMessageBox @ref="programNumberMbox" Title="Номер программы">
+    <MessageContent>
+        Блок содержащий номер УП начинается с буквы O после которой следует непосредственно номер, дополнительно, в скобках, может быть указан комментарий, который воспринимается системой ЧПУ как имя УП:<br/>
+        <p class="ex">O0001(VTULKA);</p>
+        Современные версии системы ЧПУ Fanuc позволяют создавать УП только с именем, тогда первый блок УП представляет собой имя УП заключенное в угловые скобки:<br/>
+        <p class="ex">&lt;VTULKA&gt;;</p>
+    </MessageContent>
+</MudMessageBox>
+
+<MudMessageBox @ref="coordinateSystemMbox" Title="Система координат">
+    <MessageContent>
+        Тут будет статья о привязке детали.
+    </MessageContent>
+</MudMessageBox>
+
+<MudMessageBox @ref="interpolationMbox" Title="Интерполяция">
+    <MessageContent>
+        В данном контексте интерполяция обозначает движение инструмента по прямой линии или дуге.
+    </MessageContent>
+</MudMessageBox>
 
 @code 
 {
@@ -145,7 +221,10 @@
 	}
 	public async ValueTask DisposeAsync() => await BreakpointListener.Unsubscribe(_subscriptionId);
 
-    MudMessageBox mbox { get; set; }
+    MudMessageBox gCodeMbox { get; set; }
+    MudMessageBox programNumberMbox { get; set; }
+    MudMessageBox coordinateSystemMbox { get; set; }
+    MudMessageBox interpolationMbox { get; set; }
 
     string info1 =
         "\nПрограммирование обработки на станках с числовым программным управлением (ЧПУ) осуществляется на языке, который обычно называют языком ИСО (ISO) 7 бит, " +
