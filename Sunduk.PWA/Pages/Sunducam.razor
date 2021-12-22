@@ -541,7 +541,6 @@
                                 </MudTd>
                             </RowEditingTemplate>
                         </MudTable>
-
                         <div class="mt-3 ml-0 mr-4 d-flex">
                             <div class="d-flex ml-auto align-center">
                                 <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTappingTool" />
@@ -549,6 +548,33 @@
                             </div>
                         </div>
                     </MudTabPanel>
+
+                    <MudTabPanel Text="Спец инструмент" Style="font-size: x-small">
+                                <MudTable Items="SpecialTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedSpecialTool" Elevation="0">
+                                    <HeaderContent>
+                                        <MudTh>Позиция</MudTh>
+                                        <MudTh>Описание</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                                        <MudTd DataLabel="Описание">@context.Name</MudTd>
+                                    </RowTemplate>
+                                    <RowEditingTemplate>
+                                        <MudTd DataLabel="Позиция">
+                                            <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+                                        </MudTd>
+                                        <MudTd DataLabel="Описание">
+                                            <MudTextField @bind-Value="@context.Name" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </MudTd>
+                                    </RowEditingTemplate>
+                                </MudTable>
+                                <div class="mt-3 ml-0 mr-4 d-flex">
+                                    <div class="d-flex ml-auto align-center">
+                                        <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddSpecialTool" />
+                                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveSpecialTool" />
+                                    </div>
+                                </div>
+                            </MudTabPanel>
                         </MudTabs>
             </MudSwipeArea>
         </MudItem>
@@ -586,148 +612,17 @@
         set { }
     }
 
-    private List<Tool> Tools = new();
+    public List<Tool> Tools { get; set; } = new();
 
-    private async Task SetTools()
-    {
-        await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
-        await localStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
-        await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
-        await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
-        await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
-        await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
-        await localStorage.SetItemAsync(nameof(DrillingTools), DrillingTools);
-        await localStorage.SetItemAsync(nameof(TappingTools), TappingTools);
-        await localStorage.SetItemAsync(nameof(SpecialTools), SpecialTools);
-    }
-
-    public List<TurningExternalTool> TurningExternalTools
-    {
-        get
-        {
-            List<TurningExternalTool> result = new();
-            foreach (var item in Tools.Where(x => x is TurningExternalTool))
-            {
-                result.Add(item as TurningExternalTool);
-            }
-            return result;
-        }
-        set { }
-    }
-
-    public List<TurningInternalTool> TurningInternalTools
-    {
-        get
-        {
-            List<TurningInternalTool> result = new();
-            foreach (var item in Tools.Where(x => x is TurningInternalTool))
-            {
-                result.Add(item as TurningInternalTool);
-            }
-            return result;
-        }
-        set { }
-    }
-
-    public List<GroovingExternalTool> GroovingExternalTools
-    {
-        get
-        {
-            List<GroovingExternalTool> result = new();
-            foreach (var item in Tools.Where(x => x is GroovingExternalTool))
-            {
-                result.Add(item as GroovingExternalTool);
-            }
-            return result;
-        }
-        set { }
-    }
-
-    public List<GroovingInternalTool> GroovingInternalTools
-    {
-        get
-        {
-            List<GroovingInternalTool> result = new();
-            foreach (var item in Tools.Where(x => x is GroovingInternalTool))
-            {
-                result.Add(item as GroovingInternalTool);
-            }
-            return result;
-        }
-        set { }
-    }
-
-    public List<ThreadingExternalTool> ThreadingExternalTools
-    {
-        get
-        {
-            List<ThreadingExternalTool> result = new();
-            foreach (var item in Tools.Where(x => x is ThreadingExternalTool))
-            {
-                result.Add(item as ThreadingExternalTool);
-            }
-            return result;
-        }
-        set { }
-    }
-
-    public List<ThreadingInternalTool> ThreadingInternalTools
-    {
-        get
-        {
-            List<ThreadingInternalTool> result = new();
-            foreach (var item in Tools.Where(x => x is ThreadingInternalTool))
-            {
-                result.Add(item as ThreadingInternalTool);
-            }
-            return result;
-        }
-        set { }
-    }
-
-
-
-    public List<DrillingTool> DrillingTools
-    {
-        get
-        {
-            List<DrillingTool> result = new();
-            foreach (var item in Tools.Where(x => x is DrillingTool))
-            {
-                result.Add(item as DrillingTool);
-            }
-            return result;
-        }
-        set { }
-    }
-
-    public List<TappingTool> TappingTools
-    {
-        get
-        {
-            List<TappingTool> result = new();
-            foreach (var item in Tools.Where(x => x is TappingTool))
-            {
-                result.Add(item as TappingTool);
-            }
-            return result;
-        }
-        set { }
-    }
-
-    public List<SpecialTool> SpecialTools
-    {
-        get
-        {
-            List<SpecialTool> result = new();
-            foreach (var item in Tools.Where(x => x is SpecialTool))
-            {
-                result.Add(item as SpecialTool);
-            }
-            return result;
-        }
-        set { }
-    }
+    public List<TurningExternalTool> TurningExternalTools { get; set; }
+    public List<TurningInternalTool> TurningInternalTools { get; set; }
+    public List<GroovingExternalTool> GroovingExternalTools { get; set; }
+    public List<GroovingInternalTool> GroovingInternalTools { get; set; }
+    public List<ThreadingExternalTool> ThreadingExternalTools { get; set; }
+    public List<ThreadingInternalTool> ThreadingInternalTools { get; set; }
+    public List<DrillingTool> DrillingTools { get; set; }
+    public List<TappingTool> TappingTools { get; set; }
+    public List<SpecialTool> SpecialTools { get; set; }
 
     public Materials WorkpieceMaterial { get; set; }
     public Machines Machine { get; set; }
@@ -1139,30 +1034,109 @@
     private ThreadingInternalTool selectedThreadingInternalTool = null;
     private DrillingTool selectedDrillingTool = null;
     private TappingTool selectedTappingTool = null;
+    private SpecialTool selectedSpecialTool = null;
+    
+    
 
-    private void AddTurningExternalTool() => Tools.Add(new TurningExternalTool(0101, TurningExternalTool.Types.Bar, 80, 0.8));
-    private void RemoveTurningExternalTool() => Tools.Remove(TurningExternalTools[^1]);
+    private async Task AddTurningExternalTool()
+    {
+        Tools.Add(new TurningExternalTool(0101, TurningExternalTool.Types.Bar, 80, 0.8));
+        await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+    }
+    private async Task RemoveTurningExternalTool()
+    {
+        Tools.Remove(TurningExternalTools[^1]);
+        await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+    }
 
-    private void AddTurningInternalTool() => Tools.Add(new TurningInternalTool(0101, 25, 80, 0.8));
-    private void RemoveTurningInternalTool() => Tools.Remove(TurningInternalTools[^1]);
+    private async Task AddTurningInternalTool() 
+    {
+        Tools.Add(new TurningInternalTool(0101, 25, 80, 0.8));
+        await localStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
+    }
 
-    private void AddGroovingExternalTool() => Tools.Add(new GroovingExternalTool(0101, GroovingExternalTool.Types.Cutting, 3, GroovingExternalTool.Point.Left));
-    private void RemoveGroovingExternalTool() => Tools.Remove(GroovingExternalTools[^1]);
+    private async Task RemoveTurningInternalTool() 
+    {
+        Tools.Remove(TurningInternalTools[^1]);
+        await localStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
+    }
 
-    private void AddGroovingInternalTool() => Tools.Add(new GroovingInternalTool(0101, 20, 3, GroovingInternalTool.Point.Left));
-    private void RemoveGroovingInternalTool() => Tools.Remove(GroovingInternalTools[^1]);
+    private async Task AddGroovingExternalTool()
+    {
+        Tools.Add(new GroovingExternalTool(0101, GroovingExternalTool.Types.Cutting, 3, GroovingExternalTool.Point.Left));
+        await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+    }
+    private async Task RemoveGroovingExternalTool()
+    {
+        Tools.Remove(GroovingExternalTools[^1]);
+        await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+    }
 
-    private void AddThreadingExternalTool() => Tools.Add(new ThreadingExternalTool(0101, 1.5, 1));
-    private void RemoveThreadingExternalTool() => Tools.Remove(ThreadingExternalTools[^1]);
+    private async Task AddGroovingInternalTool()
+    {
+        Tools.Add(new GroovingInternalTool(0101, 20, 3, GroovingInternalTool.Point.Left));
+        await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
+    }
+    private async Task RemoveGroovingInternalTool()
+    {
+        Tools.Remove(GroovingInternalTools[^1]);
+        await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
+    }
 
-    private void AddThreadingInternalTool() => Tools.Add(new ThreadingInternalTool(0101, 20, 1.5, 1));
-    private void RemoveThreadingInternalTool() => Tools.Remove(ThreadingInternalTools[^1]);
+    private async Task AddThreadingExternalTool()
+    {
+        Tools.Add(new ThreadingExternalTool(0101, 1.5, 1));
+        await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
+    }
+    private async Task RemoveThreadingExternalTool()
+    {
+        Tools.Remove(ThreadingExternalTools[^1]);
+        await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
+    }
 
-    private void AddDrillingTool() => Tools.Add(new DrillingTool(0101, DrillingTool.Types.Solid, 10, 140));
-    private void RemoveDrillingTool() => Tools.Remove(DrillingTools[^1]);
+    private async Task AddThreadingInternalTool()
+    {
+        Tools.Add(new ThreadingInternalTool(0101, 20, 1.5, 1));
+        await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
+    }
+    private async Task RemoveThreadingInternalTool()
+    {
+        Tools.Remove(ThreadingInternalTools[^1]);
+        await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
+    }
 
-    private void AddTappingTool() => Tools.Add(new TappingTool(0101, TappingTool.Types.Cutting, 8, 1.25));
-    private void RemoveTappingTool() => Tools.Remove(TappingTools[^1]);
+    private async Task AddDrillingTool()
+    {
+        Tools.Add(new DrillingTool(0101, DrillingTool.Types.Solid, 10, 140));
+        await localStorage.SetItemAsync(nameof(DrillingTools), DrillingTools);
+    }
+    private async Task RemoveDrillingTool()
+    {
+        Tools.Remove(DrillingTools[^1]);
+        await localStorage.SetItemAsync(nameof(DrillingTools), DrillingTools);
+    }
+
+    private async Task AddTappingTool()
+    {
+        Tools.Add(new TappingTool(0101, TappingTool.Types.Cutting, 8, 1.25));
+        await localStorage.SetItemAsync(nameof(TappingTools), TappingTools);
+    }
+    private async Task RemoveTappingTool()
+    {
+        Tools.Remove(TappingTools[^1]);
+        await localStorage.SetItemAsync(nameof(TappingTools), TappingTools);
+    }
+
+    private async Task AddSpecialTool()
+    {
+        Tools.Add(new TappingTool(0101, TappingTool.Types.Cutting, 8, 1.25));
+        await localStorage.SetItemAsync(nameof(SpecialTools), SpecialTools);
+    }
+    private async Task RemoveSpecialTool()
+    {
+        Tools.Remove(TappingTools[^1]);
+        await localStorage.SetItemAsync(nameof(SpecialTools), SpecialTools);
+    }
 
     MudTabs tabs;
 
