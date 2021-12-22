@@ -586,17 +586,7 @@
         set { }
     }
 
-    private List<Tool> _Tools = new();
-
-    public List<Tool> Tools
-    {
-        get { return _Tools; }
-        set
-        {
-            _Tools = value;
-            _ = SetTools();
-        }
-    }
+    private List<Tool> Tools = new();
 
     private async Task SetTools()
     {
