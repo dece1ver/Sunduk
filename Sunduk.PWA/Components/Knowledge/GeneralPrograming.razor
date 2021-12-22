@@ -2,11 +2,12 @@
 @implements IAsyncDisposable
 
 <style>
-    .ex{padding-right: @PaddingRight; font-family: 'Roboto Mono', monospace; font-size: @FontSize;}
+    .ex{padding-right: @Design.GetPaddingRight(breakpoint); font-family: 'Roboto Mono', monospace; font-size: @Design.GetFontSize(breakpoint);}
 </style>
 <style>
-    .desc{font-size: @FontSize; font-style: italic; font-weight: lighter}
+    .desc{font-size: @Design.GetFontSize(breakpoint); font-style: italic; font-weight: lighter}
 </style>
+
 
 <MudText Typo="Typo.body2">
     Программирование обработки на станках с числовым программным управлением (ЧПУ) Fanuc, осуществляется на языке <MudLink Typo=Typo.body2 @onclick="(() => gCodeMbox.Show())">G-кодов</MudLink>. 
@@ -178,26 +179,6 @@
 
     private Guid _subscriptionId;
     private Breakpoint breakpoint;
-
-    public string FontSize { get
-        {
-            switch (breakpoint)
-            {
-                case Breakpoint.Xs: return "xx-small";
-                case Breakpoint.Sm: return "x-small";
-                default: return "medium";
-            }
-        } }
-
-    public string PaddingRight { get
-        {
-            switch (breakpoint)
-            {
-                case Breakpoint.Xs: return "10px";
-                case Breakpoint.Sm: return "15px";
-                default: return "25px";
-            }
-        } }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
