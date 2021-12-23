@@ -241,7 +241,7 @@ namespace Sunduk.PWA.Util
         {
             return tool switch
             {
-                SpecialTool specialTool => option switch
+                SpecialTurningTool specialTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{specialTool.Position.ToolNumber()} ({specialTool.Name})".Replace(',', '.'),
                     ToolDescriptionOption.L230 => $"T{specialTool.Position.ToolNumber()}({specialTool.Name})".Replace(',', '.'),

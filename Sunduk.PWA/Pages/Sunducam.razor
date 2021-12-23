@@ -556,7 +556,7 @@
                     </MudTabPanel>
 
                     <MudTabPanel Text="Спец инструмент" Style="font-size: x-small">
-                                <MudTable Items="SpecialTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedSpecialTool" Elevation="0">
+                                <MudTable Items="SpecialTurningTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedSpecialTurningTool" Elevation="0">
                                     <HeaderContent>
                                         <MudTh>Позиция</MudTh>
                                         <MudTh>Описание</MudTh>
@@ -576,8 +576,8 @@
                                 </MudTable>
                                 <div class="mt-3 ml-0 mr-4 d-flex">
                                     <div class="d-flex ml-auto align-center">
-                                        <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddSpecialTool" />
-                                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveSpecialTool" />
+                                        <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddSpecialTurningTool" />
+                                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveSpecialTurningTool" />
                                     </div>
                                 </div>
                             </MudTabPanel>
@@ -1163,20 +1163,20 @@
         }
     }
 
-    public List<SpecialTool> SpecialTools
+    public List<SpecialTurningTool> SpecialTurningTools
     {
         get
         {
-            List<SpecialTool> result = new();
-            foreach (var item in Tools.Where(x => x is SpecialTool))
+            List<SpecialTurningTool> result = new();
+            foreach (var item in Tools.Where(x => x is SpecialTurningTool))
             {
-                result.Add(item as SpecialTool);
+                result.Add(item as SpecialTurningTool);
             }
             return result ?? new();
         }
         set 
         {
-            Tools.RemoveAll(x => x is SpecialTool);
+            Tools.RemoveAll(x => x is SpecialTurningTool);
             Tools.AddRange(value);
         }
     }
@@ -1260,11 +1260,11 @@
     {
 
         #region Инициализация спец инструмента
-        SpecialTools = await localStorage.GetItemAsync<List<SpecialTool>>(nameof(SpecialTools)) ?? new();
-        if (SpecialTools is null || SpecialTools.Count == 0)
+        SpecialTurningTools = await localStorage.GetItemAsync<List<SpecialTurningTool>>(nameof(SpecialTurningTools)) ?? new();
+        if (SpecialTurningTools is null || SpecialTurningTools.Count == 0)
         {
-            Tools.Add(new SpecialTool(0101, "UPOR"));
-            await localStorage.SetItemAsync(nameof(SpecialTools), SpecialTools);
+            Tools.Add(new SpecialTurningTool(0101, "UPOR"));
+            await localStorage.SetItemAsync(nameof(SpecialTurningTools), SpecialTurningTools);
         }
         #endregion
 
@@ -1567,7 +1567,7 @@
     private ThreadingInternalTool selectedThreadingInternalTool = null;
     private DrillingTool selectedDrillingTool = null;
     private TappingTool selectedTappingTool = null;
-    private SpecialTool selectedSpecialTool = null;
+    private SpecialTurningTool selectedSpecialTurningTool = null;
 
 
 
@@ -1660,15 +1660,15 @@
         await localStorage.SetItemAsync(nameof(TappingTools), TappingTools);
     }
 
-    private async Task AddSpecialTool()
+    private async Task AddSpecialTurningTool()
     {
-        Tools.Add(new SpecialTool(0101, "UPOR"));
-        await localStorage.SetItemAsync(nameof(SpecialTools), SpecialTools);
+        Tools.Add(new SpecialTurningTool(0101, "UPOR"));
+        await localStorage.SetItemAsync(nameof(SpecialTurningTools), SpecialTurningTools);
     }
-    private async Task RemoveSpecialTool()
+    private async Task RemoveSpecialTurningTool()
     {
-        if (SpecialTools.Count > 0) Tools.Remove(SpecialTools[^1]);
-        await localStorage.SetItemAsync(nameof(SpecialTools), SpecialTools);
+        if (SpecialTurningTools.Count > 0) Tools.Remove(SpecialTurningTools[^1]);
+        await localStorage.SetItemAsync(nameof(SpecialTurningTools), SpecialTurningTools);
     }
 
     MudTabs toolTabs;
