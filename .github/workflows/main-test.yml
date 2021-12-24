@@ -28,6 +28,9 @@ jobs:
           include-prerelease: true
 
       # Публикуем
+      - name: aot
+        run: dotnet workload install wasm-tools
+        
       - name: Publish .NET Core Project
         run: dotnet publish Sunduk.PWA/Sunduk.PWA.csproj -c Release --output release --nologo
           
