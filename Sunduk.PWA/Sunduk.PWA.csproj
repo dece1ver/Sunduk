@@ -11,6 +11,7 @@
     <Version>1.0.3</Version>
     <NeutralLanguage />
     <NoWin32Manifest>true</NoWin32Manifest>
+	<PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
 
   <ItemGroup>
