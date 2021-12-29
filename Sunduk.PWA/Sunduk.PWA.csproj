@@ -12,7 +12,6 @@
     <NeutralLanguage />
     <NoWin32Manifest>true</NoWin32Manifest>
 	<PublishTrimmed>false</PublishTrimmed>
-	<RunAOTCompilation>true</RunAOTCompilation>
   </PropertyGroup>
 
   <ItemGroup>
