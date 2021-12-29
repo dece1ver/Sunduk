@@ -15,7 +15,7 @@
             <MudTextField @bind-Value="EdgesString" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Зубья" Variant="Variant.Filled" Immediate="true" />
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="CutSpeedString" @onfocusin="@(() => CalcSpins = true)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Скорость" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
+            <MudTextField @bind-Value="CutSpeedString" @onfocusin="@(() => CalcSpins = true)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Скорость" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="м/мин" Immediate="true" />
         </MudItem>
         <MudItem xs="6" sm="5" md="5" lg="5">
             <MudTextField @bind-Value="FeedString" @onfocusin="@(() => CalcMinFeed = true)" InputMode="InputMode.numeric" Pattern="[0-9]*,[0-9]{0,4}|[0-9]*\.[0-9]{0,4}" T="string" Label="Подача" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="@FeedUnits" Immediate="true" />
