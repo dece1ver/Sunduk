@@ -3,13 +3,6 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @using MudBlazor.Services
 
-
-<style>
-    .monofield {
-        font-family: 'Roboto Mono', monospace; font-size: @Design.GetFontSize(Breakpoint.Sm);
-    }
-</style>
-
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing=1>
         <MudItem xs="12">
@@ -135,7 +128,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense">
-                        <MudTextField T="string" DisableUnderLine="true" Class="monofield" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
+                        <MudTextField T="string" DisableUnderLine="true" Style="font-family: 'Roboto Mono', monospace; font-size: smaller;" Variant="Variant.Text" @bind-Text="@ProgramText" ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
                     </MudField>
                 </MudItem>
                 break;
@@ -191,22 +184,22 @@
     }
 
     public List<Tool> Tools { get; set; } = new();
-
-    #region Токарныый инструмент
-    public List<TurningExternalTool> TurningExternalTools { get; set; }
-    public List<TurningInternalTool> TurningInternalTools { get; set; }
-    public List<GroovingExternalTool> GroovingExternalTools { get; set; }
-    public List<GroovingInternalTool> GroovingInternalTools { get; set; }
-    public List<ThreadingExternalTool> ThreadingExternalTools { get; set; }
-    public List<ThreadingInternalTool> ThreadingInternalTools { get; set; }
-    public List<TurningDrillingTool> TurningDrillingTools { get; set; }
-    public List<TurningTappingTool> TurningTappingTools { get; set; }
-    public List<SpecialTurningTool> SpecialTurningTools { get; set; }
-    #endregion
-
+    
     #region Фрезерный инструмент
     public List<MillingTool> MillingTools { get; set; }
     public List<MillingDrillingTool> MillingDrillingTools { get; set; }
+    #endregion
+
+    #region Токарныый инструмент
+    public List<GroovingExternalTool> GroovingExternalTools { get; set; }
+    public List<GroovingInternalTool> GroovingInternalTools { get; set; }
+    public List<SpecialTurningTool> SpecialTurningTools { get; set; }
+    public List<ThreadingExternalTool> ThreadingExternalTools { get; set; }
+    public List<ThreadingInternalTool> ThreadingInternalTools { get; set; }
+    public List<TurningDrillingTool> TurningDrillingTools { get; set; }
+    public List<TurningExternalTool> TurningExternalTools { get; set; }
+    public List<TurningInternalTool> TurningInternalTools { get; set; }
+    public List<TurningTappingTool> TurningTappingTools { get; set; }
     #endregion
 
 

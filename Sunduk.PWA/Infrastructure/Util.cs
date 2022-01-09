@@ -244,62 +244,8 @@ namespace Sunduk.PWA.Util
         {
             return tool switch
             {
-                SpecialTurningTool specialTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{specialTool.Position.ToolNumber()} ({specialTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{specialTool.Position.ToolNumber()}({specialTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{specialTool.Position.ToolNumber()}G54M58({specialTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{specialTool.Position.ToolNumber()}G55M58({specialTool.Name})".Replace(',', '.'),
-                    _ => string.Empty,
-                },
-                TurningExternalTool turningExternalTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{turningExternalTool.Position.ToolNumber()} ({turningExternalTool.Name} {turningExternalTool.Angle} R{turningExternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{turningExternalTool.Position.ToolNumber()}({turningExternalTool.Name} {turningExternalTool.Angle} R{turningExternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{turningExternalTool.Position.ToolNumber()}G54M58({turningExternalTool.Name} {turningExternalTool.Angle} R{turningExternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{turningExternalTool.Position.ToolNumber()}G55M58({turningExternalTool.Name} {turningExternalTool.Angle} R{turningExternalTool.Radius})".Replace(',', '.'),
-                    _ => string.Empty,
-                },
-                TurningInternalTool turningInternalTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{turningInternalTool.Position.ToolNumber()} ({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{turningInternalTool.Position.ToolNumber()}({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{turningInternalTool.Position.ToolNumber()}G54M58({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{turningInternalTool.Position.ToolNumber()}G55M58({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
-                    _ => string.Empty,
-                },
-                TurningDrillingTool TurningDrillingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{TurningDrillingTool.Position.ToolNumber()} ({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{TurningDrillingTool.Position.ToolNumber()}({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{TurningDrillingTool.Position.ToolNumber()}G54M58({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{TurningDrillingTool.Position.ToolNumber()}G55M58({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
-                    _ => string.Empty,
-                },
-                TurningTappingTool TurningTappingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{TurningTappingTool.Position.ToolNumber()} ({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{TurningTappingTool.Position.ToolNumber()}({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{TurningTappingTool.Position.ToolNumber()}G54M58({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{TurningTappingTool.Position.ToolNumber()}G55M58({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
-                    _ => string.Empty,
-                },
-                ThreadingExternalTool threadingExternalTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{threadingExternalTool.Position.ToolNumber()} ({threadingExternalTool.Name} {threadingExternalTool.Pitch} {threadingExternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{threadingExternalTool.Position.ToolNumber()}({threadingExternalTool.Name} {threadingExternalTool.Pitch} {threadingExternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{threadingExternalTool.Position.ToolNumber()}G54M58({threadingExternalTool.Name} {threadingExternalTool.Pitch} {threadingExternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{threadingExternalTool.Position.ToolNumber()}G55M58({threadingExternalTool.Name} {threadingExternalTool.Pitch} {threadingExternalTool.Angle})".Replace(',', '.'),
-                    _ => string.Empty,
-                },
-                ThreadingInternalTool threadingInternalTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{threadingInternalTool.Position.ToolNumber()} ({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{threadingInternalTool.Position.ToolNumber()}({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{threadingInternalTool.Position.ToolNumber()}G54M58({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{threadingInternalTool.Position.ToolNumber()}G55M58({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
-                    _ => string.Empty,
-                },
+                MillingTool millingTool => $"T{millingTool.Position} ({millingTool.Name} D{millingTool.Diameter.NC()})",
+                MillingDrillingTool millingDrillingTool => $"T{millingDrillingTool.Position} ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC()})",
                 GroovingExternalTool groovingExternalTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{groovingExternalTool.Position.ToolNumber()} ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})"
@@ -324,8 +270,62 @@ namespace Sunduk.PWA.Util
                     .Replace(',', '.'),
                     _ => string.Empty,
                 },
-                MillingTool millingTool => $"T{millingTool.Position} ({millingTool.Name} D{millingTool.Diameter.NC()})",
-                MillingDrillingTool millingDrillingTool => $"T{millingDrillingTool.Position} ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC()})",
+                SpecialTurningTool specialTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{specialTool.Position.ToolNumber()} ({specialTool.Name})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{specialTool.Position.ToolNumber()}({specialTool.Name})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{specialTool.Position.ToolNumber()}G54M58({specialTool.Name})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{specialTool.Position.ToolNumber()}G55M58({specialTool.Name})".Replace(',', '.'),
+                    _ => string.Empty,
+                },
+                ThreadingExternalTool threadingExternalTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{threadingExternalTool.Position.ToolNumber()} ({threadingExternalTool.Name} {threadingExternalTool.Pitch} {threadingExternalTool.Angle})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{threadingExternalTool.Position.ToolNumber()}({threadingExternalTool.Name} {threadingExternalTool.Pitch} {threadingExternalTool.Angle})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{threadingExternalTool.Position.ToolNumber()}G54M58({threadingExternalTool.Name} {threadingExternalTool.Pitch} {threadingExternalTool.Angle})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{threadingExternalTool.Position.ToolNumber()}G55M58({threadingExternalTool.Name} {threadingExternalTool.Pitch} {threadingExternalTool.Angle})".Replace(',', '.'),
+                    _ => string.Empty,
+                },
+                ThreadingInternalTool threadingInternalTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{threadingInternalTool.Position.ToolNumber()} ({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{threadingInternalTool.Position.ToolNumber()}({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{threadingInternalTool.Position.ToolNumber()}G54M58({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{threadingInternalTool.Position.ToolNumber()}G55M58({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
+                    _ => string.Empty,
+                },
+                TurningDrillingTool TurningDrillingTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{TurningDrillingTool.Position.ToolNumber()} ({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{TurningDrillingTool.Position.ToolNumber()}({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{TurningDrillingTool.Position.ToolNumber()}G54M58({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{TurningDrillingTool.Position.ToolNumber()}G55M58({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
+                    _ => string.Empty,
+                },
+                TurningExternalTool turningExternalTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{turningExternalTool.Position.ToolNumber()} ({turningExternalTool.Name} {turningExternalTool.Angle} R{turningExternalTool.Radius})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{turningExternalTool.Position.ToolNumber()}({turningExternalTool.Name} {turningExternalTool.Angle} R{turningExternalTool.Radius})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{turningExternalTool.Position.ToolNumber()}G54M58({turningExternalTool.Name} {turningExternalTool.Angle} R{turningExternalTool.Radius})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{turningExternalTool.Position.ToolNumber()}G55M58({turningExternalTool.Name} {turningExternalTool.Angle} R{turningExternalTool.Radius})".Replace(',', '.'),
+                    _ => string.Empty,
+                },
+                TurningInternalTool turningInternalTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{turningInternalTool.Position.ToolNumber()} ({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{turningInternalTool.Position.ToolNumber()}({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{turningInternalTool.Position.ToolNumber()}G54M58({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{turningInternalTool.Position.ToolNumber()}G55M58({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
+                    _ => string.Empty,
+                },
+                TurningTappingTool TurningTappingTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{TurningTappingTool.Position.ToolNumber()} ({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{TurningTappingTool.Position.ToolNumber()}({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{TurningTappingTool.Position.ToolNumber()}G54M58({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{TurningTappingTool.Position.ToolNumber()}G55M58({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
+                    _ => string.Empty,
+                },
                 _ => string.Empty,
             };
         }

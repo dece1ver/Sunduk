@@ -8,9 +8,9 @@
     }
 </style>
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid>
+    <MudGrid Spacing="1">
         <MudItem xs="12" md="6">
-            <MudSelect Label="Стандарт" T="ThreadStandart" Value="ThreadStandart" Variant="Variant.Outlined" ValueChanged="OnStandartChanged">
+            <MudSelect Label="Стандарт" T="ThreadStandart" Value="ThreadStandart" Variant="Variant.Filled" ValueChanged="OnStandartChanged">
                 <MudSelectItem Value="@(ThreadStandart.Metric)">60° Метрическая</MudSelectItem>
                 <MudSelectItem Value="@(ThreadStandart.BSPP)">55° Трубная цилиндрическая</MudSelectItem>
                 <MudSelectItem Value="@(ThreadStandart.Trapeziodal)">30° Трапецеидальная</MudSelectItem>
@@ -18,7 +18,7 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" md="6">
-            <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Outlined" ValueChanged="OnTemplateChanged">
+            <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" ValueChanged="OnTemplateChanged">
                 @foreach (string item in ThreadTemplates)
                 {
                     <MudSelectItem Value="@(item)">
@@ -28,7 +28,7 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="3" lg="12">
-            <MudField Label="Тип резьбы" Variant="Variant.Outlined" InnerPadding="false">
+            <MudField Label="Тип резьбы" Variant="Variant.Filled" InnerPadding="false" Class="mt-1" DisableUnderLine="true">
                 <MudRadioGroup @bind-SelectedOption="@ThreadType">
                     <MudRadio Option="@(CuttingType.External)" Color="Color.Primary">Наружная</MudRadio>
                     <MudRadio Option="@(CuttingType.Internal)" Color="Color.Primary">Внутренняя</MudRadio>
@@ -36,8 +36,8 @@
             </MudField>
         </MudItem>
         <MudItem xs="12" sm="9" lg="12">
-            <MudTextField @bind-Value="ThreadDiameterString" Label="Диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
-            <MudTextField @bind-Value="ThreadPitchString" Label="Шаг" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+            <MudTextField @bind-Value="ThreadDiameterString" Label="Диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Class="my-3 ml-2"/>
+            <MudTextField @bind-Value="ThreadPitchString" Label="Шаг" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Class="my-3 ml-2"/>
         </MudItem>
     </MudGrid>
     @*<MudDivider Class="my-4"/>*@
@@ -275,7 +275,7 @@
             ThreadDiameterString = diameter;
             ThreadPitchString = pitch;
             PlaneLength = 0;
-            EndPointZ = -20 - Math.Round(ThreadPitch, 1);
+            EndPointZ = -30;
         }
         else if (ThreadStandart == ThreadStandart.NPT)
         {
