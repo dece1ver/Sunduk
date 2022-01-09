@@ -156,7 +156,7 @@
             </MudItem>
             <MudItem xs="12" md="4">
                 <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool" Variant="Variant.Filled" Margin="Margin.Dense">
-                    @foreach (var tool in Tools.Where(x => x is DrillingTool))
+                    @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
                     {
                         <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                     }
@@ -336,7 +336,7 @@
             {
                 <MudItem xs="4">
                     <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
-                        @foreach (var tool in Tools.Where(x => x is TappingTool))
+                        @foreach (var tool in Tools.Where(x => x is TurningTappingTool))
                         {
                             <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                         }
@@ -398,10 +398,10 @@
     public Mode Mode { get; set; }
 
     [Parameter]
-    public Materials WorkpieceMaterial { get; set; }
+    public Material WorkpieceMaterial { get; set; }
 
     [Parameter]
-    public Machines Machine { get; set; }
+    public Machine Machine { get; set; }
 
     [Parameter]
     public double WorkpieceLength { get; set; }
@@ -569,13 +569,13 @@
             string materialInfo = string.Empty;
             switch (WorkpieceMaterial)
             {
-                case Materials.Steel:
+                case Material.Steel:
                     materialInfo = "Стальная";
                     break;
-                case Materials.Stainless:
+                case Material.Stainless:
                     materialInfo = "Нержавеющая";
                     break;
-                case Materials.Brass:
+                case Material.Brass:
                     materialInfo = "Бронзовая";
                     break;
             }
@@ -665,17 +665,17 @@
 
             if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.HighSpeedDrilling)
             {
-                return Operation.HighSpeedDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, DrillStart, DrillEnd);
+                return Operation.HighSpeedDrilling(Machine, WorkpieceMaterial, Tool as TurningDrillingTool, DrillStart, DrillEnd);
             }
 
             if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.PeckingDrilling)
             {
-                return Operation.PeckDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDepth, DrillStart, DrillEnd);
+                return Operation.PeckDrilling(Machine, WorkpieceMaterial, Tool as TurningDrillingTool, PeckingDepth, DrillStart, DrillEnd);
             }
 
             if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.PeckingDeepDrilling)
             {
-                return Operation.PeckDeepDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDeepDepth, DrillStart, DrillEnd);
+                return Operation.PeckDeepDrilling(Machine, WorkpieceMaterial, Tool as TurningDrillingTool, PeckingDeepDepth, DrillStart, DrillEnd);
             }
 
             if (Type == SequenceType.Threading && ThreadingSequence == ThreadingSequences.ThreadCutting && ThreadType == CuttingType.External)
@@ -689,7 +689,7 @@
 
             if (Type == SequenceType.Threading && ThreadingSequence == ThreadingSequences.Tapping)
             {
-                return Operation.Tapping(Machine, Tool as TappingTool, TapCutSpeed, TapStart, TapEnd);
+                return Operation.Tapping(Machine, Tool as TurningTappingTool, TapCutSpeed, TapStart, TapEnd);
             }
             return string.Empty;
         }
@@ -822,7 +822,7 @@
                         sequence = new HighSpeedDrillingSequence(
                             Machine,
                             WorkpieceMaterial,
-                            Tool as DrillingTool,
+                            Tool as TurningDrillingTool,
                             DrillStart,
                             DrillEnd)
                         { Name = "Сверление" };
@@ -832,7 +832,7 @@
                         sequence = new PeckDrillingSequence(
                             Machine,
                             WorkpieceMaterial,
-                            Tool as DrillingTool,
+                            Tool as TurningDrillingTool,
                             PeckingDepth,
                             DrillStart,
                             DrillEnd)
@@ -843,7 +843,7 @@
                         sequence = new PeckDeepDrillingSequence(
                             Machine,
                             WorkpieceMaterial,
-                            Tool as DrillingTool,
+                            Tool as TurningDrillingTool,
                             PeckingDeepDepth,
                             DrillStart,
                             DrillEnd)
@@ -871,9 +871,9 @@
                         { Name = "Точение резьбы" };
                         break;
                     case ThreadingSequences.Tapping:
-                        sequence = new TappingSequence(
+                        sequence = new TurningTappingSequence(
                     Machine,
-                    Tool as TappingTool,
+                    Tool as TurningTappingTool,
                     TapCutSpeed,
                     TapStart,
                     TapEnd)

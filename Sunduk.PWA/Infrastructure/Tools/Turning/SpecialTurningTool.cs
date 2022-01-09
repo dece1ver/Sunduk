@@ -1,4 +1,6 @@
-﻿namespace Sunduk.PWA.Infrastructure.Tools
+﻿using Sunduk.PWA.Infrastructure.Tools.Base;
+
+namespace Sunduk.PWA.Infrastructure.Tools.Turning
 {
     public class SpecialTurningTool : Tool
     {

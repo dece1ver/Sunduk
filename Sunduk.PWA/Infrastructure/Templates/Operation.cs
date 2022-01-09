@@ -1,5 +1,7 @@
 ﻿using Sunduk.PWA.Infrastructure.Sequences;
 using Sunduk.PWA.Infrastructure.Tools;
+using Sunduk.PWA.Infrastructure.Tools.Base;
+using Sunduk.PWA.Infrastructure.Tools.Turning;
 using Sunduk.PWA.Util;
 using System;
 using System.Globalization;
@@ -16,42 +18,42 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public const string STOP = "M0";
         public const string OP_STOP = "M1";
 
-        private static string SpindleUnclamp(Machines machine)
+        private static string SpindleUnclamp(Machine machine)
         {
             return machine switch
             {
-                Machines.GS1500 => "M10",
-                Machines.L230A => "M69",
+                Machine.GS1500 => "M10",
+                Machine.L230A => "M69",
                 _ => string.Empty,
             };
         }
 
-        private static string SpindleClamp(Machines machine)
+        private static string SpindleClamp(Machine machine)
         {
             return machine switch
             {
-                Machines.GS1500 => "M11",
-                Machines.L230A => "M68", //????????
+                Machine.GS1500 => "M11",
+                Machine.L230A => "M68", //????????
                 _ => string.Empty,
             };
         }
 
-        private static string CoolantOn(Machines machine)
+        private static string CoolantOn(Machine machine)
         {
             return machine switch
             {
-                Machines.GS1500 => "M58",
-                Machines.L230A => "M8",
+                Machine.GS1500 => "M58",
+                Machine.L230A => "M8",
                 _ => string.Empty,
             };
         }
 
-        private static string CoolantOff(Machines machine)
+        private static string CoolantOff(Machine machine)
         {
             return machine switch
             {
-                Machines.GS1500 => "M59",
-                Machines.L230A => "M9",
+                Machine.GS1500 => "M59",
+                Machine.L230A => "M9",
                 _ => string.Empty,
             };
         }
@@ -63,13 +65,13 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Скорость резания на черновом точении
         /// </summary>
-        public static int CuttingSpeedRough(Materials material)
+        public static int CuttingSpeedRough(Material material)
         {
             return material switch
             {
-                Materials.Steel => 280,
-                Materials.Stainless => 180,
-                Materials.Brass => 350,
+                Material.Steel => 280,
+                Material.Stainless => 180,
+                Material.Brass => 350,
                 _ => 0,
             };
         }
@@ -77,13 +79,13 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Скорость резания на чистовом точении
         /// </summary>
-        public static int CuttingSpeedFinish(Materials material)
+        public static int CuttingSpeedFinish(Material material)
         {
             return material switch
             {
-                Materials.Steel => 350,
-                Materials.Stainless => 230,
-                Materials.Brass => 450,
+                Material.Steel => 350,
+                Material.Stainless => 230,
+                Material.Brass => 450,
                 _ => 0,
             };
         }
@@ -126,70 +128,70 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Скорость резания при сверлении
         /// </summary>
-        private static int DrillCuttingSpeed(Materials material, DrillingTool drillingTool)
+        private static int DrillCuttingSpeed(Material material, TurningDrillingTool TurningDrillingTool)
         {
             return material switch
             {
-                Materials.Steel => drillingTool.Type switch
+                Material.Steel => TurningDrillingTool.Type switch
                 {
-                    DrillingTool.Types.Insert => 200,
-                    DrillingTool.Types.Solid => 100,
-                    DrillingTool.Types.Tip => 100,
-                    DrillingTool.Types.HSS => 20,
-                    DrillingTool.Types.Center => 20,
+                    TurningDrillingTool.Types.Insert => 200,
+                    TurningDrillingTool.Types.Solid => 100,
+                    TurningDrillingTool.Types.Tip => 100,
+                    TurningDrillingTool.Types.Rapid => 20,
+                    TurningDrillingTool.Types.Center => 20,
                     _ => 0,
                 },
-                Materials.Stainless => drillingTool.Type switch
+                Material.Stainless => TurningDrillingTool.Type switch
                 {
-                    DrillingTool.Types.Insert => 150,
-                    DrillingTool.Types.Solid => 60,
-                    DrillingTool.Types.Tip => 80,
-                    DrillingTool.Types.HSS => 12,
-                    DrillingTool.Types.Center => 12,
+                    TurningDrillingTool.Types.Insert => 150,
+                    TurningDrillingTool.Types.Solid => 60,
+                    TurningDrillingTool.Types.Tip => 80,
+                    TurningDrillingTool.Types.Rapid => 12,
+                    TurningDrillingTool.Types.Center => 12,
                     _ => 0,
                 },
-                Materials.Brass => drillingTool.Type switch
+                Material.Brass => TurningDrillingTool.Type switch
                 {
-                    DrillingTool.Types.Insert => 200,
-                    DrillingTool.Types.Solid => 120,
-                    DrillingTool.Types.Tip => 120,
-                    DrillingTool.Types.HSS => 20,
-                    DrillingTool.Types.Center => 20,
+                    TurningDrillingTool.Types.Insert => 200,
+                    TurningDrillingTool.Types.Solid => 120,
+                    TurningDrillingTool.Types.Tip => 120,
+                    TurningDrillingTool.Types.Rapid => 20,
+                    TurningDrillingTool.Types.Center => 20,
                     _ => 0,
                 },
                 _ => 0
             };
         }
 
-        private static double DrillFeed(Materials material, DrillingTool drillingTool)
+        private static double DrillFeed(Material material, TurningDrillingTool TurningDrillingTool)
         {
             return material switch
             {
-                Materials.Steel => drillingTool.Type switch
+                Material.Steel => TurningDrillingTool.Type switch
                 {
-                    DrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
-                    DrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
-                    DrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
-                    DrillingTool.Types.HSS => (drillingTool.Diameter * 0.015),
-                    DrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
+                    TurningDrillingTool.Types.Insert => (TurningDrillingTool.Diameter * 0.0028),
+                    TurningDrillingTool.Types.Solid => (TurningDrillingTool.Diameter * 0.01),
+                    TurningDrillingTool.Types.Tip => (TurningDrillingTool.Diameter * 0.01),
+                    TurningDrillingTool.Types.Rapid => (TurningDrillingTool.Diameter * 0.015),
+                    TurningDrillingTool.Types.Center => (TurningDrillingTool.Diameter * 0.02),
                     _ => 0,
                 },
-                Materials.Stainless => drillingTool.Type switch
+                Material.Stainless => TurningDrillingTool.Type switch
                 {
-                    DrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
-                    DrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
-                    DrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
-                    DrillingTool.Types.HSS => (drillingTool.Diameter * 0.015),
-                    DrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
+                    TurningDrillingTool.Types.Insert => (TurningDrillingTool.Diameter * 0.0028),
+                    TurningDrillingTool.Types.Solid => (TurningDrillingTool.Diameter * 0.01),
+                    TurningDrillingTool.Types.Tip => (TurningDrillingTool.Diameter * 0.01),
+                    TurningDrillingTool.Types.Rapid => (TurningDrillingTool.Diameter * 0.015),
+                    TurningDrillingTool.Types.Center => (TurningDrillingTool.Diameter * 0.02),
                     _ => 0,
                 },
-                Materials.Brass => drillingTool.Type switch
+                Material.Brass => TurningDrillingTool.Type switch
                 {
-                    DrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
-                    DrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
-                    DrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
-                    DrillingTool.Types.HSS => (drillingTool.Diameter * 0.015),
-                    DrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
+                    TurningDrillingTool.Types.Insert => (TurningDrillingTool.Diameter * 0.0028),
+                    TurningDrillingTool.Types.Solid => (TurningDrillingTool.Diameter * 0.01),
+                    TurningDrillingTool.Types.Tip => (TurningDrillingTool.Diameter * 0.01),
+                    TurningDrillingTool.Types.Rapid => (TurningDrillingTool.Diameter * 0.015),
+                    TurningDrillingTool.Types.Center => (TurningDrillingTool.Diameter * 0.02),
                     _ => 0,
                 },
                 _ => 0
@@ -201,9 +203,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// шапка
         /// </summary>
-        public static string Header(Machines machine, string number, string name, string author, double drawVersion) => machine switch
+        public static string Header(Machine machine, string number, string name, string author, double drawVersion) => machine switch
         {
-            Machines.GS1500 =>
+            Machine.GS1500 =>
             "%\n" +
             $"<{number}>({name})\n" +
             $"({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
@@ -212,14 +214,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
             $"({author})({DateTime.Now:dd.MM.yy})\n" +
             "(0M0S)\n",
 
-            Machines.L230A =>
+            Machine.L230A =>
             "%\n" +
             $"O0001({number})\n" +
             $"({name})({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
             $"({author})({DateTime.Now:dd.MM.yy})\n" +
             "(0M0S)\n",
 
-            Machines.A110 =>
+            Machine.A110 =>
             "%\n" +
             $"O0001({number})\n" +
             $"({name})({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
@@ -232,22 +234,22 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Строка безопасности
         /// </summary>
-        public static string SafetyString(Machines machine, int? speedLimit) => machine switch
+        public static string SafetyString(Machine machine, int? speedLimit) => machine switch
         {
-            Machines.GS1500 =>
+            Machine.GS1500 =>
             TURNING_REFERENT_POINT_CONSISTENTLY +
             GOODWAY_RETURN_B +
             "G40G80\n" +
             $"G50S{((speedLimit ?? 0) > 4000 ? 4000 : speedLimit ?? 0)}\n" +
             "G96\n",
 
-            Machines.L230A =>
+            Machine.L230A =>
             TURNING_REFERENT_POINT_CONSISTENTLY +
             "G40G80G55\n" +
             $"G50S{((speedLimit ?? 0) > 5000 ? 5000 : speedLimit ?? 0)}\n" +
             "G96G23\n",
 
-            Machines.A110 => "\n",
+            Machine.A110 => "\n",
 
             _ => string.Empty,
         };
@@ -255,12 +257,12 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Упор
         /// </summary>
-        public static string Limiter(Machines machine, Tool tool, double externalDiameter)
+        public static string Limiter(Machine machine, Tool tool, double externalDiameter)
         {
             if (tool is null || externalDiameter == 0) return string.Empty;
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 $"T{tool.Position.ToolNumber()}G54({tool.Name})\n" +
                 $"G0X{externalDiameter.NC(0)}.Z0.5\n" +
                 SpindleUnclamp(machine) + "\n" +
@@ -268,7 +270,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 "W1.\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 $"T{tool.Position.ToolNumber()}({tool.Name})\n" +
                 $"G0X{externalDiameter.NC(0)}.Z0.5\n" +
                 SpindleUnclamp(machine) + "\n" +
@@ -293,7 +295,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <param name="stepOver">Съем за проход</param>
         /// <param name="seqNo">Номер перехода с циклом</param>
         /// <returns></returns>
-        public static string RoughFacingCycle(Machines machine, Materials material, TurningExternalTool tool,
+        public static string RoughFacingCycle(Machine machine, Material material, TurningExternalTool tool,
             double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow,
             double stepOver, (int, int) seqNo)
         {
@@ -304,7 +306,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 stepOver == 0) return string.Empty;
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M{Direction(tool)}\n" +
                 $"G72W{stepOver.NC()}R0.1\n" +
@@ -314,7 +316,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M{Direction(tool)}\n" +
@@ -342,7 +344,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <param name="stepOver">Съем за проход</param>
         /// <param name="seqNo">Номер перехода с циклом</param>
         /// <returns></returns>
-        public static string Facing(Machines machine, Materials material, TurningExternalTool tool, 
+        public static string Facing(Machine machine, Material material, TurningExternalTool tool, 
             double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, 
             double stepOver, (int, int) seqNo)
         {
@@ -353,7 +355,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 stepOver == 0) return string.Empty;
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M{Direction(tool)}\n" +
                 $"G72W{stepOver.NC()}R0.1\n" +
@@ -364,7 +366,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M{Direction(tool)}\n" +
@@ -383,7 +385,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Торцовка черновая
         /// </summary>
-        public static string RoughFacing(Machines machine, Materials material, TurningExternalTool tool, 
+        public static string RoughFacing(Machine machine, Material material, TurningExternalTool tool, 
             double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, 
             double stepOver, (int, int) seqNo)
         {
@@ -394,7 +396,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 stepOver == 0) return string.Empty;
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M{Direction(tool)}\n" +
                 $"G72W{stepOver.NC()}R0.1\n" +
@@ -404,7 +406,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 "M59\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M{Direction(tool)}\n" +
@@ -427,8 +429,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <returns></returns>
         public static string FinishFacingCycleFromFacing(TurningExternalTool tool, FacingSequence roughFacingSequence)
         {
-            Machines machine = roughFacingSequence.Machine;
-            Materials material = roughFacingSequence.Material;
+            Machine machine = roughFacingSequence.Machine;
+            Material material = roughFacingSequence.Material;
             double externalDiameter = roughFacingSequence.ExternalDiameter;
             double internalDiameter = roughFacingSequence.InternalDiameter;
             double profStockAllow = roughFacingSequence.RoughStockAllow;
@@ -439,14 +441,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 externalDiameter < internalDiameter) return string.Empty;
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
                 $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
@@ -466,8 +468,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <returns></returns>
         public static string FinishFacingCycleFromRoughCycleFacing(TurningExternalTool tool, RoughFacingCycleSequence roughFacingSequence)
         {
-            Machines machine = roughFacingSequence.Machine;
-            Materials material = roughFacingSequence.Material;
+            Machine machine = roughFacingSequence.Machine;
+            Material material = roughFacingSequence.Material;
             double externalDiameter = roughFacingSequence.ExternalDiameter;
             double internalDiameter = roughFacingSequence.InternalDiameter;
             double profStockAllow = roughFacingSequence.RoughStockAllow;
@@ -478,14 +480,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 externalDiameter < internalDiameter) return string.Empty;
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
                 $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
@@ -505,8 +507,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <returns></returns>
         public static string FinishFacingCycleFromRoughFacing(TurningExternalTool tool, RoughFacingSequence roughFacingSequence)
         {
-            Machines machine = roughFacingSequence.Machine;
-            Materials material = roughFacingSequence.Material;
+            Machine machine = roughFacingSequence.Machine;
+            Material material = roughFacingSequence.Material;
             double externalDiameter = roughFacingSequence.ExternalDiameter;
             double internalDiameter = roughFacingSequence.InternalDiameter;
             double profStockAllow = roughFacingSequence.RoughStockAllow;
@@ -517,14 +519,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 externalDiameter < internalDiameter) return string.Empty;
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
                 $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
@@ -539,21 +541,21 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Торцовка чистовая
         /// </summary>
-        public static string FinishFacing(Machines machine, Materials material, TurningExternalTool tool, double externalDiameter, double internalDiameter, double profStockAllow)
+        public static string FinishFacing(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter, double profStockAllow)
         {
             if (tool is null ||
                 externalDiameter == 0 ||
                 externalDiameter < internalDiameter) return string.Empty;
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
                 $"G1X{internalDiameter.NC()}F{FeedFinish(tool.Radius).NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
@@ -598,7 +600,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Высокоскоростное сверление
         /// </summary>
-        public static string HighSpeedDrilling(Machines machine, Materials material, DrillingTool tool, double startZ, double endZ)
+        public static string HighSpeedDrilling(Machine machine, Material material, TurningDrillingTool tool, double startZ, double endZ)
         {
             if (tool is null ||
                 startZ <= endZ) return string.Empty;
@@ -610,7 +612,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 : $"G0Z{SAFE_APPROACH_DISTANCE.NC()}\n";
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 approach +
                 $"G1Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()}F{DrillFeed(material, tool).NC(2)}\n" +
@@ -618,7 +620,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 TURNING_REFERENT_POINT +
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
@@ -636,7 +638,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Прерывистое сверление
         /// </summary>
-        public static string PeckDrilling(Machines machine, Materials material, DrillingTool tool, double depth, double startZ, double endZ)
+        public static string PeckDrilling(Machine machine, Material material, TurningDrillingTool tool, double depth, double startZ, double endZ)
         {
             if (tool is null ||
                 startZ <= endZ ||
@@ -649,7 +651,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 : $"G0Z{SAFE_APPROACH_DISTANCE.NC()}\n";
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 TURNING_REFERENT_POINT +
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 approach +
@@ -659,7 +661,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 TURNING_REFERENT_POINT +
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
@@ -677,7 +679,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Глубокое сверление
         /// </summary>
-        public static string PeckDeepDrilling(Machines machine, Materials material, DrillingTool tool, double depth, double startZ, double endZ)
+        public static string PeckDeepDrilling(Machine machine, Material material, TurningDrillingTool tool, double depth, double startZ, double endZ)
         {
             if (tool is null ||
                 startZ <= endZ ||
@@ -690,7 +692,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 : $"G0Z{SAFE_APPROACH_DISTANCE.NC()}\n";
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 TURNING_REFERENT_POINT +
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 approach +
@@ -700,7 +702,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 TURNING_REFERENT_POINT +
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
@@ -717,7 +719,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Нарезание резьбы метчиком
         /// </summary>
-        public static string Tapping(Machines machine, TappingTool tool, double cutSpeed, double startZ, double endZ)
+        public static string Tapping(Machine machine, TurningTappingTool tool, double cutSpeed, double startZ, double endZ)
         {
             if (tool is null ||
                 startZ <= endZ) return string.Empty;
@@ -729,7 +731,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 : $"G0Z{SAFE_APPROACH_DISTANCE.NC()}\n";
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 TURNING_REFERENT_POINT +
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 approach +
@@ -739,7 +741,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 TURNING_REFERENT_POINT +
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
@@ -757,7 +759,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Нарезание резьбы
         /// </summary>
-        public static string ThreadCutting(Machines machine, Tool tool, ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNPTPlane)
+        public static string ThreadCutting(Machine machine, Tool tool, ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNPTPlane)
         {
             if (tool is null ||
                 threadDiameter <= 0 ||
@@ -782,7 +784,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
             return machine switch
             {
-                Machines.GS1500 =>
+                Machine.GS1500 =>
                 TURNING_REFERENT_POINT +
                 tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"G0X{approachDiameter}Z{startZ.NC()}S{(120 * 1000 / (threadDiameter * Math.PI)).Round(100)}G97\n" +
@@ -791,7 +793,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G96{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
-                Machines.L230A =>
+                Machine.L230A =>
                 TURNING_REFERENT_POINT +
                 tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +

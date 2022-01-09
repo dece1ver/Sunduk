@@ -20,14 +20,14 @@
                             <MudIconButton Icon="@Icons.Material.TwoTone.Save" Title="Скачать программу" Variant=Variant.Outlined
                                            OnClick="DownloadProgram" />
                             <MudIconButton Icon="@Icons.Material.TwoTone.TableView" Title="Инструмент" OnClick="OpenToolDialog" Variant=Variant.Outlined
-                                           Color="(Mode == Mode.ToolTable ? Color.Primary : Color.Default)" Class="ml-1"/>
+                                           Color="(Mode == Mode.ToolTable ? Color.Primary : Color.Default)" Class="ml-1" />
                             <MudHidden Breakpoint=Breakpoint.Xs>
                                 <MudButton OnClick="OpenSequencelDialog" EndIcon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)" Variant=Variant.Outlined
-                                       Color="(Mode == Mode.AddSequence ? Color.Primary : Color.Default)" Class="ml-1">Добавить переход</MudButton>
+                                           Color="(Mode == Mode.AddSequence ? Color.Primary : Color.Default)" Class="ml-1">Добавить переход</MudButton>
                             </MudHidden>
                             <MudHidden Breakpoint=Breakpoint.Xs Invert=true>
                                 <MudIconButton OnClick="OpenSequencelDialog" Icon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)" Variant=Variant.Outlined
-                                       Color="(Mode == Mode.AddSequence ? Color.Primary : Color.Default)" Class="ml-1">Добавить переход</MudIconButton>
+                                               Color="(Mode == Mode.AddSequence ? Color.Primary : Color.Default)" Class="ml-1">Добавить переход</MudIconButton>
                             </MudHidden>
                         </MudButtonGroup>
                         <MudIcon Icon="@Icons.Material.TwoTone.Settings" Class="d-flex ml-auto mt-1" />
@@ -36,18 +36,18 @@
                 <ChildContent>
                     <MudGrid Spacing="1">
                         <MudItem xs="12" sm="7" md="8">
-                            <MudSelect @bind-Value="Machine" Label="Станок" T="Machines" Variant="Variant.Filled" Dense="true">
-                                <MudSelectItem Value="@(Machines.L230A)">Hyundai L230A</MudSelectItem>
-                                <MudSelectItem Value="@(Machines.GS1500)">Goodway GS-1500</MudSelectItem>
-                                <MudSelectItem Value="@(Machines.A110)">Victor A110</MudSelectItem>
+                            <MudSelect @bind-Value="Machine" Label="Станок" T="Machine" Variant="Variant.Filled" Dense="true">
+                                <MudSelectItem Value="@(Machine.L230A)">Hyundai L230A</MudSelectItem>
+                                <MudSelectItem Value="@(Machine.GS1500)">Goodway GS-1500</MudSelectItem>
+                                <MudSelectItem Value="@(Machine.A110)">Victor A110</MudSelectItem>
                             </MudSelect>
                         </MudItem>
                         <MudItem xs="12" sm="5" md="4">
                             @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
-                            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал детали" T="Materials" Variant="Variant.Filled" Dense="true">
-                                <MudSelectItem Value="@Materials.Steel">Черная сталь</MudSelectItem>
-                                <MudSelectItem Value="@Materials.Stainless">Нержавеющая сталь</MudSelectItem>
-                                <MudSelectItem Value="@Materials.Brass">Бронза</MudSelectItem>
+                            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал детали" T="Material" Variant="Variant.Filled" Dense="true">
+                                <MudSelectItem Value="@Material.Steel">Черная сталь</MudSelectItem>
+                                <MudSelectItem Value="@Material.Stainless">Нержавеющая сталь</MudSelectItem>
+                                <MudSelectItem Value="@Material.Brass">Бронза</MudSelectItem>
                             </MudSelect>
                         </MudItem>
                         <MudItem xs="12" sm="6" md="6">
@@ -58,15 +58,15 @@
                         </MudItem>
                         @if (MachineType == MachineType.Turning)
                         {
-                        <MudItem xs="12" sm="4">
-                            <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                        </MudItem>
-                        <MudItem xs="12" sm="4">
-                            <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                        </MudItem>
-                        <MudItem xs="12" sm="4">
-                            <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                        </MudItem>
+                            <MudItem xs="12" sm="4">
+                                <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="12" sm="4">
+                                <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="12" sm="4">
+                                <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
                         }
                         <MudItem xs="12" sm="4">
                             <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
@@ -74,7 +74,7 @@
                         <MudItem xs="12" sm="4">
                             <MudTextField @bind-Value="DrawningVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Margin="Margin.Dense" />
                         </MudItem>
-                        <MudItem xs="12" sm="4" >
+                        <MudItem xs="12" sm="4">
                             <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
                     </MudGrid>
@@ -111,17 +111,17 @@
                                                             @if (Program.IndexOf(seq) != Program.Count - 1)
                                                             {
                                                                 <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                   OnClick="(() => MoveDownSequence(seq))" />
+                                                                               OnClick="(() => MoveDownSequence(seq))" />
                                                             }
                                                             @if (Program.IndexOf(seq) != 2)
                                                             {
                                                                 <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                   OnClick="(() => MoveUpSequence(seq))" />
+                                                                               OnClick="(() => MoveUpSequence(seq))" />
                                                             }
                                                             <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                   OnClick="(() => OpenEditSequenceDialog(seq))" />
+                                                                           OnClick="(() => OpenEditSequenceDialog(seq))" />
                                                             <MudIconButton Icon="@Icons.Material.TwoTone.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
-                                                   OnClick="(() => Program.Remove(seq))" />
+                                                                           OnClick="(() => Program.Remove(seq))" />
                                                         </MudButtonGroup>
                                                     }
                                                 </div>
@@ -141,22 +141,23 @@
                 break;
             case Mode.ToolTable:
                 <MudItem xs=12>
-                    <ToolTableComponent Tools="Tools"/>
-        </MudItem>
+                    <ToolTableComponent Tools="Tools" 
+                                        MachineType="MachineType" />
+                </MudItem>
                 break;
             case Mode.AddSequence:
-    <MudItem xs=12>
-        <AddSequenceComponent Tools="Tools"
-                              Machine="Machine"
-                              Program="Program"
-                              @bind-Mode="Mode"
-                              WorkpieceMaterial="WorkpieceMaterial"
-                              WorkpieceExternalDiameter="WorkpieceExternalDiameter"
-                              WorkpieceInternalDiameter="WorkpieceInternalDiameter"
-                              WorkpieceCurrentInternalDiameter="WorkpieceCurrentInternalDiameter"
-                              WorkpieceLength="WorkpieceLength" 
-                              CyclesCount="CyclesCount"/>
-    </MudItem>
+                <MudItem xs=12>
+                    <AddSequenceComponent Tools="Tools"
+                                          Machine="Machine"
+                                          Program="Program"
+                                          @bind-Mode="Mode"
+                                          WorkpieceMaterial="WorkpieceMaterial"
+                                          WorkpieceExternalDiameter="WorkpieceExternalDiameter"
+                                          WorkpieceInternalDiameter="WorkpieceInternalDiameter"
+                                          WorkpieceCurrentInternalDiameter="WorkpieceCurrentInternalDiameter"
+                                          WorkpieceLength="WorkpieceLength"
+                                          CyclesCount="CyclesCount" />
+                </MudItem>
                 break;
         }
     </MudGrid>
@@ -191,26 +192,35 @@
 
     public List<Tool> Tools { get; set; } = new();
 
+    #region Токарныый инструмент
     public List<TurningExternalTool> TurningExternalTools { get; set; }
     public List<TurningInternalTool> TurningInternalTools { get; set; }
     public List<GroovingExternalTool> GroovingExternalTools { get; set; }
     public List<GroovingInternalTool> GroovingInternalTools { get; set; }
     public List<ThreadingExternalTool> ThreadingExternalTools { get; set; }
     public List<ThreadingInternalTool> ThreadingInternalTools { get; set; }
-    public List<DrillingTool> DrillingTools { get; set; }
-    public List<TappingTool> TappingTools { get; set; }
+    public List<TurningDrillingTool> TurningDrillingTools { get; set; }
+    public List<TurningTappingTool> TurningTappingTools { get; set; }
     public List<SpecialTurningTool> SpecialTurningTools { get; set; }
+    #endregion
+
+    #region Фрезерный инструмент
+    public List<MillingTool> MillingTools { get; set; }
+    public List<MillingDrillingTool> MillingDrillingTools { get; set; }
+    #endregion
 
 
-    public Materials WorkpieceMaterial { get; set; }
-    public Machines Machine { get; set; }
-    public MachineType MachineType { get
+    public Material WorkpieceMaterial { get; set; }
+    public Machine Machine { get; set; }
+    public MachineType MachineType
+    {
+        get
         {
             return Machine switch
             {
-                Machines.L230A => MachineType.Turning,
-                Machines.GS1500 => MachineType.Turning,
-                Machines.A110 => MachineType.Milling,
+                Machine.L230A => MachineType.Turning,
+                Machine.GS1500 => MachineType.Turning,
+                Machine.A110 => MachineType.Milling,
                 _ => MachineType.Turning
             };
         }
@@ -297,6 +307,8 @@
             Tools.Add(new SpecialTurningTool(0101, "UPOR"));
             await localStorage.SetItemAsync(nameof(SpecialTurningTools), SpecialTurningTools);
         }
+        Tools.AddRange(SpecialTurningTools);
+
         #endregion
 
         #region Инициализация токарного инструмента
@@ -308,6 +320,7 @@
             Tools.Add(new TurningExternalTool(0303, TurningExternalTool.Types.Bar, 35, 0.4));
             await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
         }
+        Tools.AddRange(TurningExternalTools);
 
         TurningInternalTools = await localStorage.GetItemAsync<List<TurningInternalTool>>(nameof(TurningInternalTools)) ?? new();
         if (TurningInternalTools is null || TurningInternalTools.Count == 0)
@@ -329,6 +342,7 @@
             Tools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Cutting, 3, GroovingExternalTool.Point.Right));
             await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
         }
+        Tools.AddRange(GroovingExternalTools);
 
         GroovingInternalTools = await localStorage.GetItemAsync<List<GroovingInternalTool>>(nameof(GroovingInternalTools)) ?? new();
         if (GroovingInternalTools is null || GroovingInternalTools.Count == 0)
@@ -337,6 +351,7 @@
             Tools.Add(new GroovingInternalTool(1212, 40, 4, GroovingInternalTool.Point.Right));
             await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
         }
+        Tools.AddRange(GroovingInternalTools);
         #endregion
 
         #region Инициализация резьбового инструмента
@@ -346,6 +361,7 @@
             Tools.Add(new ThreadingExternalTool(1111, 1.5, 1));
             await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
         }
+        Tools.AddRange(ThreadingExternalTools);
 
         ThreadingInternalTools = await localStorage.GetItemAsync<List<ThreadingInternalTool>>(nameof(ThreadingInternalTools)) ?? new();
         if (ThreadingInternalTools is null || ThreadingInternalTools.Count == 0)
@@ -353,27 +369,50 @@
             Tools.Add(new ThreadingInternalTool(1111, 16, 1.5, 1));
             await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
         }
+        Tools.AddRange(ThreadingInternalTools);
         #endregion
 
         #region Инициализация сверел
-        DrillingTools = await localStorage.GetItemAsync<List<DrillingTool>>(nameof(DrillingTools)) ?? new();
-        if (DrillingTools is null || DrillingTools.Count == 0)
+        TurningDrillingTools = await localStorage.GetItemAsync<List<TurningDrillingTool>>(nameof(TurningDrillingTools)) ?? new();
+        if (TurningDrillingTools is null || TurningDrillingTools.Count == 0)
         {
-            Tools.Add(new DrillingTool(0505, DrillingTool.Types.HSS, 5, 120));
-            Tools.Add(new DrillingTool(0707, DrillingTool.Types.Solid, 10, 140));
-            Tools.Add(new DrillingTool(0606, DrillingTool.Types.Insert, 25, 180));
-            await localStorage.SetItemAsync(nameof(DrillingTools), DrillingTools);
+            Tools.Add(new TurningDrillingTool(0505, TurningDrillingTool.Types.Rapid, 5, 120));
+            Tools.Add(new TurningDrillingTool(0707, TurningDrillingTool.Types.Solid, 10, 140));
+            Tools.Add(new TurningDrillingTool(0606, TurningDrillingTool.Types.Insert, 25, 180));
+            await localStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);
         }
+        Tools.AddRange(TurningDrillingTools);
+
+        MillingDrillingTools = await localStorage.GetItemAsync<List<MillingDrillingTool>>(nameof(MillingDrillingTools)) ?? new();
+        if (MillingDrillingTools is null || MillingDrillingTools.Count == 0)
+        {
+            Tools.Add(new MillingDrillingTool(1, MillingDrillingTool.Types.Solid, 6, 140));
+            Tools.Add(new MillingDrillingTool(2, MillingDrillingTool.Types.Insert, 25, 180));
+            await localStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+        }
+        Tools.AddRange(MillingDrillingTools);
         #endregion
 
         #region Инициализация метчиков
-        TappingTools = await localStorage.GetItemAsync<List<TappingTool>>(nameof(TappingTools)) ?? new();
-        if (TappingTools is null || TappingTools.Count == 0)
+        TurningTappingTools = await localStorage.GetItemAsync<List<TurningTappingTool>>(nameof(TurningTappingTools)) ?? new();
+        if (TurningTappingTools is null || TurningTappingTools.Count == 0)
         {
-            Tools.Add(new TappingTool(0909, TappingTool.Types.Cutting, 12, 1.75));
-            Tools.Add(new TappingTool(0808, TappingTool.Types.Forming, 10, 1.5));
-            await localStorage.SetItemAsync(nameof(TappingTools), TappingTools);
+            Tools.Add(new TurningTappingTool(0909, TurningTappingTool.Types.Cutting, 12, 1.75));
+            Tools.Add(new TurningTappingTool(0808, TurningTappingTool.Types.Forming, 10, 1.5));
+            await localStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
         }
+        Tools.AddRange(TurningTappingTools);
+        #endregion
+
+        #region Инициализация фрез
+        MillingTools = await localStorage.GetItemAsync<List<MillingTool>>(nameof(MillingTools)) ?? new();
+        if (MillingTools is null || MillingTools.Count == 0)
+        {
+            Tools.Add(new MillingTool(3, MillingTool.Types.Solid, 12));
+            Tools.Add(new MillingTool(4, MillingTool.Types.Insert, 32));
+            await localStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+        }
+        Tools.AddRange(MillingDrillingTools);
         #endregion
 
         Program = new();
@@ -384,10 +423,6 @@
 
     private void OpenToolDialog()
     {
-        //var parameters = new DialogParameters();
-        //parameters.Add(nameof(Tools), Tools);
-        //var options = new DialogOptions() { FullScreen = true, CloseButton = true };
-        //DialogService.Show<ToolDialog>("Инструмент", parameters, options);
         if (Mode != Mode.ToolTable)
         {
             Mode = Mode.ToolTable;
@@ -548,9 +583,9 @@
                         newPeckDeepDrillingSequence.Machine = Machine;
                         newPeckDeepDrillingSequence.Material = WorkpieceMaterial;
                         break;
-                    case TappingSequence tappingSequence:
-                        TappingSequence newTappingSequence = Program[i] as TappingSequence;
-                        newTappingSequence.Machine = Machine;
+                    case TurningTappingSequence TurningTappingSequence:
+                        TurningTappingSequence newTurningTappingSequence = Program[i] as TurningTappingSequence;
+                        newTurningTappingSequence.Machine = Machine;
                         break;
                     case ThreadCuttingSequence threadCuttingSequence:
                         ThreadCuttingSequence newThreadCuttingSequence = Program[i] as ThreadCuttingSequence;

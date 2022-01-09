@@ -1,6 +1,9 @@
 ﻿using MudBlazor;
 using Sunduk.PWA.Infrastructure.Sequences;
 using Sunduk.PWA.Infrastructure.Tools;
+using Sunduk.PWA.Infrastructure.Tools.Base;
+using Sunduk.PWA.Infrastructure.Tools.Milling;
+using Sunduk.PWA.Infrastructure.Tools.Turning;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -265,20 +268,20 @@ namespace Sunduk.PWA.Util
                     ToolDescriptionOption.GoodwayRight => $"T{turningInternalTool.Position.ToolNumber()}G55M58({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
                     _ => string.Empty,
                 },
-                DrillingTool drillingTool => option switch
+                TurningDrillingTool TurningDrillingTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{drillingTool.Position.ToolNumber()} ({drillingTool.Name} D{drillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{drillingTool.Position.ToolNumber()}({drillingTool.Name} D{drillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{drillingTool.Position.ToolNumber()}G54M58({drillingTool.Name} D{drillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{drillingTool.Position.ToolNumber()}G55M58({drillingTool.Name} D{drillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.General => $"T{TurningDrillingTool.Position.ToolNumber()} ({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{TurningDrillingTool.Position.ToolNumber()}({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{TurningDrillingTool.Position.ToolNumber()}G54M58({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{TurningDrillingTool.Position.ToolNumber()}G55M58({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
                     _ => string.Empty,
                 },
-                TappingTool tappingTool => option switch
+                TurningTappingTool TurningTappingTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{tappingTool.Position.ToolNumber()} ({tappingTool.Name} M{tappingTool.Diameter}x{tappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{tappingTool.Position.ToolNumber()}({tappingTool.Name} M{tappingTool.Diameter}x{tappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{tappingTool.Position.ToolNumber()}G54M58({tappingTool.Name} M{tappingTool.Diameter}x{tappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{tappingTool.Position.ToolNumber()}G55M58({tappingTool.Name} M{tappingTool.Diameter}x{tappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.General => $"T{TurningTappingTool.Position.ToolNumber()} ({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{TurningTappingTool.Position.ToolNumber()}({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{TurningTappingTool.Position.ToolNumber()}G54M58({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{TurningTappingTool.Position.ToolNumber()}G55M58({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
                     _ => string.Empty,
                 },
                 ThreadingExternalTool threadingExternalTool => option switch
@@ -321,9 +324,10 @@ namespace Sunduk.PWA.Util
                     .Replace(',', '.'),
                     _ => string.Empty,
                 },
+                MillingTool millingTool => $"T{millingTool.Position} ({millingTool.Name} D{millingTool.Diameter.NC()})",
+                MillingDrillingTool millingDrillingTool => $"T{millingDrillingTool.Position} ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC()})",
                 _ => string.Empty,
             };
-            ;
         }
 
         public static string Description(this Sequence sequence)

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Sunduk.PWA.Infrastructure.Tools.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Sunduk.PWA.Infrastructure.Tools
+namespace Sunduk.PWA.Infrastructure.Tools.Turning
 {
     public class ThreadingInternalTool : Tool
     {
