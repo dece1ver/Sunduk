@@ -21,15 +21,15 @@ jobs:
       - uses: actions/checkout@v2
 
       # Ставим .NET
-      - name: Setup .NET 6
+      - name: Setup .NET 5
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.x.x'
-          include-prerelease: true
+          dotnet-version: '5.x.x'
+          include-prerelease: false
 
       # Публикуем
-      - name: aot
-        run: dotnet workload install wasm-tools
+      #- name: aot
+      #  run: dotnet workload install wasm-tools
         
       - name: Publish .NET Core Project
         run: dotnet publish Sunduk.PWA/Sunduk.PWA.csproj -c Release --output release --nologo
