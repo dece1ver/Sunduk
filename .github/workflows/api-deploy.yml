@@ -31,7 +31,7 @@ jobs:
         run: dotnet publish Sunduk.WebApi/Sunduk.WebApi.csproj -c Release --output release --nologo
           
       - name: Add .nojekyll file
-        run: touch release/wwwroot/.nojekyll
+        run: touch release/.nojekyll
       
       - name: Uploading files to gh-api-pages branch
         uses: JamesIves/github-pages-deploy-action@4.1.7
