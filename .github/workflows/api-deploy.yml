@@ -28,7 +28,7 @@ jobs:
           include-prerelease: false
 
       - name: Publish .NET Core Project
-        run: dotnet publish Sunduk.PWA/Sunduk.WebApi.csproj -c Release --output release --nologo
+        run: dotnet publish Sunduk.WebApi/Sunduk.WebApi.csproj -c Release --output release --nologo
           
       - name: Add .nojekyll file
         run: touch release/wwwroot/.nojekyll
