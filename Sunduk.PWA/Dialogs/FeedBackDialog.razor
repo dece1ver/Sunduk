@@ -1,0 +1,62 @@
+﻿@using System.Net.Mail
+@inject ISnackbar Snackbar
+@inject HttpClient http
+
+<style>
+    .feedback-form{
+        width: 300px
+    }
+</style>
+
+<MudDialog>
+
+
+    <DialogContent>
+        <MudTextField Class="feedback-form" T="string" Label="Имя" Variant="Variant.Filled" @bind-Value="Name" Immediate="true"/>
+        <MudTextField Class="feedback-form" T="string" Label="Сообщение" Variant="Variant.Filled" @bind-Value="Message" Lines="5" Immediate="true"/>
+    </DialogContent>
+    <DialogActions>
+        <MudIconButton Icon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="Submit"/>
+    </DialogActions>
+</MudDialog>
+@code 
+{
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    public string Name { get; set; }
+    public string Message { get; set; }
+
+    async void Submit()
+    {
+        string status = "false";
+        if (string.IsNullOrWhiteSpace(Name))
+        {
+            Snackbar.Add("Имя не должно быть пустым!", Severity.Error);
+        }
+        else if (string.IsNullOrWhiteSpace(Message))
+        {
+            Snackbar.Add("Сообщение не должно быть пустым!", Severity.Error);
+        }
+        else
+        {
+            Snackbar.Add($"Начата отправка!", Severity.Info);
+            try
+            {
+                status = await http.GetStringAsync($"api.sunduk.one/sendmessage|{Name}|{Message}");
+                if (status == "true")
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    Snackbar.Add($"Сообщение отправлено!", Severity.Success);
+                }
+                else
+                {
+                    Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
+                }
+            }
+            catch (Exception e)
+            {
+                Snackbar.Add($"Ошибка:\n{e}", Severity.Error);
+            }
+        }
+    }
+}

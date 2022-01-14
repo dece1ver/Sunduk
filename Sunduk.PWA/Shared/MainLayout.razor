@@ -15,10 +15,14 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudLink Typo="Typo.h5" Href="" Underline="Underline.None" Style="font-family: 'Saira Stencil One';">SUNDUK</MudLink>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.SendToMobile" OnClick="OpenDialog" Color="Color.Inherit" Edge="Edge.End" />
+        <MudTooltip Text="Обратная связь" Placement="Placement.Start">
+            <MudIconButton Icon="@Icons.Material.Filled.Feedback" OnClick="OpenFeedBackDialog" Color="Color.Inherit" Edge="Edge.End" />
+        </MudTooltip>
+        <MudIconButton Icon="@Icons.Material.Filled.SendToMobile" OnClick="OpenQrDialog" Color="Color.Inherit" Edge="Edge.End" />
         <MudTooltip Text="@version" Placement="Placement.Start">
             <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" OnClick="OpenChangelogDialog" Color="Color.Inherit" Edge="Edge.End" />
         </MudTooltip>
+        
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
@@ -28,45 +32,7 @@
     </MudMainContent>
 </MudLayout>
 
-<MudDialog @bind-IsVisible="visible">
-    <TitleContent>
-        <MudText Typo="Typo.h5"></MudText>
-    </TitleContent>
-    <DialogContent>
-        @if (!androidhelp && !applehelp)
-        {
-            <img src="/qr.svg" asp-append-version="true" width="300" height="325" />
-        }
-        @if (androidhelp)
-        {
-            <div id="android" class="ma-0" style="height:330px;width:300px;overflow: auto;">
-                <MudPaper Elevation="0">
-                    <MudText Typo="Typo.body2" Align="Align.Center">После сканирования QR-кода и открытия сундука в браузере телефона появится предложение установить.</MudText>
-                    <img src="/img/android_setup_1.png" asp-append-version="true" width="290" />
-                    <MudText Typo="Typo.body2" Align="Align.Center">Если предложения установить нет, то в выпадающем меню также есть пункт "Установить приложение"</MudText>
-                    <img src="/img/android_setup_2.png" asp-append-version="true" width="290" />
-                </MudPaper>
-            </div>
-        }
-        @if (applehelp)
-        {
-            <div id="apple" class="ma-0" style="height:330px;width:300px;overflow: auto;">
-                <MudPaper Elevation="0">
-                    <MudText Typo="Typo.body2" Align="Align.Center">После сканирования QR-кода и открытия сундука в браузере телефона нажимаем "поделиться".</MudText>
-                    <img src="/img/apple_setup_1.png" asp-append-version="true" width="290" />
-                    <MudText Typo="Typo.body2" Align="Align.Center">Листаем и нажимаем "На экран «Домой»"</MudText>
-                    <img src="/img/apple_setup_2.png" asp-append-version="true" width="290" />
-                </MudPaper>
-            </div>
-        }
-    </DialogContent>
-    <DialogActions>
-        <MudText Typo="Typo.body2">Установка:</MudText>
-        <MudIconButton Icon="@Icons.Material.Filled.Android" Color="Color.Primary" OnClick="Android"></MudIconButton>
-        <MudIconButton Icon="@Icons.Custom.Brands.Apple" Color="Color.Primary" OnClick="Apple" Class="mr-1"></MudIconButton>
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="Submit" Class="px-10 mr-4">OK</MudButton>
-    </DialogActions>
-</MudDialog>
+
 
 
 @code
@@ -75,11 +41,19 @@
 
     bool _drawerOpen = true;
 
-    private bool visible;
-    private bool androidhelp = false;
-    private bool applehelp = false;
+    private void OpenQrDialog()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions() { FullScreen = false, CloseButton = true };
+        DialogService.Show<QrDialog>(string.Empty, parameters, options);
+    }
 
-    private void OpenDialog() => visible = true;
+    private void OpenFeedBackDialog()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions() { FullScreen = false, CloseButton = true };
+        DialogService.Show<FeedBackDialog>("Обратная связь", parameters, options);
+    }
 
     private void OpenChangelogDialog()
     {
@@ -87,29 +61,6 @@
         var options = new DialogOptions() { FullScreen = false, CloseButton = true };
         DialogService.Show<ChangelogDialog>("Описание", parameters, options);
     }
-
-    void Submit() => visible = false;
-    void Android()
-    {
-        androidhelp = !androidhelp;
-        if (applehelp)
-        {
-            applehelp = false;
-        }
-    }
-    void Apple()
-    {
-        applehelp = !applehelp;
-        if (androidhelp)
-        {
-            androidhelp = false;
-        }
-    }
-
-
-
-
-
 
     MudTheme testTheme = new MudTheme()
     {
