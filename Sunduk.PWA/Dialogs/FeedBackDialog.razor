@@ -42,7 +42,7 @@
             Snackbar.Add($"Начата отправка!", Severity.Info);
             try
             {
-                status = await http.GetStringAsync($"api.sunduk.one/sendmessage|{Name}|{Message}");
+                status = await http.GetStringAsync($"sundukwebapi20220114222812.azurewebsites.net/sendmessage|{Name}|{Message}");
                 if (status == "true")
                 {
                     MudDialog.Close(DialogResult.Ok(true));
@@ -50,7 +50,7 @@
                 }
                 else
                 {
-                    Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
+                    Snackbar.Add($"Не удалось отправить сообщение.\n{status}", Severity.Error);
                 }
             }
             catch (Exception e)

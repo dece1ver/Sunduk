@@ -22,4 +22,9 @@ app.MapGet("/sendmessage|{Name}|{Message}", (string Name, string Message) =>
     SendMessageService.Send(Name, Message, feedbackFrom, feedbackTo, feedbackPass);
 });
 
+app.MapGet("/", () =>
+{
+    return "Ok";
+});
+
 app.Run();
