@@ -37,6 +37,6 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.7
         with:
           branch: gh-api-pages
-          folder: release/wwwroot
+          folder: release
           repository-name: dece1ver/sunduk-api
           token: ${{ secrets.ACCESS_TOKEN }}
