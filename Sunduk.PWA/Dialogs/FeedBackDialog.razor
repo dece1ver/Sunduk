@@ -16,6 +16,10 @@
         <MudTextField Class="feedback-form" T="string" Label="Сообщение" Variant="Variant.Filled" @bind-Value="Message" Lines="5" Immediate="true"/>
     </DialogContent>
     <DialogActions>
+        @if (InProgress)
+        {
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mx-4" />
+        }
         <MudIconButton Icon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="Submit"/>
     </DialogActions>
 </MudDialog>
@@ -25,6 +29,7 @@
 
     public string Name { get; set; }
     public string Message { get; set; }
+    public bool InProgress { get; set; } = false;
 
     async void Submit()
     {
@@ -39,10 +44,11 @@
         }
         else
         {
-            Snackbar.Add($"Начата отправка!", Severity.Info);
+            
             try
             {
-                status = await http.GetStringAsync($"https://sundukwebapi20220114222812.azurewebsites.net/sendmessage|{Name}|{Message}");
+                InProgress = true;
+                status = await http.GetStringAsync($"https://sundukwebapi20220114222812.azurewebsites.net//sendmessage|{Name}|{Message}");
                 if (status == "Ok")
                 {
                     MudDialog.Close(DialogResult.Ok(true));
@@ -50,12 +56,12 @@
                 }
                 else
                 {
-                    Snackbar.Add($"Не удалось отправить сообщение.\n{status}", Severity.Error);
+                    Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
                 }
             }
             catch (Exception e)
             {
-                Snackbar.Add($"Ошибка:\n{e}", Severity.Error);
+                Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
             }
         }
     }

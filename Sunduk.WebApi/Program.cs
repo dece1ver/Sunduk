@@ -10,9 +10,9 @@ builder.Services.AddCors(options =>
                       builder =>
                       {
                           builder.WithOrigins("https://sunduk.one",
-                                              "http://www.sunduk.one",
-                                              "http://test.sunduk.one",
-                                              "http://www.test.sunduk.one",
+                                              "https://www.sunduk.one",
+                                              "https://test.sunduk.one",
+                                              "https://www.test.sunduk.one",
                                               "https://localhost:5001"
                                               );
                       });
