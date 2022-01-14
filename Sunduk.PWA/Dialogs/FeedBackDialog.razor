@@ -42,8 +42,8 @@
             Snackbar.Add($"Начата отправка!", Severity.Info);
             try
             {
-                status = await http.GetStringAsync($"sundukwebapi20220114222812.azurewebsites.net/sendmessage|{Name}|{Message}");
-                if (status == "true")
+                status = await http.GetStringAsync($"https://sundukwebapi20220114222812.azurewebsites.net/sendmessage|{Name}|{Message}");
+                if (status == "Ok")
                 {
                     MudDialog.Close(DialogResult.Ok(true));
                     Snackbar.Add($"Сообщение отправлено!", Severity.Success);

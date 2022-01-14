@@ -1,7 +1,22 @@
 using Sunduk.WebApi;
 using System.Net.Mail;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      builder =>
+                      {
+                          builder.WithOrigins("https://sunduk.one",
+                                              "http://www.sunduk.one",
+                                              "http://test.sunduk.one",
+                                              "http://www.test.sunduk.one",
+                                              "https://localhost:5001"
+                                              );
+                      });
+});
 
 // Add services to the container.
 
@@ -15,11 +30,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
-
+app.UseCors(MyAllowSpecificOrigins);
 
 app.MapGet("/sendmessage|{Name}|{Message}", (string Name, string Message) =>
 {
-    SendMessageService.Send(Name, Message, feedbackFrom, feedbackTo, feedbackPass);
+    return SendMessageService.Send(Name, Message, feedbackFrom, feedbackTo, feedbackPass);
 });
 
 app.MapGet("/", () =>
