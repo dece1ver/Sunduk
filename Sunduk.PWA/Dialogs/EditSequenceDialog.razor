@@ -120,7 +120,7 @@
                 case HighSpeedDrillingSequence highSpeedDrillingSequence:
                     <MudItem xs="12">
                         <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
-                            @foreach (var tool in Tools.Where(x => x is DrillingTool))
+                            @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
                             {
                                 <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                             }
@@ -136,7 +136,7 @@
                 case PeckDrillingSequence peckDrillingSequence:
                     <MudItem xs="12" sm="6">
                         <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
-                            @foreach (var tool in Tools.Where(x => x is DrillingTool))
+                            @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
                             {
                                 <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                             }
@@ -155,7 +155,7 @@
                 case PeckDeepDrillingSequence peckDeepDrillingSequence:
                     <MudItem xs="12" sm="6">
                         <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
-                            @foreach (var tool in Tools.Where(x => x is DrillingTool))
+                            @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
                             {
                                 <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                             }
@@ -299,11 +299,11 @@
                 ThreadEnd = threadCuttingSequence.EndZ;
                 break;
             // нарезание метчиком
-            case TappingSequence tappingSequence:
-                Tool = tappingSequence.Tool;
-                TappingCutSpeed = tappingSequence.CutSpeed;
-                ThreadStart = tappingSequence.StartZ;
-                ThreadEnd = tappingSequence.EndZ;
+            case TurningTappingSequence TurningTappingSequence:
+                Tool = TurningTappingSequence.Tool;
+                TappingCutSpeed = TurningTappingSequence.CutSpeed;
+                ThreadStart = TurningTappingSequence.StartZ;
+                ThreadEnd = TurningTappingSequence.EndZ;
                 break;
             default:
                 break;
@@ -380,20 +380,20 @@
                 break;
             // высокоскоростное сверление
             case HighSpeedDrillingSequence highSpeedDrillingSequence:
-                highSpeedDrillingSequence.Tool = Tool as DrillingTool;
+                highSpeedDrillingSequence.Tool = Tool as TurningDrillingTool;
                 highSpeedDrillingSequence.StartZ = DrillStart;
                 highSpeedDrillingSequence.EndZ = DrillEnd;
                 break;
             // прерывистое сверление
             case PeckDrillingSequence peckDrillingSequence:
-                peckDrillingSequence.Tool = Tool as DrillingTool;
+                peckDrillingSequence.Tool = Tool as TurningDrillingTool;
                 peckDrillingSequence.StartZ = DrillStart;
                 peckDrillingSequence.EndZ = DrillEnd;
                 peckDrillingSequence.Depth = DrillDepth;
                 break;
             // сверление в полным выходом
             case PeckDeepDrillingSequence peckDeepDrillingSequence:
-                peckDeepDrillingSequence.Tool = Tool as DrillingTool;
+                peckDeepDrillingSequence.Tool = Tool as TurningDrillingTool;
                 peckDeepDrillingSequence.StartZ = DrillStart;
                 peckDeepDrillingSequence.EndZ = DrillEnd;
                 peckDeepDrillingSequence.Depth = DrillDepth;
@@ -407,11 +407,11 @@
                 threadCuttingSequence.EndZ = ThreadEnd;
                 break;
             // нарезание метчиком
-            case TappingSequence tappingSequence:
-                tappingSequence.Tool = Tool as TappingTool;
-                tappingSequence.CutSpeed = TappingCutSpeed;
-                tappingSequence.StartZ = ThreadStart;
-                tappingSequence.EndZ = ThreadEnd;
+            case TurningTappingSequence TurningTappingSequence:
+                TurningTappingSequence.Tool = Tool as TurningTappingTool;
+                TurningTappingSequence.CutSpeed = TappingCutSpeed;
+                TurningTappingSequence.StartZ = ThreadStart;
+                TurningTappingSequence.EndZ = ThreadEnd;
                 break;
             default:
                 break;

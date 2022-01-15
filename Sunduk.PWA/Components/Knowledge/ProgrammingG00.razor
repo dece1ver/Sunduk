@@ -1,9 +1,13 @@
-﻿<style>
-    .ex{padding-right: 20px; font-family: 'Roboto Mono', monospace; font-size: x-small;}
+﻿@using MudBlazor.Services
+@implements IAsyncDisposable
+
+<style>
+    .ex{padding-right: @Design.GetPaddingRight(breakpoint); font-family: 'Roboto Mono', monospace; font-size: @Design.GetFontSize(breakpoint);}
 </style>
 <style>
-    .desc{font-style: italic; font-size: x-small;}
+    .desc{font-size: @Design.GetFontSize(breakpoint); font-style: italic; font-weight: lighter}
 </style>
+
 
 <MudText Typo=Typo.body2>
     Команда G00 перемещает инструмент на позицию, указанную относительно системы координат заготовки на скорости ускоренного подвода. 
@@ -23,18 +27,45 @@
 
 <MudMessageBox @ref="absMbox" Title="Абсолютное перемещение">
     <MessageContent>
-        При программировании в абсолютных значениях указываются координаты относительно центра системы координат заготовки.
+        @KnowlegdeInfo.ABOLUTE_PROGRAMMING
     </MessageContent>
 </MudMessageBox>
 <MudMessageBox @ref="incMbox" Title="Относительное перемещение">
     <MessageContent>
-        При программировании в относительных/инкрементных значениях указываются координаты относительно текущего положения инструмента.
+        @KnowlegdeInfo.INCREMENT_PROGRAMMING
     </MessageContent>
 </MudMessageBox>
 
 @code 
 {
+    [Inject] IBreakpointService BreakpointListener { get; set; }
+
+    private Guid _subscriptionId;
+    private Breakpoint breakpoint;
+
     MudMessageBox absMbox { get; set; }
     MudMessageBox incMbox { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			var subscriptionResult = await BreakpointListener.Subscribe((breakpoint) =>
+			{
+				InvokeAsync(StateHasChanged);
+			}, new ResizeOptions
+			{
+				ReportRate = 250,
+				NotifyOnBreakpointOnly = true,
+			});
+
+			breakpoint = subscriptionResult.Breakpoint;
+			_subscriptionId = subscriptionResult.SubscriptionId;
+			StateHasChanged();
+		}
+
+		await base.OnAfterRenderAsync(firstRender);
+	}
+	public async ValueTask DisposeAsync() => await BreakpointListener.Unsubscribe(_subscriptionId);
 
 }

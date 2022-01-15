@@ -1,4 +1,5 @@
 ﻿using Sunduk.PWA.Infrastructure.Tools;
+using Sunduk.PWA.Infrastructure.Tools.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +9,12 @@ namespace Sunduk.PWA.Infrastructure.Sequences
 {
     public class LimiterSequence : Sequence
     {
-        public Machines Machine { get; set; }
+        public Machine Machine { get; set; }
         public Tool Tool { get; set; }
         public double ExternalDiameter { get; set; }
         public override string Operation => Templates.Operation.Limiter(Machine, Tool, ExternalDiameter);
 
-        public LimiterSequence(Machines machine, Tool tool, double externalDiameter)
+        public LimiterSequence(Machine machine, Tool tool, double externalDiameter)
         {
             Machine = machine;
             Tool = tool;

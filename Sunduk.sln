@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.0.31919.166
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sunduk.PWA", "Sunduk.PWA\Sunduk.PWA.csproj", "{040A231C-A5E2-4062-B887-7F27201FFCF0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0DBFBD69-D638-4737-8C54-42C5A88DBB54} = {0DBFBD69-D638-4737-8C54-42C5A88DBB54}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sunduk.WebApi", "Sunduk.WebApi\Sunduk.WebApi.csproj", "{0DBFBD69-D638-4737-8C54-42C5A88DBB54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +20,10 @@ Global
 		{040A231C-A5E2-4062-B887-7F27201FFCF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{040A231C-A5E2-4062-B887-7F27201FFCF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{040A231C-A5E2-4062-B887-7F27201FFCF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DBFBD69-D638-4737-8C54-42C5A88DBB54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DBFBD69-D638-4737-8C54-42C5A88DBB54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DBFBD69-D638-4737-8C54-42C5A88DBB54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DBFBD69-D638-4737-8C54-42C5A88DBB54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

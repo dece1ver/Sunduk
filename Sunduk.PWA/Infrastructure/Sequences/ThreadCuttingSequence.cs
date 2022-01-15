@@ -1,4 +1,5 @@
 ﻿using Sunduk.PWA.Infrastructure.Tools;
+using Sunduk.PWA.Infrastructure.Tools.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
 {
     public class ThreadCuttingSequence : Sequence
     {
-        public Machines Machine { get; set; }
+        public Machine Machine { get; set; }
         public Tool Tool { get; set; }
         public ThreadStandart ThreadStandart { get; set; }
         public CuttingType Type { get; set; }
@@ -19,7 +20,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public double ThreadNPTPlane { get; set; }
         public override string Operation => Templates.Operation.ThreadCutting(Machine, Tool, ThreadStandart, Type, ThreadDiameter, ThreadPitch, StartZ, EndZ, ThreadNPTPlane);
 
-        public ThreadCuttingSequence(Machines machine, Tool tool, ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNPTPlane)
+        public ThreadCuttingSequence(Machine machine, Tool tool, ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNPTPlane)
         {
             Machine = machine;
             Tool = tool;

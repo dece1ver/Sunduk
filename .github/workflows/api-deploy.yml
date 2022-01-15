@@ -1,0 +1,51 @@
+# This is a basic workflow to help you get started with Actions
+
+name: DeployApi
+
+# Controls when the workflow will run
+on:
+  push:
+    branches: [ test ]
+    
+    # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Ставим .NET
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.x.x'
+          include-prerelease: false
+      
+      - name: SetSecret
+        run: dotnet user-secrets set "FeedbackFrom" ${{ secrets.FEEDBACK_FROM }} --project "/home/runner/work/Sunduk/Sunduk/Sunduk.WebApi"
+        
+      - name: SetSecret
+        run: dotnet user-secrets set "FeedbackTo" ${{ secrets.FEEDBACK_TO }} --project "/home/runner/work/Sunduk/Sunduk/Sunduk.WebApi"
+        
+      - name: SetSecret
+        run: dotnet user-secrets set "FeedbackPass" ${{ secrets.FEEDBACK_PASS }} --project "/home/runner/work/Sunduk/Sunduk/Sunduk.WebApi"
+        
+      - name: Publish .NET Core Project
+        run: dotnet publish Sunduk.WebApi/Sunduk.WebApi.csproj -c Release --output release --nologo
+          
+      - name: Add .nojekyll file
+        run: touch release/.nojekyll
+      
+      - name: Uploading files to gh-api-pages branch
+        uses: JamesIves/github-pages-deploy-action@4.1.7
+        with:
+          branch: gh-api-pages
+          folder: release
+          repository-name: dece1ver/sunduk-api
+          token: ${{ secrets.ACCESS_TOKEN }}

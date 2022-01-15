@@ -7,7 +7,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
 {
     public class HeaderSequence : Sequence
     {
-        public Machines Machine { get; set; }
+        public Machine Machine { get; set; }
         public string DetailNumber { get; set; }
         public string DetailName { get; set; }
         public string Author { get; set; }
@@ -16,7 +16,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
 
         public override string Operation => $"{Templates.Operation.Header(Machine, DetailNumber, DetailName, Author, DrawVersion)}{ToolTable}";
 
-        public HeaderSequence(Machines machine, string number, string name, string author, double drawVersion, string toolTable)
+        public HeaderSequence(Machine machine, string number, string name, string author, double drawVersion, string toolTable)
         {
             Machine = machine;
             DetailNumber = number;

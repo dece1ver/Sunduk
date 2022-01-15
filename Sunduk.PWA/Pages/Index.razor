@@ -1,9 +1,10 @@
 ﻿@page "/"
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid Spacing="1" Class="pa-1" Justify="Justify.FlexStart">
-        <MudItem >
+
+    <MudGrid Spacing="1" Class="d-flex pa-1" Justify="Justify.FlexStart">
+        <MudItem xs="6" md="4" lg="3">
             <MudLink Href="/calculator" Underline="Underline.None">
-                <MudPaper Class="pa-6">
+                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
                     <MudGrid Justify="Justify.Center">
                         <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Calculate" />
                     </MudGrid>
@@ -14,22 +15,25 @@
             </MudLink>
         </MudItem>
 
-        @*<MudItem>
+        @if (ExperimantalMode)
+        {
+        <MudItem xs="6" md="4" lg="3">
             <MudLink Href="/sunducam" Underline="Underline.None">
-                <MudPaper Class="pa-6">
+                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
                     <MudGrid Justify="Justify.Center">
-                        <MudIcon Size="Size.Large" Icon="fas fa-digital-tachograph" />
+                        <MudIcon Size="Size.Large" Icon="@Icons.Material.Outlined.FeaturedPlayList" />
                     </MudGrid>
                     <MudGrid Justify="Justify.Center">
                         <MudText Typo="Typo.body2" Class="mt-4">SunduCAM</MudText>
                     </MudGrid>
                 </MudPaper>
             </MudLink>
-        </MudItem>*@
+        </MudItem>
+        }
 
-        <MudItem>
+        <MudItem xs="6" md="4" lg="3">
             <MudLink Href="/thread" Underline="Underline.None">
-                <MudPaper Class="pa-6">
+                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
                     <MudGrid Justify="Justify.Center">
                         <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.LineWeight" />
                     </MudGrid>
@@ -40,9 +44,9 @@
             </MudLink>
         </MudItem>
 
-        <MudItem>
+        <MudItem xs="6" md="4" lg="3">
             <MudLink Href="/stuff" Underline="Underline.None">
-                <MudPaper Class="pa-6">
+                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
                     <MudGrid Justify="Justify.Center">
                         <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.RoundedCorner" />
                     </MudGrid>
@@ -53,9 +57,9 @@
             </MudLink>
         </MudItem>
 
-        <MudItem>
+        <MudItem xs="6" md="4" lg="3">
             <MudLink Href="/angle" Underline="Underline.None">
-                <MudPaper Class="pa-6">
+                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
                     <MudGrid Justify="Justify.Center">
                         <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.SignalCellularNull" />
                     </MudGrid>
@@ -66,9 +70,27 @@
             </MudLink>
         </MudItem>
 
-        @*<MudItem>
+        @if (ExperimantalMode)
+        {
+        <MudItem xs="6" md="4" lg="3">
+            <MudLink Href="/knowledge/about" Underline="Underline.None">
+                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
+                    <MudGrid Justify="Justify.Center">
+                        <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.MenuBook" />
+                    </MudGrid>
+                    <MudGrid Justify="Justify.Center">
+                        <MudText Typo="Typo.body2" Class="mt-4">База знаний</MudText>
+                    </MudGrid>
+                </MudPaper>
+            </MudLink>
+        </MudItem>
+        }
+
+        @if (ExperimantalMode)
+        {
+        <MudItem xs="6" md="4" lg="3">
             <MudLink Href="/timecalc" Underline="Underline.None">
-                <MudPaper Class="pa-6">
+                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
                     <MudGrid Justify="Justify.Center">
                         <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Timer" />
                     </MudGrid>
@@ -78,18 +100,12 @@
                 </MudPaper>
             </MudLink>
         </MudItem>
-
-        <MudItem>
-            <MudLink Href="/knowledge/about" Underline="Underline.None">
-                <MudPaper Class="pa-6">
-                    <MudGrid Justify="Justify.Center">
-                        <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Info" />
-                    </MudGrid>
-                    <MudGrid Justify="Justify.Center">
-                        <MudText Typo="Typo.body2" Class="mt-4">База знаний</MudText>
-                    </MudGrid>
-                </MudPaper>
-            </MudLink>
-        </MudItem>*@
+        }
+        
     </MudGrid>
 </MudContainer>
+
+@code {
+    [CascadingParameter(Name = "ExperimantalMode")]
+    protected bool ExperimantalMode { get; set; }
+}

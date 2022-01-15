@@ -433,8 +433,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
         public static void GetTrapezoidalValues(string template, out string diameter, out string pitch)
         {
-            diameter = template.Split("Tr")[1].Split('x')[0];
-            pitch = template.Split("Tr")[1].Split('x')[1].Split()[0];
+            var result = template.Split("Tr")[1].Split('x');
+            diameter = result[0];
+            pitch = result[1].Split()[0];
         }
 
         public static void GetNPTValues(string template, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength)
@@ -645,7 +646,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     <= 11 => 9,
                     <= 14 => 8,
                     <= 19 => 6,
-                    >= 28 => 5,
+                    > 19 => 5,
                     _ => 0,
                 };
             }
@@ -659,7 +660,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     <= 4 => 13,
                     <= 5 => 14,
                     <= 7 => 16,
-                    > 85 => 19,
+                    > 7 => 19,
                     _ => 0,
                 };
             }

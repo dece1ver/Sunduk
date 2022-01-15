@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Sunduk.PWA.Infrastructure.Tools.Base;
 
-namespace Sunduk.PWA.Infrastructure.Tools
+namespace Sunduk.PWA.Infrastructure.Tools.Turning
 {
     public class GroovingInternalTool : Tool
     {
