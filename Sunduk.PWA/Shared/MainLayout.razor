@@ -9,11 +9,13 @@
 <MudSnackbarProvider />
 
 <MudThemeProvider Theme="testTheme" />
-
 <MudLayout>
     <MudAppBar Dense="true" Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudLink Typo="Typo.h5" Href="" Underline="Underline.None" Style="font-family: 'Saira Stencil One';">SUNDUK</MudLink>
+        <MudToggleIconButton @bind-Toggled="@ExperimentalMode"
+                     Icon="fas fa-biohazard" Color="@Color.Default" Title="Off"
+                     ToggledIcon="fas fa-biohazard" ToggledColor="@Color.Primary" ToggledTitle="On"/>
         <MudSpacer />
         <MudTooltip Text="Обратная связь" Placement="Placement.Start">
             <MudIconButton Icon="@Icons.Material.Filled.Feedback" OnClick="OpenFeedBackDialog" Color="Color.Inherit" Edge="Edge.End" />
@@ -25,10 +27,14 @@
         
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <NavMenu />
+        <CascadingValue Value="ExperimentalMode" Name="ExperimantalMode">
+            <NavMenu />
+        </CascadingValue>
     </MudDrawer>
     <MudMainContent>
-        @Body
+        <CascadingValue Value="ExperimentalMode" Name="ExperimantalMode">
+            @Body
+        </CascadingValue>
     </MudMainContent>
 </MudLayout>
 
@@ -38,6 +44,8 @@
 @code
 {
     string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+    public bool ExperimentalMode { get; set; } = true;
 
     bool _drawerOpen = true;
 
