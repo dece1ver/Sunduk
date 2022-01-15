@@ -20,7 +20,9 @@
         <MudTooltip Text="Обратная связь" Placement="Placement.Start">
             <MudIconButton Icon="@Icons.Material.Filled.Feedback" OnClick="OpenFeedBackDialog" Color="Color.Inherit" Edge="Edge.End" />
         </MudTooltip>
-        <MudIconButton Icon="@Icons.Material.Filled.SendToMobile" OnClick="OpenQrDialog" Color="Color.Inherit" Edge="Edge.End" />
+        <MudTooltip Text="QR-код и установка" Placement="Placement.Start">
+            <MudIconButton Icon="@Icons.Material.Filled.QrCodeScanner" OnClick="OpenQrDialog" Color="Color.Inherit" Edge="Edge.End" />
+        </MudTooltip>
         <MudTooltip Text="@version" Placement="Placement.Start">
             <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" OnClick="OpenChangelogDialog" Color="Color.Inherit" Edge="Edge.End" />
         </MudTooltip>
@@ -45,7 +47,7 @@
 {
     string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-    public bool ExperimentalMode { get; set; } = true;
+    public bool ExperimentalMode { get; set; } = false;
 
     bool _drawerOpen = true;
 
