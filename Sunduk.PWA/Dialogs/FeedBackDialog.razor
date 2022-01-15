@@ -48,7 +48,7 @@
             try
             {
                 InProgress = true;
-                status = await http.GetStringAsync($"https://sundukwebapi20220114222812.azurewebsites.net//sendmessage|{Name}|{Message}");
+                status = await http.GetStringAsync($"https://api.sunduk.one/sendmessage|{Name}|{Message}");
                 if (status == "Ok")
                 {
                     MudDialog.Close(DialogResult.Ok(true));
@@ -56,11 +56,13 @@
                 }
                 else
                 {
+                    InProgress = false;
                     Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
                 }
             }
             catch (Exception e)
             {
+                InProgress = false;
                 Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
             }
         }
