@@ -47,7 +47,7 @@
 
             try
             {
-                Status = await http.GetStringAsync($"https://api.sunduk.one/sendmessage|{Name}|{Message}");
+                Status = await http.GetStringAsync($"https://sundukwebapi20220114222812.azurewebsites.net/sendmessage|{Name}|{Message}");
 
                 if (Status == "Ok")
                 {
