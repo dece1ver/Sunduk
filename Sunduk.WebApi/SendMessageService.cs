@@ -17,8 +17,10 @@ namespace Sunduk.WebApi
                     mail.Body = Message;
                     mail.IsBodyHtml = false;
 
-                    using (SmtpClient smtp = new SmtpClient("smtp.yandex.ru", 465))
+                    using (SmtpClient smtp = new SmtpClient("smtp.yandex.ru", 25))
                     {
+                        smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        smtp.UseDefaultCredentials = false;
                         smtp.Credentials = new System.Net.NetworkCredential(From, Pass);
                         smtp.EnableSsl = true;
                         smtp.Send(mail);
