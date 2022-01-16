@@ -17,7 +17,7 @@ namespace Sunduk.WebApi
                     mail.Body = Message;
                     mail.IsBodyHtml = false;
 
-                    using (SmtpClient smtp = new SmtpClient("smtp.office365.com", 587))
+                    using (SmtpClient smtp = new SmtpClient("smtp.yandex.ru", 465))
                     {
                         smtp.Credentials = new System.Net.NetworkCredential(From, Pass);
                         smtp.EnableSsl = true;
