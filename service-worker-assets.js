@@ -241,7 +241,7 @@
       "url": "img\/stuffimages\/tool_vectors\/vector_8.svg"
     },
     {
-      "hash": "sha256-J1CC9Ldm672QEhXMhg7qBjeAw0Gkvaq\/yYeEe0+LfEg=",
+      "hash": "sha256-JGUV3rWrSkF5cLXkhtqKVjOVCIvdcsVVtDSn2m63LBI=",
       "url": "index.html"
     },
     {
@@ -1085,5 +1085,5 @@
       "url": "_framework\/blazor.webassembly.js"
     }
   ],
-  "version": "0Nkg1RVM"
+  "version": "UGHSZ5Ed"
 };
