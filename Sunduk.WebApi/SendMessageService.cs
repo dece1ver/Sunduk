@@ -1,4 +1,5 @@
-﻿using System.Net.Mail;
+﻿using System.Net;
+using System.Net.Mail;
 
 namespace Sunduk.WebApi
 {
@@ -11,17 +12,17 @@ namespace Sunduk.WebApi
             {
                 using (MailMessage mail = new MailMessage())
                 {
-                    mail.From = new MailAddress(From);
+                    mail.From = new MailAddress(From, "sunduk.one");
                     mail.To.Add(To);
-                    mail.Subject = $"Обратная связь от: {Name}";
-                    mail.Body = Message;
+                    mail.Subject = $"Обратная связь от: {WebUtility.UrlDecode(Name)}";
+                    mail.Body = WebUtility.UrlDecode(Message);
                     mail.IsBodyHtml = false;
 
                     using (SmtpClient smtp = new SmtpClient("smtp.yandex.ru", 25))
                     {
                         smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                         smtp.UseDefaultCredentials = false;
-                        smtp.Credentials = new System.Net.NetworkCredential(From, Pass);
+                        smtp.Credentials = new NetworkCredential(From, Pass);
                         smtp.EnableSsl = true;
                         smtp.Send(mail);
                         result = "Ok";

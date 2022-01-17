@@ -31,6 +31,7 @@
     public string Message { get; set; }
     public string Status { get; set; } = "None";
 
+
     async void Submit()
     {
         if (string.IsNullOrWhiteSpace(Name))
@@ -47,7 +48,7 @@
 
             try
             {
-                Status = await http.GetStringAsync($"https://sundukwebapi20220114222812.azurewebsites.net/sendmessage|{Name}|{Message}");
+                Status = await http.GetStringAsync($"tps://sundukwebapi20220114222812.azurewebsites.net/sendmessage|{WebUtility.UrlEncode(Name)}|{WebUtility.UrlEncode(Message)}");
 
                 if (Status == "Ok")
                 {
@@ -67,5 +68,12 @@
         }
     }
 
-    
+    private string Encode(string message)
+    {
+        return message
+            .Replace(" ", "_")
+            .Replace("?", "__")
+            .Replace(" ", "_");
+    }
+
 }
