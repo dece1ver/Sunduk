@@ -15,6 +15,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public double StartZ { get; set; }
         public double EndZ { get; set; }
         public override string Operation => Templates.Operation.HighSpeedDrilling(Machine, Material, Tool, StartZ, EndZ);
+        public override MachineType MachineType { get => MachineType.General; }
 
         public HighSpeedDrillingSequence(Machine machine, Material material, TurningDrillingTool tool, double startZ, double endZ)
         {

@@ -15,6 +15,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public double StartZ { get; set; }
         public double EndZ { get; set; }
         public override string Operation => Templates.Operation.Tapping(Machine, Tool, CutSpeed, StartZ, EndZ);
+        public override MachineType MachineType { get => MachineType.General; }
 
         public TurningTappingSequence(Machine machine, TurningTappingTool tool, double cutSpeed, double startZ, double endZ)
         {

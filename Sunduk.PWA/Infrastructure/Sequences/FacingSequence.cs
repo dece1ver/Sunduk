@@ -22,6 +22,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences
             ExternalDiameter, InternalDiameter - (Tool.Radius * 2), 
             RoughStockAllow, ProfStockAllow, StepOver, SeqNumbers);
 
+        public override MachineType MachineType { get => MachineType.Turning; }
+
         public FacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter, 
             double roughStockAllow, double profStockAllow, double stepOver, (int, int) seqNumbers)
         {

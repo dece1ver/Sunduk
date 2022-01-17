@@ -9,16 +9,27 @@
                         <MudSelectItem Value="@SequenceType.General">Общие</MudSelectItem>
                         break;
                     case SequenceType.ExternalTurning:
-                        <MudSelectItem Value="@SequenceType.ExternalTurning">Наружное точение</MudSelectItem>
+                        @if (MachineType == MachineType.Turning)
+                        {
+                            <MudSelectItem Value="@SequenceType.ExternalTurning">Наружное точение</MudSelectItem>
+                        }
                         break;
                     case SequenceType.Drilling:
                         <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
+                            
                         break;
                     case SequenceType.Threading:
+                        @if (MachineType == MachineType.Turning)
+                        {
                         <MudSelectItem Value="@SequenceType.Threading">Нарезание резьбы</MudSelectItem>
+                        }
+                            
                         break;
                     case SequenceType.Grooving:
+                        @if (MachineType == MachineType.Turning)
+                        {
                         <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
+                        }
                         break;
                 }
             }
@@ -36,9 +47,33 @@
             </MudItem>
             <MudItem xs="12" md="4">
                 <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
-                    @foreach (var tool in Tools.Where(x => x is Tool))
+                    @if (MachineType == MachineType.Turning)
                     {
-                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        @foreach (var tool in Tools.Where(x =>
+                        x is GroovingExternalTool ||
+                        x is GroovingInternalTool ||
+                        x is SpecialTurningTool ||
+                        x is ThreadingExternalTool ||
+                        x is ThreadingInternalTool ||
+                        x is TurningDrillingTool ||
+                        x is TurningExternalTool ||
+                        x is TurningInternalTool ||
+                        x is TurningTappingTool
+                        ))
+                        {
+                            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        }
+                    }
+                    @if (MachineType == MachineType.Milling)
+                    {
+                        @foreach (var tool in Tools.Where(x =>
+                        x is MillingDrillingTool ||
+                        x is MillingTappingTool ||
+                        x is MillingTool
+                        ))
+                        {
+                            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        }
                     }
                 </MudSelect>
             </MudItem>
@@ -156,9 +191,19 @@
             </MudItem>
             <MudItem xs="12" md="4">
                 <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool" Variant="Variant.Filled" Margin="Margin.Dense">
-                    @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
+                    @if (MachineType == MachineType.Turning)
                     {
-                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
+                        {
+                            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        }
+                    }
+                    @if (MachineType == MachineType.Milling)
+                    {
+                        @foreach (var tool in Tools.Where(x => x is MillingDrillingTool))
+                        {
+                            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        }
                     }
                 </MudSelect>
             </MudItem>
@@ -402,6 +447,9 @@
 
     [Parameter]
     public Machine Machine { get; set; }
+
+    [Parameter]
+    public MachineType MachineType { get; set; }
 
     [Parameter]
     public double WorkpieceLength { get; set; }
@@ -665,17 +713,17 @@
 
             if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.HighSpeedDrilling)
             {
-                return Operation.HighSpeedDrilling(Machine, WorkpieceMaterial, Tool as TurningDrillingTool, DrillStart, DrillEnd);
+                return Operation.HighSpeedDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, DrillStart, DrillEnd);
             }
 
             if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.PeckingDrilling)
             {
-                return Operation.PeckDrilling(Machine, WorkpieceMaterial, Tool as TurningDrillingTool, PeckingDepth, DrillStart, DrillEnd);
+                return Operation.PeckDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDepth, DrillStart, DrillEnd);
             }
 
             if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.PeckingDeepDrilling)
             {
-                return Operation.PeckDeepDrilling(Machine, WorkpieceMaterial, Tool as TurningDrillingTool, PeckingDeepDepth, DrillStart, DrillEnd);
+                return Operation.PeckDeepDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDeepDepth, DrillStart, DrillEnd);
             }
 
             if (Type == SequenceType.Threading && ThreadingSequence == ThreadingSequences.ThreadCutting && ThreadType == CuttingType.External)

@@ -3,6 +3,7 @@
     public enum MachineType
     {
         Turning,
-        Milling
+        Milling,
+        General,
     }
 }

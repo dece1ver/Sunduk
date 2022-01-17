@@ -10,6 +10,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public Machine Machine { get; set; }
         public int? SpeedLimit { get; set; }
         public override string Operation => Templates.Operation.SafetyString(Machine, SpeedLimit);
+        public override MachineType MachineType { get => MachineType.General; }
 
         public SafetyStringSequence(Machine machine, int speedLimit)
         {

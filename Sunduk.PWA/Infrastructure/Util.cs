@@ -20,6 +20,7 @@ namespace Sunduk.PWA.Util
         public enum GetNumberOption { Any, OnlyPositive }
         public enum PrettyStringOption { AsIs, ZeroToEmpty }
         public enum ToolDescriptionOption { General, L230, GoodwayLeft, GoodwayRight }
+        public enum NcDecimalPointOption { With, Without }
         public enum TranslateOption { RemoveBadSymbols, OnlyTranslate }
 
         /// <summary>
@@ -139,11 +140,12 @@ namespace Sunduk.PWA.Util
         /// <param name="value">Число</param>
         /// <param name="precision">Точность</param>
         /// <returns>Отформатированную строку</returns>
-        public static string NC(this double value, int precision = 3)
+        public static string NC(this double value, int precision = 3, NcDecimalPointOption option = NcDecimalPointOption.With)
         {
-            return value.ToString($"F{precision}", CultureInfo.InvariantCulture).Contains('.')
+            var result = value.ToString($"F{precision}", CultureInfo.InvariantCulture).Contains('.')
                 ? value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0')
                 : value.ToString($"F{precision}");
+            return option == NcDecimalPointOption.With ? result : result.TrimEnd('.');
         }
 
         /// <summary>
@@ -244,8 +246,9 @@ namespace Sunduk.PWA.Util
         {
             return tool switch
             {
-                MillingTool millingTool => $"T{millingTool.Position} ({millingTool.Name} D{millingTool.Diameter.NC()})",
-                MillingDrillingTool millingDrillingTool => $"T{millingDrillingTool.Position} ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC()})",
+                MillingDrillingTool millingDrillingTool => $"T{millingDrillingTool.Position} ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
+                MillingTappingTool millingTappingTool => $"T{millingTappingTool.Position} ({millingTappingTool.Name} M{millingTappingTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingTappingTool.Pitch.NC(option: NcDecimalPointOption.Without)})",
+                MillingTool millingTool => $"T{millingTool.Position} ({millingTool.Name} D{millingTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
                 GroovingExternalTool groovingExternalTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{groovingExternalTool.Position.ToolNumber()} ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})"
