@@ -48,7 +48,7 @@
 
             try
             {
-                Status = await http.GetStringAsync($"https://sundukwebapi20220114222812.azurewebsites.net/sendmessage|{WebUtility.UrlEncode(Name)}|{WebUtility.UrlEncode(Message)}");
+                Status = await http.GetStringAsync($"https://sundukwebapi20220114222812.azurewebsites.net/sendmessage|{WebUtility.UrlEncode(Encode(Name))}|{WebUtility.UrlEncode(Encode(Message))}");
 
                 if (Status == "Ok")
                 {
@@ -71,9 +71,9 @@
     private string Encode(string message)
     {
         return message
-            .Replace(" ", "_")
-            .Replace("?", "__")
-            .Replace(" ", "_");
+            .Replace(@"/", "_")
+            .Replace(@"\", "__")
+            .Replace(@".", "___");
     }
 
 }

@@ -14,8 +14,8 @@ namespace Sunduk.WebApi
                 {
                     mail.From = new MailAddress(From, "sunduk.one");
                     mail.To.Add(To);
-                    mail.Subject = $"Обратная связь от: {WebUtility.UrlDecode(Name)}";
-                    mail.Body = WebUtility.UrlDecode(Message);
+                    mail.Subject = $"Обратная связь от: {Decode(WebUtility.UrlDecode(Name))}";
+                    mail.Body = Decode(WebUtility.UrlDecode(Message));
                     mail.IsBodyHtml = false;
 
                     using (SmtpClient smtp = new SmtpClient("smtp.yandex.ru", 25))
@@ -34,6 +34,14 @@ namespace Sunduk.WebApi
                 result = ex.Message;
             }
             return result;
+        }
+
+        private static string Decode(string message)
+        {
+            return message
+                .Replace(@"___", ".")
+                .Replace(@"__", @"\")
+                .Replace(@"_", @"/");
         }
     }
 }
