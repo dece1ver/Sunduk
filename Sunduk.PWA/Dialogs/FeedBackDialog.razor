@@ -48,7 +48,7 @@
 
             try
             {
-                Status = await http.GetStringAsync($"tps://sundukwebapi20220114222812.azurewebsites.net/sendmessage|{WebUtility.UrlEncode(Name)}|{WebUtility.UrlEncode(Message)}");
+                Status = await http.GetStringAsync($"https://sundukwebapi20220114222812.azurewebsites.net/sendmessage|{WebUtility.UrlEncode(Name)}|{WebUtility.UrlEncode(Message)}");
 
                 if (Status == "Ok")
                 {
