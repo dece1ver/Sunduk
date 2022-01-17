@@ -142,6 +142,7 @@
                 <MudItem xs=12>
                     <AddSequenceComponent Tools="Tools"
                                           Machine="Machine"
+                                          MachineType="MachineType"
                                           Program="Program"
                                           @bind-Mode="Mode"
                                           WorkpieceMaterial="WorkpieceMaterial"
@@ -184,10 +185,11 @@
     }
 
     public List<Tool> Tools { get; set; } = new();
-    
+
     #region Фрезерный инструмент
     public List<MillingTool> MillingTools { get; set; }
     public List<MillingDrillingTool> MillingDrillingTools { get; set; }
+    public List<MillingTappingTool> MillingTappingTools { get; set; }
     #endregion
 
     #region Токарныый инструмент
@@ -394,7 +396,14 @@
             Tools.Add(new TurningTappingTool(0808, TurningTappingTool.Types.Forming, 10, 1.5));
             await localStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
         }
-        Tools.AddRange(TurningTappingTools);
+        MillingTappingTools = await localStorage.GetItemAsync<List<MillingTappingTool>>(nameof(MillingTappingTools)) ?? new();
+        if (MillingTappingTools is null || MillingTappingTools.Count == 0)
+        {
+            Tools.Add(new MillingTappingTool(3, MillingTappingTool.Types.Cutting, 12, 1.75));
+            Tools.Add(new MillingTappingTool(4, MillingTappingTool.Types.Forming, 10, 1.5));
+            await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
+        }
+        Tools.AddRange(MillingTappingTools);
         #endregion
 
         #region Инициализация фрез

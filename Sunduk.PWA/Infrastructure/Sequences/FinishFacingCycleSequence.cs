@@ -23,6 +23,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences
             set { }
         }
 
+        public override MachineType MachineType { get => MachineType.Turning; }
+
         public FinishFacingCycleSequence(TurningExternalTool tool, Sequence roughSequence)
         {
             RoughSequence = roughSequence;

@@ -14,9 +14,12 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public const string TURNING_REFERENT_POINT = "G30U0W0\n";
         public const string TURNING_REFERENT_POINT_CONSISTENTLY = "G30U0\nG30W0\n";
         public const string MILLING_REFERENT_POINT = "G53Z0\n";
+        public const string MILLING_SAFETY_STRING = "G90G17G54\n";
         public const string GOODWAY_RETURN_B = "G55G30B0\n";
         public const string STOP = "M0";
         public const string OP_STOP = "M1";
+
+        enum CoolantType { General, Through, Blow }
 
         private static string SpindleUnclamp(Machine machine)
         {
@@ -38,22 +41,36 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        private static string CoolantOn(Machine machine)
+        private static string CoolantOn(Machine machine, CoolantType type = CoolantType.General)
         {
             return machine switch
             {
                 Machine.GS1500 => "M58",
                 Machine.L230A => "M8",
+                Machine.A110 => type switch 
+                {
+                    CoolantType.General => "M8",
+                    CoolantType.Through => "M50",
+                    CoolantType.Blow => "M51",
+                    _ => string.Empty,
+                },
                 _ => string.Empty,
             };
         }
 
-        private static string CoolantOff(Machine machine)
+        private static string CoolantOff(Machine machine, CoolantType type = CoolantType.General)
         {
             return machine switch
             {
                 Machine.GS1500 => "M59",
                 Machine.L230A => "M9",
+                Machine.A110 => type switch
+                {
+                    CoolantType.General => "M9",
+                    CoolantType.Through => "M51",
+                    CoolantType.Blow => "M50",
+                    _ => string.Empty,
+                },
                 _ => string.Empty,
             };
         }
@@ -128,11 +145,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Скорость резания при сверлении
         /// </summary>
-        private static int DrillCuttingSpeed(Material material, TurningDrillingTool TurningDrillingTool)
+        private static int DrillCuttingSpeed(Material material, DrillingTool drillingTool)
         {
             return material switch
             {
-                Material.Steel => TurningDrillingTool.Type switch
+                Material.Steel => drillingTool.Type switch
                 {
                     TurningDrillingTool.Types.Insert => 200,
                     TurningDrillingTool.Types.Solid => 100,
@@ -141,7 +158,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     TurningDrillingTool.Types.Center => 20,
                     _ => 0,
                 },
-                Material.Stainless => TurningDrillingTool.Type switch
+                Material.Stainless => drillingTool.Type switch
                 {
                     TurningDrillingTool.Types.Insert => 150,
                     TurningDrillingTool.Types.Solid => 60,
@@ -150,7 +167,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     TurningDrillingTool.Types.Center => 12,
                     _ => 0,
                 },
-                Material.Brass => TurningDrillingTool.Type switch
+                Material.Brass => drillingTool.Type switch
                 {
                     TurningDrillingTool.Types.Insert => 200,
                     TurningDrillingTool.Types.Solid => 120,
@@ -163,35 +180,35 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        private static double DrillFeed(Material material, TurningDrillingTool TurningDrillingTool)
+        private static double DrillFeed(Material material, DrillingTool drillingTool)
         {
             return material switch
             {
-                Material.Steel => TurningDrillingTool.Type switch
+                Material.Steel => drillingTool.Type switch
                 {
-                    TurningDrillingTool.Types.Insert => (TurningDrillingTool.Diameter * 0.0028),
-                    TurningDrillingTool.Types.Solid => (TurningDrillingTool.Diameter * 0.01),
-                    TurningDrillingTool.Types.Tip => (TurningDrillingTool.Diameter * 0.01),
-                    TurningDrillingTool.Types.Rapid => (TurningDrillingTool.Diameter * 0.015),
-                    TurningDrillingTool.Types.Center => (TurningDrillingTool.Diameter * 0.02),
+                    TurningDrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
+                    TurningDrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
+                    TurningDrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
+                    TurningDrillingTool.Types.Rapid => (drillingTool.Diameter * 0.015),
+                    TurningDrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
                     _ => 0,
                 },
-                Material.Stainless => TurningDrillingTool.Type switch
+                Material.Stainless => drillingTool.Type switch
                 {
-                    TurningDrillingTool.Types.Insert => (TurningDrillingTool.Diameter * 0.0028),
-                    TurningDrillingTool.Types.Solid => (TurningDrillingTool.Diameter * 0.01),
-                    TurningDrillingTool.Types.Tip => (TurningDrillingTool.Diameter * 0.01),
-                    TurningDrillingTool.Types.Rapid => (TurningDrillingTool.Diameter * 0.015),
-                    TurningDrillingTool.Types.Center => (TurningDrillingTool.Diameter * 0.02),
+                    TurningDrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
+                    TurningDrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
+                    TurningDrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
+                    TurningDrillingTool.Types.Rapid => (drillingTool.Diameter * 0.015),
+                    TurningDrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
                     _ => 0,
                 },
-                Material.Brass => TurningDrillingTool.Type switch
+                Material.Brass => drillingTool.Type switch
                 {
-                    TurningDrillingTool.Types.Insert => (TurningDrillingTool.Diameter * 0.0028),
-                    TurningDrillingTool.Types.Solid => (TurningDrillingTool.Diameter * 0.01),
-                    TurningDrillingTool.Types.Tip => (TurningDrillingTool.Diameter * 0.01),
-                    TurningDrillingTool.Types.Rapid => (TurningDrillingTool.Diameter * 0.015),
-                    TurningDrillingTool.Types.Center => (TurningDrillingTool.Diameter * 0.02),
+                    TurningDrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
+                    TurningDrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
+                    TurningDrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
+                    TurningDrillingTool.Types.Rapid => (drillingTool.Diameter * 0.015),
+                    TurningDrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
                     _ => 0,
                 },
                 _ => 0
@@ -600,7 +617,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Высокоскоростное сверление
         /// </summary>
-        public static string HighSpeedDrilling(Machine machine, Material material, TurningDrillingTool tool, double startZ, double endZ)
+        public static string HighSpeedDrilling(Machine machine, Material material, DrillingTool tool, double startZ, double endZ)
         {
             if (tool is null ||
                 startZ <= endZ) return string.Empty;
@@ -630,6 +647,18 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
+                Machine.A110 =>
+                MILLING_REFERENT_POINT +
+                tool.Description(Util.Util.ToolDescriptionOption.General) + "\n" +
+                $"{CoolantOn(machine, CoolantType.Through)}\n" +
+                MILLING_SAFETY_STRING +
+                $"G0X0Y0S{DrillCuttingSpeed(material, tool)}M{Direction(tool)}\n" +
+                $"G43G0Z{startZ.NC()}H{tool.Position}\n" +
+                $"G81Z{endZ.NC()}X0Y0R{startZ.NC()}F{DrillFeed(material, tool).NC(2)}\n" +
+                $"G80\n" +
+                $"{CoolantOff(machine)}\n" +
+                MILLING_REFERENT_POINT,
+
                 _ => string.Empty
             };
         }
@@ -638,7 +667,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Прерывистое сверление
         /// </summary>
-        public static string PeckDrilling(Machine machine, Material material, TurningDrillingTool tool, double depth, double startZ, double endZ)
+        public static string PeckDrilling(Machine machine, Material material, DrillingTool tool, double depth, double startZ, double endZ)
         {
             if (tool is null ||
                 startZ <= endZ ||
@@ -679,7 +708,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Глубокое сверление
         /// </summary>
-        public static string PeckDeepDrilling(Machine machine, Material material, TurningDrillingTool tool, double depth, double startZ, double endZ)
+        public static string PeckDeepDrilling(Machine machine, Material material, DrillingTool tool, double depth, double startZ, double endZ)
         {
             if (tool is null ||
                 startZ <= endZ ||

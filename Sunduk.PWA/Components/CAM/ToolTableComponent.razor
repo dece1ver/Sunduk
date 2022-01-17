@@ -76,6 +76,63 @@
             </MudTabPanel>
             #endregion
 
+            #region MillingTapping
+            <MudTabPanel Text="Метчики" Style="font-size: x-small">
+                <MudTable Items="MillingTappingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedMillingTappingTool" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>Позиция</MudTh>
+                        <MudTh>Диаметр</MudTh>
+                        <MudTh>Шаг</MudTh>
+                        <MudTh>Тип</MudTh>
+                        <MudTh>Исполнение</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                        <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
+                        <MudTd DataLabel="Шаг">@context.Pitch.ToPrettyString()</MudTd>
+                        @if (context.Type == MillingTappingTool.Types.Cutting)
+                            {
+                            <MudTd DataLabel="Тип">Нарезной</MudTd>
+                            }
+                        @if (context.Type == MillingTappingTool.Types.Forming)
+                            {
+                            <MudTd DataLabel="Тип">Раскатник</MudTd>
+                            }
+                        <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
+                    </RowTemplate>
+                    <RowEditingTemplate>
+                        <MudTd DataLabel="Позиция">
+                            <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Диаметр">
+                            <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Шаг">
+                            <MudTextField @bind-Value="@context.Pitch" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Тип">
+                            <MudSelect T="MillingTappingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                <MudSelectItem Value="@MillingTappingTool.Types.Cutting">Нарезной</MudSelectItem>
+                                <MudSelectItem Value="@MillingTappingTool.Types.Forming">Раскатник</MudSelectItem>
+                            </MudSelect>
+                        </MudTd>
+                        <MudTd DataLabel="Исполнение">
+                            <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Required>
+                                <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
+                                <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+                            </MudSelect>
+                        </MudTd>
+                    </RowEditingTemplate>
+                </MudTable>
+                <div class="mt-3 ml-0 mr-4 d-flex">
+                    <div class="d-flex ml-auto align-center">
+                        <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddMillingTappingTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveMillingTappingTool" />
+                    </div>
+                </div>
+            </MudTabPanel>
+            #endregion
+
             #region Milling
             <MudTabPanel Text="Фрезы" Style="font-size: x-small">
                 <MudTable Items="MillingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedMillingTool" Elevation="0">
@@ -634,6 +691,26 @@
     }
     #endregion
 
+    #region Список метчиков (фрезерный)
+    public List<MillingTappingTool> MillingTappingTools
+    {
+        get
+        {
+            List<MillingTappingTool> result = new();
+            foreach (var item in Tools.Where(x => x is MillingTappingTool))
+            {
+                result.Add(item as MillingTappingTool);
+            }
+            return result ?? new();
+        }
+        set
+        {
+            Tools.RemoveAll(x => x is MillingDrillingTool);
+            Tools.AddRange(value);
+        }
+    }
+    #endregion
+
     #region Список фрез
     public List<MillingTool> MillingTools
     {
@@ -836,6 +913,7 @@
     #endregion
 
     private MillingDrillingTool selectedMillingDrillingTool = null;
+    private MillingTappingTool selectedMillingTappingTool = null;
     private MillingTool selectedMillingTool = null;
 
     private GroovingExternalTool selectedGroovingExternalTool = null;
@@ -858,6 +936,18 @@
     {
         if (MillingDrillingTools.Count > 0) Tools.Remove(MillingDrillingTools[^1]);
         await localStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+    }
+
+    // MillingTapping
+    private async Task AddMillingTappingTool()
+    {
+        Tools.Add(new MillingTappingTool(1, MillingTappingTool.Types.Cutting, 8, 1.25));
+        await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
+    }
+    private async Task RemoveMillingTappingTool()
+    {
+        if (MillingTappingTools.Count > 0) Tools.Remove(MillingTappingTools[^1]);
+        await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
     }
 
     //Milling

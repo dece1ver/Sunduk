@@ -17,6 +17,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public override string Operation => Templates.Operation.RoughFacingCycle(Machine, Material, Tool,
             ExternalDiameter, InternalDiameter - (Tool.Radius * 2),
             RoughStockAllow, ProfStockAllow, StepOver, SeqNumbers);
+        public override MachineType MachineType { get => MachineType.Turning; }
 
         public RoughFacingCycleSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter,
             double roughStockAllow, double profStockAllow, double stepOver, (int, int) seqNumbers)
