@@ -12,8 +12,7 @@ builder.Services.AddCors(options =>
                           builder.WithOrigins("https://sunduk.one",
                                               "https://www.sunduk.one",
                                               "https://test.sunduk.one",
-                                              "https://www.test.sunduk.one",
-                                              "https://localhost:5001"
+                                              "https://www.test.sunduk.one"
                                               );
                       });
 });
@@ -39,7 +38,7 @@ app.MapGet("/sendmessage|{Name}|{Message}", (string Name, string Message) =>
 
 app.MapGet("/", () =>
 {
-    return "Ok";
+    return "Working";
 });
 
 app.Run();
