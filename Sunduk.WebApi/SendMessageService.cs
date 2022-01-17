@@ -10,24 +10,20 @@ namespace Sunduk.WebApi
             var result = "Ne";
             try
             {
-                using (MailMessage mail = new MailMessage())
-                {
-                    mail.From = new MailAddress(From, "sunduk.one");
-                    mail.To.Add(To);
-                    mail.Subject = $"Обратная связь от: {Decode(WebUtility.UrlDecode(Name))}";
-                    mail.Body = Decode(WebUtility.UrlDecode(Message));
-                    mail.IsBodyHtml = false;
+                using MailMessage mail = new();
+                mail.From = new MailAddress(From, "sunduk.one");
+                mail.To.Add(To);
+                mail.Subject = $"Обратная связь от: {Decode(WebUtility.UrlDecode(Name))}";
+                mail.Body = Decode(WebUtility.UrlDecode(Message));
+                mail.IsBodyHtml = false;
 
-                    using (SmtpClient smtp = new SmtpClient("smtp.yandex.ru", 25))
-                    {
-                        smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-                        smtp.UseDefaultCredentials = false;
-                        smtp.Credentials = new NetworkCredential(From, Pass);
-                        smtp.EnableSsl = true;
-                        smtp.Send(mail);
-                        result = "Ok";
-                    }
-                }
+                using SmtpClient smtp = new("smtp.yandex.ru", 25);
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new NetworkCredential(From, Pass);
+                smtp.EnableSsl = true;
+                smtp.Send(mail);
+                result = "Ok";
             }
             catch (Exception ex)
             {
