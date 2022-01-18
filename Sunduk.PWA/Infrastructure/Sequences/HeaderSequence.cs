@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public double DrawVersion { get; set; }
         public string ToolTable { get; set; }
         public override string Operation => $"{Templates.Operation.Header(Machine, DetailNumber, DetailName, Author, DrawVersion)}{ToolTable}";
-        public override MachineType MachineType { get => MachineType.General; }
+        public override MachineType MachineType => MachineType.Any;
 
         public HeaderSequence(Machine machine, string number, string name, string author, double drawVersion, string toolTable)
         {

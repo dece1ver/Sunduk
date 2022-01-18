@@ -1,5 +1,7 @@
 ﻿using MudBlazor;
 using Sunduk.PWA.Infrastructure.Sequences;
+using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Sequences.Turning;
 using Sunduk.PWA.Infrastructure.Tools;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 using Sunduk.PWA.Infrastructure.Tools.Milling;
@@ -235,6 +237,14 @@ namespace Sunduk.PWA.Util
         {
             return (value * 1000).Round(10);
         }
+
+        /// <summary>
+        /// Скорость резания в обороты
+        /// </summary>
+        /// <param name="cutSpeed">Скорость</param>
+        /// <param name="diameter">Диаметр</param>
+        /// <returns>Обороты шпинделя</returns>
+        public static int ToSpindleSpeed(this int cutSpeed, double diameter, int round = 100) => ((cutSpeed * 1000) / (int)(diameter * Math.PI)).Round(round);
 
         /// <summary>
         /// Описание инструмента в УП

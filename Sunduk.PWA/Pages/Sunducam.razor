@@ -96,23 +96,34 @@
                                     {
                                         <MudListItem Text="@($"{Program.IndexOf(seq)}. {seq.Name}")" Value="Program.IndexOf(seq)">
                                             <MudGrid>
+                                                @if (seq.MachineType != MachineType.Any && seq.MachineType != MachineType)
+                                                {
+                                                    <MudTooltip Text="Этот переход будет игнорирован, т.к. его тип не совпадает с типом станка.">
+                                                        <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" Size="Size.Small" 
+                                                                 Style="margin-top: 10px; margin-bottom: 0px; margin-left: 16px"/>
+                                                    </MudTooltip>
+
+                                                }
                                                 <MudText Class="ma-3 mr-auto" Typo=Typo.body2>@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
                                                 <div Class="d-inline-flex justify-end py-2 px-3">
                                                     @if ((int)SelectedSequenceIndex == Program.IndexOf(seq))
                                                     {
                                                         <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -3px; margin-bottom: -3px">
-                                                            @if (Program.IndexOf(seq) != Program.Count - 1)
+                                                            @if (seq.MachineType == MachineType)
                                                             {
-                                                                <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                               OnClick="(() => MoveDownSequence(seq))" />
+                                                                @if (Program.IndexOf(seq) != Program.Count - 1)
+                                                                {
+                                                                    <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                                   OnClick="(() => MoveDownSequence(seq))" />
+                                                                }
+                                                                @if (Program.IndexOf(seq) != 2)
+                                                                {
+                                                                    <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                                   OnClick="(() => MoveUpSequence(seq))" />
+                                                                }
+                                                                <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                               OnClick="(() => OpenEditSequenceDialog(seq))" />
                                                             }
-                                                            @if (Program.IndexOf(seq) != 2)
-                                                            {
-                                                                <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                               OnClick="(() => MoveUpSequence(seq))" />
-                                                            }
-                                                            <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                           OnClick="(() => OpenEditSequenceDialog(seq))" />
                                                             <MudIconButton Icon="@Icons.Material.TwoTone.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
                                                                            OnClick="(() => Program.Remove(seq))" />
                                                         </MudButtonGroup>
@@ -291,6 +302,16 @@
     }
 
     public List<Sequence> Program { get; set; }
+
+    public string ProgramEnd { get
+        {
+            return MachineType switch
+            {
+                MachineType.Turning => "\nM30\n%",
+                MachineType.Milling => "\nG91G30Z0\nG90G53X-800Y0\nM30\n%",
+                _ => string.Empty
+            };
+        } }
 
     protected override async Task OnInitializedAsync()
     {
@@ -602,7 +623,7 @@
             {
                 result.Add(sequence.Operation);
             }
-            return string.Join("\n", result).Trim() + "\nM30\n%";
+            return string.Join("\n", result.Where(x => !string.IsNullOrEmpty(x))).Trim() + ProgramEnd;
         }
         set { }
     }

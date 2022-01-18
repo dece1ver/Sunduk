@@ -1,7 +1,7 @@
-﻿using Sunduk.PWA.Infrastructure.Tools;
+﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 
-namespace Sunduk.PWA.Infrastructure.Sequences
+namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
     public class FinishFacingCycleSequence : Sequence
     {
@@ -23,7 +23,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
             set { }
         }
 
-        public override MachineType MachineType { get => MachineType.Turning; }
+        public override MachineType MachineType => MachineType.Turning;
 
         public FinishFacingCycleSequence(TurningExternalTool tool, Sequence roughSequence)
         {

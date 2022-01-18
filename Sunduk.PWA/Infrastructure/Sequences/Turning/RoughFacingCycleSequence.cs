@@ -1,9 +1,9 @@
-﻿using Sunduk.PWA.Infrastructure.Tools;
+﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 
-namespace Sunduk.PWA.Infrastructure.Sequences
+namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
-    public class RoughFacingSequence : Sequence
+    public class RoughFacingCycleSequence : Sequence
     {
         public Machine Machine { get; set; }
         public Material Material { get; set; }
@@ -14,11 +14,12 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public double ProfStockAllow { get; set; }
         public double StepOver { get; set; }
         public (int, int) SeqNumbers { get; set; }
-        public override string Operation => Templates.Operation.RoughFacing(Machine, Material, Tool, 
-            ExternalDiameter, InternalDiameter - (Tool.Radius * 2), RoughStockAllow, ProfStockAllow, StepOver, SeqNumbers);
-        public override MachineType MachineType { get => MachineType.Turning; }
+        public override string Operation => Templates.Operation.RoughFacingCycle(Machine, Material, Tool,
+            ExternalDiameter, InternalDiameter - (Tool.Radius * 2),
+            RoughStockAllow, ProfStockAllow, StepOver, SeqNumbers);
+        public override MachineType MachineType => MachineType.Turning;
 
-        public RoughFacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter, 
+        public RoughFacingCycleSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter,
             double roughStockAllow, double profStockAllow, double stepOver, (int, int) seqNumbers)
         {
             Machine = machine;

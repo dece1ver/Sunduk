@@ -42,7 +42,10 @@
         case SequenceType.General:
             <MudItem xs="12" md="4">
                 <MudSelect Label="Переход" T="GeneralSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="GeneralSequence">
-                    <MudSelectItem Value="@(GeneralSequences.Limiter)">Упор</MudSelectItem>
+                    @if (MachineType == MachineType.Turning)
+                    {
+                        <MudSelectItem Value="@(GeneralSequences.Limiter)">Упор</MudSelectItem>
+                    }
                 </MudSelect>
             </MudItem>
             <MudItem xs="12" md="4">
@@ -610,36 +613,6 @@
     public double TapEnd { get => Util.GetDouble(_TapEnd, numberOption: Util.GetNumberOption.Any); }
     #endregion
 
-    public string WorkpieceInfo
-    {
-        get
-        {
-            string materialInfo = string.Empty;
-            switch (WorkpieceMaterial)
-            {
-                case Material.Steel:
-                    materialInfo = "Стальная";
-                    break;
-                case Material.Stainless:
-                    materialInfo = "Нержавеющая";
-                    break;
-                case Material.Brass:
-                    materialInfo = "Бронзовая";
-                    break;
-            }
-            string hole = string.Empty;
-            switch (WorkpieceInternalDiameter)
-            {
-                case > 0:
-                    hole = $" с отверстием Ø{WorkpieceInternalDiameter.ToPrettyString()}мм";
-                    break;
-                default:
-                    break;
-            }
-            return $"{materialInfo} заготовка Ø{WorkpieceExternalDiameter.ToPrettyString()}мм{hole}, L-{WorkpieceLength.ToPrettyString()}мм";
-        }
-    }
-
     #region Токарка
 
     public string _StepOver { get; set; }
@@ -713,7 +686,12 @@
 
             if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.HighSpeedDrilling)
             {
-                return Operation.HighSpeedDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, DrillStart, DrillEnd);
+                return MachineType switch
+                {
+                    MachineType.Turning => Operation.TurningHighSpeedDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, DrillStart, DrillEnd),
+                    MachineType.Milling => Operation.MillingHighSpeedDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, DrillStart, DrillEnd),
+                    _ => string.Empty
+                };
             }
 
             if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.PeckingDrilling)
@@ -867,36 +845,74 @@
                 switch (DrillingSequence)
                 {
                     case DrillingSequences.HighSpeedDrilling:
-                        sequence = new HighSpeedDrillingSequence(
-                            Machine,
-                            WorkpieceMaterial,
-                            Tool as TurningDrillingTool,
-                            DrillStart,
-                            DrillEnd)
-                        { Name = "Сверление" };
-
+                        if (MachineType == MachineType.Turning)
+                        {
+                            sequence = new TurningHighSpeedDrillingSequence(
+                                Machine,
+                                WorkpieceMaterial,
+                                Tool as DrillingTool,
+                                DrillStart,
+                                DrillEnd)
+                            { Name = "Сверление" };
+                        }
+                        if (MachineType == MachineType.Milling)
+                        {
+                            sequence = new MillingHighSpeedDrillingSequence(
+                                Machine,
+                                WorkpieceMaterial,
+                                Tool as DrillingTool,
+                                DrillStart,
+                                DrillEnd)
+                            { Name = "Сверление" };
+                        }
                         break;
                     case DrillingSequences.PeckingDrilling:
-                        sequence = new PeckDrillingSequence(
-                            Machine,
-                            WorkpieceMaterial,
-                            Tool as TurningDrillingTool,
-                            PeckingDepth,
-                            DrillStart,
-                            DrillEnd)
-                        { Name = "Сверление с выходом" };
-
+                        if (MachineType == MachineType.Turning)
+                        {
+                            sequence = new TurningPeckDrillingSequence(
+                                Machine,
+                                WorkpieceMaterial,
+                                Tool as TurningDrillingTool,
+                                PeckingDepth,
+                                DrillStart,
+                                DrillEnd)
+                            { Name = "Сверление с выходом" };
+                        }
+                        if (MachineType == MachineType.Milling)
+                        {
+                            sequence = new MillingPeckDrillingSequence(
+                                Machine,
+                                WorkpieceMaterial,
+                                Tool as TurningDrillingTool,
+                                PeckingDepth,
+                                DrillStart,
+                                DrillEnd)
+                            { Name = "Сверление с выходом" };
+                        }
                         break;
                     case DrillingSequences.PeckingDeepDrilling:
-                        sequence = new PeckDeepDrillingSequence(
-                            Machine,
-                            WorkpieceMaterial,
-                            Tool as TurningDrillingTool,
-                            PeckingDeepDepth,
-                            DrillStart,
-                            DrillEnd)
-                        { Name = "Глубокое сверление" };
-
+                        if (MachineType == MachineType.Turning)
+                        {
+                            sequence = new TurningPeckDeepDrillingSequence(
+                                Machine,
+                                WorkpieceMaterial,
+                                Tool as TurningDrillingTool,
+                                PeckingDeepDepth,
+                                DrillStart,
+                                DrillEnd)
+                            { Name = "Глубокое сверление" };
+                        }
+                        if (MachineType == MachineType.Milling)
+                        {
+                            sequence = new MillingPeckDeepDrillingSequence(
+                                Machine,
+                                WorkpieceMaterial,
+                                Tool as TurningDrillingTool,
+                                PeckingDeepDepth,
+                                DrillStart,
+                                DrillEnd)
+                            { Name = "Глубокое сверление" };
+                        }
                         break;
                     default:
                         break;

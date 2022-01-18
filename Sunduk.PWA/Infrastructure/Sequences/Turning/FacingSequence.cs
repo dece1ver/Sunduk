@@ -1,11 +1,7 @@
-﻿using Sunduk.PWA.Infrastructure.Tools;
+﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Sunduk.PWA.Infrastructure.Sequences
+namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
     public class FacingSequence : Sequence
     {
@@ -22,7 +18,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
             ExternalDiameter, InternalDiameter - (Tool.Radius * 2), 
             RoughStockAllow, ProfStockAllow, StepOver, SeqNumbers);
 
-        public override MachineType MachineType { get => MachineType.Turning; }
+        public override MachineType MachineType => MachineType.Turning;
 
         public FacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter, 
             double roughStockAllow, double profStockAllow, double stepOver, (int, int) seqNumbers)
