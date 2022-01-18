@@ -1,10 +1,12 @@
 ﻿using Sunduk.PWA.Infrastructure.Sequences;
+using Sunduk.PWA.Infrastructure.Sequences.Turning;
 using Sunduk.PWA.Infrastructure.Tools;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 using Sunduk.PWA.Util;
 using System;
 using System.Globalization;
+using static Sunduk.PWA.Util.Util;
 
 namespace Sunduk.PWA.Infrastructure.Templates
 {
@@ -13,7 +15,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public const double SAFE_APPROACH_DISTANCE = 2;
         public const string TURNING_REFERENT_POINT = "G30U0W0\n";
         public const string TURNING_REFERENT_POINT_CONSISTENTLY = "G30U0\nG30W0\n";
-        public const string MILLING_REFERENT_POINT = "G53Z0\n";
+        public const string MILLING_REFERENT_POINT = "/G91G30Z0\n" +
+            "/G91G53X-800Y0\n" +
+            "M1\n";
         public const string MILLING_SAFETY_STRING = "G90G17G54\n";
         public const string GOODWAY_RETURN_B = "G55G30B0\n";
         public const string STOP = "M0";
@@ -266,7 +270,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             $"G50S{((speedLimit ?? 0) > 5000 ? 5000 : speedLimit ?? 0)}\n" +
             "G96G23\n",
 
-            Machine.A110 => "\n",
+            Machine.A110 => string.Empty,
 
             _ => string.Empty,
         };
@@ -617,10 +621,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Высокоскоростное сверление
         /// </summary>
-        public static string HighSpeedDrilling(Machine machine, Material material, DrillingTool tool, double startZ, double endZ)
+        public static string TurningHighSpeedDrilling(Machine machine, Material material, DrillingTool tool, double startZ, double endZ)
         {
-            if (tool is null ||
-                startZ <= endZ) return string.Empty;
+            if (tool is null || startZ <= endZ) return string.Empty;
             string approach = startZ > 0
                 ? $"G0X-{tool.Diameter.NC()}Z{startZ.NC()}S{DrillCuttingSpeed(material, tool)}M{Direction(tool)}\n"
                 : $"G0X-{tool.Diameter.NC()}Z{SAFE_APPROACH_DISTANCE.NC()}S{DrillCuttingSpeed(material, tool)}M{Direction(tool)}\nZ{startZ.NC()}\n";
@@ -647,18 +650,25 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
+                _ => string.Empty
+            };
+        }
+
+        public static string MillingHighSpeedDrilling(Machine machine, Material material, DrillingTool tool, double startZ, double endZ)
+        {
+            if (tool is null || startZ <= endZ) return string.Empty;
+            return machine switch
+            {
                 Machine.A110 =>
                 MILLING_REFERENT_POINT +
                 tool.Description(Util.Util.ToolDescriptionOption.General) + "\n" +
-                $"{CoolantOn(machine, CoolantType.Through)}\n" +
-                MILLING_SAFETY_STRING +
+                $"T00\n" +
+                $"G57G0X0Y0S{DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter)}\n" +
                 $"G0X0Y0S{DrillCuttingSpeed(material, tool)}M{Direction(tool)}\n" +
-                $"G43G0Z{startZ.NC()}H{tool.Position}\n" +
-                $"G81Z{endZ.NC()}X0Y0R{startZ.NC()}F{DrillFeed(material, tool).NC(2)}\n" +
+                $"G43G0Z{startZ.NC()}H{tool.Position}{CoolantOn(machine, CoolantType.Through)}\n" +
+                $"G81Z{endZ.NC(option: NcDecimalPointOption.Without)}R{startZ.NC(option: NcDecimalPointOption.Without)}F{DrillFeed(material, tool).NC(2)}\n" +
                 $"G80\n" +
-                $"{CoolantOff(machine)}\n" +
-                MILLING_REFERENT_POINT,
-
+                $"{CoolantOff(machine)}\n",
                 _ => string.Empty
             };
         }
@@ -748,7 +758,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Нарезание резьбы метчиком
         /// </summary>
-        public static string Tapping(Machine machine, TurningTappingTool tool, double cutSpeed, double startZ, double endZ)
+        public static string Tapping(Machine machine, TappingTool tool, double cutSpeed, double startZ, double endZ)
         {
             if (tool is null ||
                 startZ <= endZ) return string.Empty;

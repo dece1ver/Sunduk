@@ -4,6 +4,6 @@
     {
         Turning,
         Milling,
-        General,
+        Any,
     }
 }
