@@ -5,7 +5,9 @@ using Sunduk.PWA.Infrastructure.Tools.Base;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 using Sunduk.PWA.Util;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using static Sunduk.PWA.Util.Util;
 
 namespace Sunduk.PWA.Infrastructure.Templates
@@ -654,23 +656,40 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        public static string MillingHighSpeedDrilling(Machine machine, Material material, DrillingTool tool, double startZ, double endZ)
+        public static string MillingHighSpeedDrilling(Machine machine, Material material, DrillingTool tool, double startZ, double endZ, List<Hole> holes, bool polar = false)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
-            return machine switch
+            string result = machine switch
             {
                 Machine.A110 =>
                 MILLING_REFERENT_POINT +
-                tool.Description(Util.Util.ToolDescriptionOption.General) + "\n" +
+                tool.Description(ToolDescriptionOption.General) + "\n" +
                 $"T00\n" +
-                $"G57G0X0Y0S{DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter)}\n" +
-                $"G0X0Y0S{DrillCuttingSpeed(material, tool)}M{Direction(tool)}\n" +
-                $"G43G0Z{startZ.NC()}H{tool.Position}{CoolantOn(machine, CoolantType.Through)}\n" +
-                $"G81Z{endZ.NC(option: NcDecimalPointOption.Without)}R{startZ.NC(option: NcDecimalPointOption.Without)}F{DrillFeed(material, tool).NC(2)}\n" +
-                $"G80\n" +
-                $"{CoolantOff(machine)}\n",
+                $"{(polar ? "G16" : string.Empty)}" +
+                $"G57G0X{holes[0].X}Y{holes[0].Y}S{DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter)}\n" +
+                $"G81Z{endZ.NC(option: NcDecimalPointOption.Without)}R{startZ.NC(option: NcDecimalPointOption.Without)}F{DrillFeed(material, tool).NC(2)}\n",
                 _ => string.Empty
             };
+            if (holes.Count > 1 && !string.IsNullOrEmpty(result))
+            {
+                foreach (var hole in holes.Skip(1))
+                {
+                    if (!polar) result += $"X{hole.X}";
+                    result += $"Y{hole.Y}\n";
+                }
+            }
+            if (!string.IsNullOrEmpty(result))
+            {
+                result += machine switch
+                {
+                    Machine.A110 =>
+                    $"G80\n" +
+                    $"{CoolantOff(machine)}\n" +
+                    $"{(polar ? "G15" : string.Empty)}",
+                    _ => string.Empty
+                };
+            }
+            return result;
         }
 
 

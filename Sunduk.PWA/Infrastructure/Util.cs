@@ -416,6 +416,15 @@ namespace Sunduk.PWA.Util
         };
 
         /// <summary>
+        /// Конвертер отверстий для фрезерной сверловки
+        /// </summary>
+        public static Converter<int> HolesConverter = new()
+        {
+            SetFunc = value => value.ToString(),
+            GetFunc = text => Util.GetInt(text, 1, GetNumberOption.OnlyPositive),
+        };
+
+        /// <summary>
         /// Получает номера строк для циклов УП в зависомости от количества таких переходов
         /// </summary>
         /// <param name="count">Количество переходов</param>

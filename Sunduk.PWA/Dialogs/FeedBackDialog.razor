@@ -39,38 +39,39 @@
 
     async void Submit()
     {
-        if (string.IsNullOrWhiteSpace(Name))
-        {
-            Snackbar.Add("Имя не должно быть пустым!", Severity.Error);
-        }
-        else if (string.IsNullOrWhiteSpace(Message))
-        {
-            Snackbar.Add("Сообщение не должно быть пустым!", Severity.Error);
-        }
-        else
-        {
-            Status = "Progress";
+        Snackbar.Add("Отправка через эту форму временно недоступна :с", Severity.Warning);
+        //if (string.IsNullOrWhiteSpace(Name))
+        //{
+        //    Snackbar.Add("Имя не должно быть пустым!", Severity.Error);
+        //}
+        //else if (string.IsNullOrWhiteSpace(Message))
+        //{
+        //    Snackbar.Add("Сообщение не должно быть пустым!", Severity.Error);
+        //}
+        //else
+        //{
+        //    Status = "Progress";
 
-            try
-            {
-                Status = await http.GetStringAsync($"https://sundukwebapi20220114222812.azurewebsites.net/sendmessage|{WebUtility.UrlEncode(Encode(Name))}|{WebUtility.UrlEncode(Encode(Message))}");
+        //    try
+        //    {
+        //        Status = await http.GetStringAsync($"https://api.sunduk.one/sendmessage|{WebUtility.UrlEncode(Encode(Name))}|{WebUtility.UrlEncode(Encode(Message))}");
 
-                if (Status == "Ok")
-                {
-                    MudDialog.Close(DialogResult.Ok(true));
-                    Snackbar.Add($"Сообщение отправлено!", Severity.Success);
-                }
-                else
-                {
-                    Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
-                }
-            }
-            catch (Exception e)
-            {
-                Status = e.Message;
-                Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
-            }
-        }
+        //        if (Status == "Ok")
+        //        {
+        //            MudDialog.Close(DialogResult.Ok(true));
+        //            Snackbar.Add($"Сообщение отправлено!", Severity.Success);
+        //        }
+        //        else
+        //        {
+        //            Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Status = e.Message;
+        //        Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
+        //    }
+        //}
     }
 
     private string Encode(string message)
