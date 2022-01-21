@@ -7,7 +7,6 @@
 <PageTitle>Sunduk</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Small">
-
     <MudGrid Class="mt-2">
         <MudItem xs="12">
             <MudTextField @bind-Value="Name" Label="Имя" Variant="Variant.Filled"/>
@@ -36,12 +35,20 @@
 </MudContainer>
 
 @code {
-    public string Name { get; set; }
-    public string Message { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
     public bool Progress { get; set; } = false;
+    private TimeOnly span { get; set; } = TimeOnly.FromDateTime(DateTime.Now);
+    private int Count { get; set; } = 0;
+
 
     public void Send()
     {
+        if (TimeOnly.FromDateTime(DateTime.Now).Minute - span.Minute > 1)
+        {
+            Count--;
+            span.AddMinutes(1);
+        }
         if (string.IsNullOrWhiteSpace(Name))
         {
             Snackbar.Add("Имя не заполнено", Severity.Error);
@@ -54,33 +61,48 @@
         }
         else
         {
-            Progress = true;
             var feedbackFrom = config["FeedbackFrom"];
             var feedbackTo = config["FeedbackTo"];
             var feedbackPass = config["FeedbackPass"];
 
             try
             {
-                using MailMessage mail = new();
-                mail.From = new MailAddress(feedbackFrom, "sunduk.one");
-                mail.To.Add(feedbackTo);
-                mail.Subject = $"Обратная связь от: {Name}";
-                mail.Body = Message;
-                mail.IsBodyHtml = false;
+                if(Count < 3)
+                {
+                    using MailMessage mail = new();
+                    Progress = true;
+                    mail.From = new MailAddress(feedbackFrom, "sunduk.one");
+                    mail.To.Add(feedbackTo);
+                    mail.Subject = $"Обратная связь от: {Name}";
+                    mail.Body = Message;
+                    mail.IsBodyHtml = false;
 
-                using SmtpClient smtp = new("smtp.yandex.ru", 25);
-                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-                smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential(feedbackFrom, feedbackPass);
-                smtp.EnableSsl = true;
-                smtp.Send(mail);
+                    using SmtpClient smtp = new("smtp.yandex.ru", 25);
+                    smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    smtp.UseDefaultCredentials = false;
+                    smtp.Credentials = new NetworkCredential(feedbackFrom, feedbackPass);
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                    Progress = false;
+                    Name = string.Empty;
+                    Message = string.Empty;
+                    Count++;
+                    Snackbar.Add("Сообщение успешно отправлено", Severity.Success);
+                }
+                else
+                {
+                    throw new OperationCanceledException();
+                }
+            }
+            catch (OperationCanceledException)
+            {
                 Progress = false;
-                Snackbar.Add("Сообщение успешно отправлено", Severity.Success);
+                Snackbar.Add($"Вы отправляете слишком часто, попробуйте позже.", Severity.Error);
             }
             catch (Exception ex)
             {
                 Progress = false;
-                Snackbar.Add(ex.Message, Severity.Error);
+                Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
             }
         }
     }
