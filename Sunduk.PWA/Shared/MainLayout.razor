@@ -8,7 +8,7 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudThemeProvider Theme="testTheme" />
+<MudThemeProvider Theme="theme" />
 <MudLayout>
     <MudAppBar Dense="true" Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
@@ -47,7 +47,7 @@
 {
     string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-    public bool ExperimentalMode { get; set; } = true;
+    public bool ExperimentalMode { get; set; } = false;
 
     bool _drawerOpen = true;
 
@@ -72,7 +72,7 @@
         DialogService.Show<ChangelogDialog>("Описание", parameters, options);
     }
 
-    MudTheme testTheme = new MudTheme()
+    MudTheme theme = new MudTheme()
     {
         Palette = new Palette()
         {
