@@ -1,0 +1,110 @@
+﻿@page "/"
+@using System.Net.Mail
+@using System.Net
+@inject Microsoft.Extensions.Configuration.IConfiguration config
+@inject ISnackbar Snackbar
+
+<PageTitle>Sunduk</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small">
+    <MudGrid Class="mt-2">
+        <MudItem xs="12">
+            <MudTextField @bind-Value="Name" Label="Имя" Variant="Variant.Filled"/>
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudTextField @bind-Value="Message" Label="Сообщение" Variant="Variant.Filled" Lines="8"/>
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudGrid>
+                <MudItem xs="10">
+                    @if (Progress)
+                    {
+                       <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/>
+                    }
+                </MudItem>
+                <MudItem xs="2">
+                    <MudIconButton Icon="@Icons.Material.Filled.Send" Color="Color.Primary" Size="Size.Large" OnClick="Send"/>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+
+    </MudGrid>
+
+</MudContainer>
+
+@code {
+    public string Name { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
+    public bool Progress { get; set; } = false;
+    private TimeOnly span { get; set; } = TimeOnly.FromDateTime(DateTime.Now);
+    private int Count { get; set; } = 0;
+
+
+    public void Send()
+    {
+        if (TimeOnly.FromDateTime(DateTime.Now).Minute - span.Minute > 1)
+        {
+            Count--;
+            span.AddMinutes(1);
+        }
+        if (string.IsNullOrWhiteSpace(Name))
+        {
+            Snackbar.Add("Имя не заполнено", Severity.Error);
+
+        }
+        else if(string.IsNullOrWhiteSpace(Message))
+        {
+            Snackbar.Add("Введите сообщение", Severity.Error);
+
+        }
+        else
+        {
+            var feedbackFrom = config["FeedbackFrom"];
+            var feedbackTo = config["FeedbackTo"];
+            var feedbackPass = config["FeedbackPass"];
+
+            try
+            {
+                if(Count < 3)
+                {
+                    using MailMessage mail = new();
+                    Progress = true;
+                    mail.From = new MailAddress(feedbackFrom, "sunduk.one");
+                    mail.To.Add(feedbackTo);
+                    mail.Subject = $"Обратная связь от: {Name}";
+                    mail.Body = Message;
+                    mail.IsBodyHtml = false;
+
+                    using SmtpClient smtp = new("smtp.yandex.ru", 25);
+                    smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    smtp.UseDefaultCredentials = false;
+                    smtp.Credentials = new NetworkCredential(feedbackFrom, feedbackPass);
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                    Progress = false;
+                    Name = string.Empty;
+                    Message = string.Empty;
+                    Count++;
+                    Snackbar.Add("Сообщение успешно отправлено", Severity.Success);
+                }
+                else
+                {
+                    throw new OperationCanceledException();
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Progress = false;
+                Snackbar.Add($"Вы отправляете слишком часто, попробуйте позже.", Severity.Error);
+            }
+            catch (Exception ex)
+            {
+                Progress = false;
+                Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
+            }
+        }
+    }
+}
+

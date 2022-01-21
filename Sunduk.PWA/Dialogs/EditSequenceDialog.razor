@@ -117,7 +117,7 @@
                         </MudSelect>
                     </MudItem>
                     break;
-                case HighSpeedDrillingSequence highSpeedDrillingSequence:
+                case TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence:
                     <MudItem xs="12">
                         <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
                             @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
@@ -133,7 +133,23 @@
                         <MudTextField Label="Конечная точка" @bind-Value="DrillEnd" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     break;
-                case PeckDrillingSequence peckDrillingSequence:
+                case MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence:
+                    <MudItem xs="12">
+                        <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
+                            @foreach (var tool in Tools.Where(x => x is MillingDrillingTool))
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Начальная точка" @bind-Value="DrillStart" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Конечная точка" @bind-Value="DrillEnd" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    break;
+                case TurningPeckDrillingSequence turningPeckDrillingSequence:
                     <MudItem xs="12" sm="6">
                         <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
                             @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
@@ -152,10 +168,48 @@
                         <MudTextField Label="Конечная точка" @bind-Value="DrillEnd" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                     break;
-                case PeckDeepDrillingSequence peckDeepDrillingSequence:
+                case MillingPeckDrillingSequence millingPeckDrillingSequence:
+                    <MudItem xs="12" sm="6">
+                        <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
+                            @foreach (var tool in Tools.Where(x => x is MillingDrillingTool))
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Глубина" @bind-Value="DrillDepth" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Начальная точка" @bind-Value="DrillStart" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Конечная точка" @bind-Value="DrillEnd" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    break;
+                case TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence:
                     <MudItem xs="12" sm="6">
                         <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
                             @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Глубина" @bind-Value="DrillDepth" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Начальная точка" @bind-Value="DrillStart" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Конечная точка" @bind-Value="DrillEnd" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    break;
+                case MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence:
+                    <MudItem xs="12" sm="6">
+                        <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool">
+                            @foreach (var tool in Tools.Where(x => x is MillingDrillingTool))
                             {
                                 <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                             }

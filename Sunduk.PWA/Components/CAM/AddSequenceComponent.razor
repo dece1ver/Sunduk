@@ -1,4 +1,5 @@
-﻿<MudGrid Spacing=1>
+﻿@using Sunduk.PWA.Infrastructure.Tools.Turning.Base
+<MudGrid Spacing=1>
     <MudItem xs="12" md="4">
         <MudSelect Label="Тип" T="SequenceType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnSequenceChanged">
             @foreach (var type in Enum.GetValues(typeof(SequenceType)))
@@ -16,19 +17,19 @@
                         break;
                     case SequenceType.Drilling:
                         <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
-                            
+
                         break;
                     case SequenceType.Threading:
                         @if (MachineType == MachineType.Turning)
                         {
-                        <MudSelectItem Value="@SequenceType.Threading">Нарезание резьбы</MudSelectItem>
+                            <MudSelectItem Value="@SequenceType.Threading">Нарезание резьбы</MudSelectItem>
                         }
-                            
+
                         break;
                     case SequenceType.Grooving:
                         @if (MachineType == MachineType.Turning)
                         {
-                        <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
+                            <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
                         }
                         break;
                 }
@@ -53,16 +54,16 @@
                     @if (MachineType == MachineType.Turning)
                     {
                         @foreach (var tool in Tools.Where(x =>
-                        x is GroovingExternalTool ||
-                        x is GroovingInternalTool ||
-                        x is SpecialTurningTool ||
-                        x is ThreadingExternalTool ||
-                        x is ThreadingInternalTool ||
-                        x is TurningDrillingTool ||
-                        x is TurningExternalTool ||
-                        x is TurningInternalTool ||
-                        x is TurningTappingTool
-                        ))
+                  x is GroovingExternalTool ||
+                  x is GroovingInternalTool ||
+                  x is SpecialTurningTool ||
+                  x is ThreadingExternalTool ||
+                  x is ThreadingInternalTool ||
+                  x is TurningDrillingTool ||
+                  x is TurningExternalTool ||
+                  x is TurningInternalTool ||
+                  x is TurningTappingTool
+                  ))
                         {
                             <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                         }
@@ -70,10 +71,10 @@
                     @if (MachineType == MachineType.Milling)
                     {
                         @foreach (var tool in Tools.Where(x =>
-                        x is MillingDrillingTool ||
-                        x is MillingTappingTool ||
-                        x is MillingTool
-                        ))
+                  x is MillingDrillingTool ||
+                  x is MillingTappingTool ||
+                  x is MillingTool
+                  ))
                         {
                             <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                         }
@@ -213,10 +214,10 @@
             @if (DrillingSequence == DrillingSequences.HighSpeedDrilling)
             {
                 <MudItem xs="12" md="6">
-                    <MudTextField Label="Начальная точка" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudTextField Label="Начальный Z" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" md="6">
-                    <MudTextField Label="Конечная точка" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudTextField Label="Конечный Z" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
             }
             @if (DrillingSequence == DrillingSequences.PeckingDrilling)
@@ -225,10 +226,10 @@
                     <MudTextField Label="Глубина" @bind-Value="_PeckingDepth" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" md="4">
-                    <MudTextField Label="Начальная точка" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudTextField Label="Начальный Z" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" md="4">
-                    <MudTextField Label="Конечная точка" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudTextField Label="Конечный Z" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
             }
             @if (DrillingSequence == DrillingSequences.PeckingDeepDrilling)
@@ -237,11 +238,52 @@
                     <MudTextField Label="Глубина" @bind-Value="_PeckingDeepDepth" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
                 </MudItem>
                 <MudItem xs="4">
-                    <MudTextField Label="Начальная точка" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudTextField Label="Начальный Z" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
                 <MudItem xs="4">
-                    <MudTextField Label="Конечная точка" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudTextField Label="Конечный Z" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
+            }
+            @if (MachineType == MachineType.Milling)
+            {
+                <MudItem xs="6">
+                    <MudNumericField Label="Количество отверстий" T="int" Min="1" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.HolesConverter" ValueChanged="OnHolesCountChanged" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudSelect Label="Расположение" T="HolesSetterType" @bind-Value="HolesSetter" Variant="Variant.Filled" Margin="Margin.Dense">
+                        <MudSelectItem Value="@(HolesSetterType.Manual)">Вручную</MudSelectItem>
+                        <MudSelectItem Value="@(HolesSetterType.Cylinder)">На цилиндре</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                @if (HolesSetter == HolesSetterType.Cylinder)
+                {
+                    <MudItem xs="6">
+                        <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField Label="Начальный угол" @bind-Value="StartAngle" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="°" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                }
+                @if (HolesSetter == HolesSetterType.Manual)
+                {
+                    @foreach (var hole in Holes)
+                    {
+                        <MudItem xs="6" sm="4" md="3" lg="2">
+                            <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                <MudGrid>
+                                    <MudItem xs=6>
+                                        <MudTextField Label="X" @bind-Value="Holes[Holes.IndexOf(hole)].X" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                                    </MudItem>
+                                    <MudItem xs=6>
+                                        <MudTextField Label="Y" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                                    </MudItem>
+                                </MudGrid>
+                            </MudField>
+                        </MudItem>
+                        
+                    }
+
+                }
             }
             break;
         #endregion
@@ -472,6 +514,12 @@
     [Parameter]
     public EventCallback<Mode> ModeChanged { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (Holes.Count == 0) Holes.Add(new Hole());
+        HolesCount = 1;
+    }
+
     #region Всякие OnChanged
 
     private void OnSequenceChanged(SequenceType value)
@@ -523,6 +571,20 @@
             _ThreadPitch = pitch;
             _ThreadEnd = (-threadLength).ToPrettyString(); // наверно тоже строку стоит возвращать
             ThreadNPTPlane = planeLength;
+        }
+    }
+
+    private void OnHolesCountChanged(int value)
+    {
+        if (value < 1) value = 1;
+        HolesCount = value;
+        while (Holes.Count < HolesCount)
+        {
+            Holes.Add(new Hole());
+        }
+        while (Holes.Count > HolesCount)
+        {
+            Holes.Remove(Holes[^1]);
         }
     }
     #endregion
@@ -643,6 +705,16 @@
     public string _PeckingDeepDepth { get; set; } = "2";
     public double PeckingDeepDepth { get => Util.GetDouble(_PeckingDeepDepth); }
 
+    private List<Hole> Holes { get; set; } = new();
+    private int HolesCount { get; set; } = 1;
+
+    private double HolesRadius { get; set; }
+    private double StartAngle { get; set; } = 0;
+
+    private enum HolesSetterType { Manual, Cylinder}
+    private HolesSetterType HolesSetter { get; set; }
+
+
     #endregion
 
 
@@ -689,7 +761,14 @@
                 return MachineType switch
                 {
                     MachineType.Turning => Operation.TurningHighSpeedDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, DrillStart, DrillEnd),
-                    MachineType.Milling => Operation.MillingHighSpeedDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, DrillStart, DrillEnd),
+                    MachineType.Milling => Operation.MillingHighSpeedDrilling(
+                        Machine,
+                        WorkpieceMaterial,
+                        Tool as DrillingTool,
+                        DrillStart,
+                        DrillEnd,
+                        HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
+                        HolesSetter == HolesSetterType.Cylinder ? true : false),
                     _ => string.Empty
                 };
             }
@@ -850,7 +929,7 @@
                             sequence = new TurningHighSpeedDrillingSequence(
                                 Machine,
                                 WorkpieceMaterial,
-                                Tool as DrillingTool,
+                                Tool as TurningDrillingTool,
                                 DrillStart,
                                 DrillEnd)
                             { Name = "Сверление" };
@@ -860,9 +939,10 @@
                             sequence = new MillingHighSpeedDrillingSequence(
                                 Machine,
                                 WorkpieceMaterial,
-                                Tool as DrillingTool,
+                                Tool as MillingDrillingTool,
                                 DrillStart,
-                                DrillEnd)
+                                DrillEnd,
+                                Holes)
                             { Name = "Сверление" };
                         }
                         break;
@@ -883,10 +963,11 @@
                             sequence = new MillingPeckDrillingSequence(
                                 Machine,
                                 WorkpieceMaterial,
-                                Tool as TurningDrillingTool,
+                                Tool as MillingDrillingTool,
                                 PeckingDepth,
                                 DrillStart,
-                                DrillEnd)
+                                DrillEnd,
+                                Holes)
                             { Name = "Сверление с выходом" };
                         }
                         break;
@@ -907,10 +988,11 @@
                             sequence = new MillingPeckDeepDrillingSequence(
                                 Machine,
                                 WorkpieceMaterial,
-                                Tool as TurningDrillingTool,
+                                Tool as MillingDrillingTool,
                                 PeckingDeepDepth,
                                 DrillStart,
-                                DrillEnd)
+                                DrillEnd,
+                                Holes)
                             { Name = "Глубокое сверление" };
                         }
                         break;
@@ -924,7 +1006,7 @@
                     case ThreadingSequences.ThreadCutting:
                         sequence = new ThreadCuttingSequence(
                             Machine,
-                            Tool,
+                            Tool as ThreadingTool,
                             ThreadStandart,
                             ThreadType,
                             ThreadDiameter,
@@ -956,5 +1038,18 @@
         Program.Add(sequence);
         Mode = Mode.General;
         await ModeChanged.InvokeAsync(Mode);
+    }
+
+    private List<Hole> PolarHoles(int holesCount, double radius, double startAngle)
+    {
+        List<Hole> result = new();
+        double angleStep = 360 / holesCount;
+        while (startAngle > 360) startAngle -= 360; 
+        while (startAngle < -360) startAngle += 360; 
+        for (int i = 0; i < holesCount; i++)
+        {
+            result.Add(new Hole(radius, angleStep * i + startAngle));
+        }
+        return result;
     }
 }
