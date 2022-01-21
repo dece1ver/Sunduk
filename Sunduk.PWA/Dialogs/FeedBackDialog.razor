@@ -14,10 +14,9 @@
     <DialogContent>
         <div class="ma-0" style="width:300px;overflow: auto;">
             <MudText Typo="Typo.body1" Align="Align.Left">
-                Свяжитесь со мной по электронной почте <MudLink Typo="Typo.body1" Href="@("mailto:dece1ver@sunduk.one")">dece1ver@sunduk.one</MudLink> либо используйте форму ниже.
+                Свяжитесь со мной по электронной почте <MudLink Typo="Typo.body1" Href="@("mailto:dece1ver@sunduk.one")">dece1ver@sunduk.one</MudLink> либо используйте 
+                <MudLink Typo="Typo.body1" Href="https://localhost:7080/">форму обратной связи</MudLink>.
             </MudText>
-            <MudTextField Class="feedback-form" T="string" Label="Имя" Variant="Variant.Filled" @bind-Value="Name" Immediate="true" />
-            <MudTextField Class="feedback-form" T="string" Label="Сообщение" Variant="Variant.Filled" @bind-Value="Message" Lines="5" Immediate="true" />
         </div>
     </DialogContent>
     <DialogActions>
