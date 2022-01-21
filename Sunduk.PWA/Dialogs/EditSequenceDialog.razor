@@ -148,6 +148,7 @@
                     <MudItem xs="12" sm="6">
                         <MudTextField Label="Конечная точка" @bind-Value="DrillEnd" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
+
                     break;
                 case TurningPeckDrillingSequence turningPeckDrillingSequence:
                     <MudItem xs="12" sm="6">
@@ -433,8 +434,13 @@
                 finishFacingCycleSequence.RoughSequence = RepeatableRoughFacingSequence;
                 break;
             // высокоскоростное сверление
-            case HighSpeedDrillingSequence highSpeedDrillingSequence:
+            case TurningHighSpeedDrillingSequence highSpeedDrillingSequence:
                 highSpeedDrillingSequence.Tool = Tool as TurningDrillingTool;
+                highSpeedDrillingSequence.StartZ = DrillStart;
+                highSpeedDrillingSequence.EndZ = DrillEnd;
+                break;
+            case MillingHighSpeedDrillingSequence highSpeedDrillingSequence:
+                highSpeedDrillingSequence.Tool = Tool as MillingDrillingTool;
                 highSpeedDrillingSequence.StartZ = DrillStart;
                 highSpeedDrillingSequence.EndZ = DrillEnd;
                 break;

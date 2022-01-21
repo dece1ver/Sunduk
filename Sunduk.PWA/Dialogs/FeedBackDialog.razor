@@ -18,13 +18,13 @@
             </MudText>
             <MudText Typo="Typo.body2" Align="Align.Left">
                     <p>
-                        • Email: <MudLink Typo="Typo.body2" Href="@("mailto:dece1ver@sunduk.one")">dece1ver@sunduk.one</MudLink>;
+                        • email <MudLink Typo="Typo.body2" Href="@("mailto:dece1ver@sunduk.one")">dece1ver@sunduk.one</MudLink>;
                     </p>
                     <p>
-                        • <MudLink Typo="Typo.body2" Href="https://sunduk-fb.azurewebsites.net/">Сайт обратной связи</MudLink>;
+                        • через <MudLink Typo="Typo.body2" Href="https://sunduk-fb.azurewebsites.net/">сайт обратной связи</MudLink>;
                     </p>
                     <p>
-                        • Форма ниже.
+                        • заполнив форму ниже:
                     </p>
             </MudText>
             <MudTextField Class="feedback-form" T="string" Label="Имя" Variant="Variant.Filled" @bind-Value="Name" Immediate="true" />
@@ -87,9 +87,10 @@
     private string Encode(string message)
     {
         return message
-            .Replace(@"/", "_")
-            .Replace(@"\", "__")
-            .Replace(@".", "___");
+            .Replace(@"/", "_1_")
+            .Replace(@"\", "__1_")
+            .Replace(@".", "___1_")
+            .Replace(@"@", "____1_");
     }
 
 }

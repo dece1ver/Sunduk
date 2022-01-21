@@ -7,7 +7,6 @@ namespace Sunduk.PWA.Infrastructure.Tools.Base
 {
     public class DrillingTool : Tool
     {
-        public new int Position { get; set; }
         public enum Types { Insert, Solid, Tip, Center, Rapid }
 
         private Types _Type;

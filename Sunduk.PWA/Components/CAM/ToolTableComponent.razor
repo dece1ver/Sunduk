@@ -69,8 +69,8 @@
                 </MudTable>
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
-                        <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTurningDrillingTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveTurningDrillingTool" />
+                        <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddMillingDrillingTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveMillingDrillingTool" />
                     </div>
                 </div>
             </MudTabPanel>
@@ -87,7 +87,7 @@
                         <MudTh>Исполнение</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                        <MudTd DataLabel="Позиция">@context.Position</MudTd>
                         <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Шаг">@context.Pitch.ToPrettyString()</MudTd>
                         @if (context.Type == MillingTappingTool.Types.Cutting)
@@ -139,6 +139,7 @@
                     <HeaderContent>
                         <MudTh>Позиция</MudTh>
                         <MudTh>Диаметр</MudTh>
+                        <MudTh>Зубья</MudTh>
                         <MudTh>Тип</MudTh>
                         <MudTh>Рабочая глубина</MudTh>
                         <MudTh>Радиус при вершине</MudTh>
@@ -147,6 +148,7 @@
                     <RowTemplate>
                         <MudTd DataLabel="Позиция">@context.Position</MudTd>
                         <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
+                        <MudTd DataLabel="Зубья">@context.Edges</MudTd>
                         @if (context.Type == MillingTool.Types.Solid)
                             {
                             <MudTd DataLabel="Тип">Твердосплавная</MudTd>
@@ -165,6 +167,9 @@
                         </MudTd>
                         <MudTd DataLabel="Диаметр">
                             <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Зубья">
+                            <MudTextField @bind-Value="@context.Edges" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.EdgesConverter" Required />
                         </MudTd>
                         <MudTd DataLabel="Тип">
                             <MudSelect T="MillingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
@@ -188,8 +193,8 @@
                 </MudTable>
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
-                        <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTurningDrillingTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveTurningDrillingTool" />
+                        <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddMillingTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveMillingTool" />
                     </div>
                 </div>
             </MudTabPanel>
@@ -705,7 +710,7 @@
         }
         set
         {
-            Tools.RemoveAll(x => x is MillingDrillingTool);
+            Tools.RemoveAll(x => x is MillingTappingTool);
             Tools.AddRange(value);
         }
     }

@@ -1,7 +1,9 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences;
+﻿using Sunduk.PWA.Infrastructure.CAM;
+using Sunduk.PWA.Infrastructure.Sequences;
 using Sunduk.PWA.Infrastructure.Sequences.Turning;
 using Sunduk.PWA.Infrastructure.Tools;
 using Sunduk.PWA.Infrastructure.Tools.Base;
+using Sunduk.PWA.Infrastructure.Tools.Milling;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 using Sunduk.PWA.Util;
 using System;
@@ -15,17 +17,17 @@ namespace Sunduk.PWA.Infrastructure.Templates
     public abstract class Operation
     {
         public const double SAFE_APPROACH_DISTANCE = 2;
-        public const string TURNING_REFERENT_POINT = "G30U0W0\n";
-        public const string TURNING_REFERENT_POINT_CONSISTENTLY = "G30U0\nG30W0\n";
-        public const string MILLING_REFERENT_POINT = "/G91G30Z0\n" +
-            "/G91G53X-800Y0\n" +
+        public const string TURNING_REFERENT_POINT = "G30 U0 W0\n";
+        public const string TURNING_REFERENT_POINT_CONSISTENTLY = "G30 U0\nG30 W0\n";
+        public const string MILLING_REFERENT_POINT = "/G91 G30 Z0\n" +
+            "/G91 G53 X-800 Y0\n" +
             "M1\n";
-        public const string MILLING_SAFETY_STRING = "G90G17G54\n";
-        public const string GOODWAY_RETURN_B = "G55G30B0\n";
+        public const string MILLING_SAFETY_STRING = "G90 G17 G54\n";
+        public const string GOODWAY_RETURN_B = "G55 G30 B0\n";
         public const string STOP = "M0";
         public const string OP_STOP = "M1";
 
-        enum CoolantType { General, Through, Blow }
+        
 
         private static string SpindleUnclamp(Machine machine)
         {
@@ -57,7 +59,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 {
                     CoolantType.General => "M8",
                     CoolantType.Through => "M50",
-                    CoolantType.Blow => "M51",
+                    CoolantType.Blow => "M57",
                     _ => string.Empty,
                 },
                 _ => string.Empty,
@@ -74,7 +76,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 {
                     CoolantType.General => "M9",
                     CoolantType.Through => "M51",
-                    CoolantType.Blow => "M50",
+                    CoolantType.Blow => "M59",
                     _ => string.Empty,
                 },
                 _ => string.Empty,
@@ -232,23 +234,23 @@ namespace Sunduk.PWA.Infrastructure.Templates
             "%\n" +
             $"<{number}>({name})\n" +
             $"({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
-            "G10L2P1Z-100.B300.(G54)\n" +
-            "G10L2P2Z400.(G55)\n" +
-            $"({author})({DateTime.Now:dd.MM.yy})\n" +
+            "G10 L2 P1 Z-100. B300. (G54)\n" +
+            "G10 L2 P2 Z400. (G55)\n" +
+            $"({author}) ({DateTime.Now:dd.MM.yy})\n" +
             "(0M0S)\n",
 
             Machine.L230A =>
             "%\n" +
             $"O0001({number})\n" +
-            $"({name})({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
-            $"({author})({DateTime.Now:dd.MM.yy})\n" +
+            $"({name}) ({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
+            $"({author}) ({DateTime.Now:dd.MM.yy})\n" +
             "(0M0S)\n",
 
             Machine.A110 =>
             "%\n" +
-            $"O0001({number})\n" +
-            $"({name})({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
-            $"({author})({DateTime.Now:dd.MM.yy})\n" +
+            $"O0001 ({number})\n" +
+            $"({name}) ({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
+            $"({author}) ({DateTime.Now:dd.MM.yy})\n" +
             "(0M0S)\n",
 
             _ => string.Empty,
@@ -262,15 +264,15 @@ namespace Sunduk.PWA.Infrastructure.Templates
             Machine.GS1500 =>
             TURNING_REFERENT_POINT_CONSISTENTLY +
             GOODWAY_RETURN_B +
-            "G40G80\n" +
-            $"G50S{((speedLimit ?? 0) > 4000 ? 4000 : speedLimit ?? 0)}\n" +
+            "G40 G80\n" +
+            $"G50 S{((speedLimit ?? 0) > 4000 ? 4000 : speedLimit ?? 0)}\n" +
             "G96\n",
 
             Machine.L230A =>
             TURNING_REFERENT_POINT_CONSISTENTLY +
-            "G40G80G55\n" +
-            $"G50S{((speedLimit ?? 0) > 5000 ? 5000 : speedLimit ?? 0)}\n" +
-            "G96G23\n",
+            "G40 G80 G55\n" +
+            $"G50 S{((speedLimit ?? 0) > 5000 ? 5000 : speedLimit ?? 0)}\n" +
+            "G96 G23\n",
 
             Machine.A110 => string.Empty,
 
@@ -286,16 +288,17 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                $"T{tool.Position.ToolNumber()}G54({tool.Name})\n" +
-                $"G0X{externalDiameter.NC(0)}.Z0.5\n" +
+                TURNING_REFERENT_POINT +
+                $"T{tool.Position.ToolNumber()} G54 ({tool.Name})\n" +
+                $"G0 X{externalDiameter.NC(0)} Z0.5\n" +
                 SpindleUnclamp(machine) + "\n" +
                 STOP + "\n" +
                 "W1.\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                $"T{tool.Position.ToolNumber()}({tool.Name})\n" +
-                $"G0X{externalDiameter.NC(0)}.Z0.5\n" +
+                $"T{tool.Position.ToolNumber()} ({tool.Name})\n" +
+                $"G0 X{externalDiameter.NC(0)} Z0.5\n" +
                 SpindleUnclamp(machine) + "\n" +
                 STOP + "\n" +
                 "W1.\n" +
@@ -303,6 +306,53 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
                 _ => string.Empty,
             };
+        }
+
+        /// <summary>
+        /// Упор
+        /// </summary>
+        public static string ToolCall(Machine machine, Tool tool, CoolantType coolant = CoolantType.General, bool polar = false)
+        {
+            if (tool is null) return string.Empty;
+            string direction = string.Empty;
+            if (coolant != CoolantType.General)
+            {
+                direction = tool.Hand == Tool.ToolHand.Rigth ? "M3" : "M4";
+            }
+            else if (coolant == CoolantType.General || tool.Hand == Tool.ToolHand.Rigth)
+            {
+                direction = "M13";
+            } 
+            else if (coolant == CoolantType.General || tool.Hand == Tool.ToolHand.Left)
+            {
+                direction = "M14";
+            }
+            return machine switch
+            {
+                Machine.GS1500 =>
+                TURNING_REFERENT_POINT +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"{CoolantOff(machine)}\n\n" +
+                TURNING_REFERENT_POINT,
+
+                Machine.L230A =>
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
+                $"{CoolantOff(machine)}\n\n" +
+                TURNING_REFERENT_POINT,
+
+                Machine.A110 =>
+                tool.Description(ToolDescriptionOption.General) + "\n" +
+                $"T00\n" +
+                $"{(polar ? "G16 " : string.Empty)}" +
+                $"G57 G0 X0 Y0 S3000 {direction}\n\n" +
+                $"G43 Z100 H{tool.Position} {((direction == "M13" || direction == "M14") ? string.Empty : CoolantOn(machine, coolant))}\n" +
+                $"{CoolantOff(machine, coolant)}\n" +
+                $"{(polar ? "G15\n" : string.Empty)}" +
+                MILLING_REFERENT_POINT,
+
+                _ => string.Empty,
+            };
+
         }
 
         /// <summary>
@@ -330,23 +380,24 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M{Direction(tool)}\n" +
-                $"G72W{stepOver.NC()}R0.1\n" +
-                $"G72P{seqNo.Item1}Q{seqNo.Item2}{(profStockAllow > 0 ? "W" + profStockAllow.NC() : string.Empty)}F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1}G0Z0.\n" +
-                $"N{seqNo.Item2}G1X{internalDiameter.NC()}\n" +
+                TURNING_REFERENT_POINT +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} M{Direction(tool)}\n" +
+                $"G72 W{stepOver.NC()} R0.1\n" +
+                $"G72 P{seqNo.Item1} Q{seqNo.Item2}{(profStockAllow > 0 ? " W" + profStockAllow.NC() : string.Empty)} F{FeedRough(tool.Radius).NC()}\n" +
+                $"N{seqNo.Item1} G0 Z0.\n" +
+                $"N{seqNo.Item2} G1 X{internalDiameter.NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M{Direction(tool)}\n" +
-                $"G72W{stepOver.NC()}R0.1\n" +
-                $"G72P{seqNo.Item1}Q{seqNo.Item2}{(profStockAllow > 0 ? "W" + profStockAllow.NC() : string.Empty)}F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1}G0Z0.\n" +
-                $"N{seqNo.Item2}G1X{internalDiameter.NC()}\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} M{Direction(tool)}\n" +
+                $"G72 W{stepOver.NC()} R0.1\n" +
+                $"G72 P{seqNo.Item1} Q{seqNo.Item2}{(profStockAllow > 0 ? " W" + profStockAllow.NC() : string.Empty)} F{FeedRough(tool.Radius).NC()}\n" +
+                $"N{seqNo.Item1} G0 Z0.\n" +
+                $"N{seqNo.Item2} G1 X{internalDiameter.NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
@@ -379,25 +430,26 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M{Direction(tool)}\n" +
-                $"G72W{stepOver.NC()}R0.1\n" +
-                $"G72P{seqNo.Item1}Q{seqNo.Item2}{(profStockAllow > 0 ? "W" + profStockAllow.NC() : string.Empty)}F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1}G0Z0.\n" +
-                $"N{seqNo.Item2}G1X{internalDiameter.NC()}\n" +
-                $"{(profStockAllow > 0 ? $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
+                TURNING_REFERENT_POINT +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} M{Direction(tool)}\n" +
+                $"G72 W{stepOver.NC()} R0.1\n" +
+                $"G72 P{seqNo.Item1} Q{seqNo.Item2}{(profStockAllow > 0 ? " W" + profStockAllow.NC() : string.Empty)} F{FeedRough(tool.Radius).NC()}\n" +
+                $"N{seqNo.Item1}G0 Z0.\n" +
+                $"N{seqNo.Item2}G1 X{internalDiameter.NC()}\n" +
+                $"{(profStockAllow > 0 ? $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M{Direction(tool)}\n" +
-                $"G72W{stepOver.NC()}R0.1\n" +
-                $"G72P{seqNo.Item1}Q{seqNo.Item2}{(profStockAllow > 0 ? "W" + profStockAllow.NC() : string.Empty)}F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1}G0Z0.\n" +
-                $"N{seqNo.Item2}G1X{internalDiameter.NC()}\n" +
-                $"{(profStockAllow > 0 ? $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
+                $"G0 X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} M{Direction(tool)}\n" +
+                $"G72 W{stepOver.NC()} R0.1\n" +
+                $"G72 P{seqNo.Item1} Q{seqNo.Item2}{(profStockAllow > 0 ? " W" + profStockAllow.NC() : string.Empty)} F{FeedRough(tool.Radius).NC()}\n" +
+                $"N{seqNo.Item1} G0 Z0.\n" +
+                $"N{seqNo.Item2} G1 X{internalDiameter.NC()}\n" +
+                $"{(profStockAllow > 0 ? $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
@@ -420,23 +472,24 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M{Direction(tool)}\n" +
-                $"G72W{stepOver.NC()}R0.1\n" +
-                $"G72P{seqNo.Item1}Q{seqNo.Item2}F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1}G0Z{profStockAllow.NC()}\n" +
-                $"N{seqNo.Item2}G1X{internalDiameter.NC()}\n" +
+                TURNING_REFERENT_POINT +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} M{Direction(tool)}\n" +
+                $"G72 W{stepOver.NC()} R0.1\n" +
+                $"G72 P{seqNo.Item1} Q{seqNo.Item2} F{FeedRough(tool.Radius).NC()}\n" +
+                $"N{seqNo.Item1} G0 Z{profStockAllow.NC()}\n" +
+                $"N{seqNo.Item2} G1 X{internalDiameter.NC()}\n" +
                 "M59\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()}S{CuttingSpeedRough(material)}M{Direction(tool)}\n" +
-                $"G72W{stepOver.NC()}R0.1\n" +
-                $"G72P{seqNo.Item1}Q{seqNo.Item2}F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1}G0Z{profStockAllow.NC()}\n" +
-                $"N{seqNo.Item2}G1X{internalDiameter.NC()}\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} M{Direction(tool)}\n" +
+                $"G72 W{stepOver.NC()} R0.1\n" +
+                $"G72 P{seqNo.Item1} Q{seqNo.Item2} F{FeedRough(tool.Radius).NC()}\n" +
+                $"N{seqNo.Item1} G0 Z{profStockAllow.NC()}\n" +
+                $"N{seqNo.Item2} G1 X{internalDiameter.NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
@@ -465,17 +518,18 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
-                $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
+                TURNING_REFERENT_POINT +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} M{Direction(tool)}\n" +
+                $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
-                $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} M{Direction(tool)}\n" +
+                $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
@@ -504,17 +558,18 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
-                $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
+                TURNING_REFERENT_POINT +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} M{Direction(tool)}\n" +
+                $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
-                $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} M{Direction(tool)}\n" +
+                $"G70 P{seqNo.Item1}Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
@@ -543,17 +598,18 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
-                $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
+                TURNING_REFERENT_POINT +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} M{Direction(tool)}\n" +
+                $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
-                $"G70P{seqNo.Item1}Q{seqNo.Item2}S{CuttingSpeedFinish(material)}F{FeedFinish(tool.Radius).NC()}\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} M{Direction(tool)}\n" +
+                $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
@@ -572,17 +628,18 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
-                $"G1X{internalDiameter.NC()}F{FeedFinish(tool.Radius).NC()}\n" +
+                TURNING_REFERENT_POINT +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} M{Direction(tool)}\n" +
+                $"G1 X{internalDiameter.NC()} F{FeedFinish(tool.Radius).NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
-                $"G0X{(externalDiameter + 5).NC(1)}Z{profStockAllow.NC()}S{CuttingSpeedFinish(material)}M{Direction(tool)}\n" +
-                $"G1X{internalDiameter.NC()}F{FeedFinish(tool.Radius).NC()}\n" +
+                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} M{Direction(tool)}\n" +
+                $"G1 X{internalDiameter.NC()} F{FeedFinish(tool.Radius).NC()}\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
@@ -605,14 +662,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
                 return
                     $"X{result.NC()}\n" +
-                    $"{(startProfile ? "G1Z0.\n" : string.Empty)}" +
+                    $"{(startProfile ? "G1 Z0.\n" : string.Empty)}" +
                     $"X{chamferDiameter.NC()} A-{angle.NC()}";
             }
             else if (chamferDiameter > 0 && angle > 0 && chamferSize > 0 && roundCorners)
             {
                 return
                     $"G0 X{result - 2 * (0.8 + 0.3)}\n" +
-                    $"G1Z0.\n" +
+                    $"G1 Z0.\n" +
                     $"X{result.NC()} R{(0.8 + 0.3).NC()}\n" +
                     $"X{chamferDiameter.NC()} A-{angle.NC()} R{(0.8 + 0.3).NC()}\n" +
                     $"W-{(0.8 + 0.3).NC()}";
@@ -627,27 +684,27 @@ namespace Sunduk.PWA.Infrastructure.Templates
         {
             if (tool is null || startZ <= endZ) return string.Empty;
             string approach = startZ > 0
-                ? $"G0X-{tool.Diameter.NC()}Z{startZ.NC()}S{DrillCuttingSpeed(material, tool)}M{Direction(tool)}\n"
-                : $"G0X-{tool.Diameter.NC()}Z{SAFE_APPROACH_DISTANCE.NC()}S{DrillCuttingSpeed(material, tool)}M{Direction(tool)}\nZ{startZ.NC()}\n";
+                ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()} S{DrillCuttingSpeed(material, tool)} M{Direction(tool)}\n"
+                : $"G0 X-{tool.Diameter.NC()} Z{SAFE_APPROACH_DISTANCE.NC()} S{DrillCuttingSpeed(material, tool)} M{Direction(tool)}\n Z{startZ.NC()}\n";
             string exit = startZ > 0
-                ? $"G0Z{startZ.NC()}\n"
-                : $"G0Z{SAFE_APPROACH_DISTANCE.NC()}\n";
+                ? $"G0 Z{startZ.NC()}\n"
+                : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
             return machine switch
             {
                 Machine.GS1500 =>
-                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
+                TURNING_REFERENT_POINT +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 approach +
-                $"G1Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()}F{DrillFeed(material, tool).NC(2)}\n" +
+                $"G1 Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()}F{DrillFeed(material, tool).NC(2)}\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                TURNING_REFERENT_POINT +
-                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 approach +
-                $"G1Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()}F{DrillFeed(material, tool).NC(2)}\n" +
+                $"G1 Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()} F{DrillFeed(material, tool).NC(2)}\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
@@ -656,7 +713,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        public static string MillingHighSpeedDrilling(Machine machine, Material material, DrillingTool tool, double startZ, double endZ, List<Hole> holes, bool polar = false)
+        public static string MillingHighSpeedDrilling(Machine machine, Material material, MillingDrillingTool tool, double startZ, double endZ, List<Hole> holes, bool polar = false)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
             string result = machine switch
@@ -665,17 +722,36 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 MILLING_REFERENT_POINT +
                 tool.Description(ToolDescriptionOption.General) + "\n" +
                 $"T00\n" +
-                $"{(polar ? "G16" : string.Empty)}" +
-                $"G57G0X{holes[0].X}Y{holes[0].Y}S{DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter)}\n" +
-                $"G81Z{endZ.NC(option: NcDecimalPointOption.Without)}R{startZ.NC(option: NcDecimalPointOption.Without)}F{DrillFeed(material, tool).NC(2)}\n",
+                $"{(polar ? "G16 " : string.Empty)}" +
+                $"G57 G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100)}\n" +
+                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine)}\n" +
+                $"G81 Z{endZ.NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} F{DrillFeed(material, tool).NC(0, NcDecimalPointOption.Without)}\n",
                 _ => string.Empty
             };
             if (holes.Count > 1 && !string.IsNullOrEmpty(result))
             {
                 foreach (var hole in holes.Skip(1))
                 {
-                    if (!polar) result += $"X{hole.X}";
-                    result += $"Y{hole.Y}\n";
+                    if (polar)
+                    {
+                        while (hole.Y >= 360)
+                        {
+                            hole.Y -= 360;
+                        }
+                    }
+                    if (hole.X != holes[holes.IndexOf(hole) - 1].X) 
+                    {
+                        result += $"X{hole.X.NC(option: NcDecimalPointOption.Without)} ";
+                    };
+                    if (hole.Y != holes[holes.IndexOf(hole) - 1].Y)
+                    {
+                        result += $"Y{hole.Y.NC(option: NcDecimalPointOption.Without)} ";
+                    };
+                    if (hole.Y == holes[holes.IndexOf(hole) - 1].Y && hole.X == holes[holes.IndexOf(hole) - 1].X)
+                    {
+                        result += $"X{hole.X.NC(option: NcDecimalPointOption.Without)} Y{hole.Y.NC(option: NcDecimalPointOption.Without)}";
+                    };
+                    result += "\n";
                 }
             }
             if (!string.IsNullOrEmpty(result))
@@ -702,30 +778,29 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 startZ <= endZ ||
                 depth <= 0) return string.Empty;
             string approach = startZ > 0
-                ? $"G0X-{tool.Diameter.NC()}Z{startZ.NC()}S{DrillCuttingSpeed(material, tool)}M{Direction(tool)}\n"
-                : $"G0X-{tool.Diameter.NC()}Z{SAFE_APPROACH_DISTANCE.NC()}S{DrillCuttingSpeed(material, tool)}M{Direction(tool)}\nZ{startZ.NC()}\n";
+                ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()}S{DrillCuttingSpeed(material, tool)} M{Direction(tool)}\n"
+                : $"G0 X-{tool.Diameter.NC()} Z{SAFE_APPROACH_DISTANCE.NC()}S{DrillCuttingSpeed(material, tool)} M{Direction(tool)}\nZ{startZ.NC()}\n";
             string exit = startZ > 0
-                ? $"G0Z{startZ.NC()}\n"
-                : $"G0Z{SAFE_APPROACH_DISTANCE.NC()}\n";
+                ? $"G0 Z{startZ.NC()}\n"
+                : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
             return machine switch
             {
                 Machine.GS1500 =>
                 TURNING_REFERENT_POINT +
-                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 approach +
-                "G74R0.1\n" +
-                $"G74Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()}Q{depth.Microns()}F{DrillFeed(material, tool).NC(2)}\n" +
+                "G74 R0.1\n" +
+                $"G74 Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()} Q{depth.Microns()} F{DrillFeed(material, tool).NC(2)}\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                TURNING_REFERENT_POINT +
-                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 approach +
-                "G74R0.1\n" +
-                $"G74Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()}Q{depth.Microns()}F{DrillFeed(material, tool).NC(2)}\n" +
+                "G74 R0.1\n" +
+                $"G74 Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()} Q{depth.Microns()} F{DrillFeed(material, tool).NC(2)}\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
@@ -743,29 +818,28 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 startZ <= endZ ||
                 depth <= 0) return string.Empty;
             string approach = startZ > 0
-                ? $"G0X-{tool.Diameter.NC()}Z{startZ.NC()}S{DrillCuttingSpeed(material, tool)}M{Direction(tool)}\n"
-                : $"G0X-{tool.Diameter.NC()}Z{SAFE_APPROACH_DISTANCE.NC()}S{DrillCuttingSpeed(material, tool)}M{Direction(tool)}\nZ{startZ.NC()}\n";
+                ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()} S{DrillCuttingSpeed(material, tool)} M{Direction(tool)}\n"
+                : $"G0 X-{tool.Diameter.NC()} Z{SAFE_APPROACH_DISTANCE.NC()} S{DrillCuttingSpeed(material, tool)} M{Direction(tool)}\nZ{startZ.NC()}\n";
             string exit = startZ > 0
-                ? $"G0Z{startZ.NC()}\n"
-                : $"G0Z{SAFE_APPROACH_DISTANCE.NC()}\n";
+                ? $"G0 Z{startZ.NC()}\n"
+                : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
             return machine switch
             {
                 Machine.GS1500 =>
                 TURNING_REFERENT_POINT +
-                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 approach +
-                $"G83Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()}Q{depth.Microns()}F{DrillFeed(material, tool).NC(2)}\n" +
+                $"G83 Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()} Q{depth.Microns()} F{DrillFeed(material, tool).NC(2)}\n" +
                 "G80\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                TURNING_REFERENT_POINT +
-                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 approach +
-                $"G83Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()}Q{depth.Microns()}F{DrillFeed(material, tool).NC(2)}\n" +
+                $"G83 Z{(endZ - (tool.Diameter / 2 * Math.Tan((90 - tool.Angle / 2).Radians()))).NC()} Q{depth.Microns()} F{DrillFeed(material, tool).NC(2)}\n" +
                 "G80\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
@@ -782,29 +856,28 @@ namespace Sunduk.PWA.Infrastructure.Templates
             if (tool is null ||
                 startZ <= endZ) return string.Empty;
             string approach = startZ > 0
-                ? $"G0X0.Z{startZ.NC()}S{(cutSpeed * 1000 / (tool.Diameter * Math.PI)).Round(10)}G97\n"
-                : $"G0X0.Z{SAFE_APPROACH_DISTANCE.NC()}S{(cutSpeed * 1000 / (tool.Diameter * Math.PI)).Round(10)}G97\nZ{startZ.NC()}\n";
+                ? $"G0 X0.Z{startZ.NC()}S{(cutSpeed * 1000 / (tool.Diameter * Math.PI)).Round(10)} G97\n"
+                : $"G0 X0.Z{SAFE_APPROACH_DISTANCE.NC()} S{((int)cutSpeed).ToSpindleSpeed(tool.Diameter, 10)} G97\nZ{startZ.NC()}\n";
             string exit = startZ > 0
                 ? string.Empty
-                : $"G0Z{SAFE_APPROACH_DISTANCE.NC()}\n";
+                : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
             return machine switch
             {
                 Machine.GS1500 =>
                 TURNING_REFERENT_POINT +
-                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 approach +
-                $"G84Z{endZ.NC()}P1000F{tool.Pitch.NC()}\n" +
+                $"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}\n" +
                 $"G80\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                TURNING_REFERENT_POINT +
-                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 approach +
-                $"G84Z{endZ.NC()}P1000F{tool.Pitch.NC()}\n" +
+                $"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}\n" +
                 $"G80\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
@@ -834,8 +907,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
                 threadShift = type switch
                 {
-                    CuttingType.External => $"R-{Thread.IntNPTThreadShift(endZ, startZ).NC(2)}",
-                    CuttingType.Internal => $"R{Thread.IntNPTThreadShift(endZ, startZ).NC(2)}",
+                    CuttingType.External => $" R-{Thread.IntNPTThreadShift(endZ, startZ).NC(2)}",
+                    CuttingType.Internal => $" R{Thread.IntNPTThreadShift(endZ, startZ).NC(2)}",
                     _ => string.Empty,
                 };
             }
@@ -844,20 +917,19 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
                 Machine.GS1500 =>
                 TURNING_REFERENT_POINT +
-                tool.Description(Util.Util.ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0X{approachDiameter}Z{startZ.NC()}S{(120 * 1000 / (threadDiameter * Math.PI)).Round(100)}G97\n" +
-                $"G76P0201{Thread.Profile(threadStandart)}Q{minStep}R{lastPass.NC()}\n" +
-                $"G76X{endDiameter}Z{endZ.NC()}P{profile}Q{firstPass}{threadShift}F{threadPitch.NC()}\n" +
-                $"G96{CoolantOff(machine)}\n" +
+                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"G0 X{approachDiameter} Z{startZ.NC()} S{120.ToSpindleSpeed(threadDiameter, 100)} G97\n" +
+                $"G76 P0201{Thread.Profile(threadStandart)} Q{minStep} R{lastPass.NC()}\n" +
+                $"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}\n" +
+                $"G96 {CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
-                TURNING_REFERENT_POINT +
-                tool.Description(Util.Util.ToolDescriptionOption.L230) + "\n" +
+                tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
-                $"G0X{approachDiameter}Z{startZ.NC()}S{(120 * 1000 / (threadDiameter * Math.PI)).Round(100)}G97\n" +
-                $"G76P0201{Thread.Profile(threadStandart)}Q{minStep}R{lastPass.NC()}\n" +
-                $"G76X{endDiameter}Z{endZ.NC()}P{profile}Q{firstPass}{threadShift}F{threadPitch.NC()}\n" +
+                $"G0 X{approachDiameter}Z{startZ.NC()} S{120.ToSpindleSpeed(threadDiameter, 100)} G97\n" +
+                $"G76 P0201{Thread.Profile(threadStandart)} Q{minStep} R{lastPass.NC()}\n" +
+                $"G76 X{endDiameter}Z{endZ.NC()}P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}\n" +
                 $"G96{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
