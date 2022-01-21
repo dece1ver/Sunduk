@@ -1,4 +1,4 @@
-﻿namespace Sunduk.PWA.Infrastructure.Sequences
+﻿namespace Sunduk.PWA.Infrastructure.CAM
 {
     public enum SequenceType
     {

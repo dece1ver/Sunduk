@@ -244,7 +244,15 @@ namespace Sunduk.PWA.Util
         /// <param name="cutSpeed">Скорость</param>
         /// <param name="diameter">Диаметр</param>
         /// <returns>Обороты шпинделя</returns>
-        public static int ToSpindleSpeed(this int cutSpeed, double diameter, int round = 100) => ((cutSpeed * 1000) / (int)(diameter * Math.PI)).Round(round);
+        public static int ToSpindleSpeed(this int cutSpeed, double diameter, int round = 0) => (cutSpeed * 1000 / (int)(diameter * Math.PI)).Round(round);
+
+        /// <summary>
+        /// Скорость резания в обороты
+        /// </summary>
+        /// <param name="cutSpeed">Скорость</param>
+        /// <param name="diameter">Диаметр</param>
+        /// <returns>Обороты шпинделя</returns>
+        public static int ToSpindleSpeed(this double cutSpeed, double diameter, int round = 0) => (cutSpeed * 1000 / (int)(diameter * Math.PI)).Round(round);
 
         /// <summary>
         /// Описание инструмента в УП
@@ -422,6 +430,15 @@ namespace Sunduk.PWA.Util
         {
             SetFunc = value => value.ToString(),
             GetFunc = text => Util.GetInt(text, 1, GetNumberOption.OnlyPositive),
+        };
+
+        /// <summary>
+        /// Конвертер Double
+        /// </summary>
+        public static Converter<int> EdgesConverter = new()
+        {
+            SetFunc = value => value.ToString(),
+            GetFunc = text => text.GetInt(1, GetNumberOption.OnlyPositive),
         };
 
         /// <summary>

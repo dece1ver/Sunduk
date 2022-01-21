@@ -1,4 +1,5 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences;
+﻿using Sunduk.PWA.Infrastructure.CAM;
+using Sunduk.PWA.Infrastructure.Sequences;
 using Sunduk.PWA.Util;
 using System;
 using System.Collections.Generic;

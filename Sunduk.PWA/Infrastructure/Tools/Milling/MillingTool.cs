@@ -12,6 +12,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
         public Types Type { get; set; }
         public double Diameter { get; set; }
         public double CuttingLength { get; set; }
+        public int Edges { get; set; }
         public double CornerRadius { get; set; }
         public override string Name
         {
@@ -23,11 +24,12 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
             };
         }
 
-        public MillingTool(int position, Types type, double diameter, double cuttingLength = 0, double cornerRadius = 0, ToolHand hand = ToolHand.Rigth)
+        public MillingTool(int position, Types type, double diameter, double cuttingLength = 0, int edges = 4, double cornerRadius = 0, ToolHand hand = ToolHand.Rigth)
         {
             Position = position;
             Type = type;
             Diameter = diameter;
+            Edges = edges;
             CuttingLength = cuttingLength == 0 ? (type == Types.Insert ? 10 : Math.Round(diameter * 3)) : cuttingLength;
             CornerRadius = cornerRadius == 0 ? (type == Types.Insert ? 0.8 : 0.2) : cornerRadius;
             Hand = hand;
