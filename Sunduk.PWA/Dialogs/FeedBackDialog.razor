@@ -89,7 +89,7 @@
             catch (Exception ex)
             {
                 Status = ex.Message;
-                Snackbar.Add($"Не удалось отправить сообщение.{ex.GetType()}\n{Status}", Severity.Error);
+                Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
             }
         }
     }
