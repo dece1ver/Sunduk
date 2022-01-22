@@ -52,11 +52,19 @@
     {
         if (string.IsNullOrWhiteSpace(Name))
         {
-            Snackbar.Add("Имя не должно быть пустым!", Severity.Error);
+            Snackbar.Add("Введите имя!", Severity.Error);
+        }
+        else if (Name.Length > 30)
+        {
+            Snackbar.Add("Имя слишком длинное!", Severity.Error);
         }
         else if (string.IsNullOrWhiteSpace(Message))
         {
             Snackbar.Add("Сообщение не должно быть пустым!", Severity.Error);
+        }
+        else if (Message.Length > 300)
+        {
+            Snackbar.Add("Сообщение слишком длинное, воспользуйтесь электронной почтой!", Severity.Error);
         }
         else
         {
@@ -64,7 +72,9 @@
 
             try
             {
-                Status = await http.GetStringAsync($"https://sunduk-api.azurewebsites.net/sendmessage|{WebUtility.UrlEncode(Encode(Name))}|{WebUtility.UrlEncode(Encode(Message))}");
+                var tempName = WebUtility.UrlEncode(Encode(Name));
+                var tempMessage = WebUtility.UrlEncode(Encode(Message));
+                Status = await http.GetStringAsync($"https://sunduk-api.azurewebsites.net/sendmessage|{tempName}|{tempMessage}");
 
                 if (Status == "Ok")
                 {
@@ -76,21 +86,23 @@
                     Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Status = e.Message;
+                Status = ex.Message;
                 Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
             }
         }
     }
 
-    private string Encode(string message)
+    private static string Encode(string text)
     {
-        return message
-            .Replace(@"/", "_1_")
-            .Replace(@"\", "__1_")
-            .Replace(@".", "___1_")
-            .Replace(@"@", "____1_");
+        return text
+            .Replace(@" ", "__space__")
+            .Replace("/", "__slash__")
+            .Replace("\\", "__backslash__")
+            .Replace(".", "__dot__")
+            .Replace("|", "__pipeline__")
+            .Replace("+", "__plus__")
+            .Replace("@", "__at__");
     }
-
 }
