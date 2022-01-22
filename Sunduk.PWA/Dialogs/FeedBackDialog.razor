@@ -74,7 +74,7 @@
             {
                 var tempName = WebUtility.UrlEncode(Name);
                 var tempMessage = WebUtility.UrlEncode(Message);
-                Status = await http.GetStringAsync($"https://localhost:7269/sendmessage|{tempName}|{tempMessage}");
+                Status = await http.GetStringAsync($"https://sunduk-api.azurewebsites.net/sendmessage|{tempName}|{tempMessage}");
 
                 if (Status == "Ok")
                 {
