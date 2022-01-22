@@ -64,6 +64,7 @@
 
             try
             {
+
                 Status = await http.GetStringAsync($"https://sunduk-api.azurewebsites.net/sendmessage|{WebUtility.UrlEncode(Encode(Name))}|{WebUtility.UrlEncode(Encode(Message))}");
 
                 if (Status == "Ok")
@@ -76,10 +77,10 @@
                     Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Status = e.Message;
-                Snackbar.Add($"Не удалось отправить сообщение.", Severity.Error);
+                Status = ex.Message;
+                Snackbar.Add($"Не удалось отправить сообщение.{ex.GetType()}\n{Status}", Severity.Error);
             }
         }
     }
