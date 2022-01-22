@@ -12,8 +12,7 @@ builder.Services.AddCors(options =>
                           builder.WithOrigins("https://sunduk.one",
                                               "https://www.sunduk.one",
                                               "https://test.sunduk.one",
-                                              "https://www.test.sunduk.one",
-                                              "https://localhost:44306");
+                                              "https://www.test.sunduk.one");
                       });
 });
 

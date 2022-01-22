@@ -40,6 +40,7 @@ namespace Sunduk.WebApi
                 .Replace("__backslash__", "\\")
                 .Replace("__dot__", ".")
                 .Replace("__pipeline__", "|")
+                .Replace("__plus__", "+")
                 .Replace("__at__", "@");
         }
 
