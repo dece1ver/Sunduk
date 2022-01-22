@@ -88,10 +88,11 @@
     private string Encode(string message)
     {
         return message
-            .Replace(@"/", "_1_")
-            .Replace(@"\", "__1_")
-            .Replace(@".", "___1_")
-            .Replace(@"@", "____1_");
+            .Replace(@" ", "_1_")
+            .Replace(@"/", "__1_")
+            .Replace(@"\", "___1_")
+            .Replace(@".", "____1_")
+            .Replace(@"@", "_____1_");
     }
 
 }

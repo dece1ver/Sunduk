@@ -35,11 +35,11 @@ namespace Sunduk.WebApi
         private static string Decode(string message)
         {
             return message
-                .Replace(@"____1_", "@")
-                .Replace(@"___1_", ".")
-                .Replace(@"__1_", @"\")
-                .Replace(@"_1_", @"/");
-
+                .Replace(@"_____1_", @"@")
+                .Replace(@"____1_", @".")
+                .Replace(@"___1_", @"\")
+                .Replace(@"__1_", @"/")
+                .Replace(@"_1_", @" ");
         }
 
     }
