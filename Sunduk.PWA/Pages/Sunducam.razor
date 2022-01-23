@@ -224,19 +224,7 @@
 
     public Material WorkpieceMaterial { get; set; }
     public Machine Machine { get; set; }
-    public MachineType MachineType
-    {
-        get
-        {
-            return Machine switch
-            {
-                Machine.L230A => MachineType.Turning,
-                Machine.GS1500 => MachineType.Turning,
-                Machine.A110 => MachineType.Milling,
-                _ => MachineType.Turning
-            };
-        }
-    }
+    public MachineType MachineType { get => Machine.GetMachineType(); }
 
     public string _WorkpieceExternalDiameter { get; set; } = "50";
     public double WorkpieceExternalDiameter { get => Util.GetDouble(_WorkpieceExternalDiameter); }
@@ -314,7 +302,7 @@
             return MachineType switch
             {
                 MachineType.Turning => "\nM30\n%",
-                MachineType.Milling => "\nG91G30Z0\nG90G53X-800Y0\nM30\n%",
+                MachineType.Milling => "\nM30\n%",
                 _ => string.Empty
             };
         } }
@@ -567,7 +555,7 @@
                         newHeaderSequence.DetailName = NcDetailName;
                         newHeaderSequence.Author = NcAuthor;
                         newHeaderSequence.DrawVersion = DrawningVersion;
-                        newHeaderSequence.ToolTable = Util.GetToolTable(Program);
+                        newHeaderSequence.ToolTable = Util.GetToolTable(Machine, Program);
                         Program[i] = newHeaderSequence;
                         break;
                     case SafetyStringSequence safetyStringSequence:
@@ -645,7 +633,14 @@
 
             foreach (var sequence in Program)
             {
-                result.Add(sequence.Operation);
+                if (Program.IndexOf(sequence) == Program.Count - 1)
+                {
+                    result.Add(sequence.Operation.Replace("/", string.Empty).Replace("M1", string.Empty));
+                }
+                else
+                {
+                    result.Add(sequence.Operation);
+                }
             }
             return string.Join("\n", result.Where(x => !string.IsNullOrEmpty(x))).Trim() + ProgramEnd;
         }

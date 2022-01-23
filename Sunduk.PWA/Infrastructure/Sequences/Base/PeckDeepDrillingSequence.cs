@@ -16,7 +16,6 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
         public double Depth { get; set; }
         public double StartZ { get; set; }
         public double EndZ { get; set; }
-        public override string Operation => Templates.Operation.PeckDeepDrilling(Machine, Material, Tool, Depth, StartZ, EndZ);
 
         public PeckDeepDrillingSequence(Machine machine, Material material, DrillingTool tool, double depth, double startZ, double endZ)
         {

@@ -8,11 +8,14 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Milling
     public class MillingPeckDrillingSequence : PeckDrillingSequence
     {
         public List<Hole> Holes { get; set; }
+        public bool Polar { get; set; }
         public override MachineType MachineType => MachineType.Milling;
-        public MillingPeckDrillingSequence(Machine machine, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes) 
+        public override string Operation => Templates.Operation.MillingPeckDrilling(Machine, Material, Tool as MillingDrillingTool, Depth, StartZ, EndZ, Holes, Polar);
+        public MillingPeckDrillingSequence(Machine machine, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes, bool polar) 
             : base(machine, material, tool, depth, startZ, endZ)
         {
             Holes = holes;
+            Polar = polar;
         }
     }
 }

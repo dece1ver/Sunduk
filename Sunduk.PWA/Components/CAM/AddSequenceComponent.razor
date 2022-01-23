@@ -61,7 +61,7 @@
                     }
                 </MudSelect>
             </MudItem>
-            @if (GeneralSequence == GeneralSequences.ToolCall || MachineType == MachineType.Milling)
+            @if (GeneralSequence == GeneralSequences.ToolCall && MachineType == MachineType.Milling)
             {
                 <MudItem xs="12" md="6">
                     <MudSelect Label="Тип охлаждения" T="CoolantType" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="Coolant">
@@ -733,7 +733,12 @@
             }
             if (Type == SequenceType.General && GeneralSequence == GeneralSequences.ToolCall)
             {
-                return Operation.ToolCall(Machine, Tool, Coolant, ToolCallPolar);
+                return MachineType switch
+                {
+                    MachineType.Turning => Operation.TurningToolCall(Machine, Tool, Coolant, ToolCallPolar),
+                    MachineType.Milling => Operation.MillingToolCall(Machine, Tool, Coolant, ToolCallPolar),
+                    _ => string.Empty,
+                };
             }
 
             if (Type == SequenceType.ExternalTurning && TurningSequence == TurningSequences.Facing)
@@ -782,12 +787,39 @@
 
             if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.PeckingDrilling)
             {
-                return Operation.PeckDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDepth, DrillStart, DrillEnd);
+                return MachineType switch
+                {
+                    MachineType.Turning => Operation.TurningPeckDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDepth, DrillStart, DrillEnd),
+                    MachineType.Milling => Operation.MillingPeckDrilling(
+                        Machine,
+                        WorkpieceMaterial,
+                        Tool as MillingDrillingTool,
+                        PeckingDepth,
+                        DrillStart,
+                        DrillEnd,
+                        HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
+                        HolesSetter == HolesSetterType.Cylinder ? true : false),
+                    _ => string.Empty
+                };
+                
             }
 
             if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.PeckingDeepDrilling)
             {
-                return Operation.PeckDeepDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDeepDepth, DrillStart, DrillEnd);
+                return MachineType switch
+                {
+                    MachineType.Turning => Operation.TurningPeckDeepDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDeepDepth, DrillStart, DrillEnd),
+                    MachineType.Milling => Operation.MillingPeckDeepDrilling(
+                        Machine,
+                        WorkpieceMaterial,
+                        Tool as MillingDrillingTool,
+                        PeckingDeepDepth,
+                        DrillStart,
+                        DrillEnd,
+                        HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
+                        HolesSetter == HolesSetterType.Cylinder ? true : false),
+                    _ => string.Empty
+                };
             }
 
             if (Type == SequenceType.Threading && ThreadingSequence == ThreadingSequences.ThreadCutting && ThreadType == CuttingType.External)
@@ -819,6 +851,21 @@
                     case GeneralSequences.Limiter:
                         sequence = new LimiterSequence(Machine, Tool, WorkpieceExternalDiameter)
                         { Name = $"Упор" };
+                        break;
+                    case GeneralSequences.ToolCall:
+                        switch (MachineType)
+                        {
+                            case MachineType.Turning:
+                                sequence = new TurningToolCallSequence(Machine, Tool)
+                                { Name = $"Вызов инструмента" };
+                                break;
+                            case MachineType.Milling:
+                                sequence = new MillingToolCallSequence(Machine, Tool, Coolant, ToolCallPolar)
+                                { Name = $"Вызов инструмента" };
+                                break;
+                            default:
+                                break;
+                        }
                         break;
                     default:
                         break;
@@ -945,14 +992,14 @@
                         {
                             sequence = new MillingHighSpeedDrillingSequence(
                                 Machine,
-                        WorkpieceMaterial,
-                        Tool as MillingDrillingTool,
-                        DrillStart,
-                        DrillEnd,
-                        HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
-                        HolesSetter == HolesSetterType.Cylinder ? true : false)
-                            { Name = "Сверление" };
-                        }
+                                WorkpieceMaterial,
+                                Tool as MillingDrillingTool,
+                                DrillStart,
+                                DrillEnd,
+                                HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
+                                HolesSetter == HolesSetterType.Cylinder ? true : false)
+                                { Name = "Сверление" };
+                                }
                         break;
                     case DrillingSequences.PeckingDrilling:
                         if (MachineType == MachineType.Turning)
@@ -975,9 +1022,10 @@
                                 PeckingDepth,
                                 DrillStart,
                                 DrillEnd,
-                                Holes)
-                            { Name = "Сверление с выходом" };
-                        }
+                                HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
+                                HolesSetter == HolesSetterType.Cylinder ? true : false)
+                                { Name = "Сверление" };
+                                }
                         break;
                     case DrillingSequences.PeckingDeepDrilling:
                         if (MachineType == MachineType.Turning)
@@ -1000,9 +1048,10 @@
                                 PeckingDeepDepth,
                                 DrillStart,
                                 DrillEnd,
-                                Holes)
-                            { Name = "Глубокое сверление" };
-                        }
+                                HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
+                                HolesSetter == HolesSetterType.Cylinder ? true : false)
+                                { Name = "Глубокое сверление" };
+                                }
                         break;
                     default:
                         break;

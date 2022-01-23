@@ -1,4 +1,5 @@
 ﻿using MudBlazor;
+using Sunduk.PWA.Infrastructure;
 using Sunduk.PWA.Infrastructure.Sequences;
 using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Sequences.Turning;
@@ -208,6 +209,55 @@ namespace Sunduk.PWA.Util
             return value;
         }
 
+        public static MachineType GetMachineType(this Machine machine)
+        {
+            return machine switch
+            {
+                Machine.L230A => MachineType.Turning,
+                Machine.GS1500 => MachineType.Turning,
+                Machine.A110 => MachineType.Milling,
+                _ => MachineType.Turning
+            };
+        }
+
+        /// <summary>
+        /// Добавляет отверстия к переданному куску перехода сверления
+        /// </summary>
+        /// <param name="operation">Заполняемая строка</param>
+        /// <param name="holes">Список отверстий</param>
+        /// <param name="polar">Используется ли программирование в порялной системе координат</param>
+        /// <returns></returns>
+        public static string AddPoints(ref string operation, List<Hole> holes, bool polar = false)
+        {
+            if (holes.Count > 1 && !string.IsNullOrEmpty(operation))
+            {
+                foreach (var hole in holes.Skip(1))
+                {
+                    if (polar)
+                    {
+                        while (hole.Y >= 360)
+                        {
+                            hole.Y -= 360;
+                        }
+                    }
+                    if (hole.X != holes[holes.IndexOf(hole) - 1].X)
+                    {
+                        operation += $"X{hole.X.NC(option: NcDecimalPointOption.Without)} ";
+                    };
+                    if (hole.Y != holes[holes.IndexOf(hole) - 1].Y)
+                    {
+                        operation += $"Y{hole.Y.NC(option: NcDecimalPointOption.Without)} ";
+                    };
+                    if (hole.Y == holes[holes.IndexOf(hole) - 1].Y && hole.X == holes[holes.IndexOf(hole) - 1].X)
+                    {
+                        operation += $"X{hole.X.NC(option: NcDecimalPointOption.Without)} Y{hole.Y.NC(option: NcDecimalPointOption.Without)}";
+                    };
+                    operation += "\n";
+                }
+            }
+            return operation;
+        }
+
         /// <summary>
         /// Форматирует число в номер инструмента
         /// </summary>
@@ -253,6 +303,24 @@ namespace Sunduk.PWA.Util
         /// <param name="diameter">Диаметр</param>
         /// <returns>Обороты шпинделя</returns>
         public static int ToSpindleSpeed(this double cutSpeed, double diameter, int round = 0) => (cutSpeed * 1000 / (int)(diameter * Math.PI)).Round(round);
+
+        /// <summary>
+        /// Подачу на оборот в минутную подачу
+        /// </summary>
+        /// <param name="cutSpeed">Скорость</param>
+        /// <param name="diameter">Диаметр</param>
+        /// <returns>Обороты шпинделя</returns>
+        public static int ToFeedPerMin(this int cutFeed, double spindleSpeed, int edges = 1, int round = 0) => (cutFeed * spindleSpeed * edges).Round(round);
+
+        /// <summary>
+        /// Подачу на оборот в минутную подачу
+        /// </summary>
+        /// <param name="cutSpeed">Скорость</param>
+        /// <param name="diameter">Диаметр</param>
+        /// <returns>Обороты шпинделя</returns>
+        public static int ToFeedPerMin(this double cutFeed, double spindleSpeed, int edges = 1, int round = 0) => (cutFeed * spindleSpeed * edges).Round(round);
+
+        public static double PointLength(this DrillingTool drillingTool) => (drillingTool.Diameter / 2 * Math.Tan((90 - drillingTool.Angle / 2).Radians()));
 
         /// <summary>
         /// Описание инструмента в УП
@@ -382,16 +450,25 @@ namespace Sunduk.PWA.Util
         /// </summary>
         /// <param name="program">Программа в виде списка переходов</param>
         /// <returns></returns>
-        public static string GetToolTable(List<Sequence> program)
+        public static string GetToolTable(Machine machine, List<Sequence> program) // переписать без регулярок, через инструмент в переходах
         {
             List<string> tools = new();
-            foreach (var line in program)
+            foreach (var seq in program)
             {
-                var programLine = line.Operation;
-                if (new Regex(@"T(\d+)", RegexOptions.Compiled).IsMatch(programLine) && programLine.Contains("("))
+                var programLines = seq.Operation;
+                foreach (var line in programLines.Split('\n'))
                 {
-                    var fLine = "(" + programLine.Split("(")[1].Split(")")[0] + ")";
-                    if (!tools.Contains(fLine)) tools.Add(fLine);
+                    if (new Regex(@"T(\d+)", RegexOptions.Compiled).IsMatch(line) && line.Contains("(") && !line.StartsWith('('))
+                    {
+                        var fLine = machine switch
+                        {
+                            Machine.L230A => "(" + line.Split("(")[1].Split(")")[0] + ")",
+                            Machine.GS1500 => "(" + line.Split("(")[1].Split(")")[0] + ")",
+                            Machine.A110 => $"(T{line.Split('T')[1].Split('(')[0].Trim():D2} - " + line.Split("(")[1].Split(")")[0] + ")",
+                            _ => string.Empty,
+                        };
+                        if (!tools.Contains(fLine)) tools.Add(fLine);
+                    }
                 }
             }
             if (tools.Count <= 1) return string.Empty;
