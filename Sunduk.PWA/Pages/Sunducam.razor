@@ -603,28 +603,48 @@
                         break;
                     case FinishFacingCycleSequence finishFacingCycleSequence:
                         break;
-                    case HighSpeedDrillingSequence highSpeedDrillingSequence:
-                        HighSpeedDrillingSequence newHighSpeedDrillingSequence = Program[i] as HighSpeedDrillingSequence;
-                        newHighSpeedDrillingSequence.Machine = Machine;
-                        newHighSpeedDrillingSequence.Material = WorkpieceMaterial;
+                    case TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence:
+                        TurningHighSpeedDrillingSequence newTurningHighSpeedDrillingSequence = Program[i] as TurningHighSpeedDrillingSequence;
+                        newTurningHighSpeedDrillingSequence.Machine = Machine;
+                        newTurningHighSpeedDrillingSequence.Material = WorkpieceMaterial;
                         break;
-                    case PeckDrillingSequence peckDrillingSequence:
-                        PeckDrillingSequence newPeckDrillingSequence = Program[i] as PeckDrillingSequence;
-                        newPeckDrillingSequence.Machine = Machine;
-                        newPeckDrillingSequence.Material = WorkpieceMaterial;
+                    case MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence:
+                        MillingHighSpeedDrillingSequence newMillingHighSpeedDrillingSequencee = Program[i] as MillingHighSpeedDrillingSequence;
+                        newMillingHighSpeedDrillingSequencee.Machine = Machine;
+                        newMillingHighSpeedDrillingSequencee.Material = WorkpieceMaterial;
                         break;
-                    case PeckDeepDrillingSequence peckDeepDrillingSequence:
-                        PeckDeepDrillingSequence newPeckDeepDrillingSequence = Program[i] as PeckDeepDrillingSequence;
-                        newPeckDeepDrillingSequence.Machine = Machine;
-                        newPeckDeepDrillingSequence.Material = WorkpieceMaterial;
+                    case TurningPeckDrillingSequence turningPeckDrillingSequence:
+                        TurningPeckDrillingSequence newTurningPeckDrillingSequence = Program[i] as TurningPeckDrillingSequence;
+                        newTurningPeckDrillingSequence.Machine = Machine;
+                        newTurningPeckDrillingSequence.Material = WorkpieceMaterial;
+                        break;
+                    case MillingPeckDrillingSequence millingPeckDrillingSequence:
+                        MillingPeckDrillingSequence newMillingPeckDrillingSequence = Program[i] as MillingPeckDrillingSequence;
+                        newMillingPeckDrillingSequence.Machine = Machine;
+                        newMillingPeckDrillingSequence.Material = WorkpieceMaterial;
+                        break;
+                    case TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence:
+                        TurningPeckDeepDrillingSequence newTurningPeckDeepDrillingSequence = Program[i] as TurningPeckDeepDrillingSequence;
+                        newTurningPeckDeepDrillingSequence.Machine = Machine;
+                        newTurningPeckDeepDrillingSequence.Material = WorkpieceMaterial;
+                        break;
+                    case MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence:
+                        MillingPeckDeepDrillingSequence newMillingPeckDeepDrillingSequence = Program[i] as MillingPeckDeepDrillingSequence;
+                        newMillingPeckDeepDrillingSequence.Machine = Machine;
+                        newMillingPeckDeepDrillingSequence.Material = WorkpieceMaterial;
                         break;
                     case TurningTappingSequence TurningTappingSequence:
                         TurningTappingSequence newTurningTappingSequence = Program[i] as TurningTappingSequence;
                         newTurningTappingSequence.Machine = Machine;
                         break;
+                    // миллинг таппинг
                     case ThreadCuttingSequence threadCuttingSequence:
                         ThreadCuttingSequence newThreadCuttingSequence = Program[i] as ThreadCuttingSequence;
                         newThreadCuttingSequence.Machine = Machine;
+                        break;
+                    case ToolCallSequence toolCallSequence:
+                        ToolCallSequence newToolCallSequence = Program[i] as ToolCallSequence;
+                        newToolCallSequence.Machine = Machine;
                         break;
                     default:
                         break;

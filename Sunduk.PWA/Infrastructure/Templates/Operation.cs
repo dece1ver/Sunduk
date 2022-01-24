@@ -26,6 +26,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public const string GOODWAY_RETURN_B = "G55 G30 B0\n";
         public const string STOP = "M0";
         public const string OP_STOP = "M1";
+        public const string PROCESSING_SNIPPET = "(---OBRABOTKA---)\n";
 
         
 
@@ -271,13 +272,13 @@ namespace Sunduk.PWA.Infrastructure.Templates
             TURNING_REFERENT_POINT_CONSISTENTLY +
             GOODWAY_RETURN_B +
             "G40 G80\n" +
-            $"G50 S{((speedLimit ?? 0) > 4000 ? 4000 : speedLimit ?? 3000)}\n" +
+            $"G50 S{((speedLimit ?? 0) > 4000 ? 4000 : speedLimit ?? 3500)}\n" +
             "G96\n",
 
             Machine.L230A =>
             TURNING_REFERENT_POINT_CONSISTENTLY +
             "G40 G80 G55\n" +
-            $"G50 S{((speedLimit ?? 0) > 5000 ? 5000 : speedLimit ?? 3500)}\n" +
+            $"G50 S{((speedLimit ?? 0) > 5000 ? 5000 : speedLimit ?? 3000)}\n" +
             "G96 G23\n",
 
             Machine.A110 => string.Empty,
@@ -324,12 +325,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machine.GS1500 =>
                 TURNING_REFERENT_POINT +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"{CoolantOff(machine)}\n\n" +
+                $"{CoolantOff(machine)}\n" +
+                PROCESSING_SNIPPET +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOff(machine)}\n\n" +
+                $"{CoolantOff(machine)}\n" +
+                PROCESSING_SNIPPET +
                 TURNING_REFERENT_POINT,
 
                 _ => string.Empty,
@@ -337,7 +340,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         }
 
         /// <summary>
-        /// Токарный вызов инструмента
+        /// Фрезерный вызов инструмента
         /// </summary>
         public static string MillingToolCall(Machine machine, Tool tool, CoolantType coolant = CoolantType.General, bool polar = false)
         {
@@ -362,7 +365,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"T00\n" +
                 $"{(polar ? "G16 " : string.Empty)}" +
                 $"G57 G0 X0 Y0 S3000 {direction}\n" +
-                $"G43 Z100 H{tool.Position} {((direction == "M13" || direction == "M14") ? string.Empty : CoolantOn(machine, coolant))}\n\n" +
+                $"G43 Z100 H{tool.Position} {((direction == "M13" || direction == "M14") ? string.Empty : CoolantOn(machine, coolant))}\n" +
+                PROCESSING_SNIPPET +
                 $"{CoolantOff(machine, coolant)}\n" +
                 $"{(polar ? "G15\n" : string.Empty)}" +
                 MILLING_REFERENT_POINT,
@@ -918,13 +922,13 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Нарезание резьбы метчиком
         /// </summary>
-        public static string Tapping(Machine machine, TappingTool tool, double cutSpeed, double startZ, double endZ)
+        public static string TurningTapping(Machine machine, TappingTool tool, double cutSpeed, double startZ, double endZ)
         {
             if (tool is null ||
                 startZ <= endZ) return string.Empty;
             string approach = startZ > 0
-                ? $"G0 X0.Z{startZ.NC()}S{(cutSpeed * 1000 / (tool.Diameter * Math.PI)).Round(10)} G97\n"
-                : $"G0 X0.Z{SAFE_APPROACH_DISTANCE.NC()} S{((int)cutSpeed).ToSpindleSpeed(tool.Diameter, 10)} G97\nZ{startZ.NC()}\n";
+                ? $"G0 X0. Z{startZ.NC()} S{cutSpeed.ToSpindleSpeed(tool.Diameter, 10)} G97\n"
+                : $"G0 X0. Z{SAFE_APPROACH_DISTANCE.NC()} S{((int)cutSpeed).ToSpindleSpeed(tool.Diameter, 10)} G97\nZ{startZ.NC()}\n";
             string exit = startZ > 0
                 ? string.Empty
                 : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
@@ -937,7 +941,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}\n" +
                 $"G80\n" +
                 exit +
-                $"{CoolantOff(machine)}\n" +
+                $"G96 {CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
@@ -947,11 +951,44 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}\n" +
                 $"G80\n" +
                 exit +
-                $"{CoolantOff(machine)}\n" +
+                $"G96 {CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
-
                 _ => string.Empty
             };
+        }
+
+        public static string MillingTapping(Machine machine, MillingTappingTool tool, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar = false)
+        {
+            if (tool is null || startZ <= endZ) return string.Empty;
+            var spindleSpeed = cutSpeed.ToSpindleSpeed(tool.Diameter, 10);
+            string result = machine switch
+            {
+
+                Machine.A110 =>
+                tool.Description(ToolDescriptionOption.General) + "\n" +
+                $"T00\n" +
+                $"{(polar ? "G16 " : string.Empty)}" +
+                $"G57 G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
+                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, CoolantType.Through)}\n" +
+                $"G95 G84 Z{endZ.NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} P500 F{tool.Pitch.NC()}\n",
+                _ => string.Empty
+            };
+
+            AddPoints(ref result, holes, polar);
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                result += machine switch
+                {
+                    Machine.A110 =>
+                    $"G80\n" +
+                    $"{CoolantOff(machine)}\n" +
+                    $"{(polar ? "G15" : string.Empty)}" +
+                    MILLING_REFERENT_POINT,
+                    _ => string.Empty
+                };
+            }
+            return result;
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class TurningTappingSequence : TappingSequence
     {
         public override MachineType MachineType => MachineType.Turning;
+        public override string Operation => Templates.Operation.TurningTapping(Machine, Tool as TurningTappingTool, CutSpeed, StartZ, EndZ);
         public TurningTappingSequence(Machine machine, TurningTappingTool tool, double cutSpeed, double startZ, double endZ)
             :base(machine, tool, cutSpeed, startZ, endZ)
         {
