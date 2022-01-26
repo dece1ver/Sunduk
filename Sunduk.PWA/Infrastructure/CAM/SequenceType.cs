@@ -3,6 +3,7 @@
     public enum SequenceType
     {
         General,
+        Facing,
         ExternalTurning,
         InternalTurning,
         Drilling,

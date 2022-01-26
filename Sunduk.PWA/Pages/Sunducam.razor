@@ -78,7 +78,7 @@
         {
             case Mode.General:
                 <MudItem xs="12" sm="6">
-                    <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
+                    <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense" @onfocusout="DropSelection">
                         <MudList Clickable="true" @bind-SelectedItem="SelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" Dense="true" DisableGutters=true>
                             @if (Program != null)
                             {
@@ -106,7 +106,7 @@
                                                 }
                                                 <MudText Class="ma-3 mr-auto" Typo=Typo.body2>@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
                                                 <div Class="d-inline-flex justify-end py-2 px-3">
-                                                    @if ((int)SelectedSequenceIndex == Program.IndexOf(seq))
+                                                    @if (SelectedSequenceIndex != null && (int)SelectedSequenceIndex == Program.IndexOf(seq))
                                                     {
                                                         <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -3px; margin-bottom: -3px">
                                                             @if (Program.IndexOf(seq) != Program.Count - 1)
@@ -145,6 +145,19 @@
                                       Variant="Variant.Text" @bind-Text="@ProgramText" 
                                       ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
                     </MudField>
+                    @*<MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense">
+                            @foreach (var programLine in programList)
+                            {
+                                <MudText Style="font-family: 'Roboto Mono', monospace; font-size: medium;">
+                                    <MudHighlighter Text="@programLine" 
+                                        Class="mud-primary-text"
+                                        Style="background-color:transparent;"
+                                        HighlightedText="@HighLight"
+                                        UntilNextBoundary="false"
+                                        CaseSensitive="true" />
+                                </MudText>
+                            }
+                    </MudField>*@
                 </MudItem>
                 break;
             case Mode.ToolTable:
@@ -183,7 +196,7 @@
 
     public Mode Mode { get; set; } = Mode.General;
 
-    public string Message { get; set; } = string.Empty;
+    public string HighLight => SelectedSequence is null ? string.Empty : Program[(int)SelectedSequenceIndex].Operation.Split('\n')[0];
 
     public MudListItem SelectedSequence;
     public object SelectedSequenceIndex = 0;
@@ -224,19 +237,7 @@
 
     public Material WorkpieceMaterial { get; set; }
     public Machine Machine { get; set; }
-    public MachineType MachineType
-    {
-        get
-        {
-            return Machine switch
-            {
-                Machine.L230A => MachineType.Turning,
-                Machine.GS1500 => MachineType.Turning,
-                Machine.A110 => MachineType.Milling,
-                _ => MachineType.Turning
-            };
-        }
-    }
+    public MachineType MachineType { get => Machine.GetMachineType(); }
 
     public string _WorkpieceExternalDiameter { get; set; } = "50";
     public double WorkpieceExternalDiameter { get => Util.GetDouble(_WorkpieceExternalDiameter); }
@@ -314,7 +315,7 @@
             return MachineType switch
             {
                 MachineType.Turning => "\nM30\n%",
-                MachineType.Milling => "\nG91G30Z0\nG90G53X-800Y0\nM30\n%",
+                MachineType.Milling => "\nM30\n%",
                 _ => string.Empty
             };
         } }
@@ -542,6 +543,12 @@
         SelectedSequenceIndex = (object)index;
     }
 
+    private void DropSelection()
+    {
+        SelectedSequence = null;
+        SelectedSequenceIndex = null;
+    }
+
     private async Task DownloadProgram()
     {
         bool resultDialog = await OpenConfirmDialog($"Скачать файл \"{NcDetailNumber}.nc\" ?");
@@ -567,7 +574,7 @@
                         newHeaderSequence.DetailName = NcDetailName;
                         newHeaderSequence.Author = NcAuthor;
                         newHeaderSequence.DrawVersion = DrawningVersion;
-                        newHeaderSequence.ToolTable = Util.GetToolTable(Program);
+                        newHeaderSequence.ToolTable = Util.GetToolTable(Machine, Program);
                         Program[i] = newHeaderSequence;
                         break;
                     case SafetyStringSequence safetyStringSequence:
@@ -615,28 +622,48 @@
                         break;
                     case FinishFacingCycleSequence finishFacingCycleSequence:
                         break;
-                    case HighSpeedDrillingSequence highSpeedDrillingSequence:
-                        HighSpeedDrillingSequence newHighSpeedDrillingSequence = Program[i] as HighSpeedDrillingSequence;
-                        newHighSpeedDrillingSequence.Machine = Machine;
-                        newHighSpeedDrillingSequence.Material = WorkpieceMaterial;
+                    case TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence:
+                        TurningHighSpeedDrillingSequence newTurningHighSpeedDrillingSequence = Program[i] as TurningHighSpeedDrillingSequence;
+                        newTurningHighSpeedDrillingSequence.Machine = Machine;
+                        newTurningHighSpeedDrillingSequence.Material = WorkpieceMaterial;
                         break;
-                    case PeckDrillingSequence peckDrillingSequence:
-                        PeckDrillingSequence newPeckDrillingSequence = Program[i] as PeckDrillingSequence;
-                        newPeckDrillingSequence.Machine = Machine;
-                        newPeckDrillingSequence.Material = WorkpieceMaterial;
+                    case MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence:
+                        MillingHighSpeedDrillingSequence newMillingHighSpeedDrillingSequencee = Program[i] as MillingHighSpeedDrillingSequence;
+                        newMillingHighSpeedDrillingSequencee.Machine = Machine;
+                        newMillingHighSpeedDrillingSequencee.Material = WorkpieceMaterial;
                         break;
-                    case PeckDeepDrillingSequence peckDeepDrillingSequence:
-                        PeckDeepDrillingSequence newPeckDeepDrillingSequence = Program[i] as PeckDeepDrillingSequence;
-                        newPeckDeepDrillingSequence.Machine = Machine;
-                        newPeckDeepDrillingSequence.Material = WorkpieceMaterial;
+                    case TurningPeckDrillingSequence turningPeckDrillingSequence:
+                        TurningPeckDrillingSequence newTurningPeckDrillingSequence = Program[i] as TurningPeckDrillingSequence;
+                        newTurningPeckDrillingSequence.Machine = Machine;
+                        newTurningPeckDrillingSequence.Material = WorkpieceMaterial;
+                        break;
+                    case MillingPeckDrillingSequence millingPeckDrillingSequence:
+                        MillingPeckDrillingSequence newMillingPeckDrillingSequence = Program[i] as MillingPeckDrillingSequence;
+                        newMillingPeckDrillingSequence.Machine = Machine;
+                        newMillingPeckDrillingSequence.Material = WorkpieceMaterial;
+                        break;
+                    case TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence:
+                        TurningPeckDeepDrillingSequence newTurningPeckDeepDrillingSequence = Program[i] as TurningPeckDeepDrillingSequence;
+                        newTurningPeckDeepDrillingSequence.Machine = Machine;
+                        newTurningPeckDeepDrillingSequence.Material = WorkpieceMaterial;
+                        break;
+                    case MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence:
+                        MillingPeckDeepDrillingSequence newMillingPeckDeepDrillingSequence = Program[i] as MillingPeckDeepDrillingSequence;
+                        newMillingPeckDeepDrillingSequence.Machine = Machine;
+                        newMillingPeckDeepDrillingSequence.Material = WorkpieceMaterial;
                         break;
                     case TurningTappingSequence TurningTappingSequence:
                         TurningTappingSequence newTurningTappingSequence = Program[i] as TurningTappingSequence;
                         newTurningTappingSequence.Machine = Machine;
                         break;
+                    // миллинг таппинг
                     case ThreadCuttingSequence threadCuttingSequence:
                         ThreadCuttingSequence newThreadCuttingSequence = Program[i] as ThreadCuttingSequence;
                         newThreadCuttingSequence.Machine = Machine;
+                        break;
+                    case ToolCallSequence toolCallSequence:
+                        ToolCallSequence newToolCallSequence = Program[i] as ToolCallSequence;
+                        newToolCallSequence.Machine = Machine;
                         break;
                     default:
                         break;
@@ -645,13 +672,20 @@
 
             foreach (var sequence in Program)
             {
-                result.Add(sequence.Operation);
+                if (Program.IndexOf(sequence) == Program.Count - 1)
+                {
+                    result.Add(sequence.Operation.Replace("/", string.Empty).Replace("M1", string.Empty));
+                }
+                else
+                {
+                    result.Add(sequence.Operation);
+                }
             }
             return string.Join("\n", result.Where(x => !string.IsNullOrEmpty(x))).Trim() + ProgramEnd;
         }
-        set { }
+        set { }        
     }
-
+    IEnumerable<string> programList => ProgramText.Split('\n').ToList();
 
     // Инструмент
 

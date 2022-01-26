@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sunduk.PWA.Infrastructure.Tools.Base;
+using System;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Base
 {
