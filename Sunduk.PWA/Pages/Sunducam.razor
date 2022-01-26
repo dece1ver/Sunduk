@@ -78,7 +78,7 @@
         {
             case Mode.General:
                 <MudItem xs="12" sm="6">
-                    <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
+                    <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense" @onfocusout="DropSelection">
                         <MudList Clickable="true" @bind-SelectedItem="SelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" Dense="true" DisableGutters=true>
                             @if (Program != null)
                             {
@@ -106,7 +106,7 @@
                                                 }
                                                 <MudText Class="ma-3 mr-auto" Typo=Typo.body2>@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
                                                 <div Class="d-inline-flex justify-end py-2 px-3">
-                                                    @if ((int)SelectedSequenceIndex == Program.IndexOf(seq))
+                                                    @if (SelectedSequenceIndex != null && (int)SelectedSequenceIndex == Program.IndexOf(seq))
                                                     {
                                                         <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -3px; margin-bottom: -3px">
                                                             @if (Program.IndexOf(seq) != Program.Count - 1)
@@ -145,6 +145,19 @@
                                       Variant="Variant.Text" @bind-Text="@ProgramText" 
                                       ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
                     </MudField>
+                    @*<MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense">
+                            @foreach (var programLine in programList)
+                            {
+                                <MudText Style="font-family: 'Roboto Mono', monospace; font-size: medium;">
+                                    <MudHighlighter Text="@programLine" 
+                                        Class="mud-primary-text"
+                                        Style="background-color:transparent;"
+                                        HighlightedText="@HighLight"
+                                        UntilNextBoundary="false"
+                                        CaseSensitive="true" />
+                                </MudText>
+                            }
+                    </MudField>*@
                 </MudItem>
                 break;
             case Mode.ToolTable:
@@ -183,7 +196,7 @@
 
     public Mode Mode { get; set; } = Mode.General;
 
-    public string Message { get; set; } = string.Empty;
+    public string HighLight => SelectedSequence is null ? string.Empty : Program[(int)SelectedSequenceIndex].Operation.Split('\n')[0];
 
     public MudListItem SelectedSequence;
     public object SelectedSequenceIndex = 0;
@@ -530,6 +543,12 @@
         SelectedSequenceIndex = (object)index;
     }
 
+    private void DropSelection()
+    {
+        SelectedSequence = null;
+        SelectedSequenceIndex = null;
+    }
+
     private async Task DownloadProgram()
     {
         bool resultDialog = await OpenConfirmDialog($"Скачать файл \"{NcDetailNumber}.nc\" ?");
@@ -664,9 +683,9 @@
             }
             return string.Join("\n", result.Where(x => !string.IsNullOrEmpty(x))).Trim() + ProgramEnd;
         }
-        set { }
+        set { }        
     }
-
+    IEnumerable<string> programList => ProgramText.Split('\n').ToList();
 
     // Инструмент
 
