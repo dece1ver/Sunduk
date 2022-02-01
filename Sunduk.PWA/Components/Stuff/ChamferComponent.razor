@@ -36,7 +36,7 @@
         </MudItem>
         <MudHidden Breakpoint="Breakpoint.Xs">
             <MudItem xs="12" sm="6">
-                <MudCard Elevation="0" Outlined="true" Class="mt-1">
+                <MudCard Elevation="0" Outlined="true" Class="mt-1 rounded-0">
                     <MudCardContent>
                         @if (CurrentImage == Images.ExternalChamfer)
                         {
@@ -185,7 +185,7 @@
         @if (ValidResult())
         {
             <MudItem xs="12">
-                <MudExpansionPanel Text="Пример программы для Fanuc">
+                <MudExpansionPanel Class="rounded-0" Text="Пример программы для Fanuc">
                     <MudGrid>
                         <MudItem xs="12" md="4">
                             <MudRadioGroup T="bool" @bind-SelectedOption="showClassicChamfer" Class="ma-n3">
