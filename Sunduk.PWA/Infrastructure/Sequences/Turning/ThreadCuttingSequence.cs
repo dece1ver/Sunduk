@@ -17,7 +17,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double StartZ { get; set; }
         public double EndZ { get; set; }
         public double ThreadNPTPlane { get; set; }
-        public override string Operation => Templates.Operation.ThreadCutting(Machine, Tool, ThreadStandart, Type, ThreadDiameter, ThreadPitch, StartZ, EndZ, ThreadNPTPlane);
+        public override string Operation => Templates.ThreadOperation.ThreadCutting(Machine, Tool, ThreadStandart, Type, ThreadDiameter, ThreadPitch, StartZ, EndZ, ThreadNPTPlane);
         public override MachineType MachineType => MachineType.Turning;
 
         public ThreadCuttingSequence(Machine machine, ThreadingTool tool, ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNPTPlane)

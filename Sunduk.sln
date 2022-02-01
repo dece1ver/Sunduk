@@ -10,7 +10,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sunduk.PWA", "Sunduk.PWA\Su
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sunduk.WebApi", "Sunduk.WebApi\Sunduk.WebApi.csproj", "{0DBFBD69-D638-4737-8C54-42C5A88DBB54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sunduk.Feedback", "Sunduk.Feedback\Sunduk.Feedback.csproj", "{F51609A1-EB90-47EF-88AD-69BED98C1529}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sunduk.Feedback", "Sunduk.Feedback\Sunduk.Feedback.csproj", "{F51609A1-EB90-47EF-88AD-69BED98C1529}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

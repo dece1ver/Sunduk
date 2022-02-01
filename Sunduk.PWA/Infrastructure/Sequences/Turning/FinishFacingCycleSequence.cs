@@ -14,9 +14,9 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             {
                 return RoughSequence switch
                 {
-                    RoughFacingSequence => Templates.Operation.FinishFacingCycleFromRoughFacing(Tool, RoughSequence as RoughFacingSequence),
-                    RoughFacingCycleSequence => Templates.Operation.FinishFacingCycleFromRoughCycleFacing(Tool, RoughSequence as RoughFacingCycleSequence),
-                    FacingSequence => Templates.Operation.FinishFacingCycleFromFacing(Tool, RoughSequence as FacingSequence),
+                    RoughFacingSequence => Templates.FacingOperation.FinishFacingCycleFromRoughFacing(Tool, RoughSequence as RoughFacingSequence),
+                    RoughFacingCycleSequence => Templates.FacingOperation.FinishFacingCycleFromRoughCycleFacing(Tool, RoughSequence as RoughFacingCycleSequence),
+                    FacingSequence => Templates.FacingOperation.FinishFacingCycleFromFacing(Tool, RoughSequence as FacingSequence),
                     _ => null,
                 };
             }

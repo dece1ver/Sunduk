@@ -8,6 +8,9 @@
         <MudTabPanel Text="Скругление">
             <RadiusComponent />
         </MudTabPanel>
+        <MudTabPanel Text="Ниппель">
+            <NippleComponent />
+        </MudTabPanel>
         <MudTabPanel Text="Конус сверла">
             <DrillAngleComponent />
         </MudTabPanel>
@@ -35,7 +38,7 @@
         }
         else if (direction == SwipeDirection.RightToLeft)
         {
-            if(tabs.ActivePanelIndex < 4)
+            if(tabs.ActivePanelIndex < 5)
             {
                 tabs.ActivatePanel(tabs.ActivePanelIndex + 1);
             }

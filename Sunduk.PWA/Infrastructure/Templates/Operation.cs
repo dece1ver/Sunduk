@@ -28,9 +28,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public const string OP_STOP = "M1";
         public const string PROCESSING_SNIPPET = "(---OBRABOTKA---)\n";
 
-        
 
-        private static string SpindleUnclamp(Machine machine)
+
+        public static string SpindleUnclamp(Machine machine)
         {
             return machine switch
             {
@@ -40,7 +40,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        private static string SpindleClamp(Machine machine)
+        public static string SpindleClamp(Machine machine)
         {
             return machine switch
             {
@@ -50,7 +50,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        private static string CoolantOn(Machine machine, CoolantType type = CoolantType.General)
+        public static string CoolantOn(Machine machine, Coolant type = Coolant.General)
         {
             return machine switch
             {
@@ -58,16 +58,16 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machine.L230A => "M8",
                 Machine.A110 => type switch 
                 {
-                    CoolantType.General => "M8",
-                    CoolantType.Through => "M50",
-                    CoolantType.Blow => "M57",
+                    Coolant.General => "M8",
+                    Coolant.Through => "M50",
+                    Coolant.Blow => "M57",
                     _ => string.Empty,
                 },
                 _ => string.Empty,
             };
         }
 
-        private static string CoolantOff(Machine machine, CoolantType type = CoolantType.General)
+        public static string CoolantOff(Machine machine, Coolant type = Coolant.General)
         {
             return machine switch
             {
@@ -75,16 +75,16 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machine.L230A => "M9",
                 Machine.A110 => type switch
                 {
-                    CoolantType.General => "M9",
-                    CoolantType.Through => "M51",
-                    CoolantType.Blow => "M59",
+                    Coolant.General => "M9",
+                    Coolant.Through => "M51",
+                    Coolant.Blow => "M59",
                     _ => string.Empty,
                 },
                 _ => string.Empty,
             };
         }
 
-        private static string Direction(Tool tool) => tool.Hand == Tool.ToolHand.Rigth ? "M3" : "M4";
+        public static string Direction(Tool tool) => tool.Hand == Tool.ToolHand.Rigth ? "M3" : "M4";
 
 
         #region Режимы
@@ -150,11 +150,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        
+
         /// <summary>
         /// Скорость резания при сверлении
         /// </summary>
-        private static int DrillCuttingSpeed(Material material, DrillingTool drillingTool)
+        public static int DrillCuttingSpeed(Material material, DrillingTool drillingTool)
         {
             return material switch
             {
@@ -189,7 +189,51 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        private static double DrillFeed(Machine machine, Material material, DrillingTool drillingTool)
+        /// <summary>
+        /// Скорость резания на канавках черновая
+        /// </summary>
+        public static int GroovingSpeedRough(Material material)
+        {
+            return material switch
+            {
+                Material.Steel => 100,
+                Material.Stainless => 90,
+                Material.Brass => 120,
+                _ => 0,
+            };
+        }
+
+        /// <summary>
+        /// Скорость резания на канавках чистовая
+        /// </summary>
+        public static int GroovingSpeedFinish(Material material)
+        {
+            return material switch
+            {
+                Material.Steel => 120,
+                Material.Stainless => 120,
+                Material.Brass => 140,
+                _ => 0,
+            };
+        }
+
+        /// <summary>
+        /// Подача на чистовом точении
+        /// </summary>
+        public static double GroovingFeedRough()
+        {
+            return 0.14;
+        }
+
+        /// <summary>
+        /// Подача на чистовом точении
+        /// </summary>
+        public static double GroovingFeedFinish()
+        {
+            return 0.07;
+        }
+
+        public static double DrillFeed(Machine machine, Material material, DrillingTool drillingTool)
         {
             return machine.GetMachineType() switch
             {
@@ -318,7 +362,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Токарный вызов инструмента
         /// </summary>
-        public static string TurningToolCall(Machine machine, Tool tool, CoolantType coolant = CoolantType.General, bool polar = false)
+        public static string TurningToolCall(Machine machine, Tool tool, Coolant coolant = Coolant.General, bool polar = false)
         {
             return machine switch
             {
@@ -342,19 +386,19 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Фрезерный вызов инструмента
         /// </summary>
-        public static string MillingToolCall(Machine machine, Tool tool, CoolantType coolant = CoolantType.General, bool polar = false)
+        public static string MillingToolCall(Machine machine, Tool tool, Coolant coolant = Coolant.General, bool polar = false)
         {
             if (tool is null) return string.Empty;
             string direction = string.Empty;
-            if (coolant != CoolantType.General)
+            if (coolant != Coolant.General)
             {
                 direction = Direction(tool);
             }
-            else if (coolant == CoolantType.General || tool.Hand == Tool.ToolHand.Rigth)
+            else if (coolant == Coolant.General || tool.Hand == Tool.ToolHand.Rigth)
             {
                 direction = "M13";
             }
-            else if (coolant == CoolantType.General || tool.Hand == Tool.ToolHand.Left)
+            else if (coolant == Coolant.General || tool.Hand == Tool.ToolHand.Left)
             {
                 direction = "M14";
             }
@@ -375,297 +419,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        /// <summary>
-        /// Торцовка черновая под G70
-        /// </summary>
-        /// <param name="machine">Станок</param>
-        /// <param name="material">Материал</param>
-        /// <param name="tool">Инструмент</param>
-        /// <param name="externalDiameter">Наружный диаметр</param>
-        /// <param name="internalDiameter">Внутренний диаметр</param>
-        /// <param name="roughStockAllow">Общий припуск</param>
-        /// <param name="profStockAllow">Припуск под чистовую</param>
-        /// <param name="stepOver">Съем за проход</param>
-        /// <param name="seqNo">Номер перехода с циклом</param>
-        /// <returns></returns>
-        public static string RoughFacingCycle(Machine machine, Material material, TurningExternalTool tool,
-            double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow,
-            double stepOver, (int, int) seqNo)
-        {
-            if (tool is null ||
-                externalDiameter == 0 ||
-                externalDiameter < internalDiameter ||
-                roughStockAllow < profStockAllow ||
-                stepOver == 0) return string.Empty;
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} {Direction(tool)}\n" +
-                $"G72 W{stepOver.NC()} R0.1\n" +
-                $"G72 P{seqNo.Item1} Q{seqNo.Item2}{(profStockAllow > 0 ? " W" + profStockAllow.NC() : string.Empty)} F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1} G0 Z0.\n" +
-                $"N{seqNo.Item2} G1 X{internalDiameter.NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} {Direction(tool)}\n" +
-                $"G72 W{stepOver.NC()} R0.1\n" +
-                $"G72 P{seqNo.Item1} Q{seqNo.Item2}{(profStockAllow > 0 ? " W" + profStockAllow.NC() : string.Empty)} F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1} G0 Z0.\n" +
-                $"N{seqNo.Item2} G1 X{internalDiameter.NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                _ => string.Empty,
-            };
-        }
-
-        /// <summary>
-        /// Торцовка черновая + чистовая
-        /// </summary>
-        /// <param name="machine">Станок</param>
-        /// <param name="material">Материал</param>
-        /// <param name="tool">Инструмент</param>
-        /// <param name="externalDiameter">Наружный диаметр</param>
-        /// <param name="internalDiameter">Внутренний диаметр</param>
-        /// <param name="roughStockAllow">Общий припуск</param>
-        /// <param name="profStockAllow">Припуск под чистовую</param>
-        /// <param name="stepOver">Съем за проход</param>
-        /// <param name="seqNo">Номер перехода с циклом</param>
-        /// <returns></returns>
-        public static string Facing(Machine machine, Material material, TurningExternalTool tool, 
-            double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, 
-            double stepOver, (int, int) seqNo)
-        {
-            if (tool is null ||
-                externalDiameter == 0 ||
-                externalDiameter < internalDiameter ||
-                roughStockAllow < profStockAllow ||
-                stepOver == 0) return string.Empty;
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} {Direction(tool)}\n" +
-                $"G72 W{stepOver.NC()} R0.1\n" +
-                $"G72 P{seqNo.Item1} Q{seqNo.Item2}{(profStockAllow > 0 ? " W" + profStockAllow.NC() : string.Empty)} F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1}G0 Z0.\n" +
-                $"N{seqNo.Item2}G1 X{internalDiameter.NC()}\n" +
-                $"{(profStockAllow > 0 ? $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} {Direction(tool)}\n" +
-                $"G72 W{stepOver.NC()} R0.1\n" +
-                $"G72 P{seqNo.Item1} Q{seqNo.Item2}{(profStockAllow > 0 ? " W" + profStockAllow.NC() : string.Empty)} F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1} G0 Z0.\n" +
-                $"N{seqNo.Item2} G1 X{internalDiameter.NC()}\n" +
-                $"{(profStockAllow > 0 ? $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                _ => string.Empty,
-            };
-        }
-
-        /// <summary>
-        /// Торцовка черновая
-        /// </summary>
-        public static string RoughFacing(Machine machine, Material material, TurningExternalTool tool, 
-            double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow, 
-            double stepOver, (int, int) seqNo)
-        {
-            if (tool is null ||
-                externalDiameter == 0 ||
-                externalDiameter < internalDiameter ||
-                roughStockAllow < profStockAllow ||
-                stepOver == 0) return string.Empty;
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)}Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} {Direction(tool)}\n" +
-                $"G72 W{stepOver.NC()} R0.1\n" +
-                $"G72 P{seqNo.Item1} Q{seqNo.Item2} F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1} G0 Z{profStockAllow.NC()}\n" +
-                $"N{seqNo.Item2} G1 X{internalDiameter.NC()}\n" +
-                "M59\n" +
-                TURNING_REFERENT_POINT,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} {Direction(tool)}\n" +
-                $"G72 W{stepOver.NC()} R0.1\n" +
-                $"G72 P{seqNo.Item1} Q{seqNo.Item2} F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1} G0 Z{profStockAllow.NC()}\n" +
-                $"N{seqNo.Item2} G1 X{internalDiameter.NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                _ => string.Empty,
-            };
-        }
-
-        /// <summary>
-        /// Чистовая торцовка по G70 после торцовки
-        /// </summary>
-        /// <param name="tool">Инструмент</param>
-        /// <param name="roughFacingSequence">Черновой переход</param>
-        /// <returns></returns>
-        public static string FinishFacingCycleFromFacing(TurningExternalTool tool, FacingSequence roughFacingSequence)
-        {
-            Machine machine = roughFacingSequence.Machine;
-            Material material = roughFacingSequence.Material;
-            double externalDiameter = roughFacingSequence.ExternalDiameter;
-            double internalDiameter = roughFacingSequence.InternalDiameter;
-            double profStockAllow = roughFacingSequence.RoughStockAllow;
-            (int, int) seqNo = roughFacingSequence.SeqNumbers;
-
-            if (tool is null ||
-                externalDiameter == 0 ||
-                externalDiameter < internalDiameter) return string.Empty;
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} {Direction(tool)}\n" +
-                $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} {Direction(tool)}\n" +
-                $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                _ => string.Empty,
-            };
-        }
-
-        /// <summary>
-        /// Чистовая торцовка по G70 после торцовки под G70
-        /// </summary>
-        /// <param name="tool">Инструмент</param>
-        /// <param name="roughFacingSequence">Черновой переход</param>
-        /// <returns></returns>
-        public static string FinishFacingCycleFromRoughCycleFacing(TurningExternalTool tool, RoughFacingCycleSequence roughFacingSequence)
-        {
-            Machine machine = roughFacingSequence.Machine;
-            Material material = roughFacingSequence.Material;
-            double externalDiameter = roughFacingSequence.ExternalDiameter;
-            double internalDiameter = roughFacingSequence.InternalDiameter;
-            double profStockAllow = roughFacingSequence.RoughStockAllow;
-            (int, int) seqNo = roughFacingSequence.SeqNumbers;
-
-            if (tool is null ||
-                externalDiameter == 0 ||
-                externalDiameter < internalDiameter) return string.Empty;
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} {Direction(tool)}\n" +
-                $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} {Direction(tool)}\n" +
-                $"G70 P{seqNo.Item1}Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                _ => string.Empty,
-            };
-        }
-
-        /// <summary>
-        /// Чистовая торцовка по G70 после черновой торцовки
-        /// </summary>
-        /// <param name="tool">Инструмент</param>
-        /// <param name="roughFacingSequence">Черновой переход</param>
-        /// <returns></returns>
-        public static string FinishFacingCycleFromRoughFacing(TurningExternalTool tool, RoughFacingSequence roughFacingSequence)
-        {
-            Machine machine = roughFacingSequence.Machine;
-            Material material = roughFacingSequence.Material;
-            double externalDiameter = roughFacingSequence.ExternalDiameter;
-            double internalDiameter = roughFacingSequence.InternalDiameter;
-            double profStockAllow = roughFacingSequence.RoughStockAllow;
-            (int, int) seqNo = roughFacingSequence.SeqNumbers;
-
-            if (tool is null ||
-                externalDiameter == 0 ||
-                externalDiameter < internalDiameter) return string.Empty;
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} {Direction(tool)}\n" +
-                $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} {Direction(tool)}\n" +
-                $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                _ => string.Empty,
-            };
-        }
-
-        /// <summary>
-        /// Торцовка чистовая
-        /// </summary>
-        public static string FinishFacing(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter, double profStockAllow)
-        {
-            if (tool is null ||
-                externalDiameter == 0 ||
-                externalDiameter < internalDiameter) return string.Empty;
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} {Direction(tool)}\n" +
-                $"G1 X{internalDiameter.NC()} F{FeedFinish(tool.Radius).NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} {Direction(tool)}\n" +
-                $"G1 X{internalDiameter.NC()} F{FeedFinish(tool.Radius).NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                _ => string.Empty,
-            };
-        }
+        
 
         /// <summary>
         /// наружная фаска в пределах цикла
@@ -695,350 +449,6 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     $"W-{(0.8 + 0.3).NC()}";
             }
             return string.Empty;
-        }
-
-        /// <summary>
-        /// Высокоскоростное сверление
-        /// </summary>
-        public static string TurningHighSpeedDrilling(Machine machine, Material material, DrillingTool tool, double startZ, double endZ)
-        {
-            if (tool is null || startZ <= endZ) return string.Empty;
-            string approach = startZ > 0
-                ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()} S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\n"
-                : $"G0 X-{tool.Diameter.NC()} Z{SAFE_APPROACH_DISTANCE.NC()} S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\n Z{startZ.NC()}\n";
-            string exit = startZ > 0
-                ? $"G0 Z{startZ.NC()}\n"
-                : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                approach +
-                $"G1 Z{(endZ - tool.PointLength()).NC()} F{DrillFeed(machine, material, tool).NC(2)}\n" +
-                exit +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                approach +
-                $"G1 Z{(endZ - tool.PointLength()).NC()} F{DrillFeed(machine, material, tool).NC(2)}\n" +
-                exit +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                _ => string.Empty
-            };
-        }
-
-        public static string MillingHighSpeedDrilling(Machine machine, Material material, MillingDrillingTool tool, double startZ, double endZ, List<Hole> holes, bool polar = false)
-        {
-            if (tool is null || startZ <= endZ) return string.Empty;
-            var spindleSpeed = DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100);
-            var feed = DrillFeed(machine, material, tool).ToFeedPerMin(spindleSpeed, 1, 100);
-            string result = machine switch
-            {
-                
-                Machine.A110 =>
-                tool.Description(ToolDescriptionOption.General) + "\n" +
-                $"T00\n" +
-                $"{(polar ? "G16 " : string.Empty)}" +
-                $"G57 G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, CoolantType.Through)}\n" +
-                $"G81 Z{(endZ - tool.PointLength()).NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} F{feed}\n",
-                _ => string.Empty
-            };
-
-            AddPoints(ref result, holes, polar);
-            
-            if (!string.IsNullOrEmpty(result))
-            {
-                result += machine switch
-                {
-                    Machine.A110 =>
-                    $"G80\n" +
-                    $"{CoolantOff(machine)}\n" +
-                    $"{(polar ? "G15" : string.Empty)}" +
-                    MILLING_REFERENT_POINT,
-                    _ => string.Empty
-                };
-            }
-            return result;
-        }
-
-
-        /// <summary>
-        /// Прерывистое сверление
-        /// </summary>
-        public static string TurningPeckDrilling(Machine machine, Material material, DrillingTool tool, double depth, double startZ, double endZ)
-        {
-            if (tool is null ||
-                startZ <= endZ ||
-                depth <= 0) return string.Empty;
-            string approach = startZ > 0
-                ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()}S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\n"
-                : $"G0 X-{tool.Diameter.NC()} Z{SAFE_APPROACH_DISTANCE.NC()}S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\nZ{startZ.NC()}\n";
-            string exit = startZ > 0
-                ? $"G0 Z{startZ.NC()}\n"
-                : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                approach +
-                "G74 R0.1\n" +
-                $"G74 Z{(endZ - tool.PointLength()).NC()} Q{depth.Microns()} F{DrillFeed(machine, material, tool).NC(2)}\n" +
-                exit +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                approach +
-                "G74 R0.1\n" +
-                $"G74 Z{(endZ - tool.PointLength()).NC()} Q{depth.Microns()} F{DrillFeed(machine, material, tool).NC(2)}\n" +
-                exit +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                _ => string.Empty
-            };
-        }
-
-        public static string MillingPeckDrilling(Machine machine, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes, bool polar = false)
-        {
-            if (tool is null || startZ <= endZ) return string.Empty;
-            var spindleSpeed = DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100);
-            var feed = DrillFeed(machine, material, tool).ToFeedPerMin(spindleSpeed, 1, 100);
-            string result = machine switch
-            {
-
-                Machine.A110 =>
-                tool.Description(ToolDescriptionOption.General) + "\n" +
-                $"T00\n" +
-                $"{(polar ? "G16 " : string.Empty)}" +
-                $"G57 G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, CoolantType.Through)}\n" +
-                $"G82 Z{(endZ - tool.PointLength()).NC(option: NcDecimalPointOption.Without)} Q{depth.Microns()} R{startZ.NC(option: NcDecimalPointOption.Without)} F{feed}\n",
-                _ => string.Empty
-            };
-
-            AddPoints(ref result, holes, polar);
-
-            if (!string.IsNullOrEmpty(result))
-            {
-                result += machine switch
-                {
-                    Machine.A110 =>
-                    $"G80\n" +
-                    $"{CoolantOff(machine)}\n" +
-                    $"{(polar ? "G15" : string.Empty)}" +
-                    MILLING_REFERENT_POINT,
-                    _ => string.Empty
-                };
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Глубокое сверление
-        /// </summary>
-        public static string TurningPeckDeepDrilling(Machine machine, Material material, DrillingTool tool, double depth, double startZ, double endZ)
-        {
-            if (tool is null ||
-                startZ <= endZ ||
-                depth <= 0) return string.Empty;
-            string approach = startZ > 0
-                ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()} S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\n"
-                : $"G0 X-{tool.Diameter.NC()} Z{SAFE_APPROACH_DISTANCE.NC()} S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\nZ{startZ.NC()}\n";
-            string exit = startZ > 0
-                ? $"G0 Z{startZ.NC()}\n"
-                : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                approach +
-                $"G83 Z{(endZ - tool.PointLength()).NC()} Q{depth.Microns()} F{DrillFeed(machine, material, tool).NC(2)}\n" +
-                "G80\n" +
-                exit +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                approach +
-                $"G83 Z{(endZ - tool.PointLength()).NC()} Q{depth.Microns()} F{DrillFeed(machine, material, tool).NC(2)}\n" +
-                "G80\n" +
-                exit +
-                $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-                _ => string.Empty
-            };
-        }
-
-        public static string MillingPeckDeepDrilling(Machine machine, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes, bool polar = false)
-        {
-            if (tool is null || startZ <= endZ) return string.Empty;
-            var spindleSpeed = DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100);
-            var feed = DrillFeed(machine, material, tool).ToFeedPerMin(spindleSpeed, 1, 100);
-            string result = machine switch
-            {
-
-                Machine.A110 =>
-                tool.Description(ToolDescriptionOption.General) + "\n" +
-                $"T00\n" +
-                $"{(polar ? "G16 " : string.Empty)}" +
-                $"G57 G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, CoolantType.Through)}\n" +
-                $"G83 Z{(endZ - tool.PointLength()).NC(option: NcDecimalPointOption.Without)} Q{depth.Microns()} R{startZ.NC(option: NcDecimalPointOption.Without)} F{feed}\n",
-                _ => string.Empty
-            };
-
-            AddPoints(ref result, holes, polar);
-
-            if (!string.IsNullOrEmpty(result))
-            {
-                result += machine switch
-                {
-                    Machine.A110 =>
-                    $"G80\n" +
-                    $"{CoolantOff(machine)}\n" +
-                    $"{(polar ? "G15" : string.Empty)}" +
-                    MILLING_REFERENT_POINT,
-                    _ => string.Empty
-                };
-            }
-            return result;
-        }
-
-
-        /// <summary>
-        /// Нарезание резьбы метчиком
-        /// </summary>
-        public static string TurningTapping(Machine machine, TappingTool tool, double cutSpeed, double startZ, double endZ)
-        {
-            if (tool is null ||
-                startZ <= endZ) return string.Empty;
-            string approach = startZ > 0
-                ? $"G0 X0. Z{startZ.NC()} S{cutSpeed.ToSpindleSpeed(tool.Diameter, 10)} G97\n"
-                : $"G0 X0. Z{SAFE_APPROACH_DISTANCE.NC()} S{((int)cutSpeed).ToSpindleSpeed(tool.Diameter, 10)} G97\nZ{startZ.NC()}\n";
-            string exit = startZ > 0
-                ? string.Empty
-                : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                approach +
-                $"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}\n" +
-                $"G80\n" +
-                exit +
-                $"G96 {CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                approach +
-                $"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}\n" +
-                $"G80\n" +
-                exit +
-                $"G96 {CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-                _ => string.Empty
-            };
-        }
-
-        public static string MillingTapping(Machine machine, MillingTappingTool tool, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar = false)
-        {
-            if (tool is null || startZ <= endZ) return string.Empty;
-            var spindleSpeed = cutSpeed.ToSpindleSpeed(tool.Diameter, 10);
-            string result = machine switch
-            {
-
-                Machine.A110 =>
-                tool.Description(ToolDescriptionOption.General) + "\n" +
-                $"T00\n" +
-                $"{(polar ? "G16 " : string.Empty)}" +
-                $"G57 G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, CoolantType.Through)}\n" +
-                $"G95 G84 Z{endZ.NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} P500 F{tool.Pitch.NC()}\n",
-                _ => string.Empty
-            };
-
-            AddPoints(ref result, holes, polar);
-
-            if (!string.IsNullOrEmpty(result))
-            {
-                result += machine switch
-                {
-                    Machine.A110 =>
-                    $"G80\n" +
-                    $"{CoolantOff(machine)}\n" +
-                    $"{(polar ? "G15" : string.Empty)}" +
-                    MILLING_REFERENT_POINT,
-                    _ => string.Empty
-                };
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Нарезание резьбы
-        /// </summary>
-        public static string ThreadCutting(Machine machine, Tool tool, ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNPTPlane)
-        {
-            if (tool is null ||
-                threadDiameter <= 0 ||
-                threadPitch <= 0 ||
-                startZ < endZ) return string.Empty;
-            string approachDiameter = Thread.ApproachDiameter(threadStandart, type, threadDiameter, threadPitch, endZ, startZ, threadNPTPlane).NC(1);
-            string endDiameter = Thread.EndDiameter(threadStandart, type, threadDiameter, threadPitch, endZ, startZ, threadNPTPlane).NC(2);
-            int minStep = Thread.Passes(threadStandart, type, threadPitch)[^2].Microns();
-            double lastPass = Thread.Passes(threadStandart, type, threadPitch)[^1];
-            int firstPass = Thread.Passes(threadStandart, type, threadPitch)[0].Microns();
-            int profile = Thread.ProfileHeight(threadStandart, type, threadPitch).Microns();
-            string threadShift = string.Empty;
-            if (threadStandart == ThreadStandart.NPT)
-            {
-                threadShift = type switch
-                {
-                    CuttingType.External => $" R-{Thread.IntNPTThreadShift(endZ, startZ).NC(2)}",
-                    CuttingType.Internal => $" R{Thread.IntNPTThreadShift(endZ, startZ).NC(2)}",
-                    _ => string.Empty,
-                };
-            }
-
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{approachDiameter} Z{startZ.NC()} S{120.ToSpindleSpeed(threadDiameter, 100)} G97\n" +
-                $"G76 P0201{Thread.Profile(threadStandart)} Q{minStep} R{lastPass.NC()}\n" +
-                $"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}\n" +
-                $"G96 {CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{approachDiameter}Z{startZ.NC()} S{120.ToSpindleSpeed(threadDiameter, 100)} G97\n" +
-                $"G76 P0201{Thread.Profile(threadStandart)} Q{minStep} R{lastPass.NC()}\n" +
-                $"G76 X{endDiameter}Z{endZ.NC()}P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}\n" +
-                $"G96{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
-
-                _ => string.Empty,
-            };
         }
     }
 }
