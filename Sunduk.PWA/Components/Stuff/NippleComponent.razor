@@ -11,11 +11,11 @@
             @onfocusout="(() => CurrentImage = Images.NippleBase)">
                 <MudGrid Spacing="0">
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_NippleDiameter" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                        <MudTextField @bind-Value="_NippleDiameter" T="string" Label="Диаметр на сфере ниппеля" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
                                       @onfocus="() => CurrentImage = Images.NippleDiameter" Margin="Margin.Dense"/>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_ArcCenter" T="string" Label="Губина до центра дуги" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                        <MudTextField @bind-Value="_ArcCenter" T="string" Label="Размер от торца до центра дуги" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
                                       @onfocus="() => CurrentImage = Images.NippleArcCenter" Margin="Margin.Dense"/>
                     </MudItem>
                     <MudItem xs="12">
@@ -87,16 +87,6 @@
                         }
                     </MudItem>
                     <MudItem xs="12">
-                        @if (NippleDiameter != NippelStartDiameter)
-                        {
-                            <MudText Typo="Typo.body2">@($"Угол между осью и касательной: {Angle.ToPrettyString(3)} мм")</MudText>
-                        }
-                        @if (NippleDiameter <= 0 && RadiusSize <= 0)
-                        {
-                            <MudText Typo="Typo.body2">@($"Угол между осью и касательной: -")</MudText>
-                        }
-                    </MudItem>
-                    <MudItem xs="12">
                         @if (NippleDiameter > 0 && RadiusSize > 0)
                         {
                             <MudText Typo="Typo.body2">@($"Начальный диаметр с учетом радиуса пластины: {(NippelStartDiameter - XRadiusShift).ToPrettyString()} мм")</MudText>
@@ -114,6 +104,16 @@
                         @if (NippleDiameter <= 0 && RadiusSize <= 0)
                         {
                             <MudText Typo="Typo.body2">@($"Глубина с учетом радиуса пластины: -")</MudText>
+                        }
+                    </MudItem>
+                    <MudItem xs="12">
+                        @if (NippleDiameter != NippelStartDiameter)
+                        {
+                            <MudText Typo="Typo.body2">@($"Угол между осью и касательной: {Angle.ToPrettyString(3)} мм")</MudText>
+                        }
+                        @if (NippleDiameter <= 0 && RadiusSize <= 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Угол между осью и касательной: -")</MudText>
                         }
                     </MudItem>
                 </MudGrid>
@@ -139,8 +139,6 @@
     readonly int _imgHeigth = 190;
     readonly int _imgWidth = 250;
 
-    bool showClassicRadius = true;
-
     public enum Images
     {
         NippleBase,
@@ -158,25 +156,10 @@
         {
             if (NippleDiameter > 0 && RadiusSize > 0)
             {
-                if (showClassicRadius)
-                {
-                    return
-                    $"G0 X{NippelStartDiameter.NC()} Z1. S180 M3\n" +
+                return
+                    $"G0 X{StartDiamWithShift.NC()} Z1. S180 M3\n" +
                     $"G1 Z0. F0.1\n" +
-                    $"X{NippleDiameter.NC()} R{RadiusDepth.NC()}\n" +
-                    $"W-{RadiusDepth.NC()}";
-                }
-
-                return RadiusType == Radius.External
-                ? $"G0 X{(NippleDiameter + 1).NC()} Z-{RadiusDepth.NC()} S180 M3\n" +
-                  $"G1 X{NippleDiameter.NC()} F0.1\n" +
-                  $"Z0. R{RadiusDepth.NC()}\n" +
-                  $"U-{(2 * RadiusDepth).NC()}"
-                : $"G0 X{(NippleDiameter - 1).NC()} Z1. S180 M3\n" +
-                  $"Z-{RadiusDepth.NC()}\n" +
-                  $"G1 X{NippleDiameter.NC()} F0.1\n" +
-                  $"Z0. R{RadiusDepth.NC()}\n" +
-                  $"U-{(2 * RadiusDepth).NC()}";
+                    $"G3 X{NippleDiameter.NC()} Z-{RadiusDepth.NC()} R{FullRadius.NC()}\n";
             }
             return string.Empty;
         }
@@ -196,29 +179,17 @@
     public string _InsertRadius { get; set; } = string.Empty;
     public double InsertRadius { get => Util.GetDouble(_InsertRadius); }
 
-    public double NippelStartDiameter { get => 2 * Math.Sqrt(Math.Pow(RadiusSize, 2) - Math.Pow(ArcCenter, 2)); }
+    public double NippelStartPointX { get => Math.Sqrt(Math.Pow(RadiusSize, 2) - Math.Pow(ArcCenter, 2)); }
+    public double NippelStartDiameter { get => NippelStartPointX * 2; }
 
-    public double Angle { get => Math.Atan(RadiusSize / 2 / ArcCenter).Degrees();}
+    public double Angle { get => Math.Atan(ArcCenter / NippelStartPointX).Degrees();}
 
-    public double XRadiusShift { get => (RadiusSize / ArcCenter) * (InsertRadius - InsertRadius / Math.Tan((Angle / 2).Radians())); }
+    public double XRadiusShift { get => 2 * (NippelStartPointX / ArcCenter) * (InsertRadius - InsertRadius / Math.Tan((90 - (90 - Angle) / 2).Radians())); }
+    public double StartDiamWithShift { get => NippelStartDiameter - XRadiusShift; }
 
-    public double RadiusDepth { get => RadiusSize + InsertRadius; }
+    public double RadiusDepth { get => ArcCenter + InsertRadius; }
+    public double FullRadius { get => RadiusSize + InsertRadius; }
 
     public int ExampleLines { get => RadiusExample.Count(f => f == '\n') + 1; }
-
-
-    //private void SetInternalType()
-    //{
-    //    //if (CurrentImage == Images.ExternalPartDiameter) CurrentImage = Images.InternalPartDiameter;
-    //    //if (CurrentImage == Images.ExternalRadiusSize) CurrentImage = Images.InternalRadiusSize;
-    //    //if (CurrentImage == Images.ExternalToolRadius) CurrentImage = Images.InternalToolRadius;
-    //}
-
-    //private void SetExternalType()
-    //{
-    //    //if (CurrentImage == Images.InternalPartDiameter) CurrentImage = Images.ExternalPartDiameter;
-    //    //if (CurrentImage == Images.InternalRadiusSize) CurrentImage = Images.ExternalRadiusSize;
-    //    //if (CurrentImage == Images.InternalToolRadius) CurrentImage = Images.ExternalToolRadius;
-    //}
 
 }
