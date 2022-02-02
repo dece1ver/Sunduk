@@ -1,0 +1,133 @@
+﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudGrid Spacing="1">
+        <MudItem xs="12" md="12">
+            <MudField Variant="Variant.Filled" Label="Декартова СК" DisableUnderLine="true">
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="PointXString" @onfocusin="@(() => CalcPolar = true)" DisableUnderLine="false" Label="X"
+                                      T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="PointYString" @onfocusin="@(() => CalcPolar = true)" DisableUnderLine="false" Label="Y"
+                                      T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+        </MudItem>
+        <MudItem xs="12" md="12">
+            <MudField Variant="Variant.Filled" Label="Полярная СК" DisableUnderLine="true">
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="RadiusString" @onfocusin="@(() => CalcPolar = false)" DisableUnderLine="false" Label="Радиус"
+                                      T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="AngleString" @onfocusin="@(() => CalcPolar = false)" DisableUnderLine="false" Label="Угол"
+                                      T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="°" Immediate="true" />
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code
+{
+    public bool CalcPolar { get; set; } = false;
+
+
+    private string pointX;
+
+    public string PointXString
+    {
+        get { return pointX; }
+        set
+        {
+            pointX = value;
+            if (CalcPolar)
+            {
+                RadiusString = Math.Sqrt(Math.Pow(PointX, 2) + Math.Pow(PointY, 2)).ToPrettyString();
+                AngleString = GetAngle();
+            }
+        }
+    }
+
+    public double PointX { get => Util.GetDouble(PointXString, numberOption: Util.GetNumberOption.Any); }
+
+
+    private string pointY;
+
+    public string PointYString
+    {
+        get { return pointY; }
+        set
+        {
+            pointY = value;
+            if (CalcPolar)
+            {
+                RadiusString = Math.Sqrt(Math.Pow(PointX, 2) + Math.Pow(PointY, 2)).ToPrettyString();
+                AngleString = GetAngle();
+            }
+        }
+    }
+
+    public double PointY { get => Util.GetDouble(PointYString, numberOption: Util.GetNumberOption.Any); }
+
+
+    private string radiusString;
+
+    public string RadiusString
+    {
+        get { return radiusString; }
+        set
+        {
+            radiusString = value;
+            if (CalcPolar)
+            {
+
+            }
+        }
+    }
+
+    public double Radius { get => Util.GetDouble(RadiusString, numberOption: Util.GetNumberOption.Any); }
+
+
+    private string angleString;
+
+    public string AngleString
+    {
+        get { return angleString; }
+        set
+        {
+            angleString = value;
+            if (CalcPolar)
+            {
+
+            }
+        }
+    }
+
+    public double Angle { get => Util.GetDouble(AngleString, numberOption: Util.GetNumberOption.Any); }
+
+    private string GetAngle()
+    {
+        if (PointX > 0 && PointY > 0)
+        {
+            return Math.Atan(PointX / PointY).Degrees().ToPrettyString(0);
+        }
+        if (PointX > 0 && PointY < 0)
+        {
+            return (90 + (90 - Math.Atan(PointX / -PointY).Degrees())).ToPrettyString(0);
+        }
+        if (PointX < 0 && PointY < 0)
+        {
+            return (180 + (90 - Math.Atan(-PointX / -PointY).Degrees())).ToPrettyString(0);
+        }
+        if (PointX < 0 && PointY > 0)
+        {
+            return (270 + (90 - Math.Atan(-PointX / PointY).Degrees())).ToPrettyString(0);
+        }
+        return "0";
+    }
+
+}
