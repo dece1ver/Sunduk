@@ -109,7 +109,7 @@
                     <MudItem xs="12">
                         @if (NippleDiameter != NippelStartDiameter)
                         {
-                            <MudText Typo="Typo.body2">@($"Угол между осью и касательной: {Angle.ToPrettyString(3)} мм")</MudText>
+                            <MudText Typo="Typo.body2">@($"Угол между осью и касательной: {Angle.ToPrettyString(3)}°")</MudText>
                         }
                         @if (NippleDiameter <= 0 && RadiusSize <= 0)
                         {
@@ -215,11 +215,20 @@
 
     string GetBluntedShape()
     {
-        var catet = ArcCenter - NippleBluntRadius;
-        var startX = Math.Sqrt(Math.Pow(FullRadius - NippleBluntRadius, 2) - Math.Pow(catet, 2));
-        var angle = Math.Atan(startX / catet).Degrees();
-        var endX = NippleBluntRadius * Math.Sin(angle.Radians()) + startX;
-        var endZ = NippleBluntRadius - (Math.Sqrt(Math.Pow(NippleBluntRadius, 2) - Math.Pow(NippleBluntRadius * Math.Sin(angle.Radians()), 2)));
+        var catet = ArcCenter - NippleBlunt;
+        var startX = Math.Sqrt(Math.Pow(RadiusSize - NippleBlunt, 2) - Math.Pow(catet, 2));
+        var angle = Math.Atan(startX / catet);
+        var endX = NippleBlunt * Math.Sin(angle) + startX;
+        var endZ = NippleBlunt - (Math.Sqrt(Math.Pow(NippleBlunt, 2) - Math.Pow(NippleBlunt * Math.Sin(angle), 2)));
+        if (InsertRadius > 0)
+        {
+            startX -= InsertRadius;
+            catet = NippleBluntRadius * Math.Sin(angle);
+            endX = catet + startX;
+            endZ = NippleBluntRadius - (Math.Sqrt(Math.Pow(NippleBluntRadius, 2) - Math.Pow(catet, 2)));
+        }
+
+
 
         return $"G0 X{(startX*2).NC()} Z1. S200 M3\n" +
         $"G1 Z0. F0.1\n" +
