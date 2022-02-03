@@ -141,6 +141,26 @@
       "url": "img\/stuffimages\/drill\/drill_n.svg"
     },
     {
+      "hash": "sha256-KV6\/vhdCtYp3TyiG7bflr+wbKZ4GuXzD3JNMCdObS+A=",
+      "url": "img\/stuffimages\/nipple\/nipple.svg"
+    },
+    {
+      "hash": "sha256-pEwy1L6SNPtZe1Xq5C4TpSLcfWsduatlWGuK2KpA\/uA=",
+      "url": "img\/stuffimages\/nipple\/nipple_arc_center.svg"
+    },
+    {
+      "hash": "sha256-auNMtyoItfk\/ucQ+6OKzZWkMQzCSzft1QWX8x\/omsUU=",
+      "url": "img\/stuffimages\/nipple\/nipple_diam.svg"
+    },
+    {
+      "hash": "sha256-tNMrKpvYf5F258FTPegdJlHbLukRn+Df8AH4DI7nK\/U=",
+      "url": "img\/stuffimages\/nipple\/nipple_radius.svg"
+    },
+    {
+      "hash": "sha256-XxnP7SkF+hy+eXqz0uFmIF4f+4GQZeX\/oBabmhvKyCc=",
+      "url": "img\/stuffimages\/nipple\/nipple_tool_radius.svg"
+    },
+    {
       "hash": "sha256-U2M6TDdkzQgC3nJhlzJr+dly3+MoSrhaUtXJjhsdORI=",
       "url": "img\/stuffimages\/radius\/ext_part_diam.svg"
     },
@@ -261,7 +281,7 @@
       "url": "v.svg"
     },
     {
-      "hash": "sha256-zdax9azwRhH2q\/vRsHrhwHCSAtyljCwiHQTrzJ5jAAg=",
+      "hash": "sha256-Tn\/uF966WPSyOVkWQWquAs+FxQFB7Hq+L90bj1liSng=",
       "url": "_framework\/Sunduk.dll"
     },
     {
@@ -1077,7 +1097,7 @@
       "url": "_content\/BlazorDownloadFile\/BlazorDownloadFileScript.js"
     },
     {
-      "hash": "sha256-GQKLiqJGsq6mANVRCTWTqmwgFKUBlnjcjKGWl+0ximc=",
+      "hash": "sha256-1hFy29cdx\/bBsrADf9Qkl7lXkmNPUeIT9JfMH9L6gEA=",
       "url": "_framework\/blazor.boot.json"
     },
     {
@@ -1085,5 +1105,5 @@
       "url": "_framework\/blazor.webassembly.js"
     }
   ],
-  "version": "ifX3yEiP"
+  "version": "Un9GtmuJ"
 };
