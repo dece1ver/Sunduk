@@ -32,19 +32,6 @@
         }
 
         <MudItem xs="6" md="4" lg="3">
-            <MudLink Href="/thread" Underline="Underline.None">
-                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
-                    <MudGrid Justify="Justify.Center">
-                        <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.LineWeight" />
-                    </MudGrid>
-                    <MudGrid Justify="Justify.Center">
-                        <MudText Typo="Typo.body2" Class="mt-4">Точение резьбы</MudText>
-                    </MudGrid>
-                </MudPaper>
-            </MudLink>
-        </MudItem>
-
-        <MudItem xs="6" md="4" lg="3">
             <MudLink Href="/stuff" Underline="Underline.None">
                 <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
                     <MudGrid Justify="Justify.Center">
@@ -70,8 +57,6 @@
             </MudLink>
         </MudItem>
 
-        @if (ExperimantalMode)
-        {
         <MudItem xs="6" md="4" lg="3">
             <MudLink Href="/knowledge/about" Underline="Underline.None">
                 <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
@@ -84,7 +69,6 @@
                 </MudPaper>
             </MudLink>
         </MudItem>
-        }
 
         @if (ExperimantalMode)
         {

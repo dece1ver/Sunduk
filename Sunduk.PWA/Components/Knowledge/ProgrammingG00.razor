@@ -8,10 +8,9 @@
     .desc{font-size: @Design.GetFontSize(breakpoint); font-style: italic; font-weight: lighter}
 </style>
 
-
-<MudText Typo=Typo.body2>
-    Команда G00 перемещает инструмент на позицию, указанную относительно системы координат заготовки на скорости ускоренного подвода. 
-    Указание позиции допускается в <MudLink Typo=Typo.body2 @onclick="(()=>absMbox.Show())">абсолютных</MudLink> и <MudLink Typo=Typo.body2 @onclick="(()=>incMbox.Show())">относительных</MudLink> значениях. 
+<MudText Typo=Typo.body2 Class="mt-2">
+    Команда G00 перемещает инструмент на позицию, указанную относительно системы координат заготовки на скорости ускоренного подвода.
+    Указание позиции допускается в <MudLink Typo=Typo.body2 @onclick="(()=>absMbox.Show())">абсолютных</MudLink> и <MudLink Typo=Typo.body2 @onclick="(()=>incMbox.Show())">относительных</MudLink> значениях.
     Скорость ускоренного подвода для каждой оси задается в параметре системы ЧПУ №1420 и не может задаваться в адресе F.
 </MudText>
 <MudField Variant=Variant.Filled Label="Пример УП" DisableUnderLine=true>

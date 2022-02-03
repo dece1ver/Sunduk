@@ -4,12 +4,12 @@
             <MudField Variant="Variant.Filled" Label="Декартова СК" DisableUnderLine="true">
                 <MudGrid>
                     <MudItem xs="6">
-                        <MudTextField @bind-Value="PointXString" @onfocusin="@(() => CalcPolar = true)" DisableUnderLine="false" Label="X"
-                                      T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                        <MudTextField @bind-Value="X" @onfocusin="@(() => CalcPolar = true)" DisableUnderLine="false" Label="X" Converter="Util.NullableDoubleConverterWithZero"
+                                      T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
                     </MudItem>
                     <MudItem xs="6">
-                        <MudTextField @bind-Value="PointYString" @onfocusin="@(() => CalcPolar = true)" DisableUnderLine="false" Label="Y"
-                                      T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                        <MudTextField @bind-Value="Y" @onfocusin="@(() => CalcPolar = true)" DisableUnderLine="false" Label="Y" Converter="Util.NullableDoubleConverterWithZero"
+                                      T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
                     </MudItem>
                 </MudGrid>
             </MudField>
@@ -18,12 +18,12 @@
             <MudField Variant="Variant.Filled" Label="Полярная СК" DisableUnderLine="true">
                 <MudGrid>
                     <MudItem xs="6">
-                        <MudTextField @bind-Value="RadiusString" @onfocusin="@(() => CalcPolar = false)" DisableUnderLine="false" Label="Радиус"
-                                      T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                        <MudTextField @bind-Value="Radius" @onfocusin="@(() => CalcPolar = false)" DisableUnderLine="false" Label="Радиус" Converter="Util.NullableDoubleConverterWithZero"
+                                      T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
                     </MudItem>
                     <MudItem xs="6">
-                        <MudTextField @bind-Value="AngleString" @onfocusin="@(() => CalcPolar = false)" DisableUnderLine="false" Label="Угол"
-                                      T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="°" Immediate="true" />
+                        <MudTextField @bind-Value="Angle" @onfocusin="@(() => CalcPolar = false)" DisableUnderLine="false" Label="Угол" Converter="Util.NullableDoubleConverterWithZero"
+                                      T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="°" Immediate="true" />
                     </MudItem>
                 </MudGrid>
             </MudField>
@@ -36,98 +36,109 @@
     public bool CalcPolar { get; set; } = false;
 
 
-    private string pointX;
+    private double? _X;
 
-    public string PointXString
+    public double? X
     {
-        get { return pointX; }
+        get { return _X; }
         set
         {
-            pointX = value;
+            _X = value;
             if (CalcPolar)
             {
-                RadiusString = Math.Sqrt(Math.Pow(PointX, 2) + Math.Pow(PointY, 2)).ToPrettyString();
-                AngleString = GetAngle();
+                if (X is null || Y is null)
+                {
+                    Radius = null;
+                    Angle = null;
+                }
+                else
+                {
+                    Radius = Math.Sqrt(Math.Pow(X.Value, 2) + Math.Pow(Y.Value, 2));
+                    Angle = Calc.GetAngleFromXY(X.Value, Y.Value);
+                }
             }
         }
     }
 
-    public double PointX { get => Util.GetDouble(PointXString, numberOption: Util.GetNumberOption.Any); }
 
+    private double? _Y;
 
-    private string pointY;
-
-    public string PointYString
+    public double? Y
     {
-        get { return pointY; }
+        get { return _Y; }
         set
         {
-            pointY = value;
+            _Y = value;
             if (CalcPolar)
             {
-                RadiusString = Math.Sqrt(Math.Pow(PointX, 2) + Math.Pow(PointY, 2)).ToPrettyString();
-                AngleString = GetAngle();
-            }
-        }
-    }
-
-    public double PointY { get => Util.GetDouble(PointYString, numberOption: Util.GetNumberOption.Any); }
-
-
-    private string radiusString;
-
-    public string RadiusString
-    {
-        get { return radiusString; }
-        set
-        {
-            radiusString = value;
-            if (CalcPolar)
-            {
-
-            }
-        }
-    }
-
-    public double Radius { get => Util.GetDouble(RadiusString, numberOption: Util.GetNumberOption.Any); }
-
-
-    private string angleString;
-
-    public string AngleString
-    {
-        get { return angleString; }
-        set
-        {
-            angleString = value;
-            if (CalcPolar)
-            {
+                if (X is null || Y is null)
+                {
+                    Radius = null;
+                    Angle = null;
+                }
+                else
+                {
+                    Radius = Math.Sqrt(Math.Pow(X.Value, 2) + Math.Pow(Y.Value, 2));
+                    Angle = Calc.GetAngleFromXY(X.Value, Y.Value);
+                }
 
             }
         }
     }
 
-    public double Angle { get => Util.GetDouble(AngleString, numberOption: Util.GetNumberOption.Any); }
 
-    private string GetAngle()
+
+    private double? radius;
+
+    public double? Radius
     {
-        if (PointX > 0 && PointY > 0)
+        get { return radius; }
+        set
         {
-            return Math.Atan(PointX / PointY).Degrees().ToPrettyString(0);
+            radius = value;
+            if (!CalcPolar)
+            {
+                if (Radius is null || Angle is null)
+                {
+                    X = null;
+                    Y = null;
+                }
+                else
+                {
+                    if (Angle <= 90)
+                    {
+                        X = (Radius * Math.Cos(Angle.Value.Radians()));
+                        Y = (Radius * Math.Sin(Angle.Value.Radians()));
+                    }
+                }
+            }
         }
-        if (PointX > 0 && PointY < 0)
-        {
-            return (90 + (90 - Math.Atan(PointX / -PointY).Degrees())).ToPrettyString(0);
-        }
-        if (PointX < 0 && PointY < 0)
-        {
-            return (180 + (90 - Math.Atan(-PointX / -PointY).Degrees())).ToPrettyString(0);
-        }
-        if (PointX < 0 && PointY > 0)
-        {
-            return (270 + (90 - Math.Atan(-PointX / PointY).Degrees())).ToPrettyString(0);
-        }
-        return "0";
     }
 
+    private double? angle;
+
+    public double? Angle
+    {
+        get { return angle; }
+        set
+        {
+            angle = value;
+            if (!CalcPolar)
+            {
+                if (Radius is null || Angle is null)
+                {
+                    X = null;
+                    Y = null;
+                }
+                else
+                {
+                    if (Angle <= 90)
+                    {
+                        X = (Radius * Math.Cos(Angle.Value.Radians()));
+                        Y = (Radius * Math.Sin(Angle.Value.Radians()));
+                    }
+                }
+            }
+        }
+    }
 }

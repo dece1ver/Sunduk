@@ -152,7 +152,6 @@
                             <MudRadio Option="@Calculation.Precise" Color="Color.Primary">Точный</MudRadio>
                         </MudRadioGroup>
                     </MudItem>
-
                 </MudGrid>
             </MudField>
         </MudItem>
@@ -380,11 +379,11 @@
             double result;
             if (ChamferType == Chamfer.External)
             {
-                result = (ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) - ChamferInsertRadius * Math.Tan(Util.Radians(Angle));
+                result = (ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Calc.Radians(Angle)))) - ChamferInsertRadius * Math.Tan(Calc.Radians(Angle));
             }
             else
             {
-                result = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) + ChamferInsertRadius * Math.Tan(Util.Radians(Angle)));
+                result = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Calc.Radians(Angle)))) + ChamferInsertRadius * Math.Tan(Calc.Radians(Angle)));
 
             }
             return result;
@@ -481,11 +480,11 @@
     {
         if (calcStartDiam && ChamferType == Chamfer.External && ValidResult())
         {
-            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle))))).ToPrettyString();
+            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Calc.Radians(Angle))))).ToPrettyString();
         }
         else if (calcStartDiam && ChamferType == Chamfer.Internal && ValidResult())
         {
-            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle))))).ToPrettyString();
+            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Calc.Radians(Angle))))).ToPrettyString();
         }
         else if (!calcStartDiam && ValidResult())
         {
@@ -506,11 +505,11 @@
 
         if (calcStartDiam && ChamferType == Chamfer.External && ValidResult())
         {
-            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle))))).ToPrettyString();
+            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Calc.Radians(Angle))))).ToPrettyString();
         }
         else if (calcStartDiam && ChamferType == Chamfer.Internal && ValidResult())
         {
-            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle))))).ToPrettyString();
+            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Calc.Radians(Angle))))).ToPrettyString();
         }
         else if (calcStartDiam && !ValidResult())
         {

@@ -2,6 +2,9 @@
 
 <MudSwipeArea OnSwipe="@OnSwipe">
     <MudTabs Elevation="2" @ref="tabs" Style="font-size: small">
+        <MudTabPanel Text="Резьба">
+            <ThreadTurningComponent />
+        </MudTabPanel>
         <MudTabPanel Text="Фаска">
             <ChamferComponent />
         </MudTabPanel>
@@ -13,12 +16,6 @@
         </MudTabPanel>
         <MudTabPanel Text="Конус сверла">
             <DrillAngleComponent />
-        </MudTabPanel>
-        <MudTabPanel Text="Глубина центровки">
-            <CenterLengthComponent />
-        </MudTabPanel>
-        <MudTabPanel Text="Вектора">
-            <VectorComponent />
         </MudTabPanel>
     </MudTabs>
 </MudSwipeArea>
@@ -38,7 +35,7 @@
         }
         else if (direction == SwipeDirection.RightToLeft)
         {
-            if(tabs.ActivePanelIndex < 5)
+            if(tabs.ActivePanelIndex < 4)
             {
                 tabs.ActivatePanel(tabs.ActivePanelIndex + 1);
             }

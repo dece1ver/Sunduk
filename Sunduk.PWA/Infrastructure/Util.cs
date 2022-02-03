@@ -80,57 +80,7 @@ namespace Sunduk.PWA.Util
             return defaultValue;
         }
 
-        /// <summary>
-        /// Переводит радианы в угол</summary>
-        /// <param name="radians">Значение в радианах</param>
-        /// <returns>Угловое значение</returns>
-        public static double Degrees(this double radians)
-        {
-            return radians * 180 / Math.PI;
-        }
-
-        /// <summary>
-        /// Переводит угол в радианы
-        /// </summary>
-        /// <param name="degrees">Угловое значение</param>
-        /// <returns>Радиан</returns>
-        public static double Radians(this double degrees)
-        {
-            return degrees * Math.PI / 180;
-        }
-
-        /// <summary>
-        /// Переводит угол в радианы
-        /// </summary>
-        /// <param name="degrees">Угловое значение</param>
-        /// <returns>Радиан</returns>
-        public static double Radians(this int degrees)
-        {
-            return degrees * Math.PI / 180;
-        }
-
-
-        /// <summary>
-        /// Округляет
-        /// </summary>
-        /// <param name="rounder">Значение округления</param>
-        /// <returns>Радиан</returns>
-        public static int Round(this int value, int rounder = 10)
-        {
-            if (value < rounder) return value;
-            return value / rounder * rounder;
-        }
-
-        /// <summary>
-        /// Округляет
-        /// </summary>
-        /// <param name="rounder">Значение округления</param>
-        /// <returns>Радиан</returns>
-        public static int Round(this double value, int rounder = 10)
-        {
-            if (value < rounder) return (int)value;
-            return (int)Math.Round(value / rounder) * rounder;
-        }
+        
 
         /// <summary>
         /// Возвращает шаг в мм для шага в нитках на дюйм (TPI), либо шаг в нитках на дюйм для шага в мм
@@ -269,59 +219,6 @@ namespace Sunduk.PWA.Util
             return value.ToString($"D{4}");
         }
 
-        /// <summary>
-        /// Миллиметры в микроны
-        /// </summary>
-        /// <param name="value">Число в миллиметрах</param>
-        /// <returns>Отформатированную строку</returns>
-        public static int Microns(this double value)
-        {
-            return (value * 1000).Round(10);
-        }
-
-        /// <summary>
-        /// Миллиметры в микроны
-        /// </summary>
-        /// <param name="value">Число в миллиметрах</param>
-        /// <returns>Отформатированную строку</returns>
-        public static int Microns(this int value)
-        {
-            return (value * 1000).Round(10);
-        }
-
-        /// <summary>
-        /// Скорость резания в обороты
-        /// </summary>
-        /// <param name="cutSpeed">Скорость</param>
-        /// <param name="diameter">Диаметр</param>
-        /// <returns>Обороты шпинделя</returns>
-        public static int ToSpindleSpeed(this int cutSpeed, double diameter, int round = 0) => (cutSpeed * 1000 / (int)(diameter * Math.PI)).Round(round);
-
-        /// <summary>
-        /// Скорость резания в обороты
-        /// </summary>
-        /// <param name="cutSpeed">Скорость</param>
-        /// <param name="diameter">Диаметр</param>
-        /// <returns>Обороты шпинделя</returns>
-        public static int ToSpindleSpeed(this double cutSpeed, double diameter, int round = 0) => (cutSpeed * 1000 / (int)(diameter * Math.PI)).Round(round);
-
-        /// <summary>
-        /// Подачу на оборот в минутную подачу
-        /// </summary>
-        /// <param name="cutSpeed">Скорость</param>
-        /// <param name="diameter">Диаметр</param>
-        /// <returns>Обороты шпинделя</returns>
-        public static int ToFeedPerMin(this int cutFeed, double spindleSpeed, int edges = 1, int round = 0) => (cutFeed * spindleSpeed * edges).Round(round);
-
-        /// <summary>
-        /// Подачу на оборот в минутную подачу
-        /// </summary>
-        /// <param name="cutSpeed">Скорость</param>
-        /// <param name="diameter">Диаметр</param>
-        /// <returns>Обороты шпинделя</returns>
-        public static int ToFeedPerMin(this double cutFeed, double spindleSpeed, int edges = 1, int round = 0) => (cutFeed * spindleSpeed * edges).Round(round);
-
-        public static double PointLength(this DrillingTool drillingTool) => (drillingTool.Diameter / 2 * Math.Tan((90 - drillingTool.Angle / 2).Radians()));
 
         /// <summary>
         /// Описание инструмента в УП
@@ -546,6 +443,15 @@ namespace Sunduk.PWA.Util
         {
             SetFunc = value => value.ToPrettyString(),
             GetFunc = text => Util.GetDouble(text, 0, GetNumberOption.Any),
+        };
+
+        /// <summary>
+        /// Конвертер Double с нулем
+        /// </summary>
+        public static Converter<double?> NullableDoubleConverterWithZero = new()
+        {
+            SetFunc = value => value?.ToPrettyString(stringOption: PrettyStringOption.AsIs),
+            GetFunc = text => string.IsNullOrEmpty(text) ? null : Util.GetDouble(text, 0, GetNumberOption.Any),
         };
 
         /// <summary>
