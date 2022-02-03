@@ -1,0 +1,144 @@
+﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudGrid Spacing="1">
+        <MudItem xs="12" md="12">
+            <MudField Variant="Variant.Filled" Label="Декартова СК" DisableUnderLine="true">
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="X" @onfocusin="@(() => CalcPolar = true)" DisableUnderLine="false" Label="X" Converter="Util.NullableDoubleConverterWithZero"
+                                      T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="Y" @onfocusin="@(() => CalcPolar = true)" DisableUnderLine="false" Label="Y" Converter="Util.NullableDoubleConverterWithZero"
+                                      T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+        </MudItem>
+        <MudItem xs="12" md="12">
+            <MudField Variant="Variant.Filled" Label="Полярная СК" DisableUnderLine="true">
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="Radius" @onfocusin="@(() => CalcPolar = false)" DisableUnderLine="false" Label="Радиус" Converter="Util.NullableDoubleConverterWithZero"
+                                      T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="Angle" @onfocusin="@(() => CalcPolar = false)" DisableUnderLine="false" Label="Угол" Converter="Util.NullableDoubleConverterWithZero"
+                                      T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="°" Immediate="true" />
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code
+{
+    public bool CalcPolar { get; set; } = false;
+
+
+    private double? _X;
+
+    public double? X
+    {
+        get { return _X; }
+        set
+        {
+            _X = value;
+            if (CalcPolar)
+            {
+                if (X is null || Y is null)
+                {
+                    Radius = null;
+                    Angle = null;
+                }
+                else
+                {
+                    Radius = Math.Sqrt(Math.Pow(X.Value, 2) + Math.Pow(Y.Value, 2));
+                    Angle = Calc.GetAngleFromXY(X.Value, Y.Value);
+                }
+            }
+        }
+    }
+
+
+    private double? _Y;
+
+    public double? Y
+    {
+        get { return _Y; }
+        set
+        {
+            _Y = value;
+            if (CalcPolar)
+            {
+                if (X is null || Y is null)
+                {
+                    Radius = null;
+                    Angle = null;
+                }
+                else
+                {
+                    Radius = Math.Sqrt(Math.Pow(X.Value, 2) + Math.Pow(Y.Value, 2));
+                    Angle = Calc.GetAngleFromXY(X.Value, Y.Value);
+                }
+
+            }
+        }
+    }
+
+
+
+    private double? radius;
+
+    public double? Radius
+    {
+        get { return radius; }
+        set
+        {
+            radius = value;
+            if (!CalcPolar)
+            {
+                if (Radius is null || Angle is null)
+                {
+                    X = null;
+                    Y = null;
+                }
+                else
+                {
+                    if (Angle <= 90)
+                    {
+                        X = (Radius * Math.Cos(Angle.Value.Radians()));
+                        Y = (Radius * Math.Sin(Angle.Value.Radians()));
+                    }
+                }
+            }
+        }
+    }
+
+    private double? angle;
+
+    public double? Angle
+    {
+        get { return angle; }
+        set
+        {
+            angle = value;
+            if (!CalcPolar)
+            {
+                if (Radius is null || Angle is null)
+                {
+                    X = null;
+                    Y = null;
+                }
+                else
+                {
+                    if (Angle <= 90)
+                    {
+                        X = (Radius * Math.Cos(Angle.Value.Radians()));
+                        Y = (Radius * Math.Sin(Angle.Value.Radians()));
+                    }
+                }
+            }
+        }
+    }
+}

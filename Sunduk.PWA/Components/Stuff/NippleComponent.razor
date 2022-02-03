@@ -1,0 +1,238 @@
+﻿<style>
+    .monofield {
+        font-family: 'Roboto Mono', monospace;
+    }
+</style>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudGrid Spacing="1">
+        <MudItem xs="12" sm="6">
+            <MudField Label="Параметры" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1"
+            @onfocusout="(() => CurrentImage = Images.NippleBase)">
+                <MudGrid Spacing="0">
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_NippleDiameter" T="string" Label="Диаметр на сфере ниппеля" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                                      @onfocus="() => CurrentImage = Images.NippleDiameter" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_ArcCenter" T="string" Label="Размер от торца до центра дуги" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                                      @onfocus="() => CurrentImage = Images.NippleArcCenter" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                                      @onfocus="() => CurrentImage = Images.NippleToolRaduis" Margin="Margin.Dense"/>
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+            
+        </MudItem>
+
+        <MudHidden Breakpoint="Breakpoint.Xs">
+            <MudItem xs="12" sm="6" >
+            <MudCard Elevation="0" Outlined="true" Class="mt-1 rounded-0">
+                <MudCardContent>
+                    @if (CurrentImage == Images.NippleBase)
+                    {
+                        <center>
+                            <img src="/img/stuffimages/nipple/nipple.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                        </center>
+                    }
+                    @if (CurrentImage == Images.NippleArcCenter)
+                    {
+                        <center>
+                            <img src="/img/stuffimages/nipple/nipple_arc_center.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                        </center>
+                    }
+                    @if (CurrentImage == Images.NippleDiameter)
+                    {
+                        <center>
+                            <img src="/img/stuffimages/nipple/nipple_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                        </center>
+                    }
+                    @if (CurrentImage == Images.NippleRadius)
+                    {
+                        <center>
+                            <img src="/img/stuffimages/nipple/nipple_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth"/>
+                        </center>
+                    }
+                    @if (CurrentImage == Images.NippleToolRaduis)
+                    {
+                        <center>
+                            <img src="/img/stuffimages/nipple/nipple_tool_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                        </center>
+                    }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <div>
+                <img src="/img/stuffimages/nipple/nipple.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/nipple/nipple_arc_center.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/nipple/nipple_diam.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/nipple/nipple_radius.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/nipple/nipple_tool_radius.svg" asp-append-version="true" width="0" height="0" />
+
+            </div>
+        </MudHidden>
+        <MudItem xs="12">
+            <MudField Label="Результат" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n1">
+                <MudGrid Spacing="1">
+                    <MudItem xs="12" Class="mt-2">
+                        @if (NippleDiameter != NippelStartDiameter)
+                        {
+                            <MudText Typo="Typo.body2">@($"Начальный диаметр: {NippelStartDiameter.ToPrettyString(3)} мм")</MudText>
+                        }
+                        @if (NippleDiameter <= 0 && RadiusSize <= 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Начальный диаметр: -")</MudText>
+                        }
+                    </MudItem>
+                    <MudItem xs="12">
+                        @if (NippleDiameter > 0 && RadiusSize > 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Начальный диаметр с учетом радиуса пластины: {(NippelStartDiameter - XRadiusShift).ToPrettyString()} мм")</MudText>
+                        }
+                        @if (NippleDiameter <= 0 && RadiusSize <= 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Начальный диаметр с учетом радиуса пластины: -")</MudText>
+                        }
+                    </MudItem>
+                    <MudItem xs="12">
+                        @if (NippleDiameter > 0 && RadiusSize > 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Глубина с учетом радиуса пластины: {RadiusDepth.ToPrettyString()} мм")</MudText>
+                        }
+                        @if (NippleDiameter <= 0 && RadiusSize <= 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Глубина с учетом радиуса пластины: -")</MudText>
+                        }
+                    </MudItem>
+                    <MudItem xs="12">
+                        @if (NippleDiameter != NippelStartDiameter)
+                        {
+                            <MudText Typo="Typo.body2">@($"Угол между осью и касательной: {Angle.ToPrettyString(3)}°")</MudText>
+                        }
+                        @if (NippleDiameter <= 0 && RadiusSize <= 0)
+                        {
+                            <MudText Typo="Typo.body2">@($"Угол между осью и касательной: -")</MudText>
+                        }
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+        </MudItem>
+        @if (NippleDiameter > 0 && RadiusSize > 0)
+        {
+            <MudItem xs="12">
+                <MudExpansionPanel Class="rounded-0" Text="Пример программы для Fanuc">
+                    <MudGrid Class="mb-1 pa-n3">
+                        <MudItem xs="6" md="4">
+                            <MudSwitch @bind-Checked="@RoundCorner" Label="Скруглить углы" Color="Color.Primary" Class="ma-n3"/>
+                        </MudItem>
+                        <MudItem xs="6" md="4">
+                            @if (RoundCorner)
+                            {
+                                <MudTextField @bind-Value="_NippleBlunt" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"  Class="ma-n4" DisableUnderLine="true"/>
+                            }
+                        </MudItem>
+                    </MudGrid>
+                    <MudItem xs="12" Class="mt-1">
+                        <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@RadiusExample" />
+                    </MudItem>
+                </MudExpansionPanel>
+            </MudItem>
+        }
+    </MudGrid>
+
+
+</MudContainer>
+
+@code 
+{
+    readonly int _imgHeigth = 147;
+    readonly int _imgWidth = 250;
+
+    public bool RoundCorner { get; set; } = false;
+
+    public enum Images
+    {
+        NippleBase,
+        NippleDiameter,
+        NippleRadius,
+        NippleArcCenter,
+        NippleToolRaduis,
+    };
+    public enum ImageType { Diameter, ToolRaduis, ChamferAngle, ChamferSize };
+    public Images CurrentImage { get; set; } = Images.NippleBase;
+
+    public string RadiusExample
+    {
+        get
+        {
+            if (NippleDiameter > 0 && RadiusSize > 0)
+            {
+                if (RoundCorner)
+                {
+                    return GetBluntedShape();
+                }
+                return
+                    $"G0 X{StartDiamWithShift.NC()} Z1. S200 M3\n" +
+                    $"G1 Z0. F0.1\n" +
+                    $"G3 X{NippleDiameter.NC()} Z-{RadiusDepth.NC()} R{FullRadius.NC()}\n";
+            }
+            return string.Empty;
+        }
+    }
+    public enum Radius { External, Internal };
+    public Radius RadiusType { get; set; } = Radius.External;
+
+    public string _NippleDiameter { get; set; } = string.Empty;
+    public double NippleDiameter { get => Util.GetDouble(_NippleDiameter); }
+
+    public string _ArcCenter { get; set; } = string.Empty;
+    public double ArcCenter { get => Util.GetDouble(_ArcCenter); }
+
+    public string _RadiusSize { get; set; } = string.Empty;
+    public double RadiusSize { get => NippleDiameter / 2; }
+
+    public string _InsertRadius { get; set; } = string.Empty;
+    public double InsertRadius { get => Util.GetDouble(_InsertRadius); }
+
+    public string _NippleBlunt { get; set; } = "0.3";
+    public double NippleBlunt { get => Util.GetDouble(_NippleBlunt); }
+    public double NippleBluntRadius { get => NippleBlunt + InsertRadius; }
+
+    public double NippelStartPointX { get => Math.Sqrt(Math.Pow(RadiusSize, 2) - Math.Pow(ArcCenter, 2)); }
+    public double NippelStartDiameter { get => NippelStartPointX * 2; }
+
+    public double Angle { get => Math.Atan(ArcCenter / NippelStartPointX).Degrees();}
+
+    public double XRadiusShift { get => 2 * (NippelStartPointX / ArcCenter) * (InsertRadius - InsertRadius / Math.Tan((90 - (90 - Angle) / 2).Radians())); }
+    public double StartDiamWithShift { get => NippelStartDiameter - XRadiusShift; }
+
+    public double RadiusDepth { get => ArcCenter + InsertRadius; }
+    public double FullRadius { get => RadiusSize + InsertRadius; }
+
+    public int ExampleLines { get => RadiusExample.Count(f => f == '\n') + 1; }
+
+    string GetBluntedShape()
+    {
+        var catet = ArcCenter - NippleBlunt;
+        var startX = Math.Sqrt(Math.Pow(RadiusSize - NippleBlunt, 2) - Math.Pow(catet, 2));
+        var angle = Math.Atan(startX / catet);
+        var endX = NippleBlunt * Math.Sin(angle) + startX;
+        var endZ = NippleBlunt - (Math.Sqrt(Math.Pow(NippleBlunt, 2) - Math.Pow(NippleBlunt * Math.Sin(angle), 2)));
+        if (InsertRadius > 0)
+        {
+            startX -= InsertRadius;
+            catet = NippleBluntRadius * Math.Sin(angle);
+            endX = catet + startX;
+            endZ = NippleBluntRadius - (Math.Sqrt(Math.Pow(NippleBluntRadius, 2) - Math.Pow(catet, 2)));
+        }
+
+
+
+        return $"G0 X{(startX*2).NC()} Z1. S200 M3\n" +
+        $"G1 Z0. F0.1\n" +
+        $"G3 X{(endX*2).NC()} Z-{endZ.NC()} R{NippleBluntRadius.NC()}\n" +
+        $"X{NippleDiameter.NC()} Z-{RadiusDepth.NC()} R{FullRadius.NC()}\n" +
+        $"";
+    }
+}

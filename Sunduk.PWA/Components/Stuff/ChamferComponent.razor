@@ -36,7 +36,7 @@
         </MudItem>
         <MudHidden Breakpoint="Breakpoint.Xs">
             <MudItem xs="12" sm="6">
-                <MudCard Elevation="0" Outlined="true" Class="mt-1">
+                <MudCard Elevation="0" Outlined="true" Class="mt-1 rounded-0">
                     <MudCardContent>
                         @if (CurrentImage == Images.ExternalChamfer)
                         {
@@ -152,7 +152,6 @@
                             <MudRadio Option="@Calculation.Precise" Color="Color.Primary">Точный</MudRadio>
                         </MudRadioGroup>
                     </MudItem>
-
                 </MudGrid>
             </MudField>
         </MudItem>
@@ -185,7 +184,7 @@
         @if (ValidResult())
         {
             <MudItem xs="12">
-                <MudExpansionPanel Text="Пример программы для Fanuc">
+                <MudExpansionPanel Class="rounded-0" Text="Пример программы для Fanuc">
                     <MudGrid>
                         <MudItem xs="12" md="4">
                             <MudRadioGroup T="bool" @bind-SelectedOption="showClassicChamfer" Class="ma-n3">
@@ -380,11 +379,11 @@
             double result;
             if (ChamferType == Chamfer.External)
             {
-                result = (ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) - ChamferInsertRadius * Math.Tan(Util.Radians(Angle));
+                result = (ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Calc.Radians(Angle)))) - ChamferInsertRadius * Math.Tan(Calc.Radians(Angle));
             }
             else
             {
-                result = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle)))) + ChamferInsertRadius * Math.Tan(Util.Radians(Angle)));
+                result = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Calc.Radians(Angle)))) + ChamferInsertRadius * Math.Tan(Calc.Radians(Angle)));
 
             }
             return result;
@@ -481,11 +480,11 @@
     {
         if (calcStartDiam && ChamferType == Chamfer.External && ValidResult())
         {
-            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle))))).ToPrettyString();
+            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Calc.Radians(Angle))))).ToPrettyString();
         }
         else if (calcStartDiam && ChamferType == Chamfer.Internal && ValidResult())
         {
-            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle))))).ToPrettyString();
+            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Calc.Radians(Angle))))).ToPrettyString();
         }
         else if (!calcStartDiam && ValidResult())
         {
@@ -506,11 +505,11 @@
 
         if (calcStartDiam && ChamferType == Chamfer.External && ValidResult())
         {
-            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Util.Radians(Angle))))).ToPrettyString();
+            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Calc.Radians(Angle))))).ToPrettyString();
         }
         else if (calcStartDiam && ChamferType == Chamfer.Internal && ValidResult())
         {
-            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Util.Radians(Angle))))).ToPrettyString();
+            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Calc.Radians(Angle))))).ToPrettyString();
         }
         else if (calcStartDiam && !ValidResult())
         {

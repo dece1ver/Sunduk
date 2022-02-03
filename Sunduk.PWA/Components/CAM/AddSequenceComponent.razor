@@ -62,10 +62,10 @@
             @if (GeneralSequence == GeneralSequences.ToolCall && MachineType == MachineType.Milling)
             {
                 <MudItem xs="12" md="6">
-                    <MudSelect Label="Тип охлаждения" T="CoolantType" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="Coolant">
-                        <MudSelectItem Value="@(CoolantType.General)">Обычный</MudSelectItem>
-                        <MudSelectItem Value="@(CoolantType.Through)">Через шпиндель</MudSelectItem>
-                        <MudSelectItem Value="@(CoolantType.Blow)">Обдув</MudSelectItem>
+                    <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="Coolant">
+                        <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
+                        <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
+                        <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" md="6">
@@ -344,7 +344,7 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="6">
-                        <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnCuttingTypeChanged">
+                        <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnThreadCuttingTypeChanged">
                             <MudSelectItem Value="@(CuttingType.External)">Наружная</MudSelectItem>
                             <MudSelectItem Value="@(CuttingType.Internal)">Внутренняя</MudSelectItem>
                         </MudSelect>
@@ -361,7 +361,7 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="4">
-                        <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnCuttingTypeChanged">
+                        <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnThreadCuttingTypeChanged">
                             <MudSelectItem Value="@(CuttingType.External)">Наружная</MudSelectItem>
                             <MudSelectItem Value="@(CuttingType.Internal)">Внутренняя</MudSelectItem>
                         </MudSelect>
@@ -389,7 +389,7 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="6">
-                        <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnCuttingTypeChanged">
+                        <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnThreadCuttingTypeChanged">
                             <MudSelectItem Value="@(CuttingType.External)">Наружная</MudSelectItem>
                             <MudSelectItem Value="@(CuttingType.Internal)">Внутренняя</MudSelectItem>
                         </MudSelect>
@@ -406,7 +406,7 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="4">
-                        <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnCuttingTypeChanged">
+                        <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnThreadCuttingTypeChanged">
                             <MudSelectItem Value="@(CuttingType.External)">Наружная</MudSelectItem>
                             <MudSelectItem Value="@(CuttingType.Internal)">Внутренняя</MudSelectItem>
                         </MudSelect>
@@ -511,9 +511,9 @@
         #region Канавочные
         case SequenceType.Grooving:
             <MudItem xs="4">
-                <MudSelect Label="Переход" T="GroovingSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="GroovingSequence">
-                    <MudSelectItem Value="@(GroovingSequences.Grooving)">Канавка наружная</MudSelectItem>
-                    <MudSelectItem Value="@(GroovingSequences.Cutting)">Отрезка</MudSelectItem>
+                <MudSelect Label="Переход" T="TurningGroovingSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="GroovingSequence">
+                    <MudSelectItem Value="@(TurningGroovingSequences.Cutting)">Отрезка</MudSelectItem>
+                    <MudSelectItem Value="@(TurningGroovingSequences.Grooving)">Канавка</MudSelectItem>
                 </MudSelect>
             </MudItem>
             <MudItem xs="4">
@@ -524,9 +524,36 @@
                     }
                 </MudSelect>
             </MudItem>
-            @if(GroovingSequence == GroovingSequences.Grooving)
+            @if(GroovingSequence == TurningGroovingSequences.Grooving)
             {
-                
+            <MudItem xs="4">
+                <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnGrooveCuttingTypeChanged">
+                    <MudSelectItem Value="@(CuttingType.External)">Наружная</MudSelectItem>
+                    <MudSelectItem Value="@(CuttingType.Internal)">Внутренняя</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            }
+            @if(GroovingSequence == TurningGroovingSequences.Cutting)
+            {
+            <MudItem xs="4">
+                    <MudTextField Label="Начальный диаметр" @bind-Value="_GroovingExternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+            </MudItem>
+            <MudItem xs="4">
+                    <MudTextField Label="Конечный диаметр" @bind-Value="_GroovingInternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+            </MudItem>
+            <MudItem xs="4">
+                    <MudTextField Label="Конечная точка" @bind-Value="_GroovingCuttingPoint" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+            </MudItem>
+            <MudItem xs="6">
+                    <MudTextField Label="Притупление" @bind-Value="_GroovingCutOffChamfer" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+            </MudItem>
+            <MudItem xs="6">
+                <MudSelect Label="Тип" T="Blunt" Variant="Variant.Filled" Margin="Margin.Dense">
+                    <MudSelectItem Value="@(Blunt.Chamfer)">Простая фаска</MudSelectItem>
+                    <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
+                    <MudSelectItem Value="@(Blunt.ChamferWithRadius)">Настраиваемая фаска</MudSelectItem>
+                </MudSelect>
+            </MudItem>
             }
             break;
         #endregion
@@ -606,9 +633,15 @@
         Tool = null;
     }
 
-    private void OnCuttingTypeChanged(CuttingType value)
+    private void OnThreadCuttingTypeChanged(CuttingType value)
     {
         ThreadType = value;
+        Tool = null;
+    }
+
+    private void OnGrooveCuttingTypeChanged(CuttingType value)
+    {
+        GrooveType = value;
         Tool = null;
     }
 
@@ -663,7 +696,7 @@
 
 
     #region Типы переходов
-    private SequenceType Type { get; set; } 
+    private SequenceType Type { get; set; }
 
     private enum GeneralSequences
     {
@@ -702,18 +735,18 @@
 
     private ThreadingSequences ThreadingSequence { get; set; }
 
-    private enum GroovingSequences
+    private enum TurningGroovingSequences
     {
         Grooving,
         Cutting
     }
 
-    private GroovingSequences GroovingSequence { get; set; }
+    private TurningGroovingSequences GroovingSequence { get; set; }
     #endregion
 
     private Tool Tool { get; set; }
 
-    private CoolantType Coolant { get; set; }
+    private Coolant Coolant { get; set; }
     private bool ToolCallPolar { get; set; }
 
     private Sequence RepeatableRoughFacingSequence { get; set; }
@@ -806,8 +839,24 @@
     private string _GroovingWidth { get; set; }
     private double GroovingWidth { get => Util.GetDouble(_GroovingWidth); }
 
+    private string _GroovingCuttingPoint { get; set; }
+    private double GroovingCuttingPoint { get => Util.GetDouble(_GroovingCuttingPoint); }
+
+    private string _GroovingProfStockAllow { get; set; }
+    private double GroovingProfStockAllow { get => Util.GetDouble(_GroovingProfStockAllow); }
+
+    private string _GroovingCutOffChamfer { get; set; }
+    private double GroovingCutOffChamfer { get => Util.GetDouble(_GroovingCutOffChamfer); }
+
+    private string _GroovingCornerBlunt { get; set; }
+    private double GroovingCornerBlunt { get => Util.GetDouble(_GroovingCornerBlunt); }
+
+    private Blunt GroovingBluntType { get; set; }
+
     private enum GrooveSides {Rigth, Left}
     private GrooveSides GrooveSide { get; set; }
+
+    private CuttingType GrooveType { get; set; }
 
     #endregion
 
@@ -833,37 +882,37 @@
 
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.Facing)
             {
-                return Operation.Facing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.GetCycleRange());
+                return FacingOperation.Facing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.GetCycleRange());
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.RoughFacing)
             {
-                return Operation.RoughFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.GetCycleRange());
+                return FacingOperation.RoughFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.GetCycleRange());
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.RoughFacingCycle)
             {
-                return Operation.RoughFacingCycle(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.GetCycleRange());
+                return FacingOperation.RoughFacingCycle(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), RoughStockAllow, ProfStockAllowZ, StepOver, CyclesCount.GetCycleRange());
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.FinishFacingCycle)
             {
                 return RepeatableRoughFacingSequence switch
                 {
-                    RoughFacingSequence => Operation.FinishFacingCycleFromRoughFacing(Tool as TurningExternalTool, RepeatableRoughFacingSequence as RoughFacingSequence),
-                    RoughFacingCycleSequence => Operation.FinishFacingCycleFromRoughCycleFacing(Tool as TurningExternalTool, RepeatableRoughFacingSequence as RoughFacingCycleSequence),
-                    FacingSequence => Operation.FinishFacingCycleFromFacing(Tool as TurningExternalTool, RepeatableRoughFacingSequence as FacingSequence),
+                    RoughFacingSequence => FacingOperation.FinishFacingCycleFromRoughFacing(Tool as TurningExternalTool, RepeatableRoughFacingSequence as RoughFacingSequence),
+                    RoughFacingCycleSequence => FacingOperation.FinishFacingCycleFromRoughCycleFacing(Tool as TurningExternalTool, RepeatableRoughFacingSequence as RoughFacingCycleSequence),
+                    FacingSequence => FacingOperation.FinishFacingCycleFromFacing(Tool as TurningExternalTool, RepeatableRoughFacingSequence as FacingSequence),
                     _ => string.Empty
                 };
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.FinishFacing)
             {
-                return Operation.FinishFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), ProfStockAllowZ);
+                return FacingOperation.FinishFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), ProfStockAllowZ);
             }
 
             if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.HighSpeedDrilling)
             {
                 return MachineType switch
                 {
-                    MachineType.Turning => Operation.TurningHighSpeedDrilling(Machine, WorkpieceMaterial, Tool as TurningDrillingTool, DrillStart, DrillEnd),
-                    MachineType.Milling => Operation.MillingHighSpeedDrilling(
+                    MachineType.Turning => DrillingOperation.TurningHighSpeedDrilling(Machine, WorkpieceMaterial, Tool as TurningDrillingTool, DrillStart, DrillEnd),
+                    MachineType.Milling => DrillingOperation.MillingHighSpeedDrilling(
                         Machine,
                         WorkpieceMaterial,
                         Tool as MillingDrillingTool,
@@ -879,8 +928,8 @@
             {
                 return MachineType switch
                 {
-                    MachineType.Turning => Operation.TurningPeckDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDepth, DrillStart, DrillEnd),
-                    MachineType.Milling => Operation.MillingPeckDrilling(
+                    MachineType.Turning => DrillingOperation.TurningPeckDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDepth, DrillStart, DrillEnd),
+                    MachineType.Milling => DrillingOperation.MillingPeckDrilling(
                         Machine,
                         WorkpieceMaterial,
                         Tool as MillingDrillingTool,
@@ -897,8 +946,8 @@
             {
                 return MachineType switch
                 {
-                    MachineType.Turning => Operation.TurningPeckDeepDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDeepDepth, DrillStart, DrillEnd),
-                    MachineType.Milling => Operation.MillingPeckDeepDrilling(
+                    MachineType.Turning => DrillingOperation.TurningPeckDeepDrilling(Machine, WorkpieceMaterial, Tool as DrillingTool, PeckingDeepDepth, DrillStart, DrillEnd),
+                    MachineType.Milling => DrillingOperation.MillingPeckDeepDrilling(
                         Machine,
                         WorkpieceMaterial,
                         Tool as MillingDrillingTool,
@@ -913,19 +962,19 @@
 
             if (Type == SequenceType.Threading && ThreadingSequence == ThreadingSequences.ThreadCutting && ThreadType == CuttingType.External)
             {
-                return Operation.ThreadCutting(Machine, Tool as ThreadingExternalTool, ThreadStandart, ThreadType, ThreadDiameter, ThreadPitch, ThreadStart, ThreadEnd, ThreadNPTPlane);
+                return ThreadOperation.ThreadCutting(Machine, Tool as ThreadingExternalTool, ThreadStandart, ThreadType, ThreadDiameter, ThreadPitch, ThreadStart, ThreadEnd, ThreadNPTPlane);
             }
             if (Type == SequenceType.Threading && ThreadingSequence == ThreadingSequences.ThreadCutting && ThreadType == CuttingType.Internal)
             {
-                return Operation.ThreadCutting(Machine, Tool as ThreadingInternalTool, ThreadStandart, ThreadType, ThreadDiameter, ThreadPitch, ThreadStart, ThreadEnd, ThreadNPTPlane);
+                return ThreadOperation.ThreadCutting(Machine, Tool as ThreadingInternalTool, ThreadStandart, ThreadType, ThreadDiameter, ThreadPitch, ThreadStart, ThreadEnd, ThreadNPTPlane);
             }
 
             if (Type == SequenceType.Threading && ThreadingSequence == ThreadingSequences.Tapping)
             {
                 return MachineType switch
                 {
-                    MachineType.Turning => Operation.TurningTapping(Machine, Tool as TurningTappingTool, TapCutSpeed, TapStart, TapEnd),
-                    MachineType.Milling => Operation.MillingTapping(
+                    MachineType.Turning => ThreadOperation.TurningTapping(Machine, Tool as TurningTappingTool, TapCutSpeed, TapStart, TapEnd),
+                    MachineType.Milling => ThreadOperation.MillingTapping(
                         Machine,
                         Tool as MillingTappingTool,
                         TapCutSpeed,
@@ -935,6 +984,19 @@
                         HolesSetter == HolesSetterType.Cylinder ? true : false),
                     _ => string.Empty,
                 };
+            }
+            if (Type == SequenceType.Grooving && GroovingSequence == TurningGroovingSequences.Cutting)
+            {
+                return GroovingOperation.CutOffSequence(
+                    Machine, 
+                    WorkpieceMaterial, 
+                    Tool as GroovingExternalTool, 
+                    GroovingCuttingPoint, 
+                    GroovingExternalDiameter, 
+                    GroovingInternalDiameter, 
+                    GroovingCornerBlunt, 
+                    StepOver, 
+                    GroovingBluntType);
             }
             return string.Empty;
         }
@@ -1099,7 +1161,7 @@
                                 DrillEnd,
                                 HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
                                 HolesSetter == HolesSetterType.Cylinder ? true : false)
-                                { Name = "Сверление" };
+                            { Name = "Сверление" };
                         }
                         break;
                     case DrillingSequences.PeckingDrilling:
@@ -1125,7 +1187,7 @@
                                 DrillEnd,
                                 HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
                                 HolesSetter == HolesSetterType.Cylinder ? true : false)
-                                { Name = "Сверление" };
+                            { Name = "Сверление" };
                         }
                         break;
                     case DrillingSequences.PeckingDeepDrilling:
@@ -1151,7 +1213,7 @@
                                 DrillEnd,
                                 HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
                                 HolesSetter == HolesSetterType.Cylinder ? true : false)
-                                { Name = "Глубокое сверление" };
+                            { Name = "Глубокое сверление" };
                         }
                         break;
                     default:
@@ -1217,8 +1279,8 @@
     {
         List<Hole> result = new();
         double angleStep = 360 / holesCount;
-        while (startAngle >= 360) startAngle -= 360; 
-        while (startAngle <= -360) startAngle += 360; 
+        while (startAngle >= 360) startAngle -= 360;
+        while (startAngle <= -360) startAngle += 360;
         for (int i = 0; i < holesCount; i++)
         {
             result.Add(new Hole(radius, angleStep * i + startAngle));

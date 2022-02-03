@@ -78,7 +78,7 @@
         {
             case Mode.General:
                 <MudItem xs="12" sm="6">
-                    <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense" @onfocusout="DropSelection">
+                    <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense"> @* onfocusout=DropSelection, но он дропает даже при нажатии кнопок, поэтому убрал пока *@
                         <MudList Clickable="true" @bind-SelectedItem="SelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" Dense="true" DisableGutters=true>
                             @if (Program != null)
                             {

@@ -1,26 +1,17 @@
-﻿@page "/stuff"
+﻿@page "/converters"
 
 <MudSwipeArea OnSwipe="@OnSwipe">
     <MudTabs Elevation="2" @ref="tabs" Style="font-size: small">
-        <MudTabPanel Text="Резьба">
-            <ThreadTurningComponent />
+        <MudTabPanel Text="Углы">
+            <AngleConverterComponent />
         </MudTabPanel>
-        <MudTabPanel Text="Фаска">
-            <ChamferComponent />
-        </MudTabPanel>
-        <MudTabPanel Text="Скругление">
-            <RadiusComponent />
-        </MudTabPanel>
-        <MudTabPanel Text="Сфера ниппеля">
-            <NippleComponent />
-        </MudTabPanel>
-        <MudTabPanel Text="Конус сверла">
-            <DrillAngleComponent />
+        <MudTabPanel Text="Координаты точки">
+            <PointCoordinatesComponent />
         </MudTabPanel>
     </MudTabs>
 </MudSwipeArea>
 
-@code 
+@code
 {
     MudTabs tabs;
 
@@ -35,7 +26,7 @@
         }
         else if (direction == SwipeDirection.RightToLeft)
         {
-            if(tabs.ActivePanelIndex < 4)
+            if (tabs.ActivePanelIndex < 1)
             {
                 tabs.ActivatePanel(tabs.ActivePanelIndex + 1);
             }

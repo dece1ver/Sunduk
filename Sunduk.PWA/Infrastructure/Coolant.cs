@@ -1,6 +1,6 @@
 ﻿namespace Sunduk.PWA.Infrastructure
 {
-    public enum CoolantType 
+    public enum Coolant 
     { 
         General, 
         Through, 
