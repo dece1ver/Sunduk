@@ -110,6 +110,24 @@
                         X = (Radius * Math.Cos(Angle.Value.Radians()));
                         Y = (Radius * Math.Sin(Angle.Value.Radians()));
                     }
+                    else if (Angle <= 180)
+                    {
+                        var tempAngle = Angle.Value - 90;
+                        X = (Radius * Math.Cos(tempAngle.Radians()));
+                        Y = -(Radius * Math.Sin(tempAngle.Radians()));
+                    }
+                    else if (Angle <= 270)
+                    {
+                        var tempAngle = Angle.Value - 180;
+                        X = -(Radius * Math.Cos(tempAngle.Radians()));
+                        Y = -(Radius * Math.Sin(tempAngle.Radians()));
+                    }
+                    else if (Angle <= 360)
+                    {
+                        var tempAngle = Angle.Value - 270;
+                        X = -(Radius * Math.Cos(tempAngle.Radians()));
+                        Y = (Radius * Math.Sin(tempAngle.Radians()));
+                    }
                 }
             }
         }
@@ -132,10 +150,47 @@
                 }
                 else
                 {
-                    if (Angle <= 90)
+                    while (Angle >= 360)
+                    {
+                        Angle -= 360;
+                    }
+                    if (Angle > 0 && Angle < 90)
                     {
                         X = (Radius * Math.Cos(Angle.Value.Radians()));
                         Y = (Radius * Math.Sin(Angle.Value.Radians()));
+                    }
+                    else if (Angle == 90)
+                    {
+                        X = Radius;
+                        Y = 0;
+                    }
+                    else if (Angle <= 180)
+                    {
+                        var tempAngle = Angle.Value - 90;
+                        X = (Radius * Math.Cos(tempAngle.Radians()));
+                        Y = -(Radius * Math.Sin(tempAngle.Radians()));
+                    }
+                    else if (Angle < 270)
+                    {
+                        var tempAngle = Angle.Value - 180;
+                        X = -(Radius * Math.Sin(tempAngle.Radians()));
+                        Y = -(Radius * Math.Cos(tempAngle.Radians()));
+                    }
+                    else if (Angle == 270)
+                    {
+                        X = -Radius;
+                        Y = 0;
+                    }
+                    else if (Angle < 360)
+                    {
+                        var tempAngle = Angle.Value - 270;
+                        X = -(Radius * Math.Cos(tempAngle.Radians()));
+                        Y = (Radius * Math.Sin(tempAngle.Radians()));
+                    }
+                    else if (Angle == 360)
+                    {
+                        X = 0;
+                        Y = Radius;
                     }
                 }
             }
