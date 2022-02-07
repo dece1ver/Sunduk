@@ -8,6 +8,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
 
         public Types Type { get; set; }
         public double Width { get; set; }
+        public double CornerRadius { get; set; }
         public enum Point { Left, Right }
         public Point ZeroPoint { get; set; }
         public override string Name
@@ -21,13 +22,14 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
             };
         }
 
-        public GroovingExternalTool(int position, Types type, double width, Point zeroPoint, ToolHand hand = ToolHand.Rigth)
+        public GroovingExternalTool(int position, Types type, double width, Point zeroPoint, ToolHand hand = ToolHand.Rigth, double cornerRadius = 0.2)
         {
             Position = position;
             Type = type;
             Width = width;
             ZeroPoint = zeroPoint;
             Hand = hand;
+            CornerRadius = cornerRadius;
         }
     }
 }
