@@ -99,7 +99,9 @@ namespace Sunduk.PWA.Util
             var result = value.ToString($"F{precision}", CultureInfo.InvariantCulture).Contains('.')
                 ? value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0')
                 : value.ToString($"F{precision}");
-            return option == NcDecimalPointOption.With ? result : result.TrimEnd('.');
+            return option == NcDecimalPointOption.With 
+                ? result.Contains('.') ? result : result + '.' 
+                : result.TrimEnd('.');
         }
 
         /// <summary>
