@@ -147,17 +147,24 @@
                         </MudItem>
                     </MudHidden>
                     <MudItem xs="12" sm="6">
-                        <MudRadioGroup SelectedOptionChanged="OnCalculationChanged" T="Calculation" Class="d-flex justify-center">
+                        <MudRadioGroup SelectedOption="CalculationType" SelectedOptionChanged="OnCalculationChanged" T="Calculation" Class="d-flex justify-center">
                             <MudRadio Option="@Calculation.Simplified" Color="Color.Primary">Упрощенный</MudRadio>
                             <MudRadio Option="@Calculation.Precise" Color="Color.Primary">Точный</MudRadio>
                         </MudRadioGroup>
                     </MudItem>
+                    @if (Angle != 45 && Angle != 0 && CalculationType == Calculation.Simplified)
+                    {
+                    <MudItem xs="12">
+                        <MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="@Icons.Filled.WarningAmber">Не рекомендуется использовать упрощенный расчет для углов отличных от 45°</MudAlert>
+                    </MudItem>
+                    }
                 </MudGrid>
             </MudField>
         </MudItem>
         <MudItem xs="12">
             <MudField Label="Результат" Variant="Variant.Filled" DisableUnderLine="true">
                 <MudGrid Spacing="1">
+                    
                     <MudItem xs="12" Class="mt-2">
                         @if (ValidResult() && ChamferInsertRadius > 0)
                         {
@@ -271,7 +278,7 @@
                         $"G0 X{(ChamferEndDiameter + 1).NC(1)} Z-{(ChamferSizeWithShift + (ChamferInsertRadius + RoundCorner)).NC()} S180 M3\n" +
                         $"G1 X{ChamferEndDiameter.NC()}\n" +
                         $"Z-{ChamferSizeWithShift.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
-                        $"Z0. A{Angle.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
+                        $"Z0. A-{Angle.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
                         $"U-{(2 * (ChamferInsertRadius + RoundCorner)).NC()}";
                     case Chamfer.Internal:
                         return
@@ -279,7 +286,7 @@
                         $"Z-{(ChamferSizeWithShift + (ChamferInsertRadius + RoundCorner)).NC()}\n" +
                         $"G1 X{ChamferEndDiameter.NC()}\n" +
                         $"Z-{ChamferSizeWithShift.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
-                        $"Z0. A-{Angle.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
+                        $"Z0. A{Angle.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
                         $"U{(2 * (ChamferInsertRadius + RoundCorner)).NC()}";
                     default:
                         return string.Empty;
@@ -292,7 +299,17 @@
     public Chamfer ChamferType { get; set; } = Chamfer.External;
 
     public enum Calculation { Simplified, Precise };
-    public Calculation CalculationType { get; set; } = Calculation.Simplified;
+
+    private Calculation _CalculationType = Calculation.Simplified;
+    public Calculation CalculationType
+    {
+        get { return _CalculationType; }
+        set
+        {
+            _CalculationType = value;
+            CalculateAll();
+        }
+    }
 
     public enum Images
     {
@@ -343,6 +360,8 @@
         set
         {
             _angle = value;
+            if (Angle == 45) CalculationType = Calculation.Simplified;
+            else CalculationType = Calculation.Precise;
             CalculateAll();
         }
     }
@@ -552,5 +571,4 @@
             && (ChamferSize > 0 || ChamferStartDiameter > 0)) return true;
         return false;
     }
-
 }
