@@ -11,7 +11,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
     public class GroovingOperation : Operation
     {
         public static string CutOffSequence(Machine machine, Material material, GroovingExternalTool tool, double cuttingPoint, 
-            double externalDiameter, double internalDiameter, double cornerBlunt, double stepOver, Blunt bluntType)
+            double externalDiameter, double internalDiameter, double cornerBlunt, double stepOver, Blunt bluntType, double bluntCustonAngle = 0, double bluntCustomRadius = 0)
         {
             if (tool is null) return string.Empty;
             var zPoint = tool.ZeroPoint == GroovingExternalTool.Point.Right ? cuttingPoint : cuttingPoint - tool.Width;
@@ -24,13 +24,13 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
                 switch (bluntType)
                 {
-                    case Blunt.Chamfer:
+                    case Blunt.SimpleChamfer:
                         blunt = $"G1 X{(externalDiameter - 2 * cornerBlunt - tool.CornerRadius - 1).NC(0)}\n" +
                             $"G0 X{(externalDiameter + 1).NC()}\n" +
                             $"Z{(cuttingPoint + cornerBlunt + tool.CornerRadius / 2).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" +
                             $"Z{cuttingPoint.NC()} C{(cornerBlunt + tool.CornerRadius / 2).NC()}\n" +
-                            $"U-1.";
+                            $"U-1.\n";
                         break;
                     case Blunt.Radius:
                         blunt = $"G1 X{(externalDiameter - 2 * (cornerBlunt - tool.CornerRadius) - 1).NC(0)}\n" +
@@ -38,16 +38,32 @@ namespace Sunduk.PWA.Infrastructure.Templates
                             $"Z{(cuttingPoint + cornerBlunt + tool.CornerRadius).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" +
                             $"Z{cuttingPoint.NC()} R{(cornerBlunt + tool.CornerRadius).NC()}\n" +
-                            $"U-1.";
+                            $"U-1.\n";
                         break;
-                    case Blunt.ChamferWithRadius:
-                        blunt = $"G1 X{(externalDiameter - 2 * cornerBlunt - tool.CornerRadius - 1).NC(0)}\n" +
+                    case Blunt.CustomChamfer:
+                        if (bluntCustomRadius > 0 && bluntCustonAngle > 0 && bluntCustonAngle < 90)
+                        {
+                            blunt = $"G1 X{(externalDiameter - 2 * (cornerBlunt * Math.Tan(bluntCustonAngle.Radians())) - tool.CornerRadius - 1).NC(0)}\n" +
                             $"G0 X{(externalDiameter + 1).NC()}\n" +
-                            $"Z{(cuttingPoint + cornerBlunt + tool.CornerRadius / 2 + 0.3 + tool.CornerRadius).NC()}\n" +
+                            $"Z{(cuttingPoint + cornerBlunt + tool.CornerRadius / 2 + bluntCustomRadius + tool.CornerRadius).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" +
-                            $"Z{(cuttingPoint + cornerBlunt + tool.CornerRadius / 2 + 0.3 + tool.CornerRadius).NC()} R{(cornerBlunt + tool.CornerRadius)}\n" +
-                            $"Z{cuttingPoint.NC()} A45. R{0.3 + cornerBlunt}\n" +
-                            $"U-1.";
+                            $"Z{(cuttingPoint + cornerBlunt + tool.CornerRadius / 2).NC()} R{(bluntCustomRadius + tool.CornerRadius).NC()}\n" +
+                            $"Z{cuttingPoint.NC()} A{bluntCustonAngle.NC()} R{(bluntCustomRadius + tool.CornerRadius).NC()}\n" +
+                            $"U-1.\n";
+                        }
+                        else if (bluntCustomRadius <= 0 && bluntCustonAngle > 0 && bluntCustonAngle < 90)
+                        {
+                            blunt = $"G1 X{(externalDiameter - 2 * (cornerBlunt * Math.Tan(bluntCustonAngle.Radians())) - tool.CornerRadius - 1).NC(0)}\n" +
+                            $"G0 X{(externalDiameter + 1).NC()}\n" +
+                            $"Z{(cuttingPoint + cornerBlunt + tool.CornerRadius / 2).NC()}\n" +
+                            $"G1 X{externalDiameter.NC()}\n" +
+                            $"Z{cuttingPoint.NC()} A{bluntCustonAngle.NC()}\n" +
+                            $"U-1.\n";
+                        }
+                        else
+                        {
+                            blunt = string.Empty;
+                        }
                         break;
                     default:
                         break;
