@@ -17,24 +17,20 @@ namespace Sunduk.PWA.Infrastructure.Templates
             var zPoint = tool.ZeroPoint == GroovingExternalTool.Point.Right ? cuttingPoint : cuttingPoint - tool.Width;
             var fullChamferSize = cornerBlunt + tool.CornerRadius / 2;
             var fullChamferRadius = bluntType == Blunt.CustomChamfer ? tool.CornerRadius + bluntCustomRadius : tool.CornerRadius + cornerBlunt;
-            var cutting = (stepOver == 0 || stepOver >= (externalDiameter - internalDiameter / 2))
-                ? $"G1 X{internalDiameter.NC()} F{GroovingFeedRough().NC()}\n"
-                : $"G74 R0.5\n" +
-                $"G74 X{internalDiameter.NC()} P{stepOver.Microns()} F{GroovingFeedRough().NC()}\n";
             var blunt = string.Empty;
             if (cornerBlunt > 0)
             {
                 switch (bluntType)
                 {
                     case Blunt.SimpleChamfer:
-                        blunt = $"G1 X{(externalDiameter - 2 * cornerBlunt - tool.CornerRadius - 1).NC(0)}\n" +
+                        blunt = $"G1 X{(externalDiameter - 2 * cornerBlunt - tool.CornerRadius - 1).NC(0)} F{GroovingFeedRough().NC()}\n" +
                             $"G0 X{(externalDiameter + 1).NC()}\n" +
                             $"Z{(zPoint + fullChamferSize).NC()}\n" +
-                            $"G1 X{externalDiameter.NC()}\n" +
+                            $"G1 X{externalDiameter.NC()} \n" +
                             $"Z{zPoint.NC()} C{(fullChamferSize).NC()}\n";
                         break;
                     case Blunt.Radius:
-                        blunt = $"G1 X{(externalDiameter - 2 * (cornerBlunt - tool.CornerRadius) - 1).NC(0)}\n" +
+                        blunt = $"G1 X{(externalDiameter - 2 * (cornerBlunt - tool.CornerRadius) - 1).NC(0)} F{GroovingFeedRough().NC()}\n" +
                             $"G0 X{(externalDiameter + 1).NC()}\n" +
                             $"Z{(zPoint + cornerBlunt + tool.CornerRadius).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" +
@@ -43,7 +39,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     case Blunt.CustomChamfer:
                         if (bluntCustomRadius > 0 && bluntCustomAngle > 0 && bluntCustomAngle < 90)
                         {
-                            blunt = $"G1 X{(externalDiameter - 2 * (cornerBlunt * Math.Tan(bluntCustomAngle.Radians())) - Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X - 1).NC(0)}\n" +
+                            blunt = $"G1 X{(externalDiameter - 2 * (cornerBlunt * Math.Tan(bluntCustomAngle.Radians())) - Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X - 1).NC(0)} F{GroovingFeedRough().NC()}\n" +
                             $"G0 X{(externalDiameter + 1).NC()}\n" +
                             $"Z{(zPoint + fullChamferSize + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" +
@@ -52,7 +48,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         }
                         else if (bluntCustomRadius <= 0 && bluntCustomAngle > 0 && bluntCustomAngle < 90)
                         {
-                            blunt = $"G1 X{(externalDiameter - 2 * (cornerBlunt * Math.Tan(bluntCustomAngle.Radians())) - Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X - 1).NC(0)}\n" +
+                            blunt = $"G1 X{(externalDiameter - 2 * (cornerBlunt * Math.Tan(bluntCustomAngle.Radians())) - Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X - 1).NC(0)} F{GroovingFeedRough().NC()}\n" +
                             $"G0 X{(externalDiameter + 1).NC()}\n" +
                             $"Z{(zPoint + fullChamferSize).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" +
@@ -67,6 +63,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         break;
                 }
             }
+            var feed = string.IsNullOrEmpty(blunt) ? $" F{GroovingFeedRough().NC()}" : string.Empty;
+            var cutting = (stepOver == 0 || stepOver >= (externalDiameter - internalDiameter / 2))
+                ? $"G1 X{internalDiameter.NC()}{feed}\n"
+                : $"G74 R0.5\n" +
+                $"G74 X{internalDiameter.NC()} P{stepOver.Microns()} F{GroovingFeedRough().NC()}\n";
             return machine switch
             {
                 Machine.GS1500 =>
