@@ -78,7 +78,8 @@
         {
             case Mode.General:
                 <MudItem xs="12" sm="6">
-                    <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense"> @* onfocusout=DropSelection, но он дропает даже при нажатии кнопок, поэтому убрал пока *@
+                    <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
+                        @* onfocusout=DropSelection, но он дропает даже при нажатии кнопок, поэтому убрал пока *@
                         <MudList Clickable="true" @bind-SelectedItem="SelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" Dense="true" DisableGutters=true>
                             @if (Program != null)
                             {
@@ -99,8 +100,8 @@
                                                 @if (seq.MachineType != MachineType.Any && seq.MachineType != MachineType)
                                                 {
                                                     <MudTooltip Placement="Placement.Right" Text="Этот переход будет игнорирован, т.к. его тип не совпадает с типом станка.">
-                                                        <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" Size="Size.Small" 
-                                                                 Style="margin-top: 10px; margin-bottom: 0px; margin-left: 16px"/>
+                                                        <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" Size="Size.Small"
+                                                                 Style="margin-top: 10px; margin-bottom: 0px; margin-left: 16px" />
                                                     </MudTooltip>
 
                                                 }
@@ -110,18 +111,18 @@
                                                     {
                                                         <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -3px; margin-bottom: -3px">
                                                             @if (Program.IndexOf(seq) != Program.Count - 1)
-                                                                {
-                                                                    <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                                   OnClick="(() => MoveDownSequence(seq))" />
-                                                                }
-                                                                @if (Program.IndexOf(seq) != 2)
-                                                                {
-                                                                    <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                                   OnClick="(() => MoveUpSequence(seq))" />
-                                                                }
+                                                            {
+                                                                <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                               OnClick="(() => MoveDownSequence(seq))" />
+                                                            }
+                                                            @if (Program.IndexOf(seq) != 2)
+                                                            {
+                                                                <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                               OnClick="(() => MoveUpSequence(seq))" />
+                                                            }
                                                             @if (seq.MachineType == MachineType)
                                                             {
-                                                                
+
                                                                 <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
                                                                                OnClick="(() => OpenEditSequenceDialog(seq))" />
                                                             }
@@ -140,16 +141,16 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense">
-                        <MudTextField T="string" DisableUnderLine="true" 
-                                      Style="font-family: 'Roboto Mono', monospace; font-size: medium;" 
-                                      Variant="Variant.Text" @bind-Text="@ProgramText" 
+                        <MudTextField T="string" DisableUnderLine="true"
+                                      Style="font-family: 'Roboto Mono', monospace; font-size: medium;"
+                                      Variant="Variant.Text" @bind-Text="@ProgramText"
                                       ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
                     </MudField>
                     @*<MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense">
                             @foreach (var programLine in programList)
                             {
                                 <MudText Style="font-family: 'Roboto Mono', monospace; font-size: medium;">
-                                    <MudHighlighter Text="@programLine" 
+                                    <MudHighlighter Text="@programLine"
                                         Class="mud-primary-text"
                                         Style="background-color:transparent;"
                                         HighlightedText="@HighLight"
@@ -162,7 +163,7 @@
                 break;
             case Mode.ToolTable:
                 <MudItem xs=12>
-                    <ToolTableComponent Tools="Tools" 
+                    <ToolTableComponent Tools="Tools"
                                         MachineType="MachineType" />
                 </MudItem>
                 break;
@@ -170,17 +171,22 @@
                 <MudItem xs=12>
                     <MudPaper Class="pa-4 rounded-0" Elevation="0" Outlined="false">
                         <AddSequenceComponent Tools="Tools"
-                                          Machine="Machine"
-                                          MachineType="MachineType"
-                                          Program="Program"
-                                          @bind-Mode="Mode"
-                                          WorkpieceMaterial="WorkpieceMaterial"
-                                          WorkpieceExternalDiameter="WorkpieceExternalDiameter"
-                                          WorkpieceInternalDiameter="WorkpieceInternalDiameter"
-                                          WorkpieceCurrentInternalDiameter="WorkpieceCurrentInternalDiameter"
-                                          WorkpieceLength="WorkpieceLength"
-                                          CyclesCount="CyclesCount" />
+                                              Machine="Machine"
+                                              MachineType="MachineType"
+                                              Program="Program"
+                                              @bind-Mode="Mode"
+                                              WorkpieceMaterial="WorkpieceMaterial"
+                                              WorkpieceExternalDiameter="WorkpieceExternalDiameter"
+                                              WorkpieceInternalDiameter="WorkpieceInternalDiameter"
+                                              WorkpieceCurrentInternalDiameter="WorkpieceCurrentInternalDiameter"
+                                              WorkpieceLength="WorkpieceLength"
+                                              CyclesCount="CyclesCount" />
                     </MudPaper>
+                </MudItem>
+                break;
+            case Mode.EditSequence:
+                <MudItem xs=12>
+                    <EditSequenceComponent Tools="Tools" Program="Program" Sequence="CurrentSelectedSequence" @bind-Mode="Mode"/>
                 </MudItem>
                 break;
         }
@@ -200,6 +206,7 @@
 
     public MudListItem SelectedSequence;
     public object SelectedSequenceIndex = 0;
+    public Sequence CurrentSelectedSequence { get; set; }
 
     public int CyclesCount
     {
@@ -482,16 +489,22 @@
 
     private async Task OpenEditSequenceDialog(Sequence sequence)
     {
-        var parameters = new DialogParameters();
-        parameters.Add(nameof(Tools), Tools);
-        parameters.Add(nameof(Program), Program);
-        parameters.Add(nameof(sequence), sequence);
-        var options = new DialogOptions() { FullScreen = false, CloseButton = false };
-        var dialog = DialogService.Show<EditSequenceDialog>("Редактировать переход", parameters, options);
-        var result = await dialog.Result;
-        if (!result.Cancelled)
+        //var parameters = new DialogParameters();
+        //parameters.Add(nameof(Tools), Tools);
+        //parameters.Add(nameof(Program), Program);
+        //parameters.Add(nameof(sequence), sequence);
+        //var options = new DialogOptions() { FullScreen = false, CloseButton = false };
+        //var dialog = DialogService.Show<EditSequenceDialog>("Редактировать переход", parameters, options);
+        //var result = await dialog.Result;
+        CurrentSelectedSequence = sequence;
+        await Task.Run(SaveTools);
+        if (Mode != Mode.EditSequence)
         {
-            Program = Program;
+            Mode = Mode.EditSequence;
+        }
+        else
+        {
+            Mode = Mode.General;
         }
     }
 
@@ -656,7 +669,10 @@
                         TurningTappingSequence newTurningTappingSequence = Program[i] as TurningTappingSequence;
                         newTurningTappingSequence.Machine = Machine;
                         break;
-                    // миллинг таппинг
+                    case MillingTappingSequence MillingTappingSequence:
+                        MillingTappingSequence newMillingTappingSequence = Program[i] as MillingTappingSequence;
+                        newMillingTappingSequence.Machine = Machine;
+                        break;
                     case ThreadCuttingSequence threadCuttingSequence:
                         ThreadCuttingSequence newThreadCuttingSequence = Program[i] as ThreadCuttingSequence;
                         newThreadCuttingSequence.Machine = Machine;
@@ -664,6 +680,10 @@
                     case ToolCallSequence toolCallSequence:
                         ToolCallSequence newToolCallSequence = Program[i] as ToolCallSequence;
                         newToolCallSequence.Machine = Machine;
+                        break;
+                    case TurningCutOffSequence turningCutOffSequence:
+                        TurningCutOffSequence newTurningCutOffSequence = Program[i] as TurningCutOffSequence;
+                        newTurningCutOffSequence.Machine = Machine;
                         break;
                     default:
                         break;
@@ -683,7 +703,7 @@
             }
             return string.Join("\n", result.Where(x => !string.IsNullOrEmpty(x))).Trim() + ProgramEnd;
         }
-        set { }        
+        set { }
     }
     IEnumerable<string> programList => ProgramText.Split('\n').ToList();
 

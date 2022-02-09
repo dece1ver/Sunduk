@@ -634,6 +634,7 @@
         GroovingSequence = TurningGroovingSequences.Cutting;
         _CuttingExternalDiameter = WorkpieceExternalDiameter.ToString("F0");
         _CuttingInternalDiameter = "2.5";
+        _CuttingCustomChamferAngle = "45";
 
     }
 
@@ -844,7 +845,7 @@
 
     #region Отрезка
 
-    private bool _caclCuttingChamferDiameter;
+    private bool _caclCuttingChamferDiameter = true;
     private string _CuttingExternalDiameter { get; set; }
     private double CuttingExternalDiameter { get => Util.GetDouble(_CuttingExternalDiameter); }
 
@@ -1353,6 +1354,29 @@
                 break;
 
             case SequenceType.Grooving:
+                switch (GroovingSequence)
+                {
+                    case TurningGroovingSequences.Grooving:
+                        break;
+                    case TurningGroovingSequences.Cutting:
+                        sequence = new TurningCutOffSequence(
+                            Machine,
+                            WorkpieceMaterial,
+                            Tool as GroovingExternalTool,
+                            CuttingPoint,
+                            CuttingExternalDiameter,
+                            CuttingInternalDiameter,
+                            CuttingCornerBlunt,
+                            CuttingStepOver,
+                            CuttingBluntType,
+                            CuttingCustomChamferAngle,
+                            CuttingCustomChamferBlunt
+                            )
+                        { Name = "Отрезка" };
+                        break;
+                    default:
+                        break;
+                }
                 break;
             default:
                 break;

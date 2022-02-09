@@ -222,7 +222,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// </summary>
         public static double GroovingFeedRough()
         {
-            return 0.14;
+            return 0.1;
         }
 
         /// <summary>
