@@ -162,8 +162,8 @@ namespace Sunduk.PWA.Infrastructure
         public static (double X, double Z) ChamferRadiusLengths(double angle, double radius)
         {
             return (
-                Math.Tan(((90 - angle) / 2).Radians()) * radius,
-                Math.Tan((angle / 2).Radians()) * radius);
+                Math.Tan(((90 - angle) / 2).Radians()) * radius + 0.01,
+                Math.Tan((angle / 2).Radians()) * radius + 0.01);
         }
     }
 }
