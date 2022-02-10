@@ -2,8 +2,8 @@
 {
     public enum Blunt
     {
-        Chamfer,
+        SimpleChamfer,
         Radius,
-        ChamferWithRadius
+        CustomChamfer
     }
 }

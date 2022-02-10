@@ -9,6 +9,7 @@ namespace Sunduk.PWA.Infrastructure.CAM
     { 
         General, 
         ToolTable, 
-        AddSequence 
+        AddSequence,
+        EditSequence
     };
 }

@@ -152,5 +152,18 @@ namespace Sunduk.PWA.Infrastructure
         /// <param name="drillingTool">Сверло</param>
         /// <returns></returns>
         public static double PointLength(this double diameter, double angle) => (diameter / 2 * Math.Tan((90 - angle / 2).Radians()));
+
+        /// <summary>
+        /// Смещение от виртуальных точек пересечения до концов радиусов
+        /// </summary>
+        /// <param name="angle">Угол фаски от горизонтальной оси</param>
+        /// <param name="radius">Радиус на углах фаски</param>
+        /// <returns></returns>
+        public static (double X, double Z) ChamferRadiusLengths(double angle, double radius)
+        {
+            return (
+                Math.Tan(((90 - angle) / 2).Radians()) * radius + 0.01,
+                Math.Tan((angle / 2).Radians()) * radius + 0.01);
+        }
     }
 }
