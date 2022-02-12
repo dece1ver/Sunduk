@@ -32,7 +32,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     case Blunt.Radius:
                         blunt = $"G1 X{(externalDiameter - 2 * (cornerBlunt - tool.CornerRadius) - 1).NC(0)} F{GroovingFeedRough().NC()}\n" +
                             $"G0 X{(externalDiameter + 1).NC()}\n" +
-                            $"Z{(zPoint + cornerBlunt + tool.CornerRadius).NC()}\n" +
+                            $"Z{(zPoint + fullChamferRadius).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" +
                             $"Z{zPoint.NC()} R{fullChamferRadius.NC()}\n";
                         break;
@@ -52,7 +52,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                             $"G0 X{(externalDiameter + 1).NC()}\n" +
                             $"Z{(zPoint + fullChamferSize).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" +
-                            $"Z{zPoint.NC()} A{bluntCustomAngle.NC()}\n";
+                            $"Z{zPoint.NC()} A-{bluntCustomAngle.NC()}\n";
                         }
                         else
                         {

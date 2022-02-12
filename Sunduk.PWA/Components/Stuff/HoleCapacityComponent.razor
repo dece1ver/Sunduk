@@ -1,0 +1,142 @@
+﻿<style>
+    .monofield {
+        font-family: 'Roboto Mono', monospace;
+    }
+</style>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudGrid Spacing="1">
+        <MudItem xs="12" sm="6">
+            <MudField Label="Параметры" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1"
+                      @onfocusout="(() => CurrentImage = Images.Base)">
+                <MudGrid Spacing="0">
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_HoleDiameter" T="string" Label="Диаметр отверстия" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                                      @onfocus="() => CurrentImage = Images.HoleDiameter" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_ToolSize" T="string" Label="Размер с пластиной" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                                      @onfocus="FocusToolSize" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_MinimalDiameter" T="string" Label="Минимальный диаметр" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                                      @onfocus="FocusMinimalDiameter" Margin="Margin.Dense"/>
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+
+        </MudItem>
+
+        <MudHidden Breakpoint="Breakpoint.Xs">
+            <MudItem xs="12" sm="6">
+                <MudCard Elevation="0" Outlined="true" Class="mt-1 rounded-0">
+                    <MudCardContent>
+                        @if (CurrentImage == Images.Base)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/hole_capacity/hole_capacity.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.HoleDiameter)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/hole_capacity/hole_capacity_hole_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.ToolSize)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/hole_capacity/hole_capacity_tool_size.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.MinimalDiameter)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/hole_capacity/hole_capacity_min_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <div>
+                <img src="/img/stuffimages/hole_capacity/hole_capacity.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/hole_capacity/hole_capacity_hole_diam.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/hole_capacity/hole_capacity_tool_size.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/hole_capacity/hole_capacity_min_diam.svg" asp-append-version="true" width="0" height="0" />
+            </div>
+        </MudHidden>
+    </MudGrid>
+</MudContainer>
+
+@code
+{
+    readonly int _imgHeigth = 147;
+    readonly int _imgWidth = 250;
+
+    bool calcToolSize = false;
+
+    public enum Images { Base, HoleDiameter, ToolSize, MinimalDiameter };
+    public Images CurrentImage { get; set; } = Images.Base;
+
+    public enum Radius { External, Internal };
+    public Radius RadiusType { get; set; } = Radius.External;
+
+    public string _HoleDiameter { get; set; } = string.Empty;
+    public double HoleDiameter { get => Util.GetDouble(_HoleDiameter); }
+
+    public string _ShankDiameter { get; set; } = string.Empty;
+    public double ShankDiameter { get => Util.GetDouble(_ShankDiameter); }
+
+
+
+
+    private string _toolSize;
+
+    public string _ToolSize
+    {
+        get => _toolSize;
+        set
+        {
+            _toolSize = value;
+            if (!calcToolSize)
+            {
+                _MinimalDiameter = (HoleDiameter - (HoleDiameter - ToolSize) * 2).ToPrettyString(3);
+            }
+        }
+    }
+    public double ToolSize { get => Util.GetDouble(_ToolSize); }
+
+    private string _minimalDiameter;
+    public string _MinimalDiameter
+    {
+        get => _minimalDiameter;
+        set
+        {
+            _minimalDiameter = value;
+            if (calcToolSize)
+            {
+                _ToolSize = ((HoleDiameter + MinimalDiameter) / 2).ToPrettyString();
+            }
+        }
+    }
+    public double MinimalDiameter { get => Util.GetDouble(_MinimalDiameter); }
+
+    void FocusToolSize()
+    {
+        CurrentImage = Images.ToolSize;
+        calcToolSize = false;
+    }
+
+    void FocusMinimalDiameter()
+    {
+        CurrentImage = Images.MinimalDiameter;
+        calcToolSize = true;
+    }
+
+    bool Valid()
+    {
+        if (HoleDiameter > 0 && ToolSize > 0 && HoleDiameter >= ToolSize) return true;
+        return false;
+    }
+
+}

@@ -17,6 +17,9 @@
         <MudTabPanel Text="Конус сверла">
             <DrillAngleComponent />
         </MudTabPanel>
+        <MudTabPanel Text="Расточка">
+            <HoleCapacityComponent />
+        </MudTabPanel>
     </MudTabs>
 </MudSwipeArea>
 
@@ -35,7 +38,7 @@
         }
         else if (direction == SwipeDirection.RightToLeft)
         {
-            if(tabs.ActivePanelIndex < 4)
+            if(tabs.ActivePanelIndex < 5)
             {
                 tabs.ActivatePanel(tabs.ActivePanelIndex + 1);
             }

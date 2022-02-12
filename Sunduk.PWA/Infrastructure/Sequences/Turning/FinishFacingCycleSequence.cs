@@ -1,4 +1,5 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
+﻿using Sunduk.PWA.Infrastructure.CAM;
+using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
