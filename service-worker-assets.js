@@ -141,6 +141,22 @@
       "url": "img\/stuffimages\/drill\/drill_n.svg"
     },
     {
+      "hash": "sha256-z0+hgBaBP6ac8N0JsO4XMvUKUPWNocIQv3uB51m+UWU=",
+      "url": "img\/stuffimages\/hole_capacity\/hole_capacity.svg"
+    },
+    {
+      "hash": "sha256-koIUhJAAgNiXdF2gOG9crza09KSquX3FsN7rOBHxvYk=",
+      "url": "img\/stuffimages\/hole_capacity\/hole_capacity_hole_diam.svg"
+    },
+    {
+      "hash": "sha256-tiF614iM8IsFHKYyMHY4G0c96+W20GnImf6JyuHsw6g=",
+      "url": "img\/stuffimages\/hole_capacity\/hole_capacity_min_diam.svg"
+    },
+    {
+      "hash": "sha256-3JCfXAWulBVmKMCw5wkMXSG3UspmbsHvpYp5GAntpsQ=",
+      "url": "img\/stuffimages\/hole_capacity\/hole_capacity_tool_size.svg"
+    },
+    {
       "hash": "sha256-KV6\/vhdCtYp3TyiG7bflr+wbKZ4GuXzD3JNMCdObS+A=",
       "url": "img\/stuffimages\/nipple\/nipple.svg"
     },
@@ -281,7 +297,7 @@
       "url": "v.svg"
     },
     {
-      "hash": "sha256-mMzOkl7cxthD8pvfbr7iIV+xTCEi0PgNrZauCWLoisQ=",
+      "hash": "sha256-V7TcCGwksNcT9pAq9r1Mkce0xeKOdaVvhpaqWyqJoMY=",
       "url": "_framework\/Sunduk.dll"
     },
     {
@@ -1097,7 +1113,7 @@
       "url": "_content\/BlazorDownloadFile\/BlazorDownloadFileScript.js"
     },
     {
-      "hash": "sha256-JEjsLSHl+zlS0yzHXU3Wih8dxk+LHnODKOmV5Ki8Q6c=",
+      "hash": "sha256-gaiEkC6yxYC+mpqPkFEd\/iWKWV+vNHGGEs4Y1fqjO+c=",
       "url": "_framework\/blazor.boot.json"
     },
     {
@@ -1105,5 +1121,5 @@
       "url": "_framework\/blazor.webassembly.js"
     }
   ],
-  "version": "CgPk1dWo"
+  "version": "u1Jf\/qcS"
 };
