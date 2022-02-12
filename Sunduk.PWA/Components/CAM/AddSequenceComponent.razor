@@ -32,16 +32,16 @@
                     @if (MachineType == MachineType.Turning)
                     {
                         @foreach (var tool in Tools.Where(x =>
-               x is SpecialTurningTool ||
-               x is TurningExternalTool ||
-               x is TurningInternalTool ||
-               x is GroovingExternalTool ||
-               x is GroovingInternalTool ||
-               x is ThreadingExternalTool ||
-               x is ThreadingInternalTool ||
-               x is TurningDrillingTool ||
-               x is TurningTappingTool
-               ))
+         x is SpecialTurningTool ||
+         x is TurningExternalTool ||
+         x is TurningInternalTool ||
+         x is GroovingExternalTool ||
+         x is GroovingInternalTool ||
+         x is ThreadingExternalTool ||
+         x is ThreadingInternalTool ||
+         x is TurningDrillingTool ||
+         x is TurningTappingTool
+         ))
                         {
                             <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                         }
@@ -49,10 +49,10 @@
                     @if (MachineType == MachineType.Milling)
                     {
                         @foreach (var tool in Tools.Where(x =>
-               x is MillingDrillingTool ||
-               x is MillingTappingTool ||
-               x is MillingTool
-               ))
+         x is MillingDrillingTool ||
+         x is MillingTappingTool ||
+         x is MillingTool
+         ))
                         {
                             <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                         }
@@ -81,12 +81,12 @@
         #region Обработка торца
         case SequenceType.Facing:
             <MudItem xs="12" md="4">
-                <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="TurningSequence">
-                    <MudSelectItem Value="@(TurningSequences.RoughFacing)">Черновое торцевание</MudSelectItem>
-                    <MudSelectItem Value="@(TurningSequences.FinishFacing)">Чистовое торцевание</MudSelectItem>
-                    <MudSelectItem Value="@(TurningSequences.RoughFacingCycle)">Черновое торцевание (Под G70)</MudSelectItem>
-                    <MudSelectItem Value="@(TurningSequences.FinishFacingCycle)">Чистовое торцевание (G70)</MudSelectItem>
-                    <MudSelectItem Value="@(TurningSequences.Facing)">Торцевание (черновое + чистовое)</MudSelectItem>
+                <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTurningSequenceChanged">
+                    <MudSelectItem Value="@(TurningSequences.RoughFacing)">@("Черновое торцевание")</MudSelectItem>
+                    <MudSelectItem Value="@(TurningSequences.FinishFacing)">@("Чистовое торцевание")</MudSelectItem>
+                    <MudSelectItem Value="@(TurningSequences.RoughFacingCycle)">@("Черновое торцевание (Под G70)")</MudSelectItem>
+                    <MudSelectItem Value="@(TurningSequences.FinishFacingCycle)">@("Чистовое торцевание (G70)")</MudSelectItem>
+                    <MudSelectItem Value="@(TurningSequences.Facing)">@("Торцевание (черновое + чистовое)")</MudSelectItem>
                 </MudSelect>
             </MudItem>
             <MudItem xs="12" md="4">
@@ -106,7 +106,7 @@
                     <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" md="4">
-                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllowZ" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
             }
             @if (TurningSequence == TurningSequences.RoughFacingCycle)
@@ -118,13 +118,13 @@
                     <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" md="4">
-                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllowZ" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
             }
             @if (TurningSequence == TurningSequences.FinishFacing)
             {
                 <MudItem xs="12" md="4">
-                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllowZ" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
             }
             @if (TurningSequence == TurningSequences.FinishFacingCycle)
@@ -158,7 +158,7 @@
                     <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" md="4">
-                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllowZ" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
             }
             @if (TurningSequence == TurningSequences.RoughTurning)
@@ -167,12 +167,40 @@
                     <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" md="4">
-                    <MudTextField Label="Чистовой припуск по Х" @bind-Value="_FacingProfStockAllowX" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudTextField Label="Чистовой припуск по Х" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" md="4">
-                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllowZ" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
             }
+            @if (TurningSequence != TurningSequences.FinishFacingCycle)
+            {
+                <MudItem xs="12" md="@(_MediumBluntFieldSize)">
+                    <MudTextField Label="@BluntLabel(FacingBluntType)" @bind-Value="_FacingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"
+                                  @onfocusin="@(() => _caclFacingChamferDiameter = true)" />
+                </MudItem>
+                <MudItem xs="12" md="@(_MediumBluntFieldSize)">
+                    <MudSelect Label="Тип" T="Blunt" Variant="Variant.Filled" @bind-Value="FacingBluntType" Margin="Margin.Dense">
+                        <MudSelectItem Value="@(Blunt.SimpleChamfer)">Простая фаска</MudSelectItem>
+                        <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
+                        <MudSelectItem Value="@(Blunt.CustomChamfer)">Настраиваемая фаска</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                @if (FacingBluntType == Blunt.CustomChamfer)
+                {
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Угол фаски" @bind-Value="_FacingCustomChamferAngle" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="°" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Конечный диаметр фаски" @bind-Value="_FacingCustomChamferDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true"
+                                      @onfocusin="@(() => _caclFacingChamferDiameter = false)" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Скругление на фаске" @bind-Value="_FacingCustomChamferBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                }
+            }
+
             break;
         #endregion
 
@@ -548,7 +576,7 @@
                     <MudTextField Label="Шаг" @bind-Value="_CuttingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                 </MudItem>
                 <MudItem xs="4">
-                    <MudTextField Label="@_BluntLabel" @bind-Value="_CuttingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _caclCuttingChamferDiameter = true)" />
+                    <MudTextField Label="@BluntLabel(CuttingBluntType)" @bind-Value="_CuttingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _caclCuttingChamferDiameter = true)" />
                 </MudItem>
                 <MudItem xs="4">
                     <MudSelect Label="Тип" T="Blunt" Variant="Variant.Filled" @bind-Value="CuttingBluntType" Margin="Margin.Dense">
@@ -559,15 +587,16 @@
                 </MudItem>
                 @if (CuttingBluntType == Blunt.CustomChamfer)
                 {
-                    <MudItem xs="12" sm="6" md="4">
+                    <MudItem xs="12" md="4">
                         <MudTextField Label="Угол фаски" @bind-Value="_CuttingCustomChamferAngle" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="°" Immediate="true" />
                     </MudItem>
-                    <MudItem xs="12" sm="6" md="4">
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Конечный диаметр фаски" @bind-Value="_CuttingCustomChamferDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _caclCuttingChamferDiameter = false)" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
                         <MudTextField Label="Скругление на фаске" @bind-Value="_CuttingCustomChamferBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                     </MudItem>
-                    <MudItem xs="12" sm="6" md="4">
-                        <MudTextField Label="Конечный диаметр фаски" @bind-Value="_CuttingCustomChamferDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _caclCuttingChamferDiameter = false)"/>
-                    </MudItem>
+
                 }
             }
             break;
@@ -635,6 +664,7 @@
         _CuttingExternalDiameter = WorkpieceExternalDiameter.ToString("F0");
         _CuttingInternalDiameter = "2.5";
         _CuttingCustomChamferAngle = "45";
+        _FacingCustomChamferAngle = "45";
 
     }
 
@@ -644,6 +674,31 @@
     {
         Type = value;
         Tool = null;
+    }
+
+    private void OnTurningSequenceChanged(TurningSequences value)
+    {
+        TurningSequence = value;
+        switch (TurningSequence)
+        {
+            case TurningSequences.Facing:
+
+                break;
+            case TurningSequences.FinishFacing:
+                _FacingProfStockAllow = string.Empty;
+                break;
+            case TurningSequences.FinishFacingCycle:
+                break;
+            case TurningSequences.FinishTurning:
+                break;
+            case TurningSequences.RoughFacing:
+                break;
+            case TurningSequences.RoughFacingCycle:
+                break;
+            case TurningSequences.RoughTurning:
+                _FacingProfStockAllow = "0.05";
+                break;
+        }
     }
 
     private void OnThreadingSequenceChanged(ThreadingSequences value)
@@ -717,48 +772,13 @@
     #region Типы переходов
     private SequenceType Type { get; set; }
 
-    private enum GeneralSequences
-    {
-        Limiter,
-        ToolCall
-    }
-
     private GeneralSequences GeneralSequence { get; set; }
-
-    private enum TurningSequences
-    {
-        RoughFacing,
-        FinishFacing,
-        RoughFacingCycle,
-        FinishFacingCycle,
-        Facing,
-        RoughTurning,
-        FinishTurning
-    }
 
     private TurningSequences TurningSequence { get; set; }
 
-    private enum DrillingSequences
-    {
-        HighSpeedDrilling,
-        PeckingDrilling,
-        PeckingDeepDrilling
-    }
-
     private DrillingSequences DrillingSequence { get; set; }
 
-    private enum ThreadingSequences
-    {
-        ThreadCutting, Tapping
-    }
-
     private ThreadingSequences ThreadingSequence { get; set; }
-
-    private enum TurningGroovingSequences
-    {
-        Grooving,
-        Cutting
-    }
 
     private TurningGroovingSequences GroovingSequence { get; set; }
     #endregion
@@ -802,7 +822,11 @@
     private double TapEnd { get => Util.GetDouble(_TapEnd, numberOption: Util.GetNumberOption.Any); }
     #endregion
 
-    #region Токарка
+    #region Торцовка
+    bool _caclFacingChamferDiameter = true;
+    int _MediumBluntFieldSize { get => TurningSequence == TurningSequences.FinishFacing ? 4 : 6; }
+
+    private double FacingExternalDiameter { get => WorkpieceExternalDiameter; }
 
     private string _FacingStepOver { get; set; } = "1";
     private double FacingStepOver { get => Util.GetDouble(_FacingStepOver); }
@@ -810,11 +834,63 @@
     private string _FacingRoughStockAllow { get; set; } = "2";
     private double FacingRoughStockAllow { get => Util.GetDouble(_FacingRoughStockAllow); }
 
-    private string _FacingProfStockAllowX { get; set; }
-    private double FacingProfStockAllowX { get => Util.GetDouble(_FacingProfStockAllowX); }
+    private string _FacingProfStockAllow { get; set; } = "0.2";
+    private double FacingProfStockAllow { get => Util.GetDouble(_FacingProfStockAllow); }
 
-    private string _FacingProfStockAllowZ { get; set; } = "0.2";
-    private double FacingProfStockAllowZ { get => Util.GetDouble(_FacingProfStockAllowZ); }
+    private string _facingCornerBlunt;
+    private string _FacingCornerBlunt
+    {
+        get => _facingCornerBlunt;
+        set
+        {
+            _facingCornerBlunt = value;
+            if (_caclFacingChamferDiameter)
+            {
+                _FacingCustomChamferDiameter = (FacingExternalDiameter - 2 * FacingCornerBlunt * Math.Tan(FacingCustomChamferAngle.Radians())).ToPrettyString();
+            }
+        }
+    }
+    private double FacingCornerBlunt { get => Util.GetDouble(_FacingCornerBlunt); }
+
+    private Blunt FacingBluntType { get; set; }
+
+    private string _facingCustomChamferAngle;
+    private string _FacingCustomChamferAngle
+    {
+        get => _facingCustomChamferAngle;
+        set
+        {
+            _facingCustomChamferAngle = value;
+            if (_caclFacingChamferDiameter)
+            {
+                _FacingCustomChamferDiameter = (FacingExternalDiameter - 2 * FacingCornerBlunt * Math.Tan(FacingCustomChamferAngle.Radians())).ToPrettyString();
+            }
+            else
+            {
+                _FacingCornerBlunt = ((FacingExternalDiameter - FacingCustomChamferDiameter) / 2 * Math.Tan((90 - FacingCustomChamferAngle).Radians())).ToPrettyString();
+            }
+        }
+    }
+    private double FacingCustomChamferAngle { get => Util.GetDouble(_FacingCustomChamferAngle); }
+
+    private string _FacingCustomChamferBlunt { get; set; }
+    private double FacingCustomChamferBlunt { get => Util.GetDouble(_FacingCustomChamferBlunt); }
+
+    private string _facingCustumChamferDiameter;
+    private string _FacingCustomChamferDiameter
+    {
+        get => _facingCustumChamferDiameter;
+        set
+        {
+            _facingCustumChamferDiameter = value;
+            if (!_caclFacingChamferDiameter)
+            {
+                var result = ((FacingExternalDiameter - FacingCustomChamferDiameter) / 2 * Math.Tan((90 - FacingCustomChamferAngle).Radians())).ToPrettyString();
+                _FacingCornerBlunt = result;
+            }
+        }
+    }
+    private double FacingCustomChamferDiameter { get => Util.GetDouble(_FacingCustomChamferDiameter); }
 
     #endregion
 
@@ -911,7 +987,7 @@
     }
     private double CuttingCustomChamferDiameter { get => Util.GetDouble(_CuttingCustomChamferDiameter); }
 
-    private string _BluntLabel { get => CuttingBluntType == Blunt.CustomChamfer ? "Размер фаски" : "Величина притупления"; }
+
 
     #endregion
 
@@ -968,15 +1044,54 @@
 
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.Facing)
             {
-                return FacingOperation.Facing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), FacingRoughStockAllow, FacingProfStockAllowZ, FacingStepOver, CyclesCount.GetCycleRange());
+                return FacingOperation.Facing(
+                    Machine,
+                    WorkpieceMaterial,
+                    Tool as TurningExternalTool,
+                    WorkpieceExternalDiameter,
+                    (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius),
+                    FacingRoughStockAllow,
+                    FacingProfStockAllow,
+                    FacingStepOver,
+                    CyclesCount.GetCycleRange(),
+                    FacingBluntType,
+                    FacingCustomChamferAngle,
+                    FacingCustomChamferBlunt,
+                    FacingCornerBlunt);
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.RoughFacing)
             {
-                return FacingOperation.RoughFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), FacingRoughStockAllow, FacingProfStockAllowZ, FacingStepOver, CyclesCount.GetCycleRange());
+                return FacingOperation.RoughFacing(
+                    Machine,
+                    WorkpieceMaterial,
+                    Tool as TurningExternalTool,
+                    WorkpieceExternalDiameter,
+                    (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius),
+                    FacingRoughStockAllow,
+                    FacingProfStockAllow,
+                    FacingStepOver,
+                    CyclesCount.GetCycleRange(),
+                    FacingBluntType,
+                    FacingCustomChamferAngle,
+                    FacingCustomChamferBlunt,
+                    FacingCornerBlunt);
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.RoughFacingCycle)
             {
-                return FacingOperation.RoughFacingCycle(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), FacingRoughStockAllow, FacingProfStockAllowZ, FacingStepOver, CyclesCount.GetCycleRange());
+                return FacingOperation.RoughFacingCycle(
+                    Machine, 
+                    WorkpieceMaterial, 
+                    Tool as TurningExternalTool, 
+                    WorkpieceExternalDiameter, 
+                    (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), 
+                    FacingRoughStockAllow, 
+                    FacingProfStockAllow, 
+                    FacingStepOver, 
+                    CyclesCount.GetCycleRange(), 
+                    FacingBluntType, 
+                    FacingCustomChamferAngle, 
+                    FacingCustomChamferBlunt, 
+                    FacingCornerBlunt);
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.FinishFacingCycle)
             {
@@ -990,7 +1105,17 @@
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.FinishFacing)
             {
-                return FacingOperation.FinishFacing(Machine, WorkpieceMaterial, Tool as TurningExternalTool, WorkpieceExternalDiameter, (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius), FacingProfStockAllowZ);
+                return FacingOperation.FinishFacing(
+                    Machine,
+                    WorkpieceMaterial,
+                    Tool as TurningExternalTool,
+                    WorkpieceExternalDiameter,
+                    (Tool is null ? WorkpieceCurrentInternalDiameter : WorkpieceCurrentInternalDiameter - 2 * (Tool as TurningExternalTool).Radius),
+                    FacingProfStockAllow,
+                    FacingBluntType,
+                    FacingCustomChamferAngle,
+                    FacingCustomChamferBlunt,
+                    FacingCornerBlunt);
             }
 
             if (Type == SequenceType.Drilling && DrillingSequence == DrillingSequences.HighSpeedDrilling)
@@ -1091,6 +1216,7 @@
     }
     #endregion
 
+    // добавлеие перехода
     async Task Submit()
     {
         Sequence sequence = new();
@@ -1133,9 +1259,13 @@
                             WorkpieceExternalDiameter,
                             WorkpieceInternalDiameter,
                             FacingRoughStockAllow,
-                            FacingProfStockAllowZ,
+                            FacingProfStockAllow,
                             FacingStepOver,
-                            CyclesCount.GetCycleRange())
+                            CyclesCount.GetCycleRange(),
+                            FacingBluntType,
+                            FacingCustomChamferAngle,
+                            FacingCustomChamferBlunt,
+                            FacingCornerBlunt)
                         { Name = $"Торцовка" };
                         break;
                     case TurningSequences.RoughFacing:
@@ -1146,9 +1276,13 @@
                             WorkpieceExternalDiameter,
                             WorkpieceCurrentInternalDiameter,
                             FacingRoughStockAllow,
-                            FacingProfStockAllowZ,
+                            FacingProfStockAllow,
                             FacingStepOver,
-                            CyclesCount.GetCycleRange())
+                            CyclesCount.GetCycleRange(),
+                            FacingBluntType,
+                            FacingCustomChamferAngle,
+                            FacingCustomChamferBlunt,
+                            FacingCornerBlunt)
                         { Name = $"Черновая торцовка" };
                         break;
                     case TurningSequences.RoughFacingCycle:
@@ -1159,9 +1293,13 @@
                             WorkpieceExternalDiameter,
                             WorkpieceCurrentInternalDiameter,
                             FacingRoughStockAllow,
-                            FacingProfStockAllowZ,
+                            FacingProfStockAllow,
                             FacingStepOver,
-                            CyclesCount.GetCycleRange())
+                            CyclesCount.GetCycleRange(),
+                            FacingBluntType,
+                            FacingCustomChamferAngle,
+                            FacingCustomChamferBlunt,
+                            FacingCornerBlunt)
                         { Name = $"Черновая торцовка (Под G70)" };
                         break;
                     case TurningSequences.FinishFacing:
@@ -1171,7 +1309,11 @@
                             Tool as TurningExternalTool,
                             WorkpieceExternalDiameter,
                             WorkpieceCurrentInternalDiameter,
-                            FacingProfStockAllowZ)
+                            FacingProfStockAllow,
+                            FacingBluntType,
+                            FacingCustomChamferAngle,
+                            FacingCustomChamferBlunt,
+                            FacingCornerBlunt)
                         { Name = $"Чистовая торцовка" };
                         break;
                     case TurningSequences.FinishFacingCycle:
@@ -1206,7 +1348,11 @@
                             Tool as TurningExternalTool,
                             WorkpieceExternalDiameter,
                             WorkpieceInternalDiameter,
-                            FacingProfStockAllowZ)
+                            FacingProfStockAllow,
+                            FacingBluntType,
+                            FacingCustomChamferAngle,
+                            FacingCustomChamferBlunt,
+                            FacingCornerBlunt)
                         { Name = $"Чистовая торцовка" };
                         break;
                     case TurningSequences.FinishTurning:
@@ -1216,7 +1362,11 @@
                             Tool as TurningExternalTool,
                             WorkpieceExternalDiameter,
                             WorkpieceInternalDiameter,
-                            FacingProfStockAllowZ)
+                            FacingProfStockAllow,
+                            FacingBluntType,
+                            FacingCustomChamferAngle,
+                            FacingCustomChamferBlunt,
+                            FacingCornerBlunt)
                         { Name = $"Чистовая торцовка" };
                         break;
                     default:
@@ -1398,4 +1548,6 @@
         }
         return result;
     }
+
+    string BluntLabel(Blunt bluntType) => bluntType == Blunt.CustomChamfer ? "Размер фаски" : "Величина притупления";
 }

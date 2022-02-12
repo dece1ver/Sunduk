@@ -159,11 +159,11 @@ namespace Sunduk.PWA.Infrastructure
         /// <param name="angle">Угол фаски от горизонтальной оси</param>
         /// <param name="radius">Радиус на углах фаски</param>
         /// <returns></returns>
-        public static (double X, double Z) ChamferRadiusLengths(double angle, double radius)
+        public static (double X, double Z) ChamferRadiusLengths(double angle, double radius, int round = 3)
         {
             return (
-                Math.Tan(((90 - angle) / 2).Radians()) * radius + 0.01,
-                Math.Tan((angle / 2).Radians()) * radius + 0.01);
+                Math.Round(Math.Tan(((90 - angle) / 2).Radians()) * radius, round, MidpointRounding.ToPositiveInfinity),
+                Math.Round(Math.Tan((angle / 2).Radians()) * radius, round, MidpointRounding.ToPositiveInfinity));
         }
     }
 }

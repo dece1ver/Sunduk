@@ -423,7 +423,6 @@ namespace Sunduk.PWA.Util
         }
 
 
-
         /// <summary>
         /// Меняет местами 2 элемента списка
         /// </summary>
