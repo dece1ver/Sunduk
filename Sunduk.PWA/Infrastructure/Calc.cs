@@ -165,5 +165,18 @@ namespace Sunduk.PWA.Infrastructure
                 Math.Round(Math.Tan(((90 - angle) / 2).Radians()) * radius, round, MidpointRounding.ToPositiveInfinity),
                 Math.Round(Math.Tan((angle / 2).Radians()) * radius, round, MidpointRounding.ToPositiveInfinity));
         }
+
+        /// <summary>
+        /// Смещение координат фаски с учетом радиуса пластины
+        /// </summary>
+        /// <param name="angle"></param>
+        /// <param name="radius"></param>
+        /// <returns></returns>
+        public static (double X, double Z) ChamferShifts(double angle, double radius)
+        {
+            return 
+                (Math.Tan(angle.Radians()) * (radius - radius / Math.Tan((90 - angle / 2).Radians())),
+                radius - radius / Math.Tan((90 - angle / 2).Radians()));
+        }
     }
 }
