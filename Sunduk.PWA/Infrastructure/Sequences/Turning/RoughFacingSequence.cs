@@ -19,7 +19,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double BluntCustomAngle { get; set; }
         public double BluntCustomRadius { get; set; }
         public double CornerBlunt { get; set; }
-        public override string Operation => Templates.FacingOperation.RoughFacing(
+        public override string Operation => Templates.FacingOperation.Facing(
             Machine, 
             Material, 
             Tool, 
@@ -32,7 +32,9 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             BluntType,
             BluntCustomAngle,
             BluntCustomRadius,
-            CornerBlunt);
+            CornerBlunt, 
+            false, 
+            false);
         public override MachineType MachineType => MachineType.Turning;
 
         public RoughFacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter,

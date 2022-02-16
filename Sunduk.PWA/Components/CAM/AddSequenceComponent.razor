@@ -1057,11 +1057,13 @@
                     FacingBluntType,
                     FacingCustomChamferAngle,
                     FacingCustomChamferBlunt,
-                    FacingCornerBlunt);
+                    FacingCornerBlunt,
+                    true,
+                    true);
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.RoughFacing)
             {
-                return FacingOperation.RoughFacing(
+                return FacingOperation.Facing(
                     Machine,
                     WorkpieceMaterial,
                     Tool as TurningExternalTool,
@@ -1074,11 +1076,13 @@
                     FacingBluntType,
                     FacingCustomChamferAngle,
                     FacingCustomChamferBlunt,
-                    FacingCornerBlunt);
+                    FacingCornerBlunt,
+                    false,
+                    false);
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.RoughFacingCycle)
             {
-                return FacingOperation.RoughFacingCycle(
+                return FacingOperation.Facing(
                     Machine, 
                     WorkpieceMaterial, 
                     Tool as TurningExternalTool, 
@@ -1091,17 +1095,13 @@
                     FacingBluntType, 
                     FacingCustomChamferAngle, 
                     FacingCustomChamferBlunt, 
-                    FacingCornerBlunt);
+                    FacingCornerBlunt,
+                    true,
+                    false);
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.FinishFacingCycle)
             {
-                return RepeatableRoughFacingSequence switch
-                {
-                    RoughFacingSequence => FacingOperation.FinishFacingCycleFromRoughFacing(Tool as TurningExternalTool, RepeatableRoughFacingSequence as RoughFacingSequence),
-                    RoughFacingCycleSequence => FacingOperation.FinishFacingCycleFromRoughCycleFacing(Tool as TurningExternalTool, RepeatableRoughFacingSequence as RoughFacingCycleSequence),
-                    FacingSequence => FacingOperation.FinishFacingCycleFromFacing(Tool as TurningExternalTool, RepeatableRoughFacingSequence as FacingSequence),
-                    _ => string.Empty
-                };
+                return FacingOperation.FinishFacingCycle(Tool as TurningExternalTool, RepeatableRoughFacingSequence);
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.FinishFacing)
             {
