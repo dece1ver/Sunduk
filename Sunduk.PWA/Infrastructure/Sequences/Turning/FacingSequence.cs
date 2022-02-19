@@ -36,6 +36,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             true);
 
         public override MachineType MachineType => MachineType.Turning;
+        public override string Name { get => $"Торцовка"; }
 
         public FacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter,
             double roughStockAllow, double profStockAllow, double stepOver, (int, int) seqNumbers, Blunt bluntType, double bluntCustomAngle, double bluntCustomRadius, double cornerBlunt)

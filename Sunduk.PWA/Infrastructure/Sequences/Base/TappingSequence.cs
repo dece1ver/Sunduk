@@ -13,7 +13,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
         public double CutSpeed { get; set; }
         public double StartZ { get; set; }
         public double EndZ { get; set; }
-
+        public override string Name { get => $"Резьба метчиком"; }
         public TappingSequence(Machine machine, TappingTool tool, double cutSpeed, double startZ, double endZ)
         {
             Machine = machine;

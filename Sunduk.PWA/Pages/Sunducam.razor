@@ -677,9 +677,9 @@
                         ThreadCuttingSequence newThreadCuttingSequence = Program[i] as ThreadCuttingSequence;
                         newThreadCuttingSequence.Machine = Machine;
                         break;
-                    case ToolCallSequence toolCallSequence:
-                        ToolCallSequence newToolCallSequence = Program[i] as ToolCallSequence;
-                        newToolCallSequence.Machine = Machine;
+                    case CustomSequence toolCallSequence:
+                        CustomSequence newCustomSequence = Program[i] as CustomSequence;
+                        newCustomSequence.Machine = Machine;
                         break;
                     case TurningCutOffSequence turningCutOffSequence:
                         TurningCutOffSequence newTurningCutOffSequence = Program[i] as TurningCutOffSequence;

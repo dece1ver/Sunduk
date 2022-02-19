@@ -3,15 +3,17 @@ using Sunduk.PWA.Infrastructure.Tools.Base;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Base
 {
-    public class ToolCallSequence : Sequence
+    public class CustomSequence : Sequence
     {
         public Machine Machine { get; set; }
         public Tool Tool { get; set; }
-
-        public ToolCallSequence(Machine machine, Tool tool)
+        public override string Name { get => $"Вызов инструмента"; }
+        public string CustomOperation { get; set; } 
+        public CustomSequence(Machine machine, Tool tool, string customOperation)
         {
             Machine = machine;
             Tool = tool;
+            CustomOperation = customOperation;
         }
     }
 }

@@ -19,8 +19,20 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 
         public override MachineType MachineType => MachineType.Turning;
         public override string Operation => Templates.GroovingOperation.CutOffSequence(Machine, Material, Tool, CuttingPoint, ExternalDiameter, InternalDiameter, CornerBlunt, StepOver, BluntType, BluntCustomAngle, BluntCustomRadius);
+        public override string Name { get => $"Отрезка"; }
 
-        public TurningCutOffSequence(Machine machine = default, Material material = default, GroovingExternalTool tool = null, double cuttingPoint = 0, double externalDiameter = 0, double internalDiameter = 0, double cornerBlunt = 0, double stepOver = 0, Blunt bluntType = default, double bluntCustomAngle = 0, double bluntCustomRadius = 0)
+        public TurningCutOffSequence(
+            Machine machine, 
+            Material material, 
+            GroovingExternalTool tool, 
+            double cuttingPoint, 
+            double externalDiameter, 
+            double internalDiameter, 
+            double cornerBlunt, 
+            double stepOver, 
+            Blunt bluntType , 
+            double bluntCustomAngle, 
+            double bluntCustomRadius)
         {
             Machine = machine;
             Material = material;

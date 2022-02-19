@@ -362,21 +362,24 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Токарный вызов инструмента
         /// </summary>
-        public static string TurningToolCall(Machine machine, Tool tool, Coolant coolant = Coolant.General, bool polar = false)
+        public static string TurningCustomOperation(Machine machine, Tool tool, string customOperation)
         {
+            if (tool is null) return string.Empty;
             return machine switch
             {
                 Machine.GS1500 =>
                 TURNING_REFERENT_POINT +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
+                $"{CoolantOn(machine)}\n" +
+                (string.IsNullOrEmpty(customOperation) ? PROCESSING_SNIPPET : customOperation + '\n') +
                 $"{CoolantOff(machine)}\n" +
-                PROCESSING_SNIPPET +
                 TURNING_REFERENT_POINT,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
+                $"{CoolantOn(machine)}\n" +
+                (string.IsNullOrEmpty(customOperation) ? PROCESSING_SNIPPET : customOperation + '\n') +
                 $"{CoolantOff(machine)}\n" +
-                PROCESSING_SNIPPET +
                 TURNING_REFERENT_POINT,
 
                 _ => string.Empty,
@@ -386,7 +389,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Фрезерный вызов инструмента
         /// </summary>
-        public static string MillingToolCall(Machine machine, Tool tool, Coolant coolant = Coolant.General, bool polar = false)
+        public static string MillingCustomOperation(Machine machine, Tool tool, string customOperation, Coolant coolant = Coolant.General, bool polar = false)
         {
             if (tool is null) return string.Empty;
             string direction = string.Empty;
@@ -410,7 +413,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{(polar ? "G16 " : string.Empty)}" +
                 $"G57 G0 X0 Y0 S3000 {direction}\n" +
                 $"G43 Z100 H{tool.Position} {((direction == "M13" || direction == "M14") ? string.Empty : CoolantOn(machine, coolant))}\n" +
-                PROCESSING_SNIPPET +
+                (string.IsNullOrEmpty(customOperation) ? PROCESSING_SNIPPET : customOperation + '\n') +
                 $"{CoolantOff(machine, coolant)}\n" +
                 $"{(polar ? "G15\n" : string.Empty)}" +
                 MILLING_REFERENT_POINT,
