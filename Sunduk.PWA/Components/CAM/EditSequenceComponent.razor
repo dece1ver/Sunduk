@@ -1,20 +1,35 @@
 ﻿<MudGrid Class="mt-2" Spacing="1">
     @switch (Sequence)
     {
-        case TurningToolCallSequence turningToolCallSequence:
+        case TurningCustomSequence turningCustomSequence:
             <MudItem xs="12">
                 <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool" Variant="Variant.Filled" Margin="Margin.Dense">
-                    @foreach (var tool in Tools.Where(x => x is Tool))
+                    @foreach (var tool in Tools.Where(x =>
+                                                      x is SpecialTurningTool ||
+                                                      x is TurningExternalTool ||
+                                                      x is TurningInternalTool ||
+                                                      x is GroovingExternalTool ||
+                                                      x is GroovingInternalTool ||
+                                                      x is ThreadingExternalTool ||
+                                                      x is ThreadingInternalTool ||
+                                                      x is TurningDrillingTool ||
+                                                      x is TurningTappingTool))
                     {
                         <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                     }
                 </MudSelect>
             </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="CustomOperation" Label="Произвольная обработка" T="string" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Lines="@(CustomOperation is null ? 1 : CustomOperation.Count(x => x == '\n') + 2)" />
+            </MudItem>
             break;
-        case MillingToolCallSequence millingToolCallSequence:
+        case MillingCustomSequence millingCustomSequence:
             <MudItem xs="12" md="4">
                 <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool" Variant="Variant.Filled" Margin="Margin.Dense">
-                    @foreach (var tool in Tools.Where(x => x is Tool))
+                    @foreach (var tool in Tools.Where(x =>
+                                                      x is MillingDrillingTool ||
+                                                      x is MillingTappingTool ||
+                                                      x is MillingTool))
                     {
                         <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                     }
@@ -32,6 +47,9 @@
                     <MudSelectItem Value="false">Декартова</MudSelectItem>
                     <MudSelectItem Value="true">Полярная</MudSelectItem>
                 </MudSelect>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="CustomOperation" Label="Произвольная обработка" T="string" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Lines="@(CustomOperation is null ? 1 : CustomOperation.Count(x => x == '\n') + 2)" />
             </MudItem>
             break;
         case LimiterSequence limiterSequence:
@@ -98,13 +116,13 @@
                 </MudSelect>
             </MudItem>
             <MudItem xs="12" md="4">
-                <MudTextField Label="Общий припуск" @bind-Value="RoughStockAllow" Immediate="true" Converter="Util.DoubleConverter" Variant="Variant.Filled" Margin="Margin.Dense"/>
+                <MudTextField Label="Общий припуск" @bind-Value="RoughStockAllow" Immediate="true" Converter="Util.DoubleConverter" Variant="Variant.Filled" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" md="4">
-                <MudTextField Label="Съем" @bind-Value="StepOver" Immediate="true" Converter="Util.DoubleConverter" Variant="Variant.Filled" Margin="Margin.Dense"/>
+                <MudTextField Label="Съем" @bind-Value="StepOver" Immediate="true" Converter="Util.DoubleConverter" Variant="Variant.Filled" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" md="4">
-                <MudTextField Label="Чистовой припуск по Z" @bind-Value="ProfStockAllow" Immediate="true" Converter="Util.DoubleConverter" Variant="Variant.Filled" Margin="Margin.Dense"/>
+                <MudTextField Label="Чистовой припуск по Z" @bind-Value="ProfStockAllow" Immediate="true" Converter="Util.DoubleConverter" Variant="Variant.Filled" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" md="4">
                 <MudTextField Label="@BluntLabel(BluntType)" @bind-Value="CornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _calcChamferDiameter = true)" Converter="Util.DoubleConverter" />
@@ -486,10 +504,11 @@
                 Holes = millingTappingSequence.Holes;
                 Polar = millingTappingSequence.Polar;
                 break;
-            case MillingToolCallSequence millingToolCallSequence:
-                Tool = millingToolCallSequence.Tool;
-                Coolant = millingToolCallSequence.Coolant;
-                Polar = millingToolCallSequence.Polar;
+            case MillingCustomSequence millingCustomSequence:
+                Tool = millingCustomSequence.Tool;
+                CustomOperation = millingCustomSequence.CustomOperation;
+                Coolant = millingCustomSequence.Coolant;
+                Polar = millingCustomSequence.Polar;
                 break;
 
             // токарные
@@ -580,8 +599,9 @@
                 ThreadStart = turningTappingSequence.StartZ;
                 ThreadEnd = turningTappingSequence.EndZ;
                 break;
-            case TurningToolCallSequence turningToolCallSequence:
-                Tool = turningToolCallSequence.Tool;
+            case TurningCustomSequence turningCustomSequence:
+                Tool = turningCustomSequence.Tool;
+                CustomOperation = turningCustomSequence.CustomOperation;
                 break;
             default:
                 break;
@@ -595,6 +615,7 @@
     [Parameter] public Sequence Sequence { get; set; }
 
     public Tool Tool { get; set; }
+    public string CustomOperation { get; set; }
     public Coolant Coolant { get; set; }
     public bool Polar { get; set; }
 
@@ -729,11 +750,12 @@
                     millingTappingSequence.Polar)
                 .Operation,
 
-                MillingToolCallSequence millingToolCallSequence => new MillingToolCallSequence(
-                    millingToolCallSequence.Machine,
+                MillingCustomSequence millingCustomSequence => new MillingCustomSequence(
+                    millingCustomSequence.Machine,
                     Tool,
+                    CustomOperation,
                     Coolant,
-                    millingToolCallSequence.Polar)
+                    millingCustomSequence.Polar)
                 .Operation,
 
                 // токарные
@@ -858,7 +880,7 @@
                     DrillEnd)
                 .Operation,
 
-                TurningToolCallSequence toolCallSequence => new TurningToolCallSequence(toolCallSequence.Machine, Tool).Operation,
+                TurningCustomSequence turningCustomSequence => new TurningCustomSequence(turningCustomSequence.Machine, Tool, CustomOperation).Operation,
 
                 _ => string.Empty,
             };
@@ -901,10 +923,11 @@
                 millingTappingSequence.Holes = Holes;
                 millingTappingSequence.Polar = Polar;
                 break;
-            case MillingToolCallSequence millingToolCallSequence:
-                millingToolCallSequence.Tool = Tool;
-                millingToolCallSequence.Coolant = Coolant;
-                millingToolCallSequence.Polar = Polar;
+            case MillingCustomSequence millingCustomSequence:
+                millingCustomSequence.Tool = Tool;
+                millingCustomSequence.CustomOperation = CustomOperation;
+                millingCustomSequence.Coolant = Coolant;
+                millingCustomSequence.Polar = Polar;
                 break;
 
             // токарные
@@ -994,8 +1017,9 @@
                 turningTappingSequence.StartZ = ThreadStart;
                 turningTappingSequence.EndZ = ThreadEnd;
                 break;
-            case TurningToolCallSequence turningToolCallSequence:
-                turningToolCallSequence.Tool = Tool;
+            case TurningCustomSequence turningCustomSequence:
+                turningCustomSequence.Tool = Tool;
+                turningCustomSequence.CustomOperation = CustomOperation;
                 break;
             default:
                 break;

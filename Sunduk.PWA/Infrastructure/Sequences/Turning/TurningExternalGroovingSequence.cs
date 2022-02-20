@@ -17,6 +17,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double StepOver { get; set; }
         public double ProfStockAllow { get; set; }
         public override MachineType MachineType => MachineType.Turning;
+        public override string Name { get => $"Наружная канавка"; }
 
         public TurningExternalGroovingSequence(Machine machine, Material material, GroovingExternalTool tool, double externalDiameter, double internalDiameter, double width, double externalRadius, double internalRadius, double stepOver, double profStockAllow)
         {

@@ -419,7 +419,7 @@
         {
             if (CalculationType == Calculation.Precise)
             {
-                return Math.Tan(Angle.Radians()) * (ChamferInsertRadius - ChamferInsertRadius / Math.Tan((90 - Angle / 2).Radians()));
+                return Calc.ChamferShifts(Angle, ChamferInsertRadius).X;
             }
             return ChamferInsertRadius * Math.Tan(Angle.Radians()) / 2;
         }
@@ -432,7 +432,7 @@
         {
             if (CalculationType == Calculation.Precise)
             {
-                return ChamferInsertRadius - ChamferInsertRadius / Math.Tan((90 - Angle / 2).Radians());
+                return Calc.ChamferShifts(Angle, ChamferInsertRadius).Z;
             }
             return ChamferInsertRadius * Math.Tan((90 - Angle).Radians()) / 2;
         }

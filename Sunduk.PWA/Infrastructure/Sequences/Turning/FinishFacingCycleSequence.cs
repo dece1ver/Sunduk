@@ -13,18 +13,13 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         {
             get
             {
-                return RoughSequence switch
-                {
-                    RoughFacingSequence => Templates.FacingOperation.FinishFacingCycleFromRoughFacing(Tool, RoughSequence as RoughFacingSequence),
-                    RoughFacingCycleSequence => Templates.FacingOperation.FinishFacingCycleFromRoughCycleFacing(Tool, RoughSequence as RoughFacingCycleSequence),
-                    FacingSequence => Templates.FacingOperation.FinishFacingCycleFromFacing(Tool, RoughSequence as FacingSequence),
-                    _ => null,
-                };
+                return Templates.FacingOperation.FinishFacingCycle(Tool, RoughSequence);
             }
             set { }
         }
 
         public override MachineType MachineType => MachineType.Turning;
+        public override string Name { get => $"Торцовка чистовая (G70)"; }
 
         public FinishFacingCycleSequence(TurningExternalTool tool, Sequence roughSequence)
         {

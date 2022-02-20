@@ -23,7 +23,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             Machine, 
             Material, 
             Tool, 
-            ExternalDiameter, InternalDiameter - (Tool.Radius * 2), 
+            ExternalDiameter,
+            Tool is null ? InternalDiameter : InternalDiameter - (Tool.Radius * 2),
             RoughStockAllow, 
             ProfStockAllow, 
             StepOver, 
@@ -31,12 +32,15 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             BluntType,
             BluntCustomAngle,
             BluntCustomRadius,
-            CornerBlunt);
+            CornerBlunt,
+            true,
+            true);
 
         public override MachineType MachineType => MachineType.Turning;
+        public override string Name { get => $"Торцовка"; }
 
         public FacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter,
-            double roughStockAllow, double profStockAllow, double stepOver, (int, int) seqNumbers, Blunt bluntType = default, double bluntCustomAngle = 0, double bluntCustomRadius = 0, double cornerBlunt = 0)
+            double roughStockAllow, double profStockAllow, double stepOver, (int, int) seqNumbers, Blunt bluntType, double bluntCustomAngle, double bluntCustomRadius, double cornerBlunt)
         {
             Machine = machine;
             Material = material;

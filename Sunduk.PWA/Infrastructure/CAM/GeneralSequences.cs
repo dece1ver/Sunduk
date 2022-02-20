@@ -3,6 +3,6 @@
     public enum GeneralSequences
     {
         Limiter,
-        ToolCall
+        CustomOperation
     }
 }
