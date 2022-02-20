@@ -24,7 +24,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             Material, 
             Tool, 
             ExternalDiameter, 
-            InternalDiameter - (Tool.Radius * 2), 
+            Tool is null ? InternalDiameter : InternalDiameter - (Tool.Radius * 2), 
             RoughStockAllow, 
             ProfStockAllow, 
             StepOver, 
