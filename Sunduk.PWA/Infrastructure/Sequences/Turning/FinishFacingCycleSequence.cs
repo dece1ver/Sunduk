@@ -19,7 +19,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         }
 
         public override MachineType MachineType => MachineType.Turning;
-        public override string Name { get => $"Торцовка чистовая (G70)"; }
+        public override string Name => $"Торцовка чистовая (G70)";
 
         public FinishFacingCycleSequence(TurningExternalTool tool, Sequence roughSequence)
         {

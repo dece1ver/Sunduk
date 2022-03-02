@@ -10,7 +10,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double ExternalDiameter { get; set; }
         public override string Operation => Templates.Operation.Limiter(Machine, Tool, ExternalDiameter);
         public override MachineType MachineType => MachineType.Turning;
-        public override string Name { get => $"Упор"; }
+        public override string Name => $"Упор";
 
         public LimiterSequence(Machine machine, Tool tool, double externalDiameter)
         {

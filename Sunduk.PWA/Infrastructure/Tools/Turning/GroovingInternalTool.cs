@@ -1,23 +1,23 @@
 ﻿using Sunduk.PWA.Infrastructure.Tools.Base;
+using Sunduk.PWA.Infrastructure.Tools.Turning.Base;
 
 namespace Sunduk.PWA.Infrastructure.Tools.Turning
 {
-    public class GroovingInternalTool : Tool
+    public class GroovingInternalTool : TurningGroovingTool
     {
-        public enum Point { Left, Right }
-
         public double Diameter { get; set; }
-        public double Width { get; set; }
-        public Point ZeroPoint { get; set; }
-        public override string Name => "KANAVA";
+        public override string Name => $"KANAVA";
 
-        public GroovingInternalTool(int position, double diameter, double width, Point zeroPoint, ToolHand hand = ToolHand.Rigth)
+        public GroovingInternalTool(
+            int position,
+            double diameter,
+            double width,
+            Point zeroPoint,
+            ToolHand hand = ToolHand.Rigth,
+            double cornerRadius = 0.2)
+            : base(position, width, zeroPoint, hand, cornerRadius)
         {
-            Position = position;
             Diameter = diameter;
-            Width = width;
-            ZeroPoint = zeroPoint;
-            Hand = hand;
         }
     }
 }

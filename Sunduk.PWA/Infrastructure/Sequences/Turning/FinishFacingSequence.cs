@@ -28,7 +28,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             BluntCustomRadius,
             CornerBlunt);
         public override MachineType MachineType => MachineType.Turning;
-        public override string Name { get => $"Торцовка чистовая"; }
+        public override string Name => $"Торцовка чистовая";
 
         public FinishFacingSequence(Machine machine, Material material, TurningExternalTool tool,
             double externalDiameter, double internalDiameter, double profStockAllow, Blunt bluntType = default, double bluntCustomAngle = 0, double bluntCustomRadius = 0, double cornerBlunt = 0)
