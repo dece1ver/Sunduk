@@ -4,7 +4,7 @@ using Sunduk.PWA.Util;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
-    public class TurningExternalGroovingSequence : TurningGroovingSequence
+    public class TurningExternalRoughGroovingSequence : TurningGroovingSequence
     {
         public GroovingExternalTool Tool { get; set; }
 
@@ -23,10 +23,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             InnerCornerBlunt,
             OuterBluntType,
             InnerBluntType,
-            true);
-    public override string Name => $"Канавка наружная {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}";
+            false);
+    public override string Name => $"Канавка черновая наружная {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}";
 
-        public TurningExternalGroovingSequence(
+        public TurningExternalRoughGroovingSequence(
             Machine machine,
             Material material,
             GroovingExternalTool tool,

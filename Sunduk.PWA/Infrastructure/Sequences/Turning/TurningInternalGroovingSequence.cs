@@ -22,7 +22,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             OuterCornerBlunt,
             InnerCornerBlunt,
             OuterBluntType,
-            InnerBluntType);
+            InnerBluntType,
+            true);
         public override string Name => $"Канавка внутренняя {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}";
 
         public TurningInternalGroovingSequence(
@@ -34,11 +35,12 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double internalDiameter,
             double width,
             double stepOver,
+            double profStockAllow,
             double outerCornerBlunt,
             double innerCornerBlunt,
             Blunt outerBluntType,
             Blunt innerBluntType)
-            : base(machine, material, cuttingPoint, externalDiameter, internalDiameter, width, stepOver, outerCornerBlunt, innerCornerBlunt, outerBluntType, innerBluntType)
+            : base(machine, material, cuttingPoint, externalDiameter, internalDiameter, width, stepOver, profStockAllow, outerCornerBlunt, innerCornerBlunt, outerBluntType, innerBluntType)
         {
             Tool = tool;
         }

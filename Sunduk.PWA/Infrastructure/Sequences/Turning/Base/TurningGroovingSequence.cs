@@ -29,6 +29,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double internalDiameter,
             double width,
             double stepOver,
+            double profStockAllow,
             double outerCornerBlunt,
             double innerCornerBlunt,
             Blunt outerBluntType,
@@ -41,6 +42,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             InternalDiameter = internalDiameter;
             Width = width;
             StepOver = stepOver;
+            ProfStockAllow = profStockAllow;
             OuterCornerBlunt = outerCornerBlunt;
             InnerCornerBlunt = innerCornerBlunt;
             OuterBluntType = outerBluntType;

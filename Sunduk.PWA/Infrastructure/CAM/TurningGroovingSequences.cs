@@ -3,6 +3,7 @@
     public enum TurningGroovingSequences
     {
         Grooving,
+        RoughGrooving,
         Cutting
     }
 }
