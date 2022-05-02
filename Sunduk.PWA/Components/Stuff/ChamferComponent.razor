@@ -262,11 +262,11 @@
             else if (ValidResult() && RoundCorners && showClassicChamfer)
             {
                 return
-                $"G0 X{(ChamferType == Chamfer.External ? ChamferStartDiamWithShift - 2 * (ChamferInsertRadius + RoundCorner) : ChamferStartDiamWithShift + 2 * (ChamferInsertRadius + RoundCorner)).NC()} Z1. S180 M3\n" +
+                $"G0 X{(ChamferType == Chamfer.External ? ChamferStartDiamWithShift - 2 * (Calc.ChamferRadiusLengths(Angle, CornerFullRadius).X) : ChamferStartDiamWithShift + 2 * (Calc.ChamferRadiusLengths(Angle, CornerFullRadius).X)).NC()} Z1. S180 M3\n" +
                 $"G1 Z0. F0.1\n" +
-                $"X{ChamferStartDiamWithShift.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
-                $"X{ChamferEndDiameter.NC()} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{Angle.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
-                $"W-{(ChamferInsertRadius + RoundCorner).NC()}";
+                $"X{ChamferStartDiamWithShift.NC()} R{(CornerFullRadius).NC()}\n" +
+                $"X{ChamferEndDiameter.NC()} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{Angle.NC()} R{(CornerFullRadius).NC()}\n" +
+                $"W-{(Calc.ChamferRadiusLengths(Angle, CornerFullRadius).Z).NC()}";
             }
             // обратная со скруглениями
             else if (ValidResult() && RoundCorners && !showClassicChamfer)
@@ -275,19 +275,19 @@
                 {
                     case Chamfer.External:
                         return
-                        $"G0 X{(ChamferEndDiameter + 1).NC(1)} Z-{(ChamferSizeWithShift + (ChamferInsertRadius + RoundCorner)).NC()} S180 M3\n" +
+                        $"G0 X{(ChamferEndDiameter + 1).NC(1)} Z-{(ChamferSizeWithShift + (Calc.ChamferRadiusLengths(Angle, CornerFullRadius).Z)).NC()} S180 M3\n" +
                         $"G1 X{ChamferEndDiameter.NC()}\n" +
-                        $"Z-{ChamferSizeWithShift.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
-                        $"Z0. A-{Angle.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
-                        $"U-{(2 * (ChamferInsertRadius + RoundCorner)).NC()}";
+                        $"Z-{ChamferSizeWithShift.NC()} R{(CornerFullRadius).NC()}\n" +
+                        $"Z0. A-{Angle.NC()} R{(CornerFullRadius).NC()}\n" +
+                        $"U-{(2 * (Calc.ChamferRadiusLengths(Angle, CornerFullRadius).X)).NC()}";
                     case Chamfer.Internal:
                         return
                         $"G0 X{(ChamferEndDiameter - 1).NC(1)} Z1. S180 M3\n" +
-                        $"Z-{(ChamferSizeWithShift + (ChamferInsertRadius + RoundCorner)).NC()}\n" +
+                        $"Z-{(ChamferSizeWithShift + (Calc.ChamferRadiusLengths(Angle, CornerFullRadius).Z)).NC()}\n" +
                         $"G1 X{ChamferEndDiameter.NC()}\n" +
-                        $"Z-{ChamferSizeWithShift.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
-                        $"Z0. A{Angle.NC()} R{(ChamferInsertRadius + RoundCorner).NC()}\n" +
-                        $"U{(2 * (ChamferInsertRadius + RoundCorner)).NC()}";
+                        $"Z-{ChamferSizeWithShift.NC()} R{(CornerFullRadius).NC()}\n" +
+                        $"Z0. A{Angle.NC()} R{(CornerFullRadius).NC()}\n" +
+                        $"U{(2 * (Calc.ChamferRadiusLengths(Angle, CornerFullRadius).X)).NC()}";
                     default:
                         return string.Empty;
                 }
@@ -463,6 +463,8 @@
             return Math.Abs(ChamferSize + ZRadiusShift);
         }
     }
+
+    public double CornerFullRadius { get => ChamferInsertRadius + RoundCorner;}
 
     //public void SetImage(ImageType image)
     //{

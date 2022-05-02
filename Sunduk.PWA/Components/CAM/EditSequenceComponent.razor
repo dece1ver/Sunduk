@@ -409,6 +409,47 @@
                 <MudTextField Label="Конец" @bind-Value="ThreadEnd" Immediate="true" Variant="Variant.Filled" Margin="Margin.Dense" Converter="Util.DoubleConverter" />
             </MudItem>
             break;
+        case TurningExternalGroovingSequence turningExternalGroovingSequence:
+            <MudItem xs="12">
+                <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool" Variant="Variant.Filled" Margin="Margin.Dense">
+                    @foreach (var tool in Tools.Where(x => (x is GroovingExternalTool || x is GroovingInternalTool)))
+                    {
+                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudTextField Label="Начальный диаметр" @bind-Value="ExternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudTextField Label="Конечный диаметр" @bind-Value="InternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudTextField Label="Конечная точка" @bind-Value="CuttingPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudTextField Label="Шаг" @bind-Value="StepOver" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudTextField Label="Величина притупления" @bind-Value="OuterBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+            </MudItem>
+             <MudItem xs="12" sm="6" md="4">
+                <MudTextField Label="Галтель" @bind-Value="InnerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudSelect Label="Тип" T="Blunt" Variant="Variant.Filled" @bind-Value="BluntType" Margin="Margin.Dense">
+                    <MudSelectItem Value="@(Blunt.SimpleChamfer)">Простая фаска</MudSelectItem>
+                    <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
+                    @*<MudSelectItem Value="@(Blunt.CustomChamfer)">Настраиваемая фаска</MudSelectItem>*@
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudSelect Label="Тип" T="Blunt" Variant="Variant.Filled" @bind-Value="InnerBluntType" Margin="Margin.Dense">
+                    <MudSelectItem Value="@(Blunt.SimpleChamfer)">Простая фаска</MudSelectItem>
+                    <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            break;
         case TurningCutOffSequence turningCutOffSequence:
             <MudItem xs="12">
                 <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool" Variant="Variant.Filled" Margin="Margin.Dense">
@@ -565,6 +606,18 @@
                 ThreadStart = threadCuttingSequence.StartZ;
                 ThreadEnd = threadCuttingSequence.EndZ;
                 break;
+            case TurningExternalGroovingSequence turningExternalGroovingSequence:
+                Tool = turningExternalGroovingSequence.Tool;
+                ExternalDiameter = turningExternalGroovingSequence.ExternalDiameter;
+                InternalDiameter = turningExternalGroovingSequence.InternalDiameter;
+                Width = turningExternalGroovingSequence.Width;
+                StepOver = turningExternalGroovingSequence.StepOver;
+                CuttingPoint = turningExternalGroovingSequence.CuttingPoint;
+                OuterBlunt = turningExternalGroovingSequence.OuterCornerBlunt;
+                InnerBlunt = turningExternalGroovingSequence.InnerCornerBlunt;
+                BluntType = turningExternalGroovingSequence.OuterBluntType;
+                InnerBluntType = turningExternalGroovingSequence.InnerBluntType;
+                break;
             case TurningCutOffSequence turningCutOffSequence:
                 Tool = turningCutOffSequence.Tool;
                 ExternalDiameter = turningCutOffSequence.ExternalDiameter;
@@ -614,6 +667,9 @@
     [Parameter] public List<Sequence> Program { get; set; }
     [Parameter] public Sequence Sequence { get; set; }
 
+    public Sequence CurrentSequence { get; set; } // написать как в добавлении, чтобы дубли убрать
+    // или нет
+
     public Tool Tool { get; set; }
     public string CustomOperation { get; set; }
     public Coolant Coolant { get; set; }
@@ -629,9 +685,14 @@
 
     private double StepOver { get; set; }
 
+    private double Width { get; set; }
+
     private double RoughStockAllow { get; set; }
 
     private double ProfStockAllow { get; set; }
+
+    public double OuterBlunt { get; set; }
+    public double InnerBlunt { get; set; }
 
     private double _cornerBlunt;
     private double CornerBlunt
@@ -648,6 +709,7 @@
     }
 
     private Blunt BluntType { get; set; }
+    private Blunt InnerBluntType { get; set; }
 
     private double _customChamferAngle;
     private double CustomChamferAngle
@@ -983,6 +1045,18 @@
                 threadCuttingSequence.ThreadPitch = ThreadPitch;
                 threadCuttingSequence.StartZ = ThreadStart;
                 threadCuttingSequence.EndZ = ThreadEnd;
+                break;
+            case TurningExternalGroovingSequence turningExternalGroovingSequence:
+                turningExternalGroovingSequence.Tool = Tool as GroovingExternalTool;
+                turningExternalGroovingSequence.ExternalDiameter = ExternalDiameter;
+                turningExternalGroovingSequence.InternalDiameter = InternalDiameter;
+                turningExternalGroovingSequence.Width = Width;
+                turningExternalGroovingSequence.StepOver = StepOver;
+                turningExternalGroovingSequence.CuttingPoint = CuttingPoint;
+                turningExternalGroovingSequence.OuterCornerBlunt = OuterBlunt;
+                turningExternalGroovingSequence.InnerCornerBlunt = InnerBlunt;
+                turningExternalGroovingSequence.OuterBluntType = BluntType;
+                turningExternalGroovingSequence.InnerBluntType = InnerBluntType;
                 break;
             case TurningCutOffSequence turningCutOffSequence:
                 turningCutOffSequence.ExternalDiameter = ExternalDiameter;

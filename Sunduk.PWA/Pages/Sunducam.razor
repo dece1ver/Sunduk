@@ -681,6 +681,10 @@
                         CustomSequence newCustomSequence = Program[i] as CustomSequence;
                         newCustomSequence.Machine = Machine;
                         break;
+                    case TurningGroovingSequence turningGroovingSequence:
+                        TurningGroovingSequence newTurningGroovingSequence = Program[i] as TurningGroovingSequence;
+                        newTurningGroovingSequence.Machine = Machine;
+                        break;
                     case TurningCutOffSequence turningCutOffSequence:
                         TurningCutOffSequence newTurningCutOffSequence = Program[i] as TurningCutOffSequence;
                         newTurningCutOffSequence.Machine = Machine;

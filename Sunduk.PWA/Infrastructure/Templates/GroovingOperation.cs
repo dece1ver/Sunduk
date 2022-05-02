@@ -72,8 +72,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
             var feed = string.IsNullOrEmpty(blunt) ? $" F{GroovingFeedRough().NC()}" : string.Empty;
             var cutting = (stepOver == 0 || stepOver >= (externalDiameter - internalDiameter / 2))
                 ? $"G1 X{internalDiameter.NC()}{feed}\n"
-                : $"G74 R0.5\n" +
-                $"G74 X{internalDiameter.NC()} P{stepOver.Microns()} F{GroovingFeedRough().NC()}\n";
+                : $"G75 R0.5\n" +
+                $"G75 X{internalDiameter.NC()} P{stepOver.Microns()} F{GroovingFeedRough().NC()}\n";
             return machine switch
             {
                 Machine.GS1500 =>
@@ -138,6 +138,10 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
             var outerBluntSize = outerBluntType is Blunt.SimpleChamfer ? outerCornerBlunt + tool.CornerRadius / 2 : outerCornerBlunt + tool.CornerRadius;
 
+            var useCycles = width > (tool.Width - 0.5) * 3;
+
+            var useSteps = !(stepOver == 0 || stepOver >= (externalDiameter - internalDiameter) / 2);
+
             var bluntLetter = outerBluntType is Blunt.SimpleChamfer ? "C" : "R";
             var bluntRight = $"Z{startPoint.NC()}\n";
             var bluntLeft = $"Z{endPoint.NC()}\n";
@@ -175,18 +179,34 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 roughBluntRight =  bluntRight;
                 roughBluntLeft = bluntLeft;
             }
-            var roughCutting = (stepOver == 0 || stepOver >= (externalDiameter - internalDiameter / 2))
+            string roughCutting;
+
+            if (useCycles)
+            {
+                //var rightStepOver = (Math.Abs(centerPoint) - Math.Abs((startPoint - profStockAllow))) / (Math.Floor((Math.Abs(centerPoint) - Math.Abs((startPoint - profStockAllow))) / tool.Width - 0.5));
+                //var leftStepOver = (Math.Abs(centerPoint - (tool.Width - 0.5)) - Math.Abs((endPoint + profStockAllow))) / (Math.Floor((Math.Abs(centerPoint) - Math.Abs((endPoint + profStockAllow))) / tool.Width - 0.5));
+                roughCutting = 
+                    $"G75 R0.5\n" +
+                    $"G75 X{(internalDiameter + bottomStockAllow).NC()} Z{(startPoint - profStockAllow).NC()} P{(!useSteps ? (externalDiameter - internalDiameter).Microns() : stepOver.Microns())} Q{(tool.Width - 0.5).Microns()} F{GroovingFeedRough().NC()}\n" +
+                    $"G0 Z{(centerPoint - (tool.Width - 0.5)).NC()}\n" +
+                    $"G75 X{(internalDiameter + bottomStockAllow).NC()} Z{(endPoint + profStockAllow).NC()} P{(!useSteps ? (externalDiameter - internalDiameter).Microns() : stepOver.Microns())} Q{(tool.Width - 0.5).Microns()} F{GroovingFeedRough().NC()}\n";
+            }
+            else
+            {
+                roughCutting = !useSteps
                 ? $"G1 X{(internalDiameter + bottomStockAllow).NC()} F{GroovingFeedRough().NC()}\n"
-                : $"G74 R0.5\n" +
-                $"G74 X{(internalDiameter + bottomStockAllow).NC()} P{stepOver.Microns()} F{GroovingFeedRough().NC()}\n";
+                : $"G75 R0.5\n" +
+                $"G75 X{(internalDiameter + bottomStockAllow).NC()} P{stepOver.Microns()} F{GroovingFeedRough().NC()}\n";
+            }
 
             string cutting = string.Empty;
 
-            if (profStockAllow > 0 || !doFinish)
+            if ((profStockAllow > 0 || !doFinish) && !useCycles)
             {
                 if (tool.Width == width && outerCornerBlunt > 0)
                 {
-                    cutting += $"G0 X{(externalDiameter + clearance).NC()}\n" +
+                    cutting += 
+                        $"G0 X{(externalDiameter + clearance).NC()}\n" +
                         roughBluntRight +
                         $"X{(internalDiameter + bottomStockAllow).NC()}{(innerBluntSize > 0 ? $" {bluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n" +
                         $"G0 X{(externalDiameter + clearance).NC()}\n" +
@@ -195,11 +215,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 }
                 else if (tool.Width == width - profStockAllow * 2 && outerCornerBlunt <= 0)
                 {
-                    cutting += $"G0 X{(externalDiameter + clearance).NC()}\n";
+                    //cutting += $"G0 X{(externalDiameter + clearance).NC()}\n";
                 }
                 else
                 {
-                    cutting +=
+                    if (!useCycles ||
+                        (useCycles && (profStockAllow > 0 || outerCornerBlunt > 0)))
+                    {
+                        cutting +=
                         $"G0 X{(externalDiameter + clearance).NC()}\n" +
                         roughBluntRight +
                         $"X{(internalDiameter + bottomStockAllow).NC()}{(innerBluntSize > 0 ? $" {bluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n" +
@@ -208,13 +231,15 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         roughBluntLeft +
                         $"X{(internalDiameter + bottomStockAllow).NC()}{(innerBluntSize > 0 ? $" {bluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n" +
                         $"Z{centerPoint.NC()}\n";
+                    }
                 }
             }
             if (doFinish)
             {
                 if (tool.Width == width && outerCornerBlunt > 0)
                 {
-                    cutting += $"G0 X{(externalDiameter + clearance).NC()}\n" +
+                    cutting += 
+                        $"G0 X{(externalDiameter + clearance).NC()}\n" +
                         bluntRight +
                         $"X{internalDiameter.NC()}{(innerBluntSize > 0 ? $" {bluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n" +
                         $"G0 X{(externalDiameter + clearance).NC()}\n" +
@@ -223,11 +248,15 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 }
                 else if (tool.Width == width && outerCornerBlunt <= 0)
                 {
-                    cutting += $"G0 X{(externalDiameter + clearance).NC()}\n";
+                    //cutting += $"G0 X{(externalDiameter + clearance).NC()}\n";
                 }
                 else
                 {
-                    cutting += $"G0 X{(externalDiameter + clearance).NC()}\n" +
+                    if (!useCycles || 
+                        (useCycles && (profStockAllow > 0 || outerCornerBlunt > 0)))
+                    {
+                        cutting += 
+                        $"{(!useCycles ? $"G0 X{(externalDiameter + clearance).NC()}\n" : string.Empty)}" +
                         bluntRight +
                         $"X{internalDiameter.NC()}{(innerBluntSize > 0 ? $" {bluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n" +
                         $"Z{centerPoint.NC()}\n" +
@@ -235,6 +264,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         bluntLeft +
                         $"X{internalDiameter.NC()}{(innerBluntSize > 0 ? $" {bluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n" +
                         $"Z{centerPoint.NC()}\n";
+                    }
                 }
             }
 
