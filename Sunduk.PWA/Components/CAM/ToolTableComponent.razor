@@ -210,6 +210,7 @@
                         <MudTh>Позиция</MudTh>
                         <MudTh>Тип</MudTh>
                         <MudTh>Ширина</MudTh>
+                        <MudTh>Радиус</MudTh>
                         <MudTh>Привязка</MudTh>
                         <MudTh>Исполнение</MudTh>
                     </HeaderContent>
@@ -228,6 +229,7 @@
                             <MudTd DataLabel="Тип">Лезвие</MudTd>
                             }
                         <MudTd DataLabel="Ширина">@context.Width.ToPrettyString()</MudTd>
+                        <MudTd DataLabel="Радиус">@context.CornerRadius.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Привязка">@(context.ZeroPoint == GroovingExternalTool.Point.Left ? "Как проходной" : "Как отрезной")</MudTd>
                         <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
                     </RowTemplate>
@@ -244,6 +246,9 @@
                         </MudTd>
                         <MudTd DataLabel="Ширина">
                             <MudTextField @bind-Value="@context.Width" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Радиус">
+                            <MudTextField @bind-Value="@context.CornerRadius" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
                         </MudTd>
                         <MudTd DataLabel="Привязка">
                             <MudSelect T="GroovingExternalTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
@@ -268,6 +273,56 @@
             </MudTabPanel>
             #endregion
 
+            #region GroovingFace
+            <MudTabPanel Text="Канавки торцевые" Style="font-size: x-small">
+                <MudTable Items="GroovingFaceTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedGroovingFaceTool" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>Позиция</MudTh>
+                        <MudTh>Ширина</MudTh>
+                        <MudTh>Радиус</MudTh>
+                        <MudTh>Привязка</MudTh>
+                        <MudTh>Исполнение</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+                        <MudTd DataLabel="Ширина">@context.Width.ToPrettyString()</MudTd>
+                        <MudTd DataLabel="Радиус">@context.CornerRadius.ToPrettyString()</MudTd>
+                        <MudTd DataLabel="Привязка">@(context.ZeroPoint == GroovingFaceTool.Point.Bottom ? "Как проходной" : "Как расточной")</MudTd>
+                        <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
+                    </RowTemplate>
+                    <RowEditingTemplate>
+                        <MudTd DataLabel="Позиция">
+                            <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Ширина">
+                            <MudTextField @bind-Value="@context.Width" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Ширина">
+                            <MudTextField @bind-Value="@context.CornerRadius" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Привязка">
+                            <MudSelect T="GroovingFaceTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                <MudSelectItem Value="@GroovingFaceTool.Point.Bottom">Как проходной</MudSelectItem>
+                                <MudSelectItem Value="@GroovingFaceTool.Point.Top">Как расточной</MudSelectItem>
+                            </MudSelect>
+                        </MudTd>
+                        <MudTd DataLabel="Исполнение">
+                            <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                <MudSelectItem Value="@Tool.ToolHand.Rigth">Правое</MudSelectItem>
+                                <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+                            </MudSelect>
+                        </MudTd>
+                    </RowEditingTemplate>
+                </MudTable>
+                <div class="mt-3 ml-0 mr-4 d-flex">
+                    <div class="d-flex ml-auto align-center">
+                        <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddGroovingFaceTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveGroovingFaceTool" />
+                    </div>
+                </div>
+            </MudTabPanel>
+            #endregion
+
             #region GroovingInternal
             <MudTabPanel Text="Канавки внутренние" Style="font-size: x-small">
                 <MudTable Items="GroovingInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="selectedGroovingInternalTool" Elevation="0">
@@ -275,6 +330,7 @@
                         <MudTh>Позиция</MudTh>
                         <MudTh>Диаметр</MudTh>
                         <MudTh>Ширина</MudTh>
+                        <MudTh>Радиус</MudTh>
                         <MudTh>Привязка</MudTh>
                         <MudTh>Исполнение</MudTh>
                     </HeaderContent>
@@ -282,6 +338,7 @@
                         <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
                         <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Ширина">@context.Width.ToPrettyString()</MudTd>
+                        <MudTd DataLabel="Радиус">@context.CornerRadius.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Привязка">@(context.ZeroPoint == GroovingInternalTool.Point.Left ? "Как расточной" : "Как отрезной")</MudTd>
                         <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Rigth ? "Правое" : "Левое")</MudTd>
                     </RowTemplate>
@@ -294,6 +351,9 @@
                         </MudTd>
                         <MudTd DataLabel="Ширина">
                             <MudTextField @bind-Value="@context.Width" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Радиус">
+                            <MudTextField @bind-Value="@context.CornerRadius" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
                         </MudTd>
                         <MudTd DataLabel="Привязка">
                             <MudSelect T="GroovingInternalTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
@@ -757,6 +817,26 @@
     }
     #endregion
 
+    #region Список торцевых канавочных
+    public List<GroovingFaceTool> GroovingFaceTools
+    {
+        get
+        {
+            List<GroovingFaceTool> result = new();
+            foreach (var item in Tools.Where(x => x is GroovingFaceTool))
+            {
+                result.Add(item as GroovingFaceTool);
+            }
+            return result ?? new();
+        }
+        set
+        {
+            Tools.RemoveAll(x => x is GroovingFaceTool);
+            Tools.AddRange(value);
+        }
+    }
+    #endregion
+
     #region Список внутренних канавочных
     public List<GroovingInternalTool> GroovingInternalTools
     {
@@ -922,6 +1002,7 @@
     private MillingTool selectedMillingTool = null;
 
     private GroovingExternalTool selectedGroovingExternalTool = null;
+    private GroovingFaceTool selectedGroovingFaceTool = null;
     private GroovingInternalTool selectedGroovingInternalTool = null;
     private SpecialTurningTool selectedSpecialTurningTool = null;
     private ThreadingExternalTool selectedThreadingExternalTool = null;
@@ -977,6 +1058,18 @@
     {
         if (GroovingExternalTools.Count > 0) Tools.Remove(GroovingExternalTools[^1]);
         await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+    }
+
+    // GroovingFace
+    private async Task AddGroovingFaceTool()
+    {
+        Tools.Add(new GroovingFaceTool(0101, 3, GroovingFaceTool.Point.Top));
+        await localStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
+    }
+    private async Task RemoveGroovingFaceTool()
+    {
+        if (GroovingFaceTools.Count > 0) Tools.Remove(GroovingFaceTools[^1]);
+        await localStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
     }
 
     // GroovingInternal

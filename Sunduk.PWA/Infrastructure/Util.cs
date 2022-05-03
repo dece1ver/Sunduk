@@ -260,6 +260,15 @@ namespace Sunduk.PWA.Util
                     ToolDescriptionOption.ToolTable => groovingExternalTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
+                GroovingFaceTool groovingFaceTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{groovingFaceTool.Position.ToolNumber()} ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == GroovingFaceTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{groovingFaceTool.Position.ToolNumber()} ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == GroovingFaceTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{groovingFaceTool.Position.ToolNumber()} G54 M58 ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == GroovingFaceTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{groovingFaceTool.Position.ToolNumber()} G55 M58 ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == GroovingFaceTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
+                    ToolDescriptionOption.ToolTable => groovingFaceTool.Description().Split('(')[1].TrimEnd(')'),
+                    _ => string.Empty,
+                },
                 GroovingInternalTool groovingInternalTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{groovingInternalTool.Position.ToolNumber()} ({groovingInternalTool.Name} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == GroovingInternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),

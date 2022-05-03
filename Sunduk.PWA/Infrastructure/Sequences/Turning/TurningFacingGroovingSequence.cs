@@ -9,8 +9,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public GroovingInternalTool Tool { get; set; }
 
         public override MachineType MachineType => MachineType.Turning;
-        public override string Operation => $"Канавка внутренняя {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}";
-        public override string Name => $"Канавка внутренняя {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}"; 
+        public override string Operation => $"Канавка торцевая {Width.ToPrettyString()}мм на Ø{InternalDiameter.ToPrettyString()}-{ExternalDiameter.ToPrettyString()}";
+        public override string Name => $"Канавка торцевая {Width.ToPrettyString()}мм на Ø{InternalDiameter.ToPrettyString()}-{ExternalDiameter.ToPrettyString()}";
 
         public TurningFacingGroovingSequence(
             Machine machine,

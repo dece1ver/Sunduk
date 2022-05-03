@@ -32,10 +32,11 @@
                     @if (MachineType == MachineType.Turning)
                     {
                         @foreach (var tool in Tools.Where(x =>
-                                                    x is SpecialTurningTool ||
+                                                    x is Tool ||
                                                     x is TurningExternalTool ||
                                                     x is TurningInternalTool ||
                                                     x is GroovingExternalTool ||
+                                                    x is GroovingFaceTool ||
                                                     x is GroovingInternalTool ||
                                                     x is ThreadingExternalTool ||
                                                     x is ThreadingInternalTool ||

@@ -138,7 +138,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
             var outerBluntSize = outerBluntType is Blunt.SimpleChamfer ? outerCornerBlunt + tool.CornerRadius / 2 : outerCornerBlunt + tool.CornerRadius;
 
-            var useCycles = width > (tool.Width - 0.5) * 3;
+            var useCycles = width > (tool.Width - 0.2) * 3;
 
             var useSteps = !(stepOver == 0 || stepOver >= (externalDiameter - internalDiameter) / 2);
 
@@ -183,13 +183,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
             if (useCycles)
             {
-                //var rightStepOver = (Math.Abs(centerPoint) - Math.Abs((startPoint - profStockAllow))) / (Math.Floor((Math.Abs(centerPoint) - Math.Abs((startPoint - profStockAllow))) / tool.Width - 0.5));
-                //var leftStepOver = (Math.Abs(centerPoint - (tool.Width - 0.5)) - Math.Abs((endPoint + profStockAllow))) / (Math.Floor((Math.Abs(centerPoint) - Math.Abs((endPoint + profStockAllow))) / tool.Width - 0.5));
+                var numberCuts = Math.Ceiling((width - 2 * profStockAllow - tool.Width) / (tool.Width - 0.2));
+                if (numberCuts % 2 != 0) numberCuts++;
+                var widthStepOver = (width - 2 * profStockAllow - tool.Width) / numberCuts;
                 roughCutting = 
                     $"G75 R0.5\n" +
-                    $"G75 X{(internalDiameter + bottomStockAllow).NC()} Z{(startPoint - profStockAllow).NC()} P{(!useSteps ? (externalDiameter - internalDiameter).Microns() : stepOver.Microns())} Q{(tool.Width - 0.5).Microns()} F{GroovingFeedRough().NC()}\n" +
-                    $"G0 Z{(centerPoint - (tool.Width - 0.5)).NC()}\n" +
-                    $"G75 X{(internalDiameter + bottomStockAllow).NC()} Z{(endPoint + profStockAllow).NC()} P{(!useSteps ? (externalDiameter - internalDiameter).Microns() : stepOver.Microns())} Q{(tool.Width - 0.5).Microns()} F{GroovingFeedRough().NC()}\n";
+                    $"G75 X{(internalDiameter + bottomStockAllow).NC()} Z{(startPoint - profStockAllow).NC()} P{(!useSteps ? (externalDiameter - internalDiameter).Microns() : stepOver.Microns())} Q{widthStepOver.Microns()} F{GroovingFeedRough().NC()}\n" +
+                    $"G0 Z{(centerPoint - widthStepOver).NC()}\n" +
+                    $"G75 X{(internalDiameter + bottomStockAllow).NC()} Z{(endPoint + profStockAllow).NC()} P{(!useSteps ? (externalDiameter - internalDiameter).Microns() : stepOver.Microns())} Q{widthStepOver.Microns()} F{GroovingFeedRough().NC()}\n";
             }
             else
             {

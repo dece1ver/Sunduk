@@ -11,7 +11,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning.Base
 
         public double Width { get; set; }
         public double CornerRadius { get; set; }
-        public enum Point { Left, Right }
+        public enum Point { Left, Right, Top, Bottom}
         public Point ZeroPoint { get; set; }
 
         public TurningGroovingTool(int position, double width, Point zeroPoint, ToolHand hand, double cornerRadius)
