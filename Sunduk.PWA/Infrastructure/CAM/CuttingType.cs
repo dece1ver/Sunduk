@@ -3,6 +3,8 @@
     public enum CuttingType
     {
         External,
-        Internal
+        Internal,
+        Radial,
+        Face
     }
 }

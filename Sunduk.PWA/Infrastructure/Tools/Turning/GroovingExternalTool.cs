@@ -1,16 +1,12 @@
 ﻿using Sunduk.PWA.Infrastructure.Tools.Base;
+using Sunduk.PWA.Infrastructure.Tools.Turning.Base;
 
 namespace Sunduk.PWA.Infrastructure.Tools.Turning
 {
-    public class GroovingExternalTool : Tool
+    public class GroovingExternalTool : TurningGroovingTool
     {
         public enum Types { Grooving, Cutting, Blade }
-
         public Types Type { get; set; }
-        public double Width { get; set; }
-        public double CornerRadius { get; set; }
-        public enum Point { Left, Right }
-        public Point ZeroPoint { get; set; }
         public override string Name
         {
             get => Type switch
@@ -22,14 +18,16 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
             };
         }
 
-        public GroovingExternalTool(int position, Types type, double width, Point zeroPoint, ToolHand hand = ToolHand.Rigth, double cornerRadius = 0.2)
+        public GroovingExternalTool(
+            int position, 
+            Types type, 
+            double width,
+            Point zeroPoint, 
+            ToolHand hand = ToolHand.Rigth, 
+            double cornerRadius = 0.2) 
+            : base (position, width, zeroPoint, hand, cornerRadius)
         {
-            Position = position;
             Type = type;
-            Width = width;
-            ZeroPoint = zeroPoint;
-            Hand = hand;
-            CornerRadius = cornerRadius;
         }
     }
 }

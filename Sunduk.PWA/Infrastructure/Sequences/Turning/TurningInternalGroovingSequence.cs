@@ -4,9 +4,9 @@ using Sunduk.PWA.Util;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
-    public class TurningExternalGroovingSequence : TurningGroovingSequence
+    public class TurningInternalGroovingSequence : TurningGroovingSequence
     {
-        public GroovingExternalTool Tool { get; set; }
+        public GroovingInternalTool Tool { get; set; }
 
         public override MachineType MachineType => MachineType.Turning;
         public override string Operation => Templates.GroovingOperation.GroovingSequence(
@@ -24,12 +24,12 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             OuterBluntType,
             InnerBluntType,
             true);
-    public override string Name => $"Канавка наружная {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}";
+        public override string Name => $"Канавка внутренняя {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}";
 
-        public TurningExternalGroovingSequence(
+        public TurningInternalGroovingSequence(
             Machine machine,
             Material material,
-            GroovingExternalTool tool,
+            GroovingInternalTool tool,
             double cuttingPoint,
             double externalDiameter,
             double internalDiameter,

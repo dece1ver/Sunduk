@@ -3,21 +3,21 @@ using Sunduk.PWA.Infrastructure.Tools.Turning.Base;
 
 namespace Sunduk.PWA.Infrastructure.Tools.Turning
 {
-    public class GroovingInternalTool : TurningGroovingTool
+    public class GroovingFaceTool : TurningGroovingTool
     {
-        public double Diameter { get; set; }
-        public override string Name => $"KANAVA";
+        public override string Name => $"KANAVA TORC";
 
-        public GroovingInternalTool(
+        public GroovingFaceTool(
             int position,
-            double diameter,
             double width,
             Point zeroPoint,
             ToolHand hand = ToolHand.Rigth,
             double cornerRadius = 0.2)
             : base(position, width, zeroPoint, hand, cornerRadius)
         {
-            Diameter = diameter;
+
         }
     }
 }
+    
+

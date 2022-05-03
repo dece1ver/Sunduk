@@ -231,6 +231,7 @@
 
     #region Токарныый инструмент
     public List<GroovingExternalTool> GroovingExternalTools { get; set; }
+    public List<GroovingFaceTool> GroovingFaceTools { get; set; }
     public List<GroovingInternalTool> GroovingInternalTools { get; set; }
     public List<SpecialTurningTool> SpecialTurningTools { get; set; }
     public List<ThreadingExternalTool> ThreadingExternalTools { get; set; }
@@ -369,6 +370,15 @@
         }
         Tools.AddRange(GroovingExternalTools);
 
+        // GroovingFace
+        GroovingFaceTools = await localStorage.GetItemAsync<List<GroovingFaceTool>>(nameof(GroovingFaceTools)) ?? new();
+        if (GroovingFaceTools is null || GroovingFaceTools.Count == 0)
+        {
+            GroovingFaceTools.Add(new GroovingFaceTool(1212, 4, GroovingFaceTool.Point.Bottom));
+            await localStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
+        }
+        Tools.AddRange(GroovingFaceTools);
+
         // GroovingInternal
         GroovingInternalTools = await localStorage.GetItemAsync<List<GroovingInternalTool>>(nameof(GroovingInternalTools)) ?? new();
         if (GroovingInternalTools is null || GroovingInternalTools.Count == 0)
@@ -463,6 +473,7 @@
         await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
         await localStorage.SetItemAsync(nameof(MillingTools), MillingTools);
         await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+        await localStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
         await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
         await localStorage.SetItemAsync(nameof(SpecialTurningTools), SpecialTurningTools);
         await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
@@ -680,6 +691,10 @@
                     case CustomSequence toolCallSequence:
                         CustomSequence newCustomSequence = Program[i] as CustomSequence;
                         newCustomSequence.Machine = Machine;
+                        break;
+                    case TurningGroovingSequence turningGroovingSequence:
+                        TurningGroovingSequence newTurningGroovingSequence = Program[i] as TurningGroovingSequence;
+                        newTurningGroovingSequence.Machine = Machine;
                         break;
                     case TurningCutOffSequence turningCutOffSequence:
                         TurningCutOffSequence newTurningCutOffSequence = Program[i] as TurningCutOffSequence;

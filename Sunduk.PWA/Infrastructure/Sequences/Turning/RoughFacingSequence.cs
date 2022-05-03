@@ -36,7 +36,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             false, 
             false);
         public override MachineType MachineType => MachineType.Turning;
-        public override string Name { get => ProfStockAllow > 0 ? $"Торцовка черновая" : $"Торцовка"; }
+        public override string Name => ProfStockAllow > 0 ? $"Торцовка черновая" : $"Торцовка";
 
         public RoughFacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter,
             double roughStockAllow, double profStockAllow, double stepOver, (int, int) seqNumbers, Blunt bluntType = default, double bluntCustomAngle = 0, double bluntCustomRadius = 0, double cornerBlunt = 0)

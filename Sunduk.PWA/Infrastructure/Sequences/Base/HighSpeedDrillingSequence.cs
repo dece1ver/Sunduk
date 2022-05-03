@@ -9,7 +9,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
         public DrillingTool Tool { get; set; }
         public double StartZ { get; set; }
         public double EndZ { get; set; }
-        public override string Name { get => $"Высокоскоростное сверление"; }
+        public override string Name => $"Высокоскоростное сверление";
         public HighSpeedDrillingSequence(Machine machine, Material material, DrillingTool tool, double startZ, double endZ)
         {
             Machine = machine;

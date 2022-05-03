@@ -4,32 +4,18 @@ using Sunduk.PWA.Util;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
-    public class TurningExternalGroovingSequence : TurningGroovingSequence
+    public class TurningFacingGroovingSequence : TurningGroovingSequence
     {
-        public GroovingExternalTool Tool { get; set; }
+        public GroovingInternalTool Tool { get; set; }
 
         public override MachineType MachineType => MachineType.Turning;
-        public override string Operation => Templates.GroovingOperation.GroovingSequence(
-            Machine,
-            Material,
-            Tool,
-            CuttingPoint,
-            ExternalDiameter,
-            InternalDiameter,
-            Width,
-            StepOver,
-            ProfStockAllow,
-            OuterCornerBlunt,
-            InnerCornerBlunt,
-            OuterBluntType,
-            InnerBluntType,
-            true);
-    public override string Name => $"Канавка наружная {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}";
+        public override string Operation => $"Канавка торцевая {Width.ToPrettyString()}мм на Ø{InternalDiameter.ToPrettyString()}-{ExternalDiameter.ToPrettyString()}";
+        public override string Name => $"Канавка торцевая {Width.ToPrettyString()}мм на Ø{InternalDiameter.ToPrettyString()}-{ExternalDiameter.ToPrettyString()}";
 
-        public TurningExternalGroovingSequence(
+        public TurningFacingGroovingSequence(
             Machine machine,
             Material material,
-            GroovingExternalTool tool,
+            GroovingInternalTool tool,
             double cuttingPoint,
             double externalDiameter,
             double internalDiameter,
