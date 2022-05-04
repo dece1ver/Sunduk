@@ -4,6 +4,7 @@
     {
         Grooving,
         RoughGrooving,
+        FinishGrooving,
         Cutting
     }
 }
