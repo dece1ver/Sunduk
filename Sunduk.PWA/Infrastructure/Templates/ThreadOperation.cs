@@ -21,8 +21,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
             if (tool is null ||
                 startZ <= endZ) return string.Empty;
             string approach = startZ > 0
-                ? $"G0 X0. Z{startZ.NC()} S{cutSpeed.ToSpindleSpeed(tool.Diameter, 10)} G97\n"
-                : $"G0 X0. Z{SAFE_APPROACH_DISTANCE.NC()} S{((int)cutSpeed).ToSpindleSpeed(tool.Diameter, 10)} G97\nZ{startZ.NC()}\n";
+                ? $"G0 X0. Z{startZ.NC()} S{cutSpeed.ToSpindleSpeed(tool.Diameter, 10)} {Direction(tool)} G97\n"
+                : $"G0 X0. Z{SAFE_APPROACH_DISTANCE.NC()} S{((int)cutSpeed).ToSpindleSpeed(tool.Diameter, 10)} {Direction(tool)} G97\nZ{startZ.NC()}\n";
             string exit = startZ > 0
                 ? string.Empty
                 : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";

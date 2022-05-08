@@ -18,6 +18,8 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
             };
         }
 
+        public override MachineType MachineType { get => MachineType.Turning; } 
+
         public GroovingExternalTool(
             int position, 
             Types type, 

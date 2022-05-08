@@ -74,6 +74,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 ? $"G1 X{internalDiameter.NC()}{feed}\n"
                 : $"G75 R0.5\n" +
                 $"G75 X{internalDiameter.NC()} P{stepOver.Microns()} F{GroovingFeedRough().NC()}\n";
+            if (!string.IsNullOrEmpty(blunt))
+            {
+                cutting = $"G1 X{(externalDiameter - 2 * (fullChamferSizeX * Math.Tan(bluntCustomAngle.Radians())) + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X).NC()}\n" +
+                    cutting;
+            }
             return machine switch
             {
                 Machine.GS1500 =>

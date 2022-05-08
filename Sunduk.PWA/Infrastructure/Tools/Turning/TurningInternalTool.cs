@@ -13,6 +13,8 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
         public double Angle { get; set; }
         public override string Name => "RAST";
 
+        public override MachineType MachineType { get => MachineType.Turning; }
+
         public TurningInternalTool(int position, double diameter, double angle, double radius, ToolHand hand = ToolHand.Rigth)
         {
             Position = position;
