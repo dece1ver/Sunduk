@@ -1,0 +1,46 @@
+﻿<MudField Label="Контур" Variant="Variant.Filled" Margin="Margin.Dense">
+    <MudList>
+        @foreach (var element in Contour)
+        {
+            <MudListItem>
+                <MudGrid>
+                    <MudSelect T="ElementType" @bind-Value="Type">
+                        <MudSelectItem T="ElementType" Value="ElementType.Line">Линия</MudSelectItem>
+                        <MudSelectItem T="ElementType" Value="ElementType.Arc">Дуга</MudSelectItem>
+                    </MudSelect>
+                    @switch (element)
+                    {
+                        case Line line:
+                        <MudTextField @bind-Value="line.X" AdornmentText="X"/>
+                        <MudTextField @bind-Value="line.Z" AdornmentText="Z"/>
+                        <MudTextField @bind-Value="line.Angle" AdornmentText="Угол"/>
+                            break;
+                        case Arc arc:
+                        <MudTextField @bind-Value="arc.X" AdornmentText="X"/>
+                        <MudTextField @bind-Value="arc.Z" AdornmentText="Z"/>
+                        <MudTextField @bind-Value="arc.Radius" AdornmentText="Угол"/>
+                            break;
+                    }
+                </MudGrid>
+            </MudListItem>
+        }
+
+    </MudList>
+</MudField>
+
+@code {
+    public List<Element> Contour { get; set; } = new List<Element>()
+    {
+        new Line(0, 0),
+        new Line(6, 0),
+        new Line(10, 2)
+    };
+
+    public ElementType Type { get; set; }
+
+    public enum ElementType
+    {
+        Line,
+        Arc
+    }
+}

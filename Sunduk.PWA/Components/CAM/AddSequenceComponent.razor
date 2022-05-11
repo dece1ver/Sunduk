@@ -165,6 +165,12 @@
                     <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
             }
+            @if (TurningSequence == TurningSequences.FinishTurning)
+            {
+                <MudItem xs="12">
+                    <ContourComponent></ContourComponent>
+                </MudItem>
+            }
             @if (TurningSequence != TurningSequences.FinishFacingCycle)
             {
                 <MudItem xs="12" md="@(_MediumBluntFieldSize)">
@@ -211,6 +217,9 @@
                         <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                     }
                 </MudSelect>
+            </MudItem>
+            <MudItem xs="12">
+                <ContourComponent></ContourComponent>
             </MudItem>
             break;
         #endregion

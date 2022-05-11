@@ -22,7 +22,6 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning.Base
         public double StepOver { get; set; }
         public double RoughStockAllow { get; set; }
         public double ProfStockAllow { get; set; }
-
         public override MachineType MachineType => MachineType.Turning;
     }
 }
