@@ -1,39 +1,58 @@
 ﻿<MudField Label="Контур" Variant="Variant.Filled" Margin="Margin.Dense">
-    <MudList DisableGutters="true" Dense="true">
+    <MudList DisableGutters="true" Dense="true" SelectedValue="SelectedElement">
         @foreach (var element in Contour)
         {
             <MudListItem Dense="true">
-                <MudPaper Outlined="true">
+                <MudPaper Outlined="true" Class="py-n2 my-n2">
                     <MudGrid Justify="Justify.FlexStart" Spacing=1>
-                        <MudItem>
-                            <MudSelect T="ElementType" Variant="Variant.Outlined" @bind-Value="Type" Margin="Margin.Dense" Style="width:140px">
-                                <MudSelectItem T="ElementType" Value="ElementType.Line">Линия</MudSelectItem>
-                                <MudSelectItem T="ElementType" Value="ElementType.Arc">Дуга ПЧ</MudSelectItem>
-                                <MudSelectItem T="ElementType" Value="ElementType.Arc">Дуга ПРЧ</MudSelectItem>
-                            </MudSelect>
-                        </MudItem>
                         @switch (element)
                         {
                             case Line line:
                             <MudItem>
-                                <MudTextField @bind-Value="line.X" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentText="X" Margin="Margin.Dense" Style="width: 105px" Converter="Util.DoubleConverter"/>
+                                <MudSelect T="ElementType" Value="ElementType.Line" Variant="Variant.Outlined" Immediate="true" ValueChanged="(() => SetArc(Contour.IndexOf(line)))"
+                                Margin="Margin.Dense" Style="width: 105px">
+                                    <MudSelectItem T="ElementType" Value="ElementType.Line">Линия</MudSelectItem>
+                                    <MudSelectItem T="ElementType" Value="ElementType.Arc">Дуга</MudSelectItem>
+                                </MudSelect>
                             </MudItem>
                             <MudItem>
-                                <MudTextField @bind-Value="line.Z" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentText="Z" Margin="Margin.Dense" Style="width: 105px" Converter="Util.DoubleConverter"/>
+                                <MudTextField @bind-Value="line.X" Variant="Variant.Outlined" Immediate="true"
+                                AdornmentColor="Color.Dark" Adornment="Adornment.Start" AdornmentText="X" 
+                                Margin="Margin.Dense" Style="width: 105px" Converter="Util.DoubleConverter"/>
                             </MudItem>
                             <MudItem>
-                                <MudTextField @bind-Value="line.Angle" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentText="A" Margin="Margin.Dense" Style="width: 105px" Converter="Util.DoubleConverter"/>
+                                <MudTextField @bind-Value="line.Z" Variant="Variant.Outlined" Immediate="true"
+                                AdornmentColor="Color.Dark" Adornment="Adornment.Start" AdornmentText="Z" 
+                                Margin="Margin.Dense" Style="width: 105px" Converter="Util.DoubleConverter"/>
+                            </MudItem>
+                            <MudItem>
+                                <MudTextField @bind-Value="line.Angle" Variant="Variant.Outlined" Immediate="true"
+                                AdornmentColor="Color.Dark" Adornment="Adornment.Start" AdornmentText="A" 
+                                Margin="Margin.Dense" Style="width: 105px" Converter="Util.DoubleConverter"/>
                             </MudItem>
                                 break;
                             case Arc arc:
                             <MudItem>
-                                <MudTextField @bind-Value="arc.X" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentText="X" Margin="Margin.Dense" Style="width: 105px" Converter="Util.DoubleConverter"/>
+                                <MudSelect T="ElementType" Value="ElementType.Arc" Variant="Variant.Outlined" Immediate="true" ValueChanged="(() => SetLine(Contour.IndexOf(arc)))"
+                                Margin="Margin.Dense" Style="width: 105px">
+                                    <MudSelectItem T="ElementType" Value="ElementType.Line">Линия</MudSelectItem>
+                                    <MudSelectItem T="ElementType" Value="ElementType.Arc">Дуга</MudSelectItem>
+                                </MudSelect>
                             </MudItem>
                             <MudItem>
-                                <MudTextField @bind-Value="arc.Z" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentText="Z" Margin="Margin.Dense" Style="width: 105px" Converter="Util.DoubleConverter"/>
+                                <MudTextField @bind-Value="arc.X" Variant="Variant.Outlined" Immediate="true"
+                                AdornmentColor="Color.Dark" Adornment="Adornment.Start" AdornmentText="X" 
+                                Margin="Margin.Dense" Style="width: 105px" Converter="Util.DoubleConverter"/>
                             </MudItem>
                             <MudItem>
-                                <MudTextField @bind-Value="arc.Radius" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentText="R" Margin="Margin.Dense" Style="width: 105px" Converter="Util.DoubleConverter"/>
+                                <MudTextField @bind-Value="arc.Z" Variant="Variant.Outlined" Immediate="true"
+                                AdornmentColor="Color.Dark" Adornment="Adornment.Start" AdornmentText="Z" 
+                                Margin="Margin.Dense" Style="width: 105px" Converter="Util.DoubleConverter"/>
+                            </MudItem>
+                            <MudItem>
+                                <MudTextField @bind-Value="arc.Radius" Variant="Variant.Outlined" Immediate="true"
+                                AdornmentColor="Color.Dark" Adornment="Adornment.Start" AdornmentText="R" 
+                                Margin="Margin.Dense" Style="width: 105px" Converter="Util.DoubleConverter"/>
                             </MudItem>
                                 break;
                         }
@@ -44,15 +63,35 @@
                 </MudPaper>
             </MudListItem>
         }
-        <MudField Variant=Variant.Outlined Margin="Margin.Dense">
+        <MudPaper Outlined="true" Class="py-n2 my-n2">
             <MudListItem Dense="true" OnClick="(() => Contour.Add(new Line(0, 0)))">
                 <MudField Variant="Variant.Filled" Margin="Margin.Dense" >
                     <MudText>Добавить</MudText>
                 </MudField>
             </MudListItem>
-        </MudField>
+        </MudPaper>
     </MudList>
 </MudField>
+
+<MudTextField @bind-Value="ElementIndex"/>
+@foreach (var item in Contour)
+{
+    switch (item)
+    {
+        case Line line:
+            <MudText>
+                @($"Линия X:{line.X} Z:{line.Z} A:{line.Angle}")
+            </MudText>
+            break;
+        case Arc arc:
+             <MudText>
+                @($"Дуга X:{arc.X} Z:{arc.Z} A:{arc.Radius}")
+            </MudText>
+            break;
+    }
+    
+}
+
 
 @code {
 
@@ -64,11 +103,28 @@
         new Line(10, 2)
     };
 
+    public Element SelectedElement { get; set; }
+
     public ElementType Type { get; set; }
 
     public enum ElementType
     {
         Line,
         Arc
+    }
+
+    public int ElementIndex { get; set; } = 6;
+
+
+    private void SetArc(int index)
+    {
+        ElementIndex = index;
+        Contour[index] = new Arc(0, 0, 3, Sunduk.PWA.Infrastructure.Direction.CCW);
+    }
+
+    private void SetLine(int index)
+    {
+        ElementIndex = index;
+        Contour[index] = new Line(0, 0);
     }
 }
