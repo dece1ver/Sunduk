@@ -36,6 +36,7 @@ namespace Sunduk.PWA.Util
         /// <returns>Значение Double, при неудаче возвращает значение по умолчанию</returns>
         public static double GetDouble(this string stringNumber, double defaultValue = 0, GetNumberOption numberOption = GetNumberOption.OnlyPositive)
         {
+            //if (stringNumber is "-") return double.NegativeInfinity;
             NumberFormatInfo numberFomat = new() { NumberDecimalSeparator = "," };
             if (Double.TryParse(stringNumber, NumberStyles.Any, numberFomat, out double result))
             {
@@ -462,7 +463,7 @@ namespace Sunduk.PWA.Util
         public static Converter<double?> NullableDoubleConverterWithZero = new()
         {
             SetFunc = value => value?.ToPrettyString(stringOption: PrettyStringOption.AsIs),
-            GetFunc = text => string.IsNullOrEmpty(text) ? null : Util.GetDouble(text, 0, GetNumberOption.Any),
+            GetFunc = text => (string.IsNullOrEmpty(text) || text is "-") ? null : Util.GetDouble(text, 0, GetNumberOption.Any),
         };
 
         /// <summary>

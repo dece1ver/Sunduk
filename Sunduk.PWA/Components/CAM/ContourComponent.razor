@@ -4,7 +4,8 @@
         {
             <MudListItem Dense="true">
                 <MudPaper Outlined="true" Class="py-n2 my-n2">
-                    <MudGrid Justify="Justify.FlexStart" Spacing=1>
+                    <MudFocusTrap DefaultFocus="DefaultFocus.Element">
+                        <MudGrid Justify="Justify.FlexStart" Spacing=1>
                         @switch (element)
                         {
                             case Point point:
@@ -15,14 +16,12 @@
                                 </MudSelect>
                             </MudItem>
                             <MudItem>
-                                <MudTextField @bind-Value="point.X" Variant="FieldsVariant" Immediate="true"
-                                AdornmentColor="Color.Dark" Adornment="Adornment.Start" Label="X" 
-                                Margin="Margin.Dense" Style="width: 95px" Converter="Util.NullableDoubleConverterWithZero"/>
+                                <MudTextField @bind-Value="point.X" Variant="FieldsVariant" Immediate="true" Label="X" 
+                                Margin="Margin.Dense" Style="width: 90px;" Converter="Util.NullableDoubleConverterWithZero"/>
                             </MudItem>
                             <MudItem>
-                                <MudTextField @bind-Value="point.Z" Variant="FieldsVariant" Immediate="true"
-                                AdornmentColor="Color.Dark" Adornment="Adornment.Start" Label="Z" 
-                                Margin="Margin.Dense" Style="width: 95px" Converter="Util.NullableDoubleConverterWithZero"/>
+                                <MudTextField @bind-Value="point.Z" Variant="FieldsVariant" Immediate="true" Label="Z" 
+                                Margin="Margin.Dense" Style="width: 90px;" Converter="Util.NullableDoubleConverterWithZero"/>
                             </MudItem>
                                 break;
                             case Line line:
@@ -34,19 +33,16 @@
                                 </MudSelect>
                             </MudItem>
                             <MudItem>
-                                <MudTextField @bind-Value="line.X" Variant="FieldsVariant" Immediate="true"
-                                AdornmentColor="Color.Dark" Adornment="Adornment.Start" Label="X" 
-                                Margin="Margin.Dense" Style="width: 95px" Converter="Util.NullableDoubleConverterWithZero"/>
+                                <MudTextField @bind-Value="line.X" Variant="FieldsVariant" Immediate="true" Label="X" 
+                                Margin="Margin.Dense" Style="width: 90px" Converter="Util.NullableDoubleConverterWithZero"/>
                             </MudItem>
                             <MudItem>
-                                <MudTextField @bind-Value="line.Z" Variant="FieldsVariant" Immediate="true"
-                                AdornmentColor="Color.Dark" Adornment="Adornment.Start" Label="Z" 
-                                Margin="Margin.Dense" Style="width: 95px" Converter="Util.NullableDoubleConverterWithZero"/>
+                                <MudTextField @bind-Value="line.Z" Variant="FieldsVariant" Immediate="true" Label="Z" 
+                                Margin="Margin.Dense" Style="width: 90px" Converter="Util.NullableDoubleConverterWithZero"/>
                             </MudItem>
                             <MudItem>
-                                <MudTextField @bind-Value="line.Angle" Variant="FieldsVariant" Immediate="true"
-                                AdornmentColor="Color.Dark" Adornment="Adornment.Start" Label="A" 
-                                Margin="Margin.Dense" Style="width: 95px" Converter="Util.DoubleConverter"/>
+                                <MudTextField @bind-Value="line.Angle" Variant="FieldsVariant" Immediate="true" Label="A" 
+                                Margin="Margin.Dense" Style="width: 90px" Converter="Util.DoubleConverter"/>
                             </MudItem>
                                 break;
                             case Arc arc:
@@ -60,20 +56,23 @@
                             <MudItem>
                                 <MudTextField @bind-Value="arc.X" Variant="FieldsVariant" Immediate="true"
                                 AdornmentColor="Color.Dark" Adornment="Adornment.Start" Label="X" 
-                                Margin="Margin.Dense" Style="width: 95px" Converter="Util.NullableDoubleConverterWithZero"/>
+                                Margin="Margin.Dense" Style="width: 90px" Converter="Util.NullableDoubleConverterWithZero"/>
                             </MudItem>
                             <MudItem>
                                 <MudTextField @bind-Value="arc.Z" Variant="FieldsVariant" Immediate="true"
                                 AdornmentColor="Color.Dark" Adornment="Adornment.Start" Label="Z" 
-                                Margin="Margin.Dense" Style="width: 95px" Converter="Util.NullableDoubleConverterWithZero"/>
+                                Margin="Margin.Dense" Style="width: 90px" Converter="Util.NullableDoubleConverterWithZero"/>
                             </MudItem>
                             <MudItem>
                                 <MudTextField @bind-Value="arc.Radius" Variant="FieldsVariant" Immediate="true"
                                 AdornmentColor="Color.Dark" Adornment="Adornment.Start" Label="R" 
-                                Margin="Margin.Dense" Style="width: 95px" Converter="Util.DoubleConverter"/>
+                                Margin="Margin.Dense" Style="width: 90px" Converter="Util.DoubleConverter"/>
                             </MudItem>
                                 break;
                         }
+                        <MudItem>
+                            <MudIconButton Style="margin-top: 3px; height: 40px; width: 40px" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Add" OnClick="(() => Contour.Insert(Contour.IndexOf(element) + 1, new Line(null, null)))"/>
+                        </MudItem>
                         @if(Contour.IndexOf(element) > 0)
                         {
                             <MudItem>
@@ -81,10 +80,11 @@
                             </MudItem>
                         }
                     </MudGrid>
+                    </MudFocusTrap>
                 </MudPaper>
             </MudListItem>
         }
-        <MudPaper Outlined="true">
+        @*<MudPaper Outlined="true">
             <MudListItem Dense="true" OnClick="(() => Contour.Add(new Line(null, null)))">
                 <MudGrid Justify="Justify.Center">
                     <MudItem>
@@ -92,7 +92,7 @@
                     </MudItem>
                 </MudGrid>
             </MudListItem>
-        </MudPaper>
+        </MudPaper>*@
     </MudList>
 </MudField>
 
