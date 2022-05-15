@@ -10,7 +10,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.ContourElements
             Z = z;
         }
 
-        public double? X { get; set; }
-        public double? Z { get; set; }
+        public override double? X { get; set; }
+        public override double? Z { get; set; }
     }
 }

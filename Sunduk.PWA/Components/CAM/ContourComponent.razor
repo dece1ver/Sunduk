@@ -93,6 +93,43 @@
                 </MudGrid>
             </MudListItem>
         </MudPaper>*@
+        <MudPaper>
+            
+            
+            <center>
+                <svg height="@(ContourHeigh + 40)" width="@(ContourWidth + 50)" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <defs>
+                        <g height="@(ContourHeigh)" width="@(ContourWidth)" id="contour">
+                            <path stroke="#FF5722" stroke-width="2" fill="none"
+                                d="@Path"/>
+                        </g>
+                        <g height="50" width="50" id="cs">
+                            <path stroke="white" stroke-width="1" fill="none"
+                                d="M 0,-50 L 0,50 M -50,0 L50,0"/>
+                        </g>
+                        @*<g height="@(MaxDiameter * 4 + 10)" id="cs">
+                            <path stroke="red" stroke-width="2" fill="none"
+                                d="@Path"/>
+                        </g>*@
+                    </defs>
+                    <g transform="translate(@(ContourWidth / 2 ),@(ContourHeigh + 20))">
+                        <use xlink:href="#contour"/>
+                        <use xlink:href="#cs"/>
+                        <text x="5" y="-35" style="font-family: 'Roboto Mono', monospace; color: white" font-size="10">X</text>
+                        <text x="40" y="10" style="font-family: 'Roboto Mono', monospace; color: white" font-size="10">Z</text>
+                    </g>
+                </svg>
+            </center>
+        </MudPaper>
+        <MudText>
+            @Path
+        </MudText>
+        <MudText>
+            @($"X{MaxHeigh} Z{MaxLength}")
+        </MudText>
+        <MudText>
+            @($"H{ContourHeigh} W{ContourWidth}")
+        </MudText>
     </MudList>
 </MudField>
 
@@ -111,6 +148,54 @@
         Line,
         Arc
     }
+
+    public double? MaxHeigh { get
+        {
+            var minX = Contour.Select(x => x.X).Min();
+            if (minX > 0) minX = 0;
+            var maxX = Contour.Select(x => x.X).Max();
+            return maxX - minX;
+        } }
+    public double? MaxLength { get
+        {
+            var minZ = Contour.Select(x => x.Z).Min();
+            var maxZ = Contour.Select(x => x.Z).Max();
+            return maxZ - minZ;
+        } }
+
+    public double ContourHeigh { get
+        {
+            double maxHeigh = 200;
+            var tempCalc = (MaxHeigh ?? 0) * 2 + 20;
+            if (tempCalc > maxHeigh) maxHeigh = tempCalc;
+            return Math.Abs(maxHeigh);
+        } }
+
+    public double ContourWidth { get
+        {
+            double maxWidth = 400;
+            var tempCalc = (MaxLength ?? 0) * 6;
+            if (tempCalc > maxWidth) maxWidth = tempCalc;
+            return Math.Abs(maxWidth);
+        } }
+
+    public string Path { get
+        {
+            string path = string.Empty;
+            foreach (var element in Contour)
+            {
+                switch (element)
+                {
+                    case Point point:
+                        path += $"M {(point.Z*4).ToString().Replace(",",".")},{(-point.X/2*4).ToString().Replace(",",".")} ";
+                        break;
+                    case Line line:
+                        path += $"L {(line.Z*4).ToString().Replace(",",".")},{(-line.X/2*4).ToString().Replace(",",".")} ";
+                        break;
+                }
+            }
+            return path;
+        } set { } }
 
     public List<Element> Contour { get; set; } = new List<Element>()
     {

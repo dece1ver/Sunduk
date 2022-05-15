@@ -15,8 +15,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.ContourElements
             EndBluntType = endBluntType;
         }
 
-        public double? X { get; set; }
-        public double? Z { get; set; }
+        public override double? X { get; set; }
+        public override double? Z { get; set; }
         public double Angle { get; set; }
         public double StartBlunt { get; set; }
         public Blunt StartBluntType { get; set; }

@@ -14,8 +14,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.ContourElements
             Direction = direction;
         }
 
-        public double? X { get; set; }
-        public double? Z { get; set; }
+        public override double? X { get; set; }
+        public override double? Z { get; set; }
         public double Radius { get; set; }
         public double CenterX { get; set; }
         public double CenterZ { get; set; }
