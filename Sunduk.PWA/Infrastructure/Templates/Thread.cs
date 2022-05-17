@@ -683,6 +683,115 @@ namespace Sunduk.PWA.Infrastructure.Templates
             }
         }
 
+        public static double ThreadChamfer(ThreadStandart threadStandart, double threadPitch)
+        {
+            switch (threadStandart)
+            {
+                case ThreadStandart.Metric:
+                    switch (threadPitch)
+                    {
+                        case > 0.2 and <= 0.35:
+                            return 0.2;
+                        case <= 0.35:
+                            return 0.3;
+                        case <= 0.7:
+                            return 0.5;
+                        case <= 1:
+                            return 1;
+                        case <= 1.75:
+                            return 1.6;
+                        case <= 2:
+                            return 2;
+                        case <= 3:
+                            return 2.5;
+                        case <= 4:
+                            return 3;
+                        case > 4:
+                            return 4;
+                        default:
+                            return 0;
+                    }
+                case ThreadStandart.BSPP:
+                    switch (threadPitch)
+                    {
+                        case <= 0.907:
+                            return 1;
+                        case <= 1.337:
+                            return 1.6;
+                        case <= 1.814:
+                            return 2;
+                        case > 1.814:
+                            return 2.5;
+                        default:
+                            return 0;
+                    }
+                case ThreadStandart.NPT:
+                    switch (threadPitch)
+                    {
+                        case <= 0.907:
+                            return 1;
+                        case <= 1.814:
+                            return 1.6;
+                        case > 1.814:
+                            return 2;
+                        default:
+                            return 0;
+                    }
+                case ThreadStandart.Trapeziodal:
+                    switch (threadPitch)
+                    {
+                        case <= 1.5:
+                            return 1;
+                        case <= 2:
+                            return 1.6;
+                        case <= 3:
+                            return 2;
+                        case <= 4:
+                            return 2.5;
+                        case <= 5:
+                            return 3;
+                        case <= 6:
+                            return 3.5;
+                        case <= 7:
+                            return 4;
+                        case <= 8:
+                            return 4.5;
+                        case <= 9:
+                            return 5;
+                        case <= 10:
+                            return 5.5;
+                        case <= 12:
+                            return 6.5;
+                        case <= 14:
+                            return 8;
+                        case <= 16:
+                            return 9;
+                        case <= 18:
+                            return 10;
+                        case <= 20:
+                            return 11;
+                        case <= 22:
+                            return 12;
+                        case <= 24:
+                            return 13;
+                        case <= 28:
+                            return 16;
+                        case <= 32:
+                            return 17;
+                        case <= 36:
+                            return 20;
+                        case <= 40:
+                            return 21;
+                        case > 40:
+                            return 25;
+                        default:
+                            return 0;
+                    }
+                default:
+                    return 0;
+            }
+        }
+
         /// <summary>
         /// Считает проходы при нарезании резьбы
         /// </summary>
