@@ -683,56 +683,109 @@ namespace Sunduk.PWA.Infrastructure.Templates
             }
         }
 
-        public static double ThreadChamfer(ThreadStandart threadStandart, double threadPitch)
+        /// <summary>
+        /// Размеры фасок по ГОСТ 10549-80
+        /// </summary>
+        /// <param name="threadStandart"></param>
+        /// <param name="threadPitch"></param>
+        /// <returns></returns>
+        public static double ThreadChamfer(ThreadStandart threadStandart, double threadPitch, CuttingType threadType)
         {
             switch (threadStandart)
             {
                 case ThreadStandart.Metric:
-                    switch (threadPitch)
+                    switch (threadType)
                     {
-                        case > 0.2 and <= 0.35:
-                            return 0.2;
-                        case <= 0.35:
-                            return 0.3;
-                        case <= 0.7:
-                            return 0.5;
-                        case <= 1:
-                            return 1;
-                        case <= 1.75:
-                            return 1.6;
-                        case <= 2:
-                            return 2;
-                        case <= 3:
-                            return 2.5;
-                        case <= 4:
-                            return 3;
-                        case > 4:
-                            return 4;
+                        case CuttingType.External:
+
+                            switch (threadPitch)
+                            {
+                                case <= 0.3:
+                                    return 0.2;
+                                case <= 0.45:
+                                    return 0.3;
+                                case <= 0.7:
+                                    return 0.5;
+                                case <= 1:
+                                    return 1;
+                                case <= 1.75:
+                                    return 1.6;
+                                case <= 2:
+                                    return 2;
+                                case <= 3:
+                                    return 2.5;
+                                case <= 4:
+                                    return 3;
+                                case > 4:
+                                    return 4;
+                                default:
+                                    return 0;
+                            }
+                         case CuttingType.Internal:
+                            switch (threadPitch)
+                            {
+                                case <= 0.35:
+                                    return 0.2;
+                                case <= 0.45:
+                                    return 0.3;
+                                case <= 0.7:
+                                    return 0.5;
+                                case <= 1:
+                                    return 1;
+                                case <= 1.75:
+                                    return 1.6;
+                                case <= 2:
+                                    return 2;
+                                case <= 3:
+                                    return 2.5;
+                                case <= 4:
+                                    return 3;
+                                case > 4:
+                                    return 4;
+                                default:
+                                    return 0;
+                            }
                         default:
                             return 0;
                     }
                 case ThreadStandart.BSPP:
-                    switch (threadPitch)
+                    switch (threadType)
                     {
-                        case <= 0.907:
-                            return 1;
-                        case <= 1.337:
-                            return 1.6;
-                        case <= 1.814:
-                            return 2;
-                        case > 1.814:
-                            return 2.5;
+                        case CuttingType.External:
+                            switch (threadPitch)
+                            {
+                                case <= 0.907: // 28
+                                    return 1;
+                                case <= 1.337: // 19
+                                    return 1.6;
+                                case <= 1.814: // 14
+                                    return 2;
+                                case > 1.814:  //>14
+                                    return 2.5;
+                                default:
+                                    return 0;
+                            }
+                        case CuttingType.Internal:
+                            switch (threadPitch)
+                            {
+                                case <= 1.814:
+                                    return 1;
+                                case > 1.814:
+                                    return 1.6;
+                                default:
+                                    return 0;
+                            }
                         default:
                             return 0;
                     }
                 case ThreadStandart.NPT:
                     switch (threadPitch)
                     {
-                        case <= 0.907:
+                        case <= 0.941: // 27
                             return 1;
-                        case <= 1.814:
+                        case <= 1.814: // 14
                             return 1.6;
-                        case > 1.814:
+                        case > 1.814:  //>14
                             return 2;
                         default:
                             return 0;
@@ -787,6 +840,73 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         default:
                             return 0;
                     }
+                default:
+                    return 0;
+            }
+        }
+
+        /// <summary>
+        /// Размеры сбегов по ГОСТ 10549-80
+        /// </summary>
+        /// <param name="threadStandart"></param>
+        /// <param name="threadPitch"></param>
+        /// <returns></returns>
+        public static double ThreadRunout(ThreadStandart threadStandart, double threadPitch, CuttingType threadType)
+        {
+            switch (threadStandart)
+            {
+                case ThreadStandart.Metric:
+                    return Math.Round(1.25 * threadPitch, 2);
+                case ThreadStandart.BSPP:
+                    switch (threadType)
+                    {
+                        case CuttingType.External:
+                            switch (threadPitch)
+                            {
+                                case <= 0.907: // 28
+                                    return 1;
+                                case <= 1.337: // 19
+                                    return 1.5;
+                                case <= 1.814: // 14
+                                    return 2;
+                                case > 1.814:  //>14
+                                    return 2.5;
+                                default:
+                                    return 0;
+                            }
+                        case CuttingType.Internal:
+                            switch (threadPitch)
+                            {
+                                case <= 0.907: // 28
+                                    return 1.4;
+                                case <= 1.337: // 19
+                                    return 2;
+                                case <= 1.814: // 14
+                                    return 3;
+                                case > 1.814:  //>14
+                                    return 4;
+                                default:
+                                    return 0;
+                            }
+                        default:
+                            return 0;
+                    }
+                case ThreadStandart.NPT:
+                    switch (threadPitch)
+                    {
+                        case <= 0.941: // 27
+                            return 2.5;
+                        case <= 1.411: // 18
+                            return 3.5;
+                        case <= 1.814: // 14
+                            return 4.5;
+                        case > 1.814:  //>14
+                            return 5.5;
+                        default:
+                            return 0;
+                    }
+                case ThreadStandart.Trapeziodal:
+                    return 0;
                 default:
                     return 0;
             }
@@ -924,6 +1044,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 _ => double.NaN,
             };
         }
+
 
         public static bool Valid(double threadDiamer, double threadPitch)
         {
