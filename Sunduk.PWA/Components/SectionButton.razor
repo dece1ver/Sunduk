@@ -1,0 +1,16 @@
+﻿<MudLink Href="@Link" Underline="Underline.None">
+    <MudPaper Class="px-6 flex-grow-1 flex-shrink-0 py-10">
+        <MudGrid Justify="Justify.Center">
+            <MudIcon Size="Size.Large" Icon="@Icon" />
+        </MudGrid>
+        <MudGrid Justify="Justify.Center">
+            <MudText Typo="Typo.body2" Class="mt-4">@Label</MudText>
+        </MudGrid>
+    </MudPaper>
+</MudLink>
+
+@code {
+    [Parameter] public string Label { get; set; }
+    [Parameter] public string Link { get; set; }
+    [Parameter] public string Icon { get; set; }
+}

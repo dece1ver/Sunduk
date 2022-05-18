@@ -3,86 +3,32 @@
 
     <MudGrid Spacing="1" Class="d-flex pa-1" Justify="Justify.FlexStart">
         <MudItem xs="6" md="4" lg="3">
-            <MudLink Href="/calculator" Underline="Underline.None">
-                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
-                    <MudGrid Justify="Justify.Center">
-                        <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Calculate" />
-                    </MudGrid>
-                    <MudGrid Justify="Justify.Center">
-                        <MudText Typo="Typo.body2" Class="mt-4">Калькулятор режимов</MudText>
-                    </MudGrid>
-                </MudPaper>
-            </MudLink>
+            <SectionButton Label="Калькулятор режимов" Link="/calculator" Icon="@Icons.Material.Filled.Calculate" />
         </MudItem>
 
         @if (ExperimantalMode)
         {
         <MudItem xs="6" md="4" lg="3">
-            <MudLink Href="/sunducam" Underline="Underline.None">
-                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
-                    <MudGrid Justify="Justify.Center">
-                        <MudIcon Size="Size.Large" Icon="@Icons.Material.Outlined.FeaturedPlayList" />
-                    </MudGrid>
-                    <MudGrid Justify="Justify.Center">
-                        <MudText Typo="Typo.body2" Class="mt-4">SunduCAM</MudText>
-                    </MudGrid>
-                </MudPaper>
-            </MudLink>
+            <SectionButton Label="SunduCAM" Link="/sunducam" Icon="@Icons.Material.Outlined.FeaturedPlayList" />
         </MudItem>
         }
 
         <MudItem xs="6" md="4" lg="3">
-            <MudLink Href="/stuff" Underline="Underline.None">
-                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
-                    <MudGrid Justify="Justify.Center">
-                        <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.RoundedCorner" />
-                    </MudGrid>
-                    <MudGrid Justify="Justify.Center">
-                        <MudText Typo="Typo.body2" Class="mt-4">Всякая хрень</MudText>
-                    </MudGrid>
-                </MudPaper>
-            </MudLink>
+            <SectionButton Label="Всякая хрень" Link="/stuff" Icon="@Icons.Material.Filled.RoundedCorner" />
         </MudItem>
 
         <MudItem xs="6" md="4" lg="3">
-            <MudLink Href="/converters" Underline="Underline.None">
-                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
-                    <MudGrid Justify="Justify.Center">
-                        <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Transform" />
-                    </MudGrid>
-                    <MudGrid Justify="Justify.Center">
-                        <MudText Typo="Typo.body2" Class="mt-4">Конвертеры</MudText>
-                    </MudGrid>
-                </MudPaper>
-            </MudLink>
+            <SectionButton Label="Конвертеры" Link="/converters" Icon="@Icons.Material.Filled.Transform" />
         </MudItem>
 
         <MudItem xs="6" md="4" lg="3">
-            <MudLink Href="/knowledge/about" Underline="Underline.None">
-                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
-                    <MudGrid Justify="Justify.Center">
-                        <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.MenuBook" />
-                    </MudGrid>
-                    <MudGrid Justify="Justify.Center">
-                        <MudText Typo="Typo.body2" Class="mt-4">База знаний</MudText>
-                    </MudGrid>
-                </MudPaper>
-            </MudLink>
+            <SectionButton Label="База знаний" Link="/knowledge/about" Icon="@Icons.Material.Filled.MenuBook" />
         </MudItem>
 
         @if (ExperimantalMode)
         {
         <MudItem xs="6" md="4" lg="3">
-            <MudLink Href="/timecalc" Underline="Underline.None">
-                <MudPaper Class="pa-6 flex-grow-1 flex-shrink-0">
-                    <MudGrid Justify="Justify.Center">
-                        <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Timer" />
-                    </MudGrid>
-                    <MudGrid Justify="Justify.Center">
-                        <MudText Typo="Typo.body2" Class="mt-4">Расчеты времени</MudText>
-                    </MudGrid>
-                </MudPaper>
-            </MudLink>
+            <SectionButton Label="Расчеты времени" Link="/timecalc" Icon="@Icons.Material.Filled.Timer" />
         </MudItem>
         }
         

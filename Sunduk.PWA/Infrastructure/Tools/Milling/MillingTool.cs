@@ -23,6 +23,8 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
                 _ => string.Empty,
             };
         }
+        public override MachineType MachineType { get => MachineType.Milling; }
+
 
         public MillingTool(int position, Types type, double diameter, double cuttingLength = 0, int edges = 4, double cornerRadius = 0, ToolHand hand = ToolHand.Rigth)
         {

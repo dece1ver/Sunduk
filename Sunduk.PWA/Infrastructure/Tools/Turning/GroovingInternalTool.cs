@@ -8,6 +8,8 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
         public double Diameter { get; set; }
         public override string Name => $"KANAVA";
 
+        public override MachineType MachineType { get => MachineType.Turning; }
+
         public GroovingInternalTool(
             int position,
             double diameter,
