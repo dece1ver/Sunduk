@@ -116,7 +116,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machine.GS1500 =>
                 TURNING_REFERENT_POINT +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{approachDiameter} Z{startZ.NC()} S{120.ToSpindleSpeed(threadDiameter, 100)} G97\n" +
+                $"G0 X{approachDiameter} Z{startZ.NC()} S{120.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97\n" +
                 $"G76 P0201{Thread.Profile(threadStandart)} Q{minStep} R{lastPass.NC()}\n" +
                 $"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}\n" +
                 $"G96 {CoolantOff(machine)}\n" +
@@ -125,10 +125,10 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
-                $"G0 X{approachDiameter} Z{startZ.NC()} S{120.ToSpindleSpeed(threadDiameter, 100)} G97\n" +
+                $"G0 X{approachDiameter} Z{startZ.NC()} S{120.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97\n" +
                 $"G76 P0201{Thread.Profile(threadStandart)} Q{minStep} R{lastPass.NC()}\n" +
                 $"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}\n" +
-                $"G96{CoolantOff(machine)}\n" +
+                $"G96 {CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
                 _ => string.Empty,

@@ -46,6 +46,10 @@
                                         <MudTextField @bind-Value="line.Angle" Variant="FieldsVariant" Immediate="true" Label="A" 
                                         Margin="Margin.Dense" Style="width: 90px" Converter="Util.DoubleConverter"/>
                                     </MudItem>
+                                    <MudItem>
+                                        <MudTextField @bind-Value="line.Blunt" Variant="FieldsVariant" Immediate="true" Label="@BluntLabel(line)" 
+                                        Margin="Margin.Dense" Style="width: 90px" Converter="Util.DoubleConverter"/>
+                                    </MudItem>
                                     @*<MudItem>
                                         <MudIconButton Style="margin-top: 3px; height: 40px; width: 40px" Variant="Variant.Text"/>
                                     </MudItem>*@
@@ -57,14 +61,6 @@
                                             <MudSelectItem T="ElementType" Value="ElementType.Line">Линия</MudSelectItem>
                                             <MudSelectItem T="ElementType" Value="ElementType.Arc">
                                                 Дуга
-                                                @*@if (arc.Direction is Infrastructure.Direction.CW)
-                                                {
-                                                    <MudIcon Class="mt-n1 mb-n1" Size="Size.Small" Icon="@Icons.Material.Filled.RotateRight"/>
-                                                }
-                                                @if (arc.Direction is Infrastructure.Direction.CCW)
-                                                {
-                                                    <MudIcon Class="mt-n1 mb-n1" Size="Size.Small" Icon="@Icons.Material.Filled.RotateLeft"/>
-                                                }*@
                                                 </MudSelectItem>
                                         </MudSelect>
                                     </MudItem>
@@ -93,15 +89,18 @@
                                     
                                         break;
                                 }
-                                <MudItem>
-                                    <MudIconButton Style="margin-top: 3px; height: 40px; width: 40px" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Add" OnClick="(() => Contour.Insert(Contour.IndexOf(element) + 1, new Line(null, null)))"/>
+                                <MudItem Class="d-flex justify-end flex-grow-1 gap-4">
+                                    <MudItem>
+                                        <MudIconButton Style="margin-top: 3px; height: 40px; width: 40px" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Add" OnClick="(() => Contour.Insert(Contour.IndexOf(element) + 1, new Line(null, null)))"/>
+                                    </MudItem>
+                                    @if(Contour.IndexOf(element) > 0)
+                                    {
+                                    <MudItem>
+                                        <MudIconButton Style="margin-top: 3px; height: 40px; width: 40px" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Remove" OnClick="(() => Contour.Remove(element))"/>
+                                    </MudItem>
+                                    }
                                 </MudItem>
-                                @if(Contour.IndexOf(element) > 0)
-                                {
-                                <MudItem>
-                                    <MudIconButton Style="margin-top: 3px; height: 40px; width: 40px" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Remove" OnClick="(() => Contour.Remove(element))"/>
-                                </MudItem>
-                                }
+                                
                             </MudGrid>
                             </MudFocusTrap>
                         </MudPaper>
@@ -251,8 +250,7 @@
 
     public List<Element> Contour { get; set; } = new List<Element>()
     {
-        new Point(0, 0),
-        new Line(16, 0),
+        new Point(16, 0),
         new Arc(20, -2, 2, Infrastructure.Direction.CCW),
         new Line(20, -20),
         new Line(15, -22.5),
@@ -291,4 +289,15 @@
                 return Icons.Material.Filled.ArrowDropDown;
         }
     }
+
+    string BluntLabel(Line line)
+    {
+        return line.BluntType switch
+        {
+            Blunt.Radius => "R",
+            Blunt.SimpleChamfer => "C",
+            _ => string.Empty,
+        };
+    }
+
 }

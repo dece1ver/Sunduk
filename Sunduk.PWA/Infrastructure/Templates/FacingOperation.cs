@@ -228,6 +228,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 TURNING_REFERENT_POINT +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"{blunt}X{internalDiameter.NC()}{feed}\n" +
+                $"W0.5\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
@@ -235,6 +236,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"{blunt}X{internalDiameter.NC()}{feed}\n" +
+                $"W0.5\n" +
                 $"{CoolantOff(machine)}\n" +
                 TURNING_REFERENT_POINT,
 
