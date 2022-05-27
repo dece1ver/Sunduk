@@ -1,4 +1,6 @@
-﻿<MudField Label="Контур" Variant="Variant.Filled" Margin="Margin.Dense" DisableUnderLine="true">
+﻿@inject ISnackbar Snackbar
+
+<MudField Label="Контур" Variant="Variant.Filled" Margin="Margin.Dense" DisableUnderLine="true">
     <MudGrid Spacing="1">
         <MudItem xs=12 lg=6>
             <MudList DisableGutters="true" Dense="true">
@@ -13,42 +15,46 @@
                                     case Point point:
                                     <MudItem>
                                         <MudSelect T="ElementType" Value="ElementType.Point" Variant="FieldsVariant" Immediate="true" ReadOnly="true" OpenIcon="null"
-                                        Label="Тип" Margin="Margin.Dense" Style="width: 138px">
+                                        Label="Тип" Margin="Margin.Dense" Style="width: 137px; margin-left: 2px" DisableUnderLine="!FirstFieldsUnderline">
                                             <MudSelectItem T="ElementType" Value="ElementType.Point">Старт</MudSelectItem>
                                         </MudSelect>
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="point.X" Variant="FieldsVariant" Immediate="true" Label="X" 
-                                        Margin="Margin.Dense" Style="width: 90px;" Converter="Util.NullableDoubleConverterWithZero"/>
+                                        <MudTextField @bind-Value="point.X" Variant="FieldsVariant" Immediate="true" Label="X" DisableUnderLine="!FieldsUnderline"
+                                        Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.NullableDoubleConverterWithZero"/>
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="point.Z" Variant="FieldsVariant" Immediate="true" Label="Z" 
-                                        Margin="Margin.Dense" Style="width: 90px;" Converter="Util.NullableDoubleConverterWithZero"/>
+                                        <MudTextField @bind-Value="point.Z" Variant="FieldsVariant" Immediate="true" Label="Z" DisableUnderLine="!FieldsUnderline"
+                                        Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.NullableDoubleConverterWithZero"/>
+                                    </MudItem>
+                                    <MudItem>
+                                        <MudTextField @bind-Value="point.Blunt" Variant="FieldsVariant" Immediate="true" Label="R" DisableUnderLine="!FieldsUnderline"
+                                        Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.DoubleConverter"/>
                                     </MudItem>
                                         break;
                                     case Line line:
                                     <MudItem>
                                         <MudSelect T="ElementType" Value="ElementType.Line" Variant="FieldsVariant" Immediate="true" ValueChanged="((type) => SetArc(Contour.IndexOf(line), type))"
-                                        Label="Тип" Margin="Margin.Dense" Style="width: 138px">
+                                        Label="Тип" Margin="Margin.Dense" Style="width: 137px; margin-left: 2px" DisableUnderLine="!FirstFieldsUnderline">
                                             <MudSelectItem T="ElementType" Value="ElementType.Line">Линия</MudSelectItem>
                                             <MudSelectItem T="ElementType" Value="ElementType.Arc">Дуга</MudSelectItem>
                                         </MudSelect>
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="line.X" Variant="FieldsVariant" Immediate="true" Label="X" 
-                                        Margin="Margin.Dense" Style="width: 90px" Converter="Util.NullableDoubleConverterWithZero"/>
+                                        <MudTextField @bind-Value="line.X" Variant="FieldsVariant" Immediate="true" Label="X" DisableUnderLine="!FieldsUnderline" 
+                                        Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.NullableDoubleConverterWithZero"/>
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="line.Z" Variant="FieldsVariant" Immediate="true" Label="Z" 
-                                        Margin="Margin.Dense" Style="width: 90px" Converter="Util.NullableDoubleConverterWithZero"/>
+                                        <MudTextField @bind-Value="line.Z" Variant="FieldsVariant" Immediate="true" Label="Z" DisableUnderLine="!FieldsUnderline" 
+                                        Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.NullableDoubleConverterWithZero"/>
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="line.Angle" Variant="FieldsVariant" Immediate="true" Label="A" 
-                                        Margin="Margin.Dense" Style="width: 90px" Converter="Util.DoubleConverter"/>
+                                        <MudTextField @bind-Value="line.Angle" Variant="FieldsVariant" Immediate="true" Label="A" DisableUnderLine="!FieldsUnderline" 
+                                        Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.DoubleConverter"/>
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="line.Blunt" Variant="FieldsVariant" Immediate="true" Label="@BluntLabel(line)" 
-                                        Margin="Margin.Dense" Style="width: 90px" Converter="Util.DoubleConverter"/>
+                                        <MudTextField @bind-Value="line.Blunt" Variant="FieldsVariant" Immediate="true" Label="@BluntLabel(line)" DisableUnderLine="!FieldsUnderline" 
+                                        Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.DoubleConverter"/>
                                     </MudItem>
                                     @*<MudItem>
                                         <MudIconButton Style="margin-top: 3px; height: 40px; width: 40px" Variant="Variant.Text"/>
@@ -56,47 +62,55 @@
                                         break;
                                     case Arc arc:
                                     <MudItem>
-                                        <MudSelect T="ElementType" Value="ElementType.Arc" Variant="FieldsVariant" Immediate="true" ValueChanged="((type) => SetLine(Contour.IndexOf(arc), type))"
-                                        Label="Тип" Margin="Margin.Dense" Style="width: 90px" >
-                                            <MudSelectItem T="ElementType" Value="ElementType.Line">Линия</MudSelectItem>
-                                            <MudSelectItem T="ElementType" Value="ElementType.Arc">
-                                                Дуга
-                                                </MudSelectItem>
-                                        </MudSelect>
+                                        <MudBadge Origin="Origin.CenterLeft" Icon="@Icons.Material.Filled.Error" Color="Color.Error" Overlap="true" Visible="!ValidArc(Contour.IndexOf(arc))">
+                                            <MudSelect T="ElementType" Value="ElementType.Arc" Variant="FieldsVariant" Immediate="true" ValueChanged="((type) => SetLine(Contour.IndexOf(arc), type))"
+                                            Label="Тип" Margin="Margin.Dense" Style="width: 85px; margin-left: 2px" DisableUnderLine="!FirstFieldsUnderline">
+                                                <MudSelectItem T="ElementType" Value="ElementType.Line">Линия</MudSelectItem>
+                                                <MudSelectItem T="ElementType" Value="ElementType.Arc">Дуга</MudSelectItem>
+                                            </MudSelect>
+                                        </MudBadge>
                                     </MudItem>
                                     <MudItem>
                                         @if (arc.Direction is Infrastructure.Direction.CW)
                                         {
-                                            <MudIconButton Style="margin-top: 3px; height: 40px; width: 40px" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.RotateRight" OnClick="(() => arc.Direction = Infrastructure.Direction.CCW)"/>
+                                            <MudIconButton Style="@($"margin-top: 3px; height: {ButtonSize}px; width: {ButtonSize}px; margin-left: -4px")" Variant="ButtonsVariant" DisableElevation="true"
+                                            Icon="@Icons.Material.Filled.RotateRight" OnClick="(() => arc.Direction = Infrastructure.Direction.CCW)"/>
                                         }
                                         @if (arc.Direction is Infrastructure.Direction.CCW)
                                         {
-                                            <MudIconButton Style="margin-top: 3px; height: 40px; width: 40px" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.RotateLeft" OnClick="(() => arc.Direction = Infrastructure.Direction.CW)"/>
+                                            <MudIconButton Style="@($"margin-top: 3px; height: {ButtonSize}px; width: {ButtonSize}px; margin-left: -4px")" Variant="ButtonsVariant" DisableElevation="true"
+                                            Icon="@Icons.Material.Filled.RotateLeft" OnClick="(() => arc.Direction = Infrastructure.Direction.CW)"/>
                                         }
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="arc.X" Variant="FieldsVariant" Immediate="true" Label="X" 
-                                        Margin="Margin.Dense" Style="width: 90px" Converter="Util.NullableDoubleConverterWithZero"/>
+                                        <MudTextField @bind-Value="arc.X" Variant="FieldsVariant" Immediate="true" Label="X" DisableUnderLine="!FieldsUnderline"
+                                        Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.NullableDoubleConverterWithZero"/>
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="arc.Z" Variant="FieldsVariant" Immediate="true" Label="Z" 
-                                        Margin="Margin.Dense" Style="width: 90px" Converter="Util.NullableDoubleConverterWithZero"/>
+                                        <MudTextField @bind-Value="arc.Z" Variant="FieldsVariant" Immediate="true" Label="Z" DisableUnderLine="!FieldsUnderline"
+                                        Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.NullableDoubleConverterWithZero"/>
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="arc.Radius" Variant="FieldsVariant" Immediate="true" Label="R" 
-                                        Margin="Margin.Dense" Style="width: 90px" Converter="Util.DoubleConverter"/>
+                                        <MudTextField @bind-Value="arc.Radius" Variant="FieldsVariant" Immediate="true" Label="R" DisableUnderLine="!FieldsUnderline"
+                                        Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.DoubleConverter"/>
                                     </MudItem>
                                     
                                         break;
                                 }
                                 <MudItem Class="d-flex justify-end flex-grow-1 gap-4">
                                     <MudItem>
-                                        <MudIconButton Style="margin-top: 3px; height: 40px; width: 40px" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Add" OnClick="(() => Contour.Insert(Contour.IndexOf(element) + 1, new Line(null, null)))"/>
+                                        <MudIconButton Style="@($"margin-top: 3px; margin-left: 4px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true" 
+                                        Icon="@Icons.Material.Filled.Calculate" OnClick="(() => CalculateElement(Contour.IndexOf(element)))"/>
+                                    </MudItem>
+                                    <MudItem>
+                                        <MudIconButton Style="@($"margin-top: 3px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true" 
+                                        Icon="@Icons.Material.Filled.Add" OnClick="(() => Contour.Insert(Contour.IndexOf(element) + 1, new Line(null, null)))"/>
                                     </MudItem>
                                     @if(Contour.IndexOf(element) > 0)
                                     {
                                     <MudItem>
-                                        <MudIconButton Style="margin-top: 3px; height: 40px; width: 40px" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Remove" OnClick="(() => Contour.Remove(element))"/>
+                                        <MudIconButton Style="@($"margin-top: 3px; margin-left: 4px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true" 
+                                        Icon="@Icons.Material.Filled.Remove" OnClick="(() => Contour.Remove(element))"/>
                                     </MudItem>
                                     }
                                 </MudItem>
@@ -115,9 +129,9 @@
                         </MudGrid>
                     </MudListItem>
                 </MudPaper>*@
-                @*<MudText>
+                <MudText>
                     @Path
-                </MudText>*@
+                </MudText>
                 @*<MudText>
                     @($"MaxX{MaxHeight} MaxZ{MaxLength}")
                 </MudText>
@@ -132,7 +146,7 @@
         <MudItem xs=12 lg=6>
             <MudPaper Outlined="true" Class="mt-1">
                 <center>
-                    <svg height="@FieldHeight" width="400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="@($"{0} {0} {ContourWidth} {ContourHeigh}")">
+                    <svg height="@FieldHeight" width="600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="@($"{0} {0} {ContourWidth} {ContourHeigh}")">
                         <defs>
                             <g height="@(ContourHeigh)" width="@(ContourWidth)" id="contour">
                                 <path stroke="#FF5722" stroke-width="2" fill="none"
@@ -162,7 +176,12 @@
 
 @code {
 
-    public Variant FieldsVariant { get; set; } = Variant.Outlined;
+    public Variant FieldsVariant { get => Variant.Filled; }
+    public Variant ButtonsVariant { get => Variant.Filled; }
+    public bool FieldsUnderline { get => false; }
+    public bool FirstFieldsUnderline { get => false; }
+    public int ButtonSize { get => 48 ; }
+    public int FieldsWidth { get => 87 ; }
 
     public int ElementIndex { get; set; }
 
@@ -223,8 +242,8 @@
 
     public double FieldHeight { get
         {
-            if (Contour.Count < 6) return 282;
-            return Contour.Count * 47;
+            if (Contour.Count < 6) return 330;
+            return Contour.Count * 55;
         } }
 
     public string Path { get
@@ -235,13 +254,28 @@
                 switch (element)
                 {
                     case Point point:
-                        path += $"M {(point.Z*4).ToString().Replace(",",".")},{(-point.X/2*4).ToString().Replace(",",".")} ";
+                        if (point.Blunt > 0 && Contour.Count > Contour.IndexOf(point) + 1)
+                        {
+                            path += $"M {(point.Z*4).ToString().Replace(",",".")},{(-point.X/2*4).ToString().Replace(",",".")} ";
+                            path += $"A{(point.Blunt*4).ToString().Replace(",",".")},{(point.Blunt*4).ToString().Replace(",",".")},0,0{(point.Z > (Contour[Contour.IndexOf(point) + 1].Z) ? 0 : 1)},{(point.Z > (Contour[Contour.IndexOf(point) + 1].Z) ? -point.Blunt*4 : point.Blunt*4).ToString().Replace(",",".")},{(-Contour[Contour.IndexOf(point) + 1].X/2*4).ToString().Replace(",",".")} ";
+                        }
+                        else
+                        {
+                            path += $"M {(point.Z*4).ToString().Replace(",",".")},{(-point.X/2*4).ToString().Replace(",",".")} ";
+                        }
                         break;
                     case Line line:
                         path += $"L {(line.Z*4).ToString().Replace(",",".")},{(-line.X/2*4).ToString().Replace(",",".")} ";
                         break;
                     case Arc arc:
-                        path += $"A{(arc.Radius*4).ToString().Replace(",",".")},{(arc.Radius*4).ToString().Replace(",",".")},0,0{(arc.Direction is Infrastructure.Direction.CCW ? 0 : 1)},{(arc.Z*4).ToString().Replace(",",".")},{(-arc.X/2*4).ToString().Replace(",",".")} ";
+                        if (ValidArc(Contour.IndexOf(arc)))
+                        {
+                            path += $"A{(arc.Radius*4).ToString().Replace(",",".")},{(arc.Radius*4).ToString().Replace(",",".")},0,0{(arc.Direction is Infrastructure.Direction.CCW ? 0 : 1)},{(arc.Z*4).ToString().Replace(",",".")},{(-arc.X/2*4).ToString().Replace(",",".")} ";
+                        }
+                        else
+                        {
+                            path += $"L {(arc.Z*4).ToString().Replace(",",".")},{(-arc.X/2*4).ToString().Replace(",",".")} ";
+                        }
                         break;
                 }
             }
@@ -250,22 +284,14 @@
 
     public List<Element> Contour { get; set; } = new List<Element>()
     {
-        new Point(16, 0),
-        new Arc(20, -2, 2, Infrastructure.Direction.CCW),
-        new Line(20, -20),
-        new Line(15, -22.5),
-        new Line(15, -25),
-        new Arc(25, -30, 5, Infrastructure.Direction.CW),
-        new Line(40, -30),
-        new Arc(42, -31, 1, Infrastructure.Direction.CCW),
-        new Line(42, -40),
+        new Point(null, null)
     };
 
     private void SetArc(int index, ElementType type)
     {
         if (type is ElementType.Arc)
         {
-            Contour[index] = new Arc(null, null, 0, Sunduk.PWA.Infrastructure.Direction.CCW);
+            Contour[index] = new Arc(Contour[index].X, Contour[index].Z, (Contour[index] as Line).Blunt, Sunduk.PWA.Infrastructure.Direction.CCW);
         }
     }
 
@@ -273,7 +299,7 @@
     {
         if (type is ElementType.Line)
         {
-            Contour[index] = new Line(null, null);
+            Contour[index] = new Line(Contour[index].X, Contour[index].Z, 0, (Contour[index] as Arc).Radius);
         }
     }
 
@@ -298,6 +324,48 @@
             Blunt.SimpleChamfer => "C",
             _ => string.Empty,
         };
+    }
+
+    bool ValidArc(int index)
+    {
+        var radius = (Contour[index] as Arc).Radius;
+        if (radius <= 0) return false; 
+        var xDifference = (Contour[index].X - Contour[index - 1].X) / 2;
+        var zDifference = Contour[index].Z - Contour[index - 1].Z;
+        var length = Math.Sqrt(Math.Pow(xDifference ?? 0, 2) + Math.Pow(zDifference ?? 0, 2));
+        if (radius * 2 < length) return false;
+        return true;
+    }
+
+    void CalculateElement(int index)
+    {
+        var element = Contour[index];
+        if (Contour.Count > index + 1)
+        {
+            switch (element)
+            {
+                case Point point:
+                    if (point.Blunt >= 0 &&
+                        point.X is null &&
+                        Contour[index + 1] is Line nextLineX &&
+                        nextLineX.X != null)
+                    {
+                        point.X = nextLineX.X - point.Blunt * 2;
+                    }
+                    if (point.Blunt >= 0 &&
+                        point.Z is null &&
+                        Contour[index + 1] is Line nextLineZ &&
+                        nextLineZ.Z != null)
+                    {
+                        point.Z = 0;
+                    }
+                    return;
+            }
+        }
+        else
+        {
+            Snackbar.Add("Нечего считать");
+        }
     }
 
 }
