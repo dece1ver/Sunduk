@@ -39,9 +39,8 @@ namespace Sunduk.PWA.Infrastructure.Tools.Base
         }
         public double Diameter { get; set; }
         public double Angle { get; set; }
-        public override string Name
-        {
-            get => Type switch
+        public override string Name =>
+            Type switch
             {
                 Types.Insert => "SV KORP",
                 Types.Solid => "SV TV",
@@ -50,7 +49,6 @@ namespace Sunduk.PWA.Infrastructure.Tools.Base
                 Types.Rapid => "SV HSS",
                 _ => string.Empty,
             };
-        }
 
         public DrillingTool(int position, Types type, double diameter, double angle, ToolHand hand = ToolHand.Rigth)
         {

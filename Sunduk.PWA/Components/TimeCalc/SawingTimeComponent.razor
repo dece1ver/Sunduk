@@ -178,22 +178,22 @@
     public TimeValue TimeModifier { get; set; } = TimeValue.Minute;
 
     public string _WorkpieceExternalDiameter { get; set; } = string.Empty;
-    public double WorkpieceExternalDiameter { get => Util.GetDouble(_WorkpieceExternalDiameter); }
+    public double WorkpieceExternalDiameter => Util.GetDouble(_WorkpieceExternalDiameter);
 
     public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
-    public double WorkpieceInternalDiameter { get => Util.GetDouble(_WorkpieceInternalDiameter); }
+    public double WorkpieceInternalDiameter => Util.GetDouble(_WorkpieceInternalDiameter);
 
     public string _WorkpieceWidth { get; set; } = string.Empty;
-    public double WorkpieceWidth { get => Util.GetDouble(_WorkpieceWidth); }
+    public double WorkpieceWidth => Util.GetDouble(_WorkpieceWidth);
 
     public string _WorkpieceHeight { get; set; } = string.Empty;
-    public double WorkpieceHeight { get => Util.GetDouble(_WorkpieceHeight); }
+    public double WorkpieceHeight => Util.GetDouble(_WorkpieceHeight);
 
     public string _WorkpieceLength { get; set; } = string.Empty;
-    public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
+    public double WorkpieceLength => Util.GetDouble(_WorkpieceLength);
 
     public string _PartsCount { get; set; } = string.Empty;
-    public double PartsCount { get => Util.GetDouble(_PartsCount, 1); }
+    public double PartsCount => Util.GetDouble(_PartsCount, 1);
 
     #region Заготовка
     public bool ValidWorkpiece

@@ -733,8 +733,7 @@
     [Parameter]
     public MachineType MachineType { get; set; }
 
-    public int Tabs { get => MachineType == MachineType.Turning ? 9 : 2; }
-
+    public int Tabs => MachineType == MachineType.Turning ? 9 : 2;
 
     #region Список сверел (фрезерный)
     public List<MillingDrillingTool> MillingDrillingTools

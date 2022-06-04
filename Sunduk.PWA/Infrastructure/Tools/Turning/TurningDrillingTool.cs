@@ -4,7 +4,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
 {
     public class TurningDrillingTool : DrillingTool 
     {
-        public override MachineType MachineType { get => MachineType.Turning; }
+        public override MachineType MachineType => MachineType.Turning;
 
         public TurningDrillingTool(int position, Types type, double diameter, double angle, ToolHand hand = ToolHand.Rigth)
             : base(position, type, diameter, angle, hand)

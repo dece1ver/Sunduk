@@ -830,45 +830,46 @@
     private CuttingType ThreadType { get; set; }
 
     private string _ThreadDiameter { get; set; }
-    private double ThreadDiameter { get => Util.GetDouble(_ThreadDiameter, numberOption: Util.GetNumberOption.Any); }
+    private double ThreadDiameter => Util.GetDouble(_ThreadDiameter, numberOption: Util.GetNumberOption.Any);
 
     private string _ThreadPitch { get; set; }
-    private double ThreadPitch { get => Util.GetDouble(_ThreadPitch, numberOption: Util.GetNumberOption.Any); }
+    private double ThreadPitch => Util.GetDouble(_ThreadPitch, numberOption: Util.GetNumberOption.Any);
 
     private string _ThreadStart { get; set; }
-    private double ThreadStart { get => Util.GetDouble(_ThreadStart, numberOption: Util.GetNumberOption.Any); }
+    private double ThreadStart => Util.GetDouble(_ThreadStart, numberOption: Util.GetNumberOption.Any);
 
     private string _ThreadEnd { get; set; } = "-";
-    private double ThreadEnd { get => Util.GetDouble(_ThreadEnd, numberOption: Util.GetNumberOption.Any) - Math.Round(ThreadPitch, 1); }
+    private double ThreadEnd => Util.GetDouble(_ThreadEnd, numberOption: Util.GetNumberOption.Any) - Math.Round(ThreadPitch, 1);
 
     private double ThreadNPTPlane { get; set; }
     #endregion
 
     #region Резьбонарезание
     private string _TapCutSpeed { get; set; }
-    private double TapCutSpeed { get => Util.GetDouble(_TapCutSpeed, numberOption: Util.GetNumberOption.Any); }
+    private double TapCutSpeed => Util.GetDouble(_TapCutSpeed, numberOption: Util.GetNumberOption.Any);
 
     private string _TapStart { get; set; }
-    private double TapStart { get => Util.GetDouble(_TapStart, numberOption: Util.GetNumberOption.Any); }
+    private double TapStart => Util.GetDouble(_TapStart, numberOption: Util.GetNumberOption.Any);
 
     private string _TapEnd { get; set; } = "-";
-    private double TapEnd { get => Util.GetDouble(_TapEnd, numberOption: Util.GetNumberOption.Any); }
+    private double TapEnd => Util.GetDouble(_TapEnd, numberOption: Util.GetNumberOption.Any);
+
     #endregion
 
     #region Торцовка
     bool _caclFacingChamferDiameter = true;
-    int _MediumBluntFieldSize { get => TurningSequence == TurningSequences.FinishFacing ? 4 : 6; }
+    int _MediumBluntFieldSize => TurningSequence == TurningSequences.FinishFacing ? 4 : 6;
 
-    private double FacingExternalDiameter { get => WorkpieceExternalDiameter; }
+    private double FacingExternalDiameter => WorkpieceExternalDiameter;
 
     private string _FacingStepOver { get; set; } = "1";
-    private double FacingStepOver { get => Util.GetDouble(_FacingStepOver); }
+    private double FacingStepOver => Util.GetDouble(_FacingStepOver);
 
     private string _FacingRoughStockAllow { get; set; } = "2";
-    private double FacingRoughStockAllow { get => Util.GetDouble(_FacingRoughStockAllow); }
+    private double FacingRoughStockAllow => Util.GetDouble(_FacingRoughStockAllow);
 
     private string _FacingProfStockAllow { get; set; } = "0.2";
-    private double FacingProfStockAllow { get => Util.GetDouble(_FacingProfStockAllow); }
+    private double FacingProfStockAllow => Util.GetDouble(_FacingProfStockAllow);
 
     private string _facingCornerBlunt;
     private string _FacingCornerBlunt
@@ -883,7 +884,7 @@
             }
         }
     }
-    private double FacingCornerBlunt { get => Util.GetDouble(_FacingCornerBlunt); }
+    private double FacingCornerBlunt => Util.GetDouble(_FacingCornerBlunt);
 
     private Blunt FacingBluntType { get; set; }
 
@@ -904,10 +905,10 @@
             }
         }
     }
-    private double FacingCustomChamferAngle { get => Util.GetDouble(_FacingCustomChamferAngle); }
+    private double FacingCustomChamferAngle => Util.GetDouble(_FacingCustomChamferAngle);
 
     private string _FacingCustomChamferBlunt { get; set; }
-    private double FacingCustomChamferBlunt { get => Util.GetDouble(_FacingCustomChamferBlunt); }
+    private double FacingCustomChamferBlunt => Util.GetDouble(_FacingCustomChamferBlunt);
 
     private string _facingCustumChamferDiameter;
     private string _FacingCustomChamferDiameter
@@ -923,23 +924,23 @@
             }
         }
     }
-    private double FacingCustomChamferDiameter { get => Util.GetDouble(_FacingCustomChamferDiameter); }
+    private double FacingCustomChamferDiameter => Util.GetDouble(_FacingCustomChamferDiameter);
 
     #endregion
 
     #region Сверловка
 
     private string _DrillStart { get; set; } = "2";
-    private double DrillStart { get => Util.GetDouble(_DrillStart, numberOption: Util.GetNumberOption.Any); }
+    private double DrillStart => Util.GetDouble(_DrillStart, numberOption: Util.GetNumberOption.Any);
 
     private string _DrillEnd { get; set; } = "-";
-    private double DrillEnd { get => Util.GetDouble(_DrillEnd, numberOption: Util.GetNumberOption.Any); }
+    private double DrillEnd => Util.GetDouble(_DrillEnd, numberOption: Util.GetNumberOption.Any);
 
     private string _PeckingDepth { get; set; } = "0.25";
-    private double PeckingDepth { get => Util.GetDouble(_PeckingDepth); }
+    private double PeckingDepth => Util.GetDouble(_PeckingDepth);
 
     private string _PeckingDeepDepth { get; set; } = "2";
-    private double PeckingDeepDepth { get => Util.GetDouble(_PeckingDeepDepth); }
+    private double PeckingDeepDepth => Util.GetDouble(_PeckingDeepDepth);
 
     private List<Hole> Holes { get; set; } = new();
     private int HolesCount { get; set; } = 1;
@@ -956,16 +957,16 @@
 
     private bool _caclCuttingChamferDiameter = true;
     private string _CuttingExternalDiameter { get; set; }
-    private double CuttingExternalDiameter { get => Util.GetDouble(_CuttingExternalDiameter); }
+    private double CuttingExternalDiameter => Util.GetDouble(_CuttingExternalDiameter);
 
     private string _CuttingInternalDiameter { get; set; }
-    private double CuttingInternalDiameter { get => Util.GetDouble(_CuttingInternalDiameter); }
+    private double CuttingInternalDiameter => Util.GetDouble(_CuttingInternalDiameter);
 
     private string _CuttingStepOver { get; set; }
-    private double CuttingStepOver { get => Util.GetDouble(_CuttingStepOver); }
+    private double CuttingStepOver => Util.GetDouble(_CuttingStepOver);
 
     private string _CuttingPoint { get; set; } = "-";
-    private double CuttingPoint { get => Util.GetDouble(_CuttingPoint, numberOption: Util.GetNumberOption.Any); }
+    private double CuttingPoint => Util.GetDouble(_CuttingPoint, numberOption: Util.GetNumberOption.Any);
 
     private string _cuttingCornerBlunt;
     private string _CuttingCornerBlunt
@@ -980,7 +981,7 @@
             }
         }
     }
-    private double CuttingCornerBlunt { get => Util.GetDouble(_CuttingCornerBlunt); }
+    private double CuttingCornerBlunt => Util.GetDouble(_CuttingCornerBlunt);
 
     private Blunt CuttingBluntType { get; set; } = Blunt.SimpleChamfer;
 
@@ -1001,10 +1002,10 @@
             }
         }
     }
-    private double CuttingCustomChamferAngle { get => Util.GetDouble(_CuttingCustomChamferAngle); }
+    private double CuttingCustomChamferAngle => Util.GetDouble(_CuttingCustomChamferAngle);
 
     private string _CuttingCustomChamferBlunt { get; set; }
-    private double CuttingCustomChamferBlunt { get => Util.GetDouble(_CuttingCustomChamferBlunt); }
+    private double CuttingCustomChamferBlunt => Util.GetDouble(_CuttingCustomChamferBlunt);
 
     private string _cuttingCustumChamferDiameter;
     private string _CuttingCustomChamferDiameter {
@@ -1018,40 +1019,38 @@
             }
         }
     }
-    private double CuttingCustomChamferDiameter { get => Util.GetDouble(_CuttingCustomChamferDiameter); }
-
-
+    private double CuttingCustomChamferDiameter => Util.GetDouble(_CuttingCustomChamferDiameter);
 
     #endregion
 
     #region Канавки
 
     private string _GroovingExternalDiameter { get; set; }
-    private double GroovingExternalDiameter { get => Util.GetDouble(_GroovingExternalDiameter); }
+    private double GroovingExternalDiameter => Util.GetDouble(_GroovingExternalDiameter);
 
     private string _GroovingInternalDiameter { get; set; }
-    private double GroovingInternalDiameter { get => Util.GetDouble(_GroovingInternalDiameter); }
+    private double GroovingInternalDiameter => Util.GetDouble(_GroovingInternalDiameter);
 
     private string _GroovingStepOver { get; set; }
-    private double GroovingStepOver { get => Util.GetDouble(_GroovingStepOver); }
+    private double GroovingStepOver => Util.GetDouble(_GroovingStepOver);
 
     private string _GroovingWidth { get; set; }
-    private double GroovingWidth { get => Util.GetDouble(_GroovingWidth); }
+    private double GroovingWidth => Util.GetDouble(_GroovingWidth);
 
     private string _GroovingStartPoint { get; set; }
-    private double GroovingStartPoint { get => Util.GetDouble(_GroovingStartPoint); }
+    private double GroovingStartPoint => Util.GetDouble(_GroovingStartPoint);
 
     private string _GroovingCuttingPoint { get; set; } = "-";
-    private double GroovingCuttingPoint { get => Util.GetDouble(_GroovingCuttingPoint, numberOption: Util.GetNumberOption.Any); }
+    private double GroovingCuttingPoint => Util.GetDouble(_GroovingCuttingPoint, numberOption: Util.GetNumberOption.Any);
 
     private string _GroovingProfStockAllow { get; set; }
-    private double GroovingProfStockAllow { get => Util.GetDouble(_GroovingProfStockAllow); }
+    private double GroovingProfStockAllow => Util.GetDouble(_GroovingProfStockAllow);
 
     private string _OuterGroovingCornerBlunt { get; set; }
-    private double OuterGroovingCornerBlunt { get => Util.GetDouble(_OuterGroovingCornerBlunt); }
+    private double OuterGroovingCornerBlunt => Util.GetDouble(_OuterGroovingCornerBlunt);
 
     private string _InnerGroovingCornerBlunt { get; set; }
-    private double InnerGroovingCornerBlunt { get => Util.GetDouble(_InnerGroovingCornerBlunt); }
+    private double InnerGroovingCornerBlunt => Util.GetDouble(_InnerGroovingCornerBlunt);
 
     private Blunt OuterGroovingBluntType { get; set; }
     private Blunt InnerGroovingBluntType { get; set; }

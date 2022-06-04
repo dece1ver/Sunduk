@@ -7,18 +7,16 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
     {
         public enum Types { Grooving, Cutting, Blade }
         public Types Type { get; set; }
-        public override string Name
-        {
-            get => Type switch
+        public override string Name =>
+            Type switch
             {
                 Types.Grooving => "KANAVA",
                 Types.Cutting => "OTR",
                 Types.Blade => "LEZVIE",
                 _ => string.Empty,
             };
-        }
 
-        public override MachineType MachineType { get => MachineType.Turning; } 
+        public override MachineType MachineType => MachineType.Turning;
 
         public GroovingExternalTool(
             int position, 

@@ -54,7 +54,7 @@
 
     public string DiameterString
     {
-        get { return diameterString; }
+        get => diameterString;
         set
         {
             diameterString = value;
@@ -72,7 +72,8 @@
         }
     }
 
-    public double Diameter { get => Util.GetDouble(DiameterString, 0); }
+    public double Diameter => Util.GetDouble(DiameterString, 0);
+
     #endregion
 
     #region Скрость резания
@@ -80,7 +81,7 @@
 
     public string CutSpeedString
     {
-        get { return cutSpeedstring; }
+        get => cutSpeedstring;
         set
         {
             cutSpeedstring = value;
@@ -99,7 +100,8 @@
         }
     }
 
-    public double CutSpeed { get => Util.GetDouble(CutSpeedString, 0); }
+    public double CutSpeed => Util.GetDouble(CutSpeedString, 0);
+
     #endregion
 
     #region Обороты
@@ -107,7 +109,7 @@
 
     public string SpindleSpeedString
     {
-        get { return spingleSpeedString; }
+        get => spingleSpeedString;
         set
         {
             spingleSpeedString = value;
@@ -129,7 +131,8 @@
         }
     }
 
-    public double SpindleSpeed { get => Util.GetDouble(SpindleSpeedString, 0); }
+    public double SpindleSpeed => Util.GetDouble(SpindleSpeedString, 0);
+
     #endregion
 
     #region Зубья
@@ -137,7 +140,7 @@
 
     public string EdgesString
     {
-        get { return egdesString; }
+        get => egdesString;
         set
         {
             egdesString = value;
@@ -152,17 +155,18 @@
         }
     }
 
-    public int Edges { get => Util.GetInt(EdgesString, 1); }
+    public int Edges => Util.GetInt(EdgesString, 1);
+
     #endregion
 
-    public string FeedUnits { get => Edges > 1 ? "мм/зуб" : "мм/об"; }
+    public string FeedUnits => Edges > 1 ? "мм/зуб" : "мм/об";
 
     #region Подача
     private string feedString = String.Empty;
 
     public string FeedString
     {
-        get { return feedString; }
+        get => feedString;
         set
         {
             feedString = value;
@@ -172,7 +176,8 @@
             }
         }
     }
-    public double Feed { get => Util.GetDouble(FeedString); }
+    public double Feed => Util.GetDouble(FeedString);
+
     #endregion
 
     #region Минутная подача
@@ -180,7 +185,7 @@
 
     public string MinFeedString
     {
-        get { return minFeedString; }
+        get => minFeedString;
         set
         {
             minFeedString = value;
@@ -191,7 +196,7 @@
         }
     }
 
-    public double MinFeed { get => Util.GetDouble(MinFeedString); }
+    public double MinFeed => Util.GetDouble(MinFeedString);
 
     #endregion
 

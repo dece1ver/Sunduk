@@ -19,8 +19,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public const double SAFE_APPROACH_DISTANCE = 2;
         public const string TURNING_REFERENT_POINT = "G30 U0 W0\n";
         public const string TURNING_REFERENT_POINT_CONSISTENTLY = "G30 U0\nG30 W0\n";
-        public const string MILLING_REFERENT_POINT = "/G91 G30 Z0\n" +
-            "/G91 G53 X-800 Y0\n" +
+        public const string MILLING_REFERENT_POINT = 
+            "/G90 G30 Z0\n" +
+            "/G90 G53 X-800 Y0\n" +
             "M1\n";
         public const string MILLING_SAFETY_STRING = "G90 G17 G54\n";
         public const string GOODWAY_RETURN_B = "G55 G30 B0\n";
@@ -310,7 +311,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Строка безопасности
         /// </summary>
-        public static string SafetyString(Machine machine, int? speedLimit) => machine switch
+        public static string SafetyString(Machine machine, int? speedLimit, CoordinateSystem cs) => machine switch
         {
             Machine.GS1500 =>
             TURNING_REFERENT_POINT_CONSISTENTLY +
@@ -321,7 +322,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
             Machine.L230A =>
             TURNING_REFERENT_POINT_CONSISTENTLY +
-            "G40 G80 G55\n" +
+            $"G40 G80 {cs}\n" +
             $"G50 S{((speedLimit ?? 0) > 5000 ? 5000 : speedLimit ?? 3000)}\n" +
             "G96 G23\n",
 

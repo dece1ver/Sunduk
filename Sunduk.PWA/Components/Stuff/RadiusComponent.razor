@@ -200,13 +200,13 @@
     public Radius RadiusType { get; set; } = Radius.External;
 
     public string _RadiusDiameter { get; set; } = string.Empty;
-    public double RadiusDiameter { get => Util.GetDouble(_RadiusDiameter); }
+    public double RadiusDiameter => Util.GetDouble(_RadiusDiameter);
 
     public string _RadiusSize { get; set; } = string.Empty;
-    public double RadiusSize { get => Util.GetDouble(_RadiusSize); }
+    public double RadiusSize => Util.GetDouble(_RadiusSize);
 
     public string _InsertRadius { get; set; } = string.Empty;
-    public double InsertRadius { get => Util.GetDouble(_InsertRadius); }
+    public double InsertRadius => Util.GetDouble(_InsertRadius);
 
     public double RadiusStartDiameter
     {
@@ -220,9 +220,9 @@
         }
     }
 
-    public double RadiusDepth { get => RadiusSize + InsertRadius; }
+    public double RadiusDepth => RadiusSize + InsertRadius;
 
-    public int ExampleLines { get => RadiusExample.Count(f => f == '\n') + 1; }
+    public int ExampleLines => RadiusExample.Count(f => f == '\n') + 1;
 
 
     //private void SetInternalType()

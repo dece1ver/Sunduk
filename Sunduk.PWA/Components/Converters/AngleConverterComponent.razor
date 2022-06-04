@@ -52,7 +52,7 @@
 
     public string DecimalAngleString
     {
-        get { return decimalAngleString; }
+        get => decimalAngleString;
         set
         {
             decimalAngleString = value;
@@ -68,13 +68,13 @@
         }
     }
 
-    public double DecimalAngle { get => Util.GetDouble(DecimalAngleString); }
+    public double DecimalAngle => Util.GetDouble(DecimalAngleString);
 
     private string radiansAngleString;
 
     public string RadiansAngleString
     {
-        get { return radiansAngleString; }
+        get => radiansAngleString;
         set
         {
             radiansAngleString = value;
@@ -93,13 +93,13 @@
         }
     }
 
-    public double RadiansAngle { get => Util.GetDouble(RadiansAngleString); }
+    public double RadiansAngle => Util.GetDouble(RadiansAngleString);
 
     private string intAngleString;
 
     public string IntAngleString
     {
-        get { return intAngleString; }
+        get => intAngleString;
         set
         {
             intAngleString = value;
@@ -110,13 +110,13 @@
         }
     }
 
-    public double IntAngle { get => Util.GetDouble(IntAngleString); }
+    public double IntAngle => Util.GetDouble(IntAngleString);
 
     private string minAngleString;
 
     public string MinAngleString
     {
-        get { return minAngleString; }
+        get => minAngleString;
         set
         {
             minAngleString = value;
@@ -126,13 +126,13 @@
             }
         }
     }
-    public double MinAngle { get => Util.GetDouble(MinAngleString); }
+    public double MinAngle => Util.GetDouble(MinAngleString);
 
     private string secAngleString;
 
     public string SecAngleString
     {
-        get { return secAngleString; }
+        get => secAngleString;
         set
         {
             secAngleString = value;
@@ -143,7 +143,7 @@
         }
     }
 
-    public double SecAngle { get => Util.GetDouble(SecAngleString); }
+    public double SecAngle => Util.GetDouble(SecAngleString);
 
     bool ValidAngle() => (MinAngle >= 0 && MinAngle < 60 && SecAngle >= 0 && SecAngle < 60) ? true : false;
 }

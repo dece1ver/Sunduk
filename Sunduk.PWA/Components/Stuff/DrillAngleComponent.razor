@@ -65,11 +65,11 @@
     public Images CurrentImage { get; set; } = Images.Drill;
 
     public string _DrillDiameter { get; set; }
-    public double DrillDiameter { get => Util.GetDouble(_DrillDiameter); }
+    public double DrillDiameter => Util.GetDouble(_DrillDiameter);
 
     public string _DrillAngle { get; set; }
-    public double DrillAngle { get => Util.GetDouble(_DrillAngle); }
+    public double DrillAngle => Util.GetDouble(_DrillAngle);
 
-    public string ResultMessage { get => $"Длина конуса {((DrillDiameter / 2) * Math.Tan((90 - DrillAngle / 2).Radians())).ToPrettyString()} мм"; }
+    public string ResultMessage => $"Длина конуса {((DrillDiameter / 2) * Math.Tan((90 - DrillAngle / 2).Radians())).ToPrettyString()} мм";
 
 }

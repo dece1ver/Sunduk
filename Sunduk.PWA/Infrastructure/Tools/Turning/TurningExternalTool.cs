@@ -11,7 +11,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
         public double Angle { get; set; }
         public override string Name => Type == Types.Face ? "TORC" : "PROHOD";
 
-        public override MachineType MachineType { get => MachineType.Turning; }
+        public override MachineType MachineType => MachineType.Turning;
 
         public TurningExternalTool(int position, Types type, double angle, double radius, ToolHand hand = ToolHand.Rigth)
         {

@@ -6,7 +6,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
     public class FinishTurningSequence : TurningSequence
     {
-        public override string Operation { get => string.Empty; }
+        public override string Operation => string.Empty;
 
         public FinishTurningSequence(Machine machine, Material material, List<Element> contour, double stepOver, double roughStockAllow, double profStockAllow)
             : base(machine, material, contour, stepOver, roughStockAllow, profStockAllow)

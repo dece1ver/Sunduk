@@ -180,10 +180,10 @@
 
 
     public string ThreadDiameterString { get; set; }
-    public double ThreadDiameter { get => Util.GetDouble(ThreadDiameterString); }
+    public double ThreadDiameter => Util.GetDouble(ThreadDiameterString);
 
     public string ThreadPitchString { get; set; }
-    public double ThreadPitch { get => Util.GetDouble(ThreadPitchString); }
+    public double ThreadPitch => Util.GetDouble(ThreadPitchString);
 
     public double PlaneLength { get; set; } = 0;
     public string ThreadShift
@@ -272,11 +272,11 @@
     //}
 
 
-    public double[] Passes { get => Thread.Passes(ThreadStandart, ThreadType, ThreadPitch); }
-    public double[] TotalPasses { get => Thread.TotalPasses(ThreadStandart, ThreadType, ThreadPitch); }
+    public double[] Passes => Thread.Passes(ThreadStandart, ThreadType, ThreadPitch);
+    public double[] TotalPasses => Thread.TotalPasses(ThreadStandart, ThreadType, ThreadPitch);
 
 
-    public int SpindleSpeed { get => ((int)(120000 / (Math.PI * ThreadDiameter))); }
+    public int SpindleSpeed => ((int)(120000 / (Math.PI * ThreadDiameter)));
 
     public double? ThreadAngle
     {
