@@ -1,22 +1,19 @@
-﻿using MudBlazor;
-using Sunduk.PWA.Infrastructure;
-using Sunduk.PWA.Infrastructure.Sequences;
-using Sunduk.PWA.Infrastructure.Sequences.Base;
-using Sunduk.PWA.Infrastructure.Sequences.Milling;
-using Sunduk.PWA.Infrastructure.Sequences.Turning;
-using Sunduk.PWA.Infrastructure.Tools;
-using Sunduk.PWA.Infrastructure.Tools.Base;
-using Sunduk.PWA.Infrastructure.Tools.Milling;
-using Sunduk.PWA.Infrastructure.Tools.Turning;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
+using MudBlazor;
+using Sunduk.PWA.Infrastructure.Sequences;
+using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Sequences.Milling;
+using Sunduk.PWA.Infrastructure.Sequences.Turning;
+using Sunduk.PWA.Infrastructure.Tools.Base;
+using Sunduk.PWA.Infrastructure.Tools.Milling;
+using Sunduk.PWA.Infrastructure.Tools.Turning;
+using Sunduk.PWA.Infrastructure.Tools.Turning.Base;
 
-namespace Sunduk.PWA.Util
+namespace Sunduk.PWA.Infrastructure
 {
     public static class Util
     {
@@ -37,24 +34,14 @@ namespace Sunduk.PWA.Util
         public static double GetDouble(this string stringNumber, double defaultValue = 0, GetNumberOption numberOption = GetNumberOption.OnlyPositive)
         {
             //if (stringNumber is "-") return double.NegativeInfinity;
-            NumberFormatInfo numberFomat = new() { NumberDecimalSeparator = "," };
-            if (Double.TryParse(stringNumber, NumberStyles.Any, numberFomat, out double result))
+            NumberFormatInfo numberFormat = new() { NumberDecimalSeparator = "," };
+            if (!double.TryParse(stringNumber, NumberStyles.Any, numberFormat, out double result)) return defaultValue;
+            return numberOption switch
             {
-                if (numberOption == GetNumberOption.OnlyPositive && result >= 0)
-                {
-                    return result;
-                }
-                else if (numberOption == GetNumberOption.Any)
-                {
-                    return result;
-                }
-                else
-                {
-                    return defaultValue;
-                }
-
-            }
-            return defaultValue;
+                GetNumberOption.OnlyPositive when result >= 0 => result,
+                GetNumberOption.Any => result,
+                _ => defaultValue
+            };
         }
 
         /// <summary>
@@ -66,19 +53,16 @@ namespace Sunduk.PWA.Util
         /// <returns>Значение Int32, при неудаче возвращает значение по умолчанию</returns>
         public static int GetInt(this string stringNumber, int defaultValue = 0, GetNumberOption numberOption = GetNumberOption.OnlyPositive)
         {
-            NumberFormatInfo numberFomat = new() { NumberDecimalSeparator = "," };
-            if (Int32.TryParse(stringNumber, NumberStyles.Any, numberFomat, out int result))
+            NumberFormatInfo numberFormat = new() { NumberDecimalSeparator = "," };
+            if (!int.TryParse(stringNumber, NumberStyles.Any, numberFormat, out int result)) return defaultValue;
+            if (numberOption == GetNumberOption.OnlyPositive && result > 0)
             {
-                if (numberOption == GetNumberOption.OnlyPositive && result > 0)
-                {
-                    return result;
-                }
-                else
-                {
-                    return defaultValue;
-                }
+                return result;
             }
-            return defaultValue;
+            else
+            {
+                return defaultValue;
+            }
         }
 
         
@@ -94,10 +78,11 @@ namespace Sunduk.PWA.Util
         /// </summary>
         /// <param name="value">Число</param>
         /// <param name="precision">Точность</param>
+        /// <param name="option">Опция плавающей точки</param>
         /// <returns>Отформатированную строку</returns>
         public static string NC(this double value, int precision = 3, NcDecimalPointOption option = NcDecimalPointOption.With)
         {
-            var result = value.ToString($"F{precision}", CultureInfo.InvariantCulture).Contains('.')
+            string result = value.ToString($"F{precision}", CultureInfo.InvariantCulture).Contains('.')
                 ? value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0')
                 : value.ToString($"F{precision}");
             return option == NcDecimalPointOption.With 
@@ -109,6 +94,7 @@ namespace Sunduk.PWA.Util
         /// Транслитерация строки 
         /// </summary>
         /// <param name="value">Число</param>
+        /// <param name="option">Опция удаления символов</param>
         /// <returns>Отформатированную строку</returns>
         public static string Translate(this string value, TranslateOption option = TranslateOption.RemoveBadSymbols)
         {
@@ -152,15 +138,7 @@ namespace Sunduk.PWA.Util
                 .Replace("Э", "E")
                 .Replace("Ю", "YU")
                 .Replace("Я", "YA");
-            if (option == TranslateOption.RemoveBadSymbols)
-            {
-                foreach (char item in Path.GetInvalidPathChars().Union(Path.GetInvalidFileNameChars()))
-                {
-                    value = value.Replace(item, '-');
-                }
-            }
-
-            return value;
+            return option != TranslateOption.RemoveBadSymbols ? value : Path.GetInvalidPathChars().Union(Path.GetInvalidFileNameChars()).Aggregate(value, (current, item) => current.Replace(item, '-'));
         }
 
         public static MachineType GetMachineType(this Machine machine)
@@ -179,35 +157,33 @@ namespace Sunduk.PWA.Util
         /// </summary>
         /// <param name="operation">Заполняемая строка</param>
         /// <param name="holes">Список отверстий</param>
-        /// <param name="polar">Используется ли программирование в порялной системе координат</param>
+        /// <param name="polar">Используется ли программирование в полярной системе координат</param>
         /// <returns></returns>
         public static string AddPoints(ref string operation, List<Hole> holes, bool polar = false)
         {
-            if (holes.Count > 1 && !string.IsNullOrEmpty(operation))
+            if (holes.Count <= 1 || string.IsNullOrEmpty(operation)) return operation;
+            foreach (var hole in holes.Skip(1))
             {
-                foreach (var hole in holes.Skip(1))
+                if (polar)
                 {
-                    if (polar)
+                    while (hole.Y >= 360)
                     {
-                        while (hole.Y >= 360)
-                        {
-                            hole.Y -= 360;
-                        }
+                        hole.Y -= 360;
                     }
-                    if (hole.X != holes[holes.IndexOf(hole) - 1].X)
-                    {
-                        operation += $"X{hole.X.NC(option: NcDecimalPointOption.Without)} ";
-                    };
-                    if (hole.Y != holes[holes.IndexOf(hole) - 1].Y)
-                    {
-                        operation += $"Y{hole.Y.NC(option: NcDecimalPointOption.Without)} ";
-                    };
-                    if (hole.Y == holes[holes.IndexOf(hole) - 1].Y && hole.X == holes[holes.IndexOf(hole) - 1].X)
-                    {
-                        operation += $"X{hole.X.NC(option: NcDecimalPointOption.Without)} Y{hole.Y.NC(option: NcDecimalPointOption.Without)}";
-                    };
-                    operation += "\n";
                 }
+                if (Math.Abs(hole.X - holes[holes.IndexOf(hole) - 1].X) > 0.001)
+                {
+                    operation += $"X{hole.X.NC(option: NcDecimalPointOption.Without)} ";
+                };
+                if (Math.Abs(hole.Y - holes[holes.IndexOf(hole) - 1].Y) > 0.001)
+                {
+                    operation += $"Y{hole.Y.NC(option: NcDecimalPointOption.Without)} ";
+                };
+                if (Math.Abs(hole.Y - holes[holes.IndexOf(hole) - 1].Y) < 0.001 && Math.Abs(hole.X - holes[holes.IndexOf(hole) - 1].X) < 0.001)
+                {
+                    operation += $"X{hole.X.NC(option: NcDecimalPointOption.Without)} Y{hole.Y.NC(option: NcDecimalPointOption.Without)}";
+                };
+                operation += "\n";
             }
             return operation;
         }
@@ -219,7 +195,7 @@ namespace Sunduk.PWA.Util
         /// <returns>Отформатированную строку</returns>
         public static string ToolNumber(this int value)
         {
-            return value.ToString($"D{4}");
+            return value.ToString($"D4");
         }
 
 
@@ -233,10 +209,22 @@ namespace Sunduk.PWA.Util
         {
             return tool switch
             {
+                MillingChamferTool millingChamferTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{millingChamferTool.Position} ({millingChamferTool.Name} D{millingChamferTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
+                    ToolDescriptionOption.ToolTable => millingChamferTool.Description().Split('(')[1].TrimEnd(')'),
+                    _ => string.Empty,
+                },
                 MillingDrillingTool millingDrillingTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{millingDrillingTool.Position} ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
                     ToolDescriptionOption.ToolTable => millingDrillingTool.Description().Split('(')[1].TrimEnd(')'),
+                    _ => string.Empty,
+                },
+                MillingSpecialTool millingSpecialTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{millingSpecialTool.Position} ({millingSpecialTool.Name})",
+                    ToolDescriptionOption.ToolTable => millingSpecialTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 MillingTappingTool millingTappingTool => option switch
@@ -254,32 +242,32 @@ namespace Sunduk.PWA.Util
 
                 GroovingExternalTool groovingExternalTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{groovingExternalTool.Position.ToolNumber()} ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{groovingExternalTool.Position.ToolNumber()} ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{groovingExternalTool.Position.ToolNumber()} G54 M58 ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{groovingExternalTool.Position.ToolNumber()} G55 M58 ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == GroovingExternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
+                    ToolDescriptionOption.General => $"T{groovingExternalTool.Position.ToolNumber()} ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{groovingExternalTool.Position.ToolNumber()} ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{groovingExternalTool.Position.ToolNumber()} G54 M58 ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{groovingExternalTool.Position.ToolNumber()} G55 M58 ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
                     ToolDescriptionOption.ToolTable => groovingExternalTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 GroovingFaceTool groovingFaceTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{groovingFaceTool.Position.ToolNumber()} ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == GroovingFaceTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{groovingFaceTool.Position.ToolNumber()} ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == GroovingFaceTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{groovingFaceTool.Position.ToolNumber()} G54 M58 ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == GroovingFaceTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{groovingFaceTool.Position.ToolNumber()} G55 M58 ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == GroovingFaceTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
+                    ToolDescriptionOption.General => $"T{groovingFaceTool.Position.ToolNumber()} ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == TurningGroovingTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{groovingFaceTool.Position.ToolNumber()} ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == TurningGroovingTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{groovingFaceTool.Position.ToolNumber()} G54 M58 ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == TurningGroovingTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{groovingFaceTool.Position.ToolNumber()} G55 M58 ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == TurningGroovingTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
                     ToolDescriptionOption.ToolTable => groovingFaceTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 GroovingInternalTool groovingInternalTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{groovingInternalTool.Position.ToolNumber()} ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == GroovingInternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{groovingInternalTool.Position.ToolNumber()} ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == GroovingInternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{groovingInternalTool.Position.ToolNumber()} G54 M58 ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == GroovingInternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{groovingInternalTool.Position.ToolNumber()} G55 M58 ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == GroovingInternalTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
+                    ToolDescriptionOption.General => $"T{groovingInternalTool.Position.ToolNumber()} ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{groovingInternalTool.Position.ToolNumber()} ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{groovingInternalTool.Position.ToolNumber()} G54 M58 ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{groovingInternalTool.Position.ToolNumber()} G55 M58 ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
                     ToolDescriptionOption.ToolTable => groovingInternalTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
-                SpecialTurningTool specialTool => option switch
+                TurningSpecialTool specialTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{specialTool.Position.ToolNumber()} ({specialTool.Name})".Replace(',', '.'),
                     ToolDescriptionOption.L230 => $"T{specialTool.Position.ToolNumber()} ({specialTool.Name})".Replace(',', '.'),
@@ -306,13 +294,13 @@ namespace Sunduk.PWA.Util
                     ToolDescriptionOption.ToolTable => threadingInternalTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
-                TurningDrillingTool TurningDrillingTool => option switch
+                TurningDrillingTool turningDrillingTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{TurningDrillingTool.Position.ToolNumber()} ({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{TurningDrillingTool.Position.ToolNumber()} ({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{TurningDrillingTool.Position.ToolNumber()} G54 M58 ({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{TurningDrillingTool.Position.ToolNumber()} G55 M58 ({TurningDrillingTool.Name} D{TurningDrillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => TurningDrillingTool.Description().Split('(')[1].TrimEnd(')'),
+                    ToolDescriptionOption.General => $"T{turningDrillingTool.Position.ToolNumber()} ({turningDrillingTool.Name} D{turningDrillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{turningDrillingTool.Position.ToolNumber()} ({turningDrillingTool.Name} D{turningDrillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{turningDrillingTool.Position.ToolNumber()} G54 M58 ({turningDrillingTool.Name} D{turningDrillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{turningDrillingTool.Position.ToolNumber()} G55 M58 ({turningDrillingTool.Name} D{turningDrillingTool.Diameter})".Replace(',', '.'),
+                    ToolDescriptionOption.ToolTable => turningDrillingTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 TurningExternalTool turningExternalTool => option switch
@@ -333,13 +321,13 @@ namespace Sunduk.PWA.Util
                     ToolDescriptionOption.ToolTable => turningInternalTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
-                TurningTappingTool TurningTappingTool => option switch
+                TurningTappingTool turningTappingTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{TurningTappingTool.Position.ToolNumber()} ({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{TurningTappingTool.Position.ToolNumber()} ({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{TurningTappingTool.Position.ToolNumber()} G54 M58 ({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{TurningTappingTool.Position.ToolNumber()} G55 M58 ({TurningTappingTool.Name} M{TurningTappingTool.Diameter}x{TurningTappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => TurningTappingTool.Description().Split('(')[1].TrimEnd(')'),
+                    ToolDescriptionOption.General => $"T{turningTappingTool.Position.ToolNumber()} ({turningTappingTool.Name} M{turningTappingTool.Diameter}x{turningTappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{turningTappingTool.Position.ToolNumber()} ({turningTappingTool.Name} M{turningTappingTool.Diameter}x{turningTappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{turningTappingTool.Position.ToolNumber()} G54 M58 ({turningTappingTool.Name} M{turningTappingTool.Diameter}x{turningTappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{turningTappingTool.Position.ToolNumber()} G55 M58 ({turningTappingTool.Name} M{turningTappingTool.Diameter}x{turningTappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.ToolTable => turningTappingTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 _ => string.Empty,
@@ -375,6 +363,7 @@ namespace Sunduk.PWA.Util
         /// <summary>
         /// Получает таблицу инструмента из текста УП
         /// </summary>
+        /// <param name="machine">Станок</param>
         /// <param name="program">Программа в виде списка переходов</param>
         /// <returns></returns>
         public static string GetToolTable(Machine machine, List<Sequence> program) // переписать без регулярок, через инструмент в переходах
@@ -382,7 +371,7 @@ namespace Sunduk.PWA.Util
             List<string> tools = new();
             foreach (var seq in program.Skip(2))
             {
-                var tool = machine switch
+                string tool = machine switch
                 {
                     Machine.L230A => seq switch 
                     {
@@ -429,8 +418,7 @@ namespace Sunduk.PWA.Util
                 };
                 if (!tools.Contains(tool)) tools.Add(tool);
             }
-            if (tools.Count <= 1) return string.Empty;
-            return $"\n{string.Join("\n", tools)}\n" ;
+            return tools.Count <= 1 ? string.Empty : $"\n{string.Join("\n", tools)}\n";
         }
 
 
@@ -441,12 +429,7 @@ namespace Sunduk.PWA.Util
         /// <param name="list">Список в котором меняем</param>
         /// <param name="index1">Индекс первого элемента</param>
         /// <param name="index2">Индекс второго элемента</param>
-        public static void Swap<T>(this List<T> list, int index1, int index2)
-        {
-            var temp = list[index1];
-            list[index1] = list[index2];
-            list[index2] = temp;
-        }
+        public static void Swap<T>(this List<T> list, int index1, int index2) => (list[index1], list[index2]) = (list[index2], list[index1]);
 
         /// <summary>
         /// Конвертер Double
@@ -454,7 +437,7 @@ namespace Sunduk.PWA.Util
         public static Converter<double> DoubleConverter = new()
         {
             SetFunc = value => value.ToPrettyString(),
-            GetFunc = text => Util.GetDouble(text, 0, GetNumberOption.Any),
+            GetFunc = text => text.GetDouble(0, GetNumberOption.Any),
         };
 
         /// <summary>
@@ -463,7 +446,7 @@ namespace Sunduk.PWA.Util
         public static Converter<double?> NullableDoubleConverterWithZero = new()
         {
             SetFunc = value => value?.ToPrettyString(stringOption: PrettyStringOption.AsIs),
-            GetFunc = text => (string.IsNullOrEmpty(text) || text is "-") ? null : Util.GetDouble(text, 0, GetNumberOption.Any),
+            GetFunc = text => (string.IsNullOrEmpty(text) || text is "-") ? null : text.GetDouble(0, GetNumberOption.Any),
         };
 
         /// <summary>
@@ -472,7 +455,7 @@ namespace Sunduk.PWA.Util
         public static Converter<int> HolesConverter = new()
         {
             SetFunc = value => value.ToString(),
-            GetFunc = text => Util.GetInt(text, 1, GetNumberOption.OnlyPositive),
+            GetFunc = text => text.GetInt(1, GetNumberOption.OnlyPositive),
         };
 
         /// <summary>
@@ -485,7 +468,7 @@ namespace Sunduk.PWA.Util
         };
 
         /// <summary>
-        /// Получает номера строк для циклов УП в зависомости от количества таких переходов
+        /// Получает номера строк для циклов УП в зависимости от количества таких переходов
         /// </summary>
         /// <param name="count">Количество переходов</param>
         /// <returns></returns>

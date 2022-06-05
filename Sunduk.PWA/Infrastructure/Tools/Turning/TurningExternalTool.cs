@@ -2,7 +2,7 @@
 
 namespace Sunduk.PWA.Infrastructure.Tools.Turning
 {
-    public class TurningExternalTool : Tool
+    public sealed class TurningExternalTool : Tool
     {
         public enum Types { Face, Bar }
 
@@ -13,7 +13,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
 
         public override MachineType MachineType => MachineType.Turning;
 
-        public TurningExternalTool(int position, Types type, double angle, double radius, ToolHand hand = ToolHand.Rigth)
+        public TurningExternalTool(int position, Types type, double angle, double radius, ToolHand hand = ToolHand.Right)
         {
             Position = position;
             Type = type;

@@ -2,7 +2,7 @@
 
 namespace Sunduk.PWA.Infrastructure.Sequences.ContourElements
 {
-    public class Line : Element
+    public sealed class Line : Element
     {
         public Line(double? x, double? z, double angle = 0, double blunt = 0, Blunt bluntType = Infrastructure.Blunt.Radius)
         {

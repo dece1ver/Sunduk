@@ -23,7 +23,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
             Types type, 
             double width,
             Point zeroPoint, 
-            ToolHand hand = ToolHand.Rigth, 
+            ToolHand hand = ToolHand.Right, 
             double cornerRadius = 0.2) 
             : base (position, width, zeroPoint, hand, cornerRadius)
         {

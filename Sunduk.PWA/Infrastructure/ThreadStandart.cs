@@ -4,7 +4,7 @@
     {
         Metric,
         BSPP,
-        Trapeziodal,
+        Trapezoidal,
         NPT
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sunduk.PWA.Infrastructure.Tools.Milling
 {
-    public class MillingTool : Tool
+    public sealed class MillingTool : Tool
     {
         public enum Types { Insert, Solid }
         public Types Type { get; set; }
@@ -25,7 +25,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
         public override MachineType MachineType => MachineType.Milling;
 
 
-        public MillingTool(int position, Types type, double diameter, double cuttingLength = 0, int edges = 4, double cornerRadius = 0, ToolHand hand = ToolHand.Rigth)
+        public MillingTool(int position, Types type, double diameter, double cuttingLength = 0, int edges = 4, double cornerRadius = 0, ToolHand hand = ToolHand.Right)
         {
             Position = position;
             Type = type;

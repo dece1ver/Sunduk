@@ -2,11 +2,11 @@
 
 namespace Sunduk.PWA.Infrastructure.Tools.Turning
 {
-    public class SpecialTurningTool : Tool
+    public sealed class TurningSpecialTool : Tool
     {
         public override MachineType MachineType => MachineType.Turning;
 
-        public SpecialTurningTool(int position, string name, ToolHand hand = ToolHand.Rigth)
+        public TurningSpecialTool(int position, string name, ToolHand hand = ToolHand.Right)
         {
             Position = position;
             Name = name;

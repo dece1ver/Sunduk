@@ -257,7 +257,7 @@
     public List<GroovingExternalTool> GroovingExternalTools { get; set; }
     public List<GroovingFaceTool> GroovingFaceTools { get; set; }
     public List<GroovingInternalTool> GroovingInternalTools { get; set; }
-    public List<SpecialTurningTool> SpecialTurningTools { get; set; }
+    public List<TurningSpecialTool> TurningSpecialTools { get; set; }
     public List<ThreadingExternalTool> ThreadingExternalTools { get; set; }
     public List<ThreadingInternalTool> ThreadingInternalTools { get; set; }
     public List<TurningDrillingTool> TurningDrillingTools { get; set; }
@@ -405,13 +405,13 @@
         Tools.AddRange(GroovingInternalTools);
 
         // SpecialTurning
-        SpecialTurningTools = await localStorage.GetItemAsync<List<SpecialTurningTool>>(nameof(SpecialTurningTools)) ?? new List<SpecialTurningTool>();
-        if (SpecialTurningTools.Count == 0)
+        TurningSpecialTools = await localStorage.GetItemAsync<List<TurningSpecialTool>>(nameof(TurningSpecialTools)) ?? new List<TurningSpecialTool>();
+        if (TurningSpecialTools.Count == 0)
         {
-            SpecialTurningTools.Add(new SpecialTurningTool(0101, "UPOR"));
-            await localStorage.SetItemAsync(nameof(SpecialTurningTools), SpecialTurningTools);
+            TurningSpecialTools.Add(new TurningSpecialTool(0101, "UPOR"));
+            await localStorage.SetItemAsync(nameof(TurningSpecialTools), TurningSpecialTools);
         }
-        Tools.AddRange(SpecialTurningTools);
+        Tools.AddRange(TurningSpecialTools);
 
         // ThreadingExternal
         ThreadingExternalTools = await localStorage.GetItemAsync<List<ThreadingExternalTool>>(nameof(ThreadingExternalTools)) ?? new List<ThreadingExternalTool>();
@@ -491,7 +491,7 @@
         await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
         await localStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
         await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
-        await localStorage.SetItemAsync(nameof(SpecialTurningTools), SpecialTurningTools);
+        await localStorage.SetItemAsync(nameof(TurningSpecialTools), TurningSpecialTools);
         await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
         await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
         await localStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);

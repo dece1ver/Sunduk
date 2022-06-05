@@ -13,7 +13,7 @@
             <MudSelect Label="Стандарт" T="ThreadStandart" Value="ThreadStandart" Variant="Variant.Filled" ValueChanged="OnStandartChanged">
                 <MudSelectItem Value="@(ThreadStandart.Metric)">60° Метрическая</MudSelectItem>
                 <MudSelectItem Value="@(ThreadStandart.BSPP)">55° Трубная цилиндрическая</MudSelectItem>
-                <MudSelectItem Value="@(ThreadStandart.Trapeziodal)">30° Трапецеидальная</MudSelectItem>
+                <MudSelectItem Value="@(ThreadStandart.Trapezoidal)">30° Трапецеидальная</MudSelectItem>
                 <MudSelectItem Value="@(ThreadStandart.NPT)">60° Коническая</MudSelectItem>
             </MudSelect>
         </MudItem>
@@ -153,19 +153,19 @@
         {
             if (ThreadStandart == ThreadStandart.Metric)
             {
-                return Thread.metricTemplates;
+                return Thread.MetricTemplates;
             }
             else if (ThreadStandart == ThreadStandart.BSPP)
             {
-                return Thread.bsppTemplates;
+                return Thread.BsppTemplates;
             }
-            else if (ThreadStandart == ThreadStandart.Trapeziodal)
+            else if (ThreadStandart == ThreadStandart.Trapezoidal)
             {
-                return Thread.trapezoidalTemplates;
+                return Thread.TrapezoidalTemplates;
             }
             else if (ThreadStandart == ThreadStandart.NPT)
             {
-                return Thread.nptTemplates;
+                return Thread.NptTemplates;
             }
             else
             {
@@ -195,9 +195,9 @@
                 switch (ThreadType)
                 {
                     case CuttingType.External:
-                        return $" R-{Thread.IntNPTThreadShift(EndPointZ, StartPointZ).NC(2)}";
+                        return $" R-{Thread.IntNptThreadShift(EndPointZ, StartPointZ).NC(2)}";
                     case CuttingType.Internal:
-                        return $" R{Thread.IntNPTThreadShift(EndPointZ, StartPointZ).NC(2)}";
+                        return $" R{Thread.IntNptThreadShift(EndPointZ, StartPointZ).NC(2)}";
                     default:
                         return string.Empty;
                 }
@@ -260,7 +260,7 @@
     //        {
     //            return "TPI";
     //        }
-    //        else if (ThreadStandart == ThreadStandart.Trapeziodal)
+    //        else if (ThreadStandart == ThreadStandart.Trapezoidal)
     //        {
     //            return "мм";
     //        }
@@ -346,13 +346,13 @@
         }
         else if (ThreadStandart == ThreadStandart.BSPP)
         {
-            Thread.GetBSPPValues(CurrentThreadTemplate, out string diameter, out string pitch);
+            Thread.GetBsppValues(CurrentThreadTemplate, out string diameter, out string pitch);
             ThreadDiameterString = diameter;
             ThreadPitchString = pitch;
             PlaneLength = 0;
             EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandart, ThreadPitch, ThreadType), 1);
         }
-        else if (ThreadStandart == ThreadStandart.Trapeziodal)
+        else if (ThreadStandart == ThreadStandart.Trapezoidal)
         {
             Thread.GetTrapezoidalValues(CurrentThreadTemplate, out string diameter, out string pitch);
             ThreadDiameterString = diameter;
@@ -362,7 +362,7 @@
         }
         else if (ThreadStandart == ThreadStandart.NPT)
         {
-            Thread.GetNPTValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
+            Thread.GetNptValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
             ThreadDiameterString = externalDiameter;
             ThreadPitchString = pitch;
             PlaneLength = planeLength;

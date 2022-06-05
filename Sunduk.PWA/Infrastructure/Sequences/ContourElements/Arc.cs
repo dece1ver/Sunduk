@@ -2,7 +2,7 @@
 
 namespace Sunduk.PWA.Infrastructure.Sequences.ContourElements
 {
-    public class Arc : Element
+    public sealed class Arc : Element
     {
         public Arc(double? x, double? z, double radius, Direction direction, double centerX = 0, double centerZ = 0)
         {

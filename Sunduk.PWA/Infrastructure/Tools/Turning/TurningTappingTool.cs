@@ -2,11 +2,11 @@
 
 namespace Sunduk.PWA.Infrastructure.Tools.Turning
 {
-    public class TurningTappingTool : TappingTool
+    public sealed class TurningTappingTool : TappingTool
     {
         public override MachineType MachineType => MachineType.Turning;
 
-        public TurningTappingTool(int position, Types type, double diameter, double pitch, ToolHand hand = ToolHand.Rigth)
+        public TurningTappingTool(int position, Types type, double diameter, double pitch, ToolHand hand = ToolHand.Right)
             :base(position, type, diameter, pitch, hand)
         {
             Position = position;

@@ -5,12 +5,11 @@ using Sunduk.PWA.Infrastructure.Tools;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 using Sunduk.PWA.Infrastructure.Tools.Milling;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
-using Sunduk.PWA.Util;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using static Sunduk.PWA.Util.Util;
+using static Sunduk.PWA.Infrastructure.Util;
 
 namespace Sunduk.PWA.Infrastructure.Templates
 {
@@ -85,7 +84,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        public static string Direction(Tool tool) => tool.Hand == Tool.ToolHand.Rigth ? "M3" : "M4";
+        public static string Direction(Tool tool) => tool.Hand == Tool.ToolHand.Right ? "M3" : "M4";
 
 
         #region Режимы
@@ -398,7 +397,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
                 direction = Direction(tool);
             }
-            else if (coolant == Coolant.General || tool.Hand == Tool.ToolHand.Rigth)
+            else if (coolant == Coolant.General || tool.Hand == Tool.ToolHand.Right)
             {
                 direction = "M13";
             }

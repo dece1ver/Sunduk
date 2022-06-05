@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Sunduk.PWA.Infrastructure.TimeCalc
 {
-    public class TurningTimeRoughSequence : TurningTimeSequence
+    public sealed class TurningTimeRoughSequence : TurningTimeSequence
     {
         public double StartDiameter { get; set; }
         public double EndDiameter { get; set; }

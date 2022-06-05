@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sunduk.PWA.Infrastructure.Tools.Turning
 {
-    public class TurningInternalTool : Tool
+    public sealed class TurningInternalTool : Tool
     {
         public double Diameter { get; set; }
         public double Radius { get; set; }
@@ -15,7 +15,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
 
         public override MachineType MachineType => MachineType.Turning;
 
-        public TurningInternalTool(int position, double diameter, double angle, double radius, ToolHand hand = ToolHand.Rigth)
+        public TurningInternalTool(int position, double diameter, double angle, double radius, ToolHand hand = ToolHand.Right)
         {
             Position = position;
             Diameter = diameter;

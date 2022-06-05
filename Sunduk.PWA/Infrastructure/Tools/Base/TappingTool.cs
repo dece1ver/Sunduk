@@ -14,7 +14,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Base
         public double Pitch { get; set; }
         public override string Name => Type == Types.Forming ? "RASKATNIK" : "METCHIK";
 
-        public TappingTool(int position, Types type, double diameter, double pitch, ToolHand hand = ToolHand.Rigth)
+        public TappingTool(int position, Types type, double diameter, double pitch, ToolHand hand = ToolHand.Right)
         {
             Position = position;
             Type = type;

@@ -2,11 +2,11 @@
 
 namespace Sunduk.PWA.Infrastructure.Tools.Milling
 {
-    public class MillingTappingTool : TappingTool
+    public sealed class MillingTappingTool : TappingTool
     {
         public override MachineType MachineType => MachineType.Milling;
 
-        public MillingTappingTool(int position, Types type, double diameter, double pitch, ToolHand hand = ToolHand.Rigth)
+        public MillingTappingTool(int position, Types type, double diameter, double pitch, ToolHand hand = ToolHand.Right)
             : base(position, type, diameter, pitch, hand)
         {
             Position = position;

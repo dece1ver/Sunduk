@@ -372,17 +372,17 @@
                     </MudSelect>
                 </MudItem>
             }
-            <MudItem xs="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapeziodal ? 6 : 4)">
+            <MudItem xs="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapezoidal ? 6 : 4)">
                 <MudSelect @bind-Value="ThreadType" Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense">
                     <MudSelectItem Value="CuttingType.External">Наружная</MudSelectItem>
                     <MudSelectItem Value="CuttingType.Internal">Внутренняя</MudSelectItem>
                 </MudSelect>
             </MudItem>
-            <MudItem xs="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapeziodal ? 6 : 4)">
+            <MudItem xs="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapezoidal ? 6 : 4)">
                 <MudSelect @bind-Value="ThreadStandart" Label="Тип" T="ThreadStandart" Variant="Variant.Filled" Margin="Margin.Dense">
                     <MudSelectItem Value="@(ThreadStandart.Metric)">Метрическая 60° (М)</MudSelectItem>
                     <MudSelectItem Value="@(ThreadStandart.BSPP)">Трубная цилиндрическая 55° (Tr)</MudSelectItem>
-                    <MudSelectItem Value="@(ThreadStandart.Trapeziodal)">Трапецеидальная 30° (G)</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandart.Trapezoidal)">Трапецеидальная 30° (G)</MudSelectItem>
                     <MudSelectItem Value="@(ThreadStandart.NPT)">Коническая 60° (K)</MudSelectItem>
                 </MudSelect>
             </MudItem>
@@ -390,7 +390,7 @@
                 {
                 <MudItem xs="6" sm="6" md="4">
                     <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
-                        @foreach (string item in Thread.bsppTemplates)
+                        @foreach (string item in Thread.BsppTemplates)
                         {
                             <MudSelectItem Value="@(item)">
                                 <MudText>@item</MudText>
@@ -403,7 +403,7 @@
                 {
                 <MudItem xs="6" sm="6" md="4">
                     <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
-                        @foreach (string item in Thread.nptTemplates)
+                        @foreach (string item in Thread.NptTemplates)
                         {
                             <MudSelectItem Value="@(item)">
                                 <MudText>@item</MudText>
@@ -1130,14 +1130,14 @@
 
         if (ThreadStandart == ThreadStandart.BSPP)
         {
-            Thread.GetBSPPValues(CurrentThreadTemplate, out string diameter, out string pitch);
+            Thread.GetBsppValues(CurrentThreadTemplate, out string diameter, out string pitch);
             ThreadDiameter = diameter.GetDouble();
             ThreadPitch = pitch.GetDouble();
             ThreadNPTPlane = 0;
         }
         else if (ThreadStandart == ThreadStandart.NPT)
         {
-            Thread.GetNPTValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
+            Thread.GetNptValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
             ThreadDiameter = externalDiameter.GetDouble();
             ThreadPitch = pitch.GetDouble();
             ThreadEnd = (-threadLength); // наверно тоже строку стоит возвращать

@@ -2,7 +2,7 @@
 
 namespace Sunduk.PWA.Infrastructure.Sequences.ContourElements
 {
-    public class Point : Element
+    public sealed class Point : Element
     {
         public Point(double? x, double? z, double blunt = 0)
         {

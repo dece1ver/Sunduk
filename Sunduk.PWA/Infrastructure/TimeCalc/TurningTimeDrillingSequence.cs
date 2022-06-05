@@ -1,6 +1,6 @@
 ﻿namespace Sunduk.PWA.Infrastructure.TimeCalc
 {
-    public class TurningTimeDrillingSequence : TurningTimeSequence
+    public sealed class TurningTimeDrillingSequence : TurningTimeSequence
     {
         public double Diameter { get; set; }
         public double Length { get; set; }

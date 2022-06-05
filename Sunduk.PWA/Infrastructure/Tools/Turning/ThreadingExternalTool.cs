@@ -7,7 +7,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
     {
         public override MachineType MachineType => MachineType.Turning;
 
-        public ThreadingExternalTool(int position, double pitch, double angle, ToolHand hand = ToolHand.Rigth) 
+        public ThreadingExternalTool(int position, double pitch, double angle, ToolHand hand = ToolHand.Right) 
             : base(position, pitch, angle, hand)
         {
         }
