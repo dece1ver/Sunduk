@@ -248,9 +248,13 @@
     public List<Tool> Tools { get; set; } = new();
 
     #region Фрезерный инструмент
-    public List<MillingTool> MillingTools { get; set; }
+    
+    public List<MillingChamferTool> MillingChamferTools { get; set; }
     public List<MillingDrillingTool> MillingDrillingTools { get; set; }
+    public List<MillingSpecialTool> MillingSpecialTools { get; set; }
     public List<MillingTappingTool> MillingTappingTools { get; set; }
+    public List<MillingThreadCuttingTool> MillingThreadCuttingTools { get; set; }
+    public List<MillingTool> MillingTools { get; set; }
     #endregion
 
     #region Токарныый инструмент
@@ -268,7 +272,9 @@
 
 
     public Material WorkpieceMaterial { get; set; }
+
     public Machine Machine { get; set; }
+
     public MachineType MachineType => Machine.GetMachineType();
 
     public string _WorkpieceExternalDiameter { get; set; } = "50";
@@ -344,33 +350,63 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Machine = await localStorage.GetItemAsync<Machine>(nameof(Machine));
         OnMachineChanged(Machine);
+
+        // MillingChamfer
+        MillingChamferTools = await localStorage.GetItemAsync<List<MillingChamferTool>>(nameof(MillingChamferTools)) ?? new List<MillingChamferTool>();
+        if (MillingChamferTools.Count == 0)
+        {
+            MillingChamferTools.Add(new MillingChamferTool(05, 12, 45, 1));
+            MillingChamferTools.Add(new MillingChamferTool(11, 16, 45, 1));
+            MillingChamferTools.Add(new MillingChamferTool(16, 6, 45));
+            await localStorage.SetItemAsync(nameof(MillingChamferTools), MillingChamferTools);
+        }
+        Tools.AddRange(MillingChamferTools);
+
         // MillingDrilling
         MillingDrillingTools = await localStorage.GetItemAsync<List<MillingDrillingTool>>(nameof(MillingDrillingTools)) ?? new List<MillingDrillingTool>();
         if (MillingDrillingTools.Count == 0)
         {
-            MillingDrillingTools.Add(new MillingDrillingTool(1, DrillingTool.Types.Solid, 6, 140));
-            MillingDrillingTools.Add(new MillingDrillingTool(2, DrillingTool.Types.Insert, 25, 180));
+            MillingDrillingTools.Add(new MillingDrillingTool(13, DrillingTool.Types.Solid, 11.2, 140));
             await localStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
         }
         Tools.AddRange(MillingDrillingTools);
+
+        // MillingSpecial
+        MillingSpecialTools = await localStorage.GetItemAsync<List<MillingSpecialTool>>(nameof(MillingSpecialTools)) ?? new List<MillingSpecialTool>();
+        if (MillingSpecialTools.Count == 0)
+        {
+            MillingSpecialTools.Add(new MillingSpecialTool(24, "BLUM"));
+            await localStorage.SetItemAsync(nameof(MillingSpecialTools), MillingSpecialTools);
+        }
+        Tools.AddRange(MillingSpecialTools);
 
         // MillingTapping
         MillingTappingTools = await localStorage.GetItemAsync<List<MillingTappingTool>>(nameof(MillingTappingTools)) ?? new List<MillingTappingTool>();
         if (MillingTappingTools.Count == 0)
         {
-            MillingTappingTools.Add(new MillingTappingTool(3, TappingTool.Types.Cutting, 12, 1.75));
-            MillingTappingTools.Add(new MillingTappingTool(4, TappingTool.Types.Forming, 10, 1.5));
+            
             await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
         }
         Tools.AddRange(MillingTappingTools);
+
+        // MillingThreadCutting
+        MillingThreadCuttingTools = await localStorage.GetItemAsync<List<MillingThreadCuttingTool>>(nameof(MillingThreadCuttingTools)) ?? new List<MillingThreadCuttingTool>();
+        if (MillingThreadCuttingTools.Count == 0)
+        {
+            MillingThreadCuttingTools.Add(new MillingThreadCuttingTool(14, 9.5, ThreadStandart.NPT, 1.411));
+            await localStorage.SetItemAsync(nameof(MillingThreadCuttingTools), MillingThreadCuttingTools);
+        }
+        Tools.AddRange(MillingThreadCuttingTools);
 
         // Milling
         MillingTools = await localStorage.GetItemAsync<List<MillingTool>>(nameof(MillingTools)) ?? new List<MillingTool>();
         if (MillingTools.Count == 0)
         {
-            MillingTools.Add(new MillingTool(3, MillingTool.Types.Solid, 12));
-            MillingTools.Add(new MillingTool(4, MillingTool.Types.Insert, 32));
+            MillingTools.Add(new MillingTool(04, MillingTool.Types.Insert, 63, 5));
+            MillingTools.Add(new MillingTool(12, MillingTool.Types.Insert, 32, 3));
+            MillingTools.Add(new MillingTool(20, MillingTool.Types.Insert, 80, 6));
             await localStorage.SetItemAsync(nameof(MillingTools), MillingTools);
         }
         Tools.AddRange(MillingTools);
@@ -482,11 +518,19 @@
         };
     }
 
+    private async Task SaveMachine()
+    {
+        await localStorage.SetItemAsync(nameof(Machine), Machine);
+    }
+
     private async Task SaveTools()
     {
 
+        await localStorage.SetItemAsync(nameof(MillingChamferTools), MillingChamferTools);
         await localStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+        await localStorage.SetItemAsync(nameof(MillingSpecialTools), MillingSpecialTools);
         await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
+        await localStorage.SetItemAsync(nameof(MillingThreadCuttingTools), MillingThreadCuttingTools);
         await localStorage.SetItemAsync(nameof(MillingTools), MillingTools);
         await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
         await localStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
@@ -498,7 +542,6 @@
         await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
         await localStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
         await localStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
-
     }
 
     private async Task OpenToolDialog()
@@ -517,6 +560,7 @@
             _ => throw new ArgumentOutOfRangeException(nameof(machine), machine, null)
             };
         Machine = machine;
+        _ = SaveMachine();
     }
 
     private async Task OpenEditSequenceDialog(Sequence sequence)
@@ -543,8 +587,7 @@
     private async Task<bool> OpenConfirmDialog(string message)
     {
         message ??= string.Empty;
-        var parameters = new DialogParameters();
-        parameters.Add(nameof(message), message);
+        var parameters = new DialogParameters { { nameof(message), message } };
         var options = new DialogOptions() { FullScreen = false, CloseButton = false };
         var dialog = DialogService.Show<ConfirmDialog>("Подтверждение", parameters, options);
         var result = await dialog.Result;

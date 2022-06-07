@@ -211,7 +211,7 @@ namespace Sunduk.PWA.Infrastructure
             {
                 MillingChamferTool millingChamferTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{millingChamferTool.Position} ({millingChamferTool.Name} D{millingChamferTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
+                    ToolDescriptionOption.General => $"T{millingChamferTool.Position} ({millingChamferTool.Name} D{millingChamferTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingChamferTool.Angle.NC(option: NcDecimalPointOption.Without)})",
                     ToolDescriptionOption.ToolTable => millingChamferTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },

@@ -16,7 +16,7 @@
 
     @switch (Type)
     {
-        #region Общие
+        // Общие
         case SequenceType.General:
             <MudItem xs="12" md="4">
                 <MudSelect Label="Переход" T="GeneralSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="GeneralSequence">
@@ -68,9 +68,9 @@
                 </MudItem>
             }
             break;
-        #endregion
 
-        #region Обработка торца
+
+        // Обработка торца
         case SequenceType.Facing:
             <MudItem xs="12" md="4">
                 <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTurningSequenceChanged">
@@ -200,9 +200,9 @@
             }
 
             break;
-        #endregion
+        
 
-        #region Токарные
+        //Токарные
         case SequenceType.ExternalTurning:
             <MudItem xs="12" md="4">
                 <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="TurningSequence">
@@ -222,9 +222,9 @@
                 <ContourComponent></ContourComponent>
             </MudItem>
             break;
-        #endregion
+        
 
-        #region Сверлильные
+        //Сверлильные
         case SequenceType.Drilling:
             <MudItem xs="12" md="4">
                 <MudSelect Label="Переход" T="DrillingSequences" @bind-Value="DrillingSequence" Variant="Variant.Filled" Margin="Margin.Dense">
@@ -325,9 +325,9 @@
                 }
             }
             break;
-        #endregion
+        
 
-        #region Резьбонарезные
+        //Резьбонарезные
         case SequenceType.Threading:
             <MudItem xs="12" sm="6" md="4">
                 <MudSelect Label="Переход" T="ThreadingSequences" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnThreadingSequenceChanged">
@@ -365,8 +365,8 @@
                 <MudItem xs="6" sm="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapezoidal ? 6 : 4)">
                     <MudSelect Label="Стандарт" T="ThreadStandart" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="ThreadStandart">
                         <MudSelectItem Value="@(ThreadStandart.Metric)">Метрическая 60° (М)</MudSelectItem>
-                        <MudSelectItem Value="@(ThreadStandart.BSPP)">Трубная цилиндрическая 55° (Tr)</MudSelectItem>
-                        <MudSelectItem Value="@(ThreadStandart.Trapezoidal)">Трапецеидальная 30° (G)</MudSelectItem>
+                        <MudSelectItem Value="@(ThreadStandart.BSPP)">Трубная цилиндрическая 55° (G)</MudSelectItem>
+                        <MudSelectItem Value="@(ThreadStandart.Trapezoidal)">Трапецеидальная 30° (Tr)</MudSelectItem>
                         <MudSelectItem Value="@(ThreadStandart.NPT)">Коническая 60° (K)</MudSelectItem>
                     </MudSelect>
                 </MudItem>
@@ -486,9 +486,9 @@
                 }
             }
             break;
-        #endregion
+        
 
-        #region Канавочные
+        //Канавочные
         case SequenceType.Grooving:
             <MudItem xs="4">
                 <MudSelect Label="Переход" T="TurningGroovingSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="GroovingSequence">
@@ -624,7 +624,7 @@
                 }
             }
             break;
-        #endregion
+        
 
         default:
             break;
@@ -699,7 +699,7 @@
         InnerGroovingBluntType = Blunt.Radius;
     }
 
-    #region Всякие OnChanged
+    //Всякие OnChanged
 
     private void OnSequenceChanged(SequenceType value)
     {
@@ -798,10 +798,10 @@
             Holes.Remove(Holes[^1]);
         }
     }
-    #endregion
+    
 
 
-    #region Типы переходов
+    //Типы переходов
     private SequenceType Type { get; set; }
 
     private GeneralSequences GeneralSequence { get; set; }
@@ -813,7 +813,7 @@
     private ThreadingSequences ThreadingSequence { get; set; }
 
     private TurningGroovingSequences GroovingSequence { get; set; }
-    #endregion
+    
 
     private Tool Tool { get; set; }
     private string CustomOperation { get; set; } = string.Empty;
@@ -825,7 +825,7 @@
 
     private string CurrentThreadTemplate { get; set; }
 
-    #region Точение резьбы
+    //Точение резьбы
     private ThreadStandart ThreadStandart { get; set; }
     private CuttingType ThreadType { get; set; }
 
@@ -842,9 +842,9 @@
     private double ThreadEnd => Util.GetDouble(_ThreadEnd, numberOption: Util.GetNumberOption.Any) - Math.Round(ThreadPitch, 1);
 
     private double ThreadNPTPlane { get; set; }
-    #endregion
+    
 
-    #region Резьбонарезание
+    //Резьбонарезание
     private string _TapCutSpeed { get; set; }
     private double TapCutSpeed => Util.GetDouble(_TapCutSpeed, numberOption: Util.GetNumberOption.Any);
 
@@ -854,9 +854,9 @@
     private string _TapEnd { get; set; } = "-";
     private double TapEnd => Util.GetDouble(_TapEnd, numberOption: Util.GetNumberOption.Any);
 
-    #endregion
+    
 
-    #region Торцовка
+    //Торцовка
     bool _caclFacingChamferDiameter = true;
     int _MediumBluntFieldSize => TurningSequence == TurningSequences.FinishFacing ? 4 : 6;
 
@@ -926,9 +926,9 @@
     }
     private double FacingCustomChamferDiameter => Util.GetDouble(_FacingCustomChamferDiameter);
 
-    #endregion
+    
 
-    #region Сверловка
+    //Сверловка
 
     private string _DrillStart { get; set; } = "2";
     private double DrillStart => Util.GetDouble(_DrillStart, numberOption: Util.GetNumberOption.Any);
@@ -951,9 +951,9 @@
     private enum HolesSetterType { Manual, Cylinder}
     private HolesSetterType HolesSetter { get; set; }
 
-    #endregion
+    
 
-    #region Отрезка
+    //Отрезка
 
     private bool _caclCuttingChamferDiameter = true;
     private string _CuttingExternalDiameter { get; set; }
@@ -1021,9 +1021,9 @@
     }
     private double CuttingCustomChamferDiameter => Util.GetDouble(_CuttingCustomChamferDiameter);
 
-    #endregion
+    
 
-    #region Канавки
+    //Канавки
 
     private string _GroovingExternalDiameter { get; set; }
     private double GroovingExternalDiameter => Util.GetDouble(_GroovingExternalDiameter);
@@ -1061,12 +1061,12 @@
 
     private bool ExternalGrooving => GroovingExternalDiameter > GroovingInternalDiameter;
 
-    #endregion
+    
 
     /// <summary>
     /// Тут сразу формируется переход, текст которого выводится в пример. Уже созданный тут переход сабмитится при нажатии на кнопку.
     /// </summary>
-    #region Пример
+    //Пример
     public string ExampleText
     {
         get
@@ -1426,7 +1426,7 @@
             return string.Empty;
         }
     }
-    #endregion
+    
 
     // добавлеие перехода
     async Task Submit()

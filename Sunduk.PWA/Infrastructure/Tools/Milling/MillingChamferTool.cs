@@ -10,10 +10,12 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
         public double Angle { get; set; }
         public double TipCompensation { get; set; }
 
-        public MillingChamferTool(int position, string name, ToolHand hand = ToolHand.Right)
+        public MillingChamferTool(int position, double diameter, double angle, double tipCompensation = 0, ToolHand hand = ToolHand.Right)
         {
             Position = position;
-            Name = name;
+            Diameter = diameter;
+            Angle = angle;
+            TipCompensation = tipCompensation;
             Hand = hand;
         }
     }

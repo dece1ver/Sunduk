@@ -25,7 +25,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
         public override MachineType MachineType => MachineType.Milling;
 
 
-        public MillingTool(int position, Types type, double diameter, double cuttingLength = 0, int edges = 4, double cornerRadius = 0, ToolHand hand = ToolHand.Right)
+        public MillingTool(int position, Types type, double diameter, int edges = 4, double cuttingLength = 0, double cornerRadius = 0, ToolHand hand = ToolHand.Right)
         {
             Position = position;
             Type = type;

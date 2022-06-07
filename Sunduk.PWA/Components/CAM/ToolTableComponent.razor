@@ -1,22 +1,33 @@
-﻿@inject Blazored.LocalStorage.ILocalStorageService localStorage
+﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
 <MudSwipeArea OnSwipe="@OnSwipe">
     <MudTabs @ref="_toolTabs" Elevation="0">
         @if (MachineType == MachineType.Milling)
         {
-            @*#region MillingChamfer
+            // Общий список
+            <MudTabPanel Text="Общий" Style="font-size: x-small">
+
+                @foreach (var tool in Tools.Where(x => x.MachineType is MachineType.Milling))
+                {
+                    <MudText>@tool.Description()</MudText>
+                }
+            </MudTabPanel>
+
+            // MillingChamfer
             <MudTabPanel Text="Фасочники" Style="font-size: x-small">
                 <MudTable Items="MillingChamferTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedMillingChamferTool" Elevation="0">
                     <HeaderContent>
                         <MudTh>Позиция</MudTh>
                         <MudTh>Диаметр</MudTh>
                         <MudTh>Угол</MudTh>
+                        <MudTh>Компенсация кончика</MudTh>
                         <MudTh>Исполнение</MudTh>
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd DataLabel="Позиция">@context.Position</MudTd>
                         <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Угол">@context.Angle.ToPrettyString()</MudTd>
+                        <MudTd DataLabel="Компенсация кончика">@context.TipCompensation.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Right ? "Правое" : "Левое")</MudTd>
                     </RowTemplate>
                     <RowEditingTemplate>
@@ -27,9 +38,12 @@
                             <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
                         </MudTd>
                         <MudTd DataLabel="Угол">
-                            <MudAutocomplete T="double" Label="Угол" @bind-Value="@context.Angle" SearchFunc="@SearchAsync" CoerceText="true" CoerceValue="true" 
-                                Converter="Util.DoubleConverter" Required Variant="Variant.Outlined" Margin="Margin.Dense" />
-
+                            @*<MudAutocomplete T="double" Label="Угол" @bind-Value="@context.Angle" SearchFunc="@SearchAsync" CoerceText="true" CoerceValue="true" 
+                                Converter="Util.DoubleConverter" Required Variant="Variant.Outlined" Margin="Margin.Dense" />*@
+                            <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Компенсация кончика">
+                            <MudTextField @bind-Value="@context.TipCompensation" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
                         </MudTd>
                         <MudTd DataLabel="Исполнение">
                             <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
@@ -41,14 +55,14 @@
                 </MudTable>
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
-                        <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddMillingDrillingTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveMillingDrillingTool" />
+                        <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddMillingChamferTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastMillingChamferTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion*@
+            
 
-            #region MillingDrilling
+            // MillingDrilling
             <MudTabPanel Text="Сверла" Style="font-size: x-small">
                 <MudTable Items="MillingDrillingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedMillingDrillingTool" Elevation="0">
                     <HeaderContent>
@@ -62,23 +76,23 @@
                         <MudTd DataLabel="Позиция">@context.Position</MudTd>
                         <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Угол">@context.Angle.ToPrettyString()</MudTd>
-                        @if (context.Type == MillingDrillingTool.Types.Solid)
+                        @if (context.Type == DrillingTool.Types.Solid)
                             {
                             <MudTd DataLabel="Тип">Твердосплавное</MudTd>
                             }
-                        @if (context.Type == MillingDrillingTool.Types.Insert)
+                        @if (context.Type == DrillingTool.Types.Insert)
                             {
                             <MudTd DataLabel="Тип">С пластинами</MudTd>
                             }
-                        @if (context.Type == MillingDrillingTool.Types.Tip)
+                        @if (context.Type == DrillingTool.Types.Tip)
                             {
                             <MudTd DataLabel="Тип">С головкой</MudTd>
                             }
-                        @if (context.Type == MillingDrillingTool.Types.Rapid)
+                        @if (context.Type == DrillingTool.Types.Rapid)
                             {
                             <MudTd DataLabel="Тип">Быстрорез</MudTd>
                             }
-                        @if (context.Type == MillingDrillingTool.Types.Center)
+                        @if (context.Type == DrillingTool.Types.Center)
                             {
                             <MudTd DataLabel="Тип">Центровочное</MudTd>
                             }
@@ -95,12 +109,12 @@
                             <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
                         </MudTd>
                         <MudTd DataLabel="Тип">
-                            <MudSelect T="MillingDrillingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                <MudSelectItem Value="@MillingDrillingTool.Types.Solid">Твердосплавное</MudSelectItem>
-                                <MudSelectItem Value="@MillingDrillingTool.Types.Insert">С пластинами</MudSelectItem>
-                                <MudSelectItem Value="@MillingDrillingTool.Types.Tip">С головкой</MudSelectItem>
-                                <MudSelectItem Value="@MillingDrillingTool.Types.Rapid">Быстрорез</MudSelectItem>
-                                <MudSelectItem Value="@MillingDrillingTool.Types.Center">Центровочное</MudSelectItem>
+                            <MudSelect T="DrillingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                <MudSelectItem Value="@DrillingTool.Types.Solid">Твердосплавное</MudSelectItem>
+                                <MudSelectItem Value="@DrillingTool.Types.Insert">С пластинами</MudSelectItem>
+                                <MudSelectItem Value="@DrillingTool.Types.Tip">С головкой</MudSelectItem>
+                                <MudSelectItem Value="@DrillingTool.Types.Rapid">Быстрорез</MudSelectItem>
+                                <MudSelectItem Value="@DrillingTool.Types.Center">Центровочное</MudSelectItem>
                             </MudSelect>
                         </MudTd>
                         <MudTd DataLabel="Исполнение">
@@ -114,13 +128,41 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddMillingDrillingTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveMillingDrillingTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastMillingDrillingTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
 
-            #region MillingTapping
+
+            // MillingSpecial
+            <MudTabPanel Text="Спец инструмент" Style="font-size: x-small">
+                <MudTable Items="MillingSpecialTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedMillingSpecialTool" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>Позиция</MudTh>
+                        <MudTh>Описание</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Позиция">@context.Position</MudTd>
+                        <MudTd DataLabel="Описание">@context.Name</MudTd>
+                    </RowTemplate>
+                    <RowEditingTemplate>
+                        <MudTd DataLabel="Позиция">
+                            <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Описание">
+                            <MudTextField @bind-Value="@context.Name" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                        </MudTd>
+                    </RowEditingTemplate>
+                </MudTable>
+            <div class="mt-3 ml-0 mr-4 d-flex">
+                <div class="d-flex ml-auto align-center">
+                    <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddMillingSpecialTool" />
+                    <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastMillingSpecialTool" />
+                </div>
+            </div>
+            </MudTabPanel>
+
+            // MillingTapping
             <MudTabPanel Text="Метчики" Style="font-size: x-small">
                 <MudTable Items="MillingTappingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedMillingTappingTool" Elevation="0">
                     <HeaderContent>
@@ -134,14 +176,14 @@
                         <MudTd DataLabel="Позиция">@context.Position</MudTd>
                         <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Шаг">@context.Pitch.ToPrettyString()</MudTd>
-                        @if (context.Type == MillingTappingTool.Types.Cutting)
-                            {
+                        @if (context.Type == TappingTool.Types.Cutting)
+                        {
                             <MudTd DataLabel="Тип">Нарезной</MudTd>
-                            }
-                        @if (context.Type == MillingTappingTool.Types.Forming)
-                            {
+                        }
+                        @if (context.Type == TappingTool.Types.Forming)
+                        {
                             <MudTd DataLabel="Тип">Раскатник</MudTd>
-                            }
+                        }
                         <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Right ? "Правое" : "Левое")</MudTd>
                     </RowTemplate>
                     <RowEditingTemplate>
@@ -155,9 +197,9 @@
                             <MudTextField @bind-Value="@context.Pitch" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
                         </MudTd>
                         <MudTd DataLabel="Тип">
-                            <MudSelect T="MillingTappingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                <MudSelectItem Value="@MillingTappingTool.Types.Cutting">Нарезной</MudSelectItem>
-                                <MudSelectItem Value="@MillingTappingTool.Types.Forming">Раскатник</MudSelectItem>
+                            <MudSelect T="TappingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                <MudSelectItem Value="@TappingTool.Types.Cutting">Нарезной</MudSelectItem>
+                                <MudSelectItem Value="@TappingTool.Types.Forming">Раскатник</MudSelectItem>
                             </MudSelect>
                         </MudTd>
                         <MudTd DataLabel="Исполнение">
@@ -171,13 +213,77 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddMillingTappingTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveMillingTappingTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastMillingTappingTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
 
-            #region Milling
+            // MillingThreadCutting
+            <MudTabPanel Text="Резьбофрезы" Style="font-size: x-small">
+                <MudTable Items="MillingThreadCuttingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedMillingThreadCuttingTool" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>Позиция</MudTh>
+                        <MudTh>Стандарт</MudTh>
+                        <MudTh>Диаметр</MudTh>
+                        <MudTh>Шаг</MudTh>
+                        <MudTh>Исполнение</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Позиция">@context.Position</MudTd>
+                        @switch (@context.ThreadStandart)
+                        {
+                            case ThreadStandart.Metric:
+                                <MudTd DataLabel="Стандарт">Метрическая 60° (М)</MudTd>
+                                break;
+                            case ThreadStandart.BSPP:
+                                <MudTd DataLabel="Стандарт">Трубная цилиндрическая 55° (G)</MudTd>
+                                break;
+                            case ThreadStandart.Trapezoidal:
+                                <MudTd DataLabel="Стандарт">Трапецеидальная 30° (Tr)</MudTd>
+                                break;
+                            case ThreadStandart.NPT:
+                                <MudTd DataLabel="Стандарт">Коническая 60° (K)</MudTd>
+                                break;
+                        }
+                        <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
+                        <MudTd DataLabel="Шаг">@context.Pitch.ToPrettyString()</MudTd>
+                        <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Right ? "Правое" : "Левое")</MudTd>
+                    </RowTemplate>
+                    <RowEditingTemplate>
+                        <MudTd DataLabel="Позиция">
+                            <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Стандарт">
+                            <MudSelect T="ThreadStandart" @bind-Value="@context.ThreadStandart" Variant="Variant.Outlined" Required>
+                                <MudSelectItem Value="@(ThreadStandart.Metric)">Метрическая 60° (М)</MudSelectItem>
+                                <MudSelectItem Value="@(ThreadStandart.BSPP)">Трубная цилиндрическая 55° (G)</MudSelectItem>
+                                <MudSelectItem Value="@(ThreadStandart.Trapezoidal)">Трапецеидальная 30° (Tr)</MudSelectItem>
+                                <MudSelectItem Value="@(ThreadStandart.NPT)">Коническая 60° (K)</MudSelectItem>
+                            </MudSelect>
+                        </MudTd>
+                        <MudTd DataLabel="Диаметр">
+                            <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Шаг">
+                            <MudTextField @bind-Value="@context.Pitch" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                        </MudTd>
+                        <MudTd DataLabel="Исполнение">
+                            <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Required>
+                                <MudSelectItem Value="@Tool.ToolHand.Right">Правое</MudSelectItem>
+                                <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+                            </MudSelect>
+                        </MudTd>
+                    </RowEditingTemplate>
+                </MudTable>
+                <div class="mt-3 ml-0 mr-4 d-flex">
+                    <div class="d-flex ml-auto align-center">
+                        <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddMillingThreadCuttingTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastMillingThreadCuttingTool" />
+                    </div>
+                </div>
+            </MudTabPanel>
+
+            // Milling
             <MudTabPanel Text="Фрезы" Style="font-size: x-small">
                 <MudTable Items="MillingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedMillingTool" Elevation="0">
                     <HeaderContent>
@@ -238,16 +344,16 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddMillingTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveMillingTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastMillingTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
+
         }
 
         @if (MachineType == MachineType.Turning)
         {
-            #region GroovingExternal
+            // GroovingExternal
             <MudTabPanel Text="Канавки наружные" Style="font-size: x-small">
                 <MudTable Items="GroovingExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedGroovingExternalTool" Elevation="0">
                     <HeaderContent>
@@ -274,7 +380,7 @@
                             }
                         <MudTd DataLabel="Ширина">@context.Width.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Радиус">@context.CornerRadius.ToPrettyString()</MudTd>
-                        <MudTd DataLabel="Привязка">@(context.ZeroPoint == GroovingExternalTool.Point.Left ? "Как проходной" : "Как отрезной")</MudTd>
+                        <MudTd DataLabel="Привязка">@(context.ZeroPoint == TurningGroovingTool.Point.Left ? "Как проходной" : "Как отрезной")</MudTd>
                         <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Right ? "Правое" : "Левое")</MudTd>
                     </RowTemplate>
                     <RowEditingTemplate>
@@ -295,9 +401,9 @@
                             <MudTextField @bind-Value="@context.CornerRadius" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
                         </MudTd>
                         <MudTd DataLabel="Привязка">
-                            <MudSelect T="GroovingExternalTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                <MudSelectItem Value="@GroovingExternalTool.Point.Left">Как проходной</MudSelectItem>
-                                <MudSelectItem Value="@GroovingExternalTool.Point.Right">Как отрезной</MudSelectItem>
+                            <MudSelect T="TurningGroovingTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                <MudSelectItem Value="@TurningGroovingTool.Point.Left">Как проходной</MudSelectItem>
+                                <MudSelectItem Value="@TurningGroovingTool.Point.Right">Как отрезной</MudSelectItem>
                             </MudSelect>
                         </MudTd>
                         <MudTd DataLabel="Исполнение">
@@ -311,13 +417,13 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddGroovingExternalTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveGroovingExternalTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastGroovingExternalTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
 
-            #region GroovingFace
+
+            // GroovingFace
             <MudTabPanel Text="Канавки торцевые" Style="font-size: x-small">
                 <MudTable Items="GroovingFaceTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedGroovingFaceTool" Elevation="0">
                     <HeaderContent>
@@ -331,7 +437,7 @@
                         <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
                         <MudTd DataLabel="Ширина">@context.Width.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Радиус">@context.CornerRadius.ToPrettyString()</MudTd>
-                        <MudTd DataLabel="Привязка">@(context.ZeroPoint == GroovingFaceTool.Point.Bottom ? "Как проходной" : "Как расточной")</MudTd>
+                        <MudTd DataLabel="Привязка">@(context.ZeroPoint == TurningGroovingTool.Point.Bottom ? "Как проходной" : "Как расточной")</MudTd>
                         <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Right ? "Правое" : "Левое")</MudTd>
                     </RowTemplate>
                     <RowEditingTemplate>
@@ -345,9 +451,9 @@
                             <MudTextField @bind-Value="@context.CornerRadius" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
                         </MudTd>
                         <MudTd DataLabel="Привязка">
-                            <MudSelect T="GroovingFaceTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                <MudSelectItem Value="@GroovingFaceTool.Point.Bottom">Как проходной</MudSelectItem>
-                                <MudSelectItem Value="@GroovingFaceTool.Point.Top">Как расточной</MudSelectItem>
+                            <MudSelect T="TurningGroovingTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                <MudSelectItem Value="@TurningGroovingTool.Point.Bottom">Как проходной</MudSelectItem>
+                                <MudSelectItem Value="@TurningGroovingTool.Point.Top">Как расточной</MudSelectItem>
                             </MudSelect>
                         </MudTd>
                         <MudTd DataLabel="Исполнение">
@@ -361,13 +467,13 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddGroovingFaceTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveGroovingFaceTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastGroovingFaceTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
 
-            #region GroovingInternal
+
+            // GroovingInternal
             <MudTabPanel Text="Канавки внутренние" Style="font-size: x-small">
                 <MudTable Items="GroovingInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedGroovingInternalTool" Elevation="0">
                     <HeaderContent>
@@ -383,7 +489,7 @@
                         <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Ширина">@context.Width.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Радиус">@context.CornerRadius.ToPrettyString()</MudTd>
-                        <MudTd DataLabel="Привязка">@(context.ZeroPoint == GroovingInternalTool.Point.Left ? "Как расточной" : "Как отрезной")</MudTd>
+                        <MudTd DataLabel="Привязка">@(context.ZeroPoint == TurningGroovingTool.Point.Left ? "Как расточной" : "Как отрезной")</MudTd>
                         <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Right ? "Правое" : "Левое")</MudTd>
                     </RowTemplate>
                     <RowEditingTemplate>
@@ -400,9 +506,9 @@
                             <MudTextField @bind-Value="@context.CornerRadius" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
                         </MudTd>
                         <MudTd DataLabel="Привязка">
-                            <MudSelect T="GroovingInternalTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                <MudSelectItem Value="@GroovingInternalTool.Point.Left">Как расточной</MudSelectItem>
-                                <MudSelectItem Value="@GroovingInternalTool.Point.Right">Как отрезной</MudSelectItem>
+                            <MudSelect T="TurningGroovingTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                <MudSelectItem Value="@TurningGroovingTool.Point.Left">Как расточной</MudSelectItem>
+                                <MudSelectItem Value="@TurningGroovingTool.Point.Right">Как отрезной</MudSelectItem>
                             </MudSelect>
                         </MudTd>
                         <MudTd DataLabel="Исполнение">
@@ -416,13 +522,13 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddGroovingInternalTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveGroovingInternalTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastGroovingInternalTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
 
-            #region SpecialTurning
+
+            // SpecialTurning
             <MudTabPanel Text="Спец инструмент" Style="font-size: x-small">
                 <MudTable Items="TurningSpecialTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedTurningSpecialTool" Elevation="0">
                     <HeaderContent>
@@ -445,13 +551,13 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddSpecialTurningTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveSpecialTurningTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastSpecialTurningTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
 
-            #region ThreadingExternal
+
+            // ThreadingExternal
             <MudTabPanel Text="Резьбовые наружные" Style="font-size: x-small">
                 <MudTable Items="ThreadingExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedThreadingExternalTool" Elevation="0">
                     <HeaderContent>
@@ -487,13 +593,13 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddThreadingExternalTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveThreadingExternalTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastThreadingExternalTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
 
-            #region ThreadingInternal
+
+            // ThreadingInternal
             <MudTabPanel Text="Резьбовые внутренние" Style="font-size: x-small">
                 <MudTable Items="ThreadingInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedThreadingInternalTool" Elevation="0">
                     <HeaderContent>
@@ -534,13 +640,13 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddThreadingInternalTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveThreadingInternalTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastThreadingInternalTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
 
-            #region TurningDrilling
+
+            // TurningDrilling
             <MudTabPanel Text="Сверла" Style="font-size: x-small">
                 <MudTable Items="TurningDrillingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedTurningDrillingTool" Elevation="0">
                     <HeaderContent>
@@ -554,23 +660,23 @@
                         <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
                         <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Угол">@context.Angle.ToPrettyString()</MudTd>
-                        @if (context.Type == TurningDrillingTool.Types.Solid)
+                        @if (context.Type == DrillingTool.Types.Solid)
                             {
                             <MudTd DataLabel="Тип">Твердосплавное</MudTd>
                             }
-                        @if (context.Type == TurningDrillingTool.Types.Insert)
+                        @if (context.Type == DrillingTool.Types.Insert)
                             {
                             <MudTd DataLabel="Тип">С пластинами</MudTd>
                             }
-                        @if (context.Type == TurningDrillingTool.Types.Tip)
+                        @if (context.Type == DrillingTool.Types.Tip)
                             {
                             <MudTd DataLabel="Тип">С головкой</MudTd>
                             }
-                        @if (context.Type == TurningDrillingTool.Types.Rapid)
+                        @if (context.Type == DrillingTool.Types.Rapid)
                             {
                             <MudTd DataLabel="Тип">Быстрорез</MudTd>
                             }
-                        @if (context.Type == TurningDrillingTool.Types.Center)
+                        @if (context.Type == DrillingTool.Types.Center)
                             {
                             <MudTd DataLabel="Тип">Центровочное</MudTd>
                             }
@@ -587,12 +693,12 @@
                             <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
                         </MudTd>
                         <MudTd DataLabel="Тип">
-                            <MudSelect T="TurningDrillingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                <MudSelectItem Value="@TurningDrillingTool.Types.Solid">Твердосплавное</MudSelectItem>
-                                <MudSelectItem Value="@TurningDrillingTool.Types.Insert">С пластинами</MudSelectItem>
-                                <MudSelectItem Value="@TurningDrillingTool.Types.Tip">С головкой</MudSelectItem>
-                                <MudSelectItem Value="@TurningDrillingTool.Types.Rapid">Быстрорез</MudSelectItem>
-                                <MudSelectItem Value="@TurningDrillingTool.Types.Center">Центровочное</MudSelectItem>
+                            <MudSelect T="DrillingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                <MudSelectItem Value="@DrillingTool.Types.Solid">Твердосплавное</MudSelectItem>
+                                <MudSelectItem Value="@DrillingTool.Types.Insert">С пластинами</MudSelectItem>
+                                <MudSelectItem Value="@DrillingTool.Types.Tip">С головкой</MudSelectItem>
+                                <MudSelectItem Value="@DrillingTool.Types.Rapid">Быстрорез</MudSelectItem>
+                                <MudSelectItem Value="@DrillingTool.Types.Center">Центровочное</MudSelectItem>
                             </MudSelect>
                         </MudTd>
                         <MudTd DataLabel="Исполнение">
@@ -606,13 +712,13 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTurningDrillingTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveTurningDrillingTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastTurningDrillingTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
 
-            #region TurningExternal
+
+            // TurningExternal
             <MudTabPanel Text="Точение наружное" Style="font-size: x-small">
                 <MudTable Items="TurningExternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedTurningExternalTool" Elevation="0">
                     <HeaderContent>
@@ -656,13 +762,13 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTurningExternalTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveTurningExternalTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastTurningExternalTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
 
-            #region TurningInternal
+
+            // TurningInternal
             <MudTabPanel Text="Точение внутреннее" Style="font-size: x-small">
                 <MudTable Items="TurningInternalTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedTurningInternalTool" Elevation="0">
                     <HeaderContent>
@@ -703,13 +809,13 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTurningInternalTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveTurningInternalTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastTurningInternalTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
 
-            #region TurningTapping
+
+            // TurningTapping
             <MudTabPanel Text="Метчики" Style="font-size: x-small">
                 <MudTable Items="TurningTappingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" @bind-SelectedItem="_selectedTurningTappingTool" Elevation="0">
                     <HeaderContent>
@@ -723,11 +829,11 @@
                         <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
                         <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
                         <MudTd DataLabel="Шаг">@context.Pitch.ToPrettyString()</MudTd>
-                        @if (context.Type == TurningTappingTool.Types.Cutting)
+                        @if (context.Type == TappingTool.Types.Cutting)
                             {
                             <MudTd DataLabel="Тип">Нарезной</MudTd>
                             }
-                        @if (context.Type == TurningTappingTool.Types.Forming)
+                        @if (context.Type == TappingTool.Types.Forming)
                             {
                             <MudTd DataLabel="Тип">Раскатник</MudTd>
                             }
@@ -744,9 +850,9 @@
                             <MudTextField @bind-Value="@context.Pitch" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
                         </MudTd>
                         <MudTd DataLabel="Тип">
-                            <MudSelect T="TurningTappingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
-                                <MudSelectItem Value="@TurningTappingTool.Types.Cutting">Нарезной</MudSelectItem>
-                                <MudSelectItem Value="@TurningTappingTool.Types.Forming">Раскатник</MudSelectItem>
+                            <MudSelect T="TappingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                                <MudSelectItem Value="@TappingTool.Types.Cutting">Нарезной</MudSelectItem>
+                                <MudSelectItem Value="@TappingTool.Types.Forming">Раскатник</MudSelectItem>
                             </MudSelect>
                         </MudTd>
                         <MudTd DataLabel="Исполнение">
@@ -760,11 +866,10 @@
                 <div class="mt-3 ml-0 mr-4 d-flex">
                     <div class="d-flex ml-auto align-center">
                         <MudIconButton Style="margin-right: 5px" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Outlined.AddCircleOutline" OnClick="AddTurningTappingTool" />
-                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveTurningTappingTool" />
+                        <MudIconButton Variant="Variant.Outlined" Color="Color.Error" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="RemoveLastTurningTappingTool" />
                     </div>
                 </div>
             </MudTabPanel>
-            #endregion
         }
     </MudTabs>
 </MudSwipeArea>
@@ -822,6 +927,18 @@
         set
         {
             Tools.RemoveAll(x => x is MillingTappingTool);
+            Tools.AddRange(value);
+        }
+    }
+    #endregion
+
+    #region Список резьбофрез
+    public List<MillingThreadCuttingTool> MillingThreadCuttingTools
+    {
+        get => Tools.OfType<MillingThreadCuttingTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is MillingThreadCuttingTool);
             Tools.AddRange(value);
         }
     }
@@ -965,6 +1082,7 @@
     private MillingDrillingTool _selectedMillingDrillingTool = null;
     private MillingSpecialTool _selectedMillingSpecialTool = null;
     private MillingTappingTool _selectedMillingTappingTool = null;
+    private MillingThreadCuttingTool _selectedMillingThreadCuttingTool = null;
     private MillingTool _selectedMillingTool = null;
 
     private GroovingExternalTool _selectedGroovingExternalTool = null;
@@ -979,159 +1097,195 @@
     private TurningTappingTool _selectedTurningTappingTool = null;
 
     // MillingDrilling
+    private async Task AddMillingChamferTool()
+    {
+        Tools.Add(new MillingChamferTool(1, 6, 45));
+        await LocalStorage.SetItemAsync(nameof(MillingChamferTools), MillingChamferTools);
+    }
+    private async Task RemoveLastMillingChamferTool()
+    {
+        if (MillingChamferTools.Count > 0) Tools.Remove(MillingChamferTools[^1]);
+        await LocalStorage.SetItemAsync(nameof(MillingChamferTools), MillingChamferTools);
+    }
+
+    // MillingDrilling
     private async Task AddMillingDrillingTool()
     {
         Tools.Add(new MillingDrillingTool(1, DrillingTool.Types.Solid, 10, 140));
-        await localStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
     }
-    private async Task RemoveMillingDrillingTool()
+    private async Task RemoveLastMillingDrillingTool()
     {
         if (MillingDrillingTools.Count > 0) Tools.Remove(MillingDrillingTools[^1]);
-        await localStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+    }
+
+    // MillingSpecial
+    private async Task AddMillingSpecialTool()
+    {
+        Tools.Add(new MillingSpecialTool(1, string.Empty));
+        await LocalStorage.SetItemAsync(nameof(MillingSpecialTools), MillingSpecialTools);
+    }
+    private async Task RemoveLastMillingSpecialTool()
+    {
+        if (MillingSpecialTools.Count > 0) Tools.Remove(MillingSpecialTools[^1]);
+        await LocalStorage.SetItemAsync(nameof(MillingSpecialTools), MillingSpecialTools);
     }
 
     // MillingTapping
     private async Task AddMillingTappingTool()
     {
         Tools.Add(new MillingTappingTool(1, TappingTool.Types.Cutting, 8, 1.25));
-        await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
     }
-    private async Task RemoveMillingTappingTool()
+    private async Task RemoveLastMillingTappingTool()
     {
         if (MillingTappingTools.Count > 0) Tools.Remove(MillingTappingTools[^1]);
-        await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
+    }
+
+    // MillingThreadCutting
+    private async Task AddMillingThreadCuttingTool()
+    {
+        Tools.Add(new MillingThreadCuttingTool(1, 9.5, ThreadStandart.NPT, 1.411));
+        await LocalStorage.SetItemAsync(nameof(MillingThreadCuttingTools), MillingThreadCuttingTools);
+    }
+    private async Task RemoveLastMillingThreadCuttingTool()
+    {
+        if (MillingThreadCuttingTools.Count > 0) Tools.Remove(MillingThreadCuttingTools[^1]);
+        await LocalStorage.SetItemAsync(nameof(MillingThreadCuttingTools), MillingThreadCuttingTools);
     }
 
     //Milling
     private async Task AddMillingTool()
     {
         Tools.Add(new MillingTool(1, MillingTool.Types.Solid, 12));
-        await localStorage.SetItemAsync(nameof(MillingTools), MillingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingTools), MillingTools);
     }
-    private async Task RemoveMillingTool()
+    private async Task RemoveLastMillingTool()
     {
         if (MillingTools.Count > 0) Tools.Remove(MillingTools[^1]);
-        await localStorage.SetItemAsync(nameof(MillingTools), MillingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingTools), MillingTools);
     }
 
     // GroovingExternal
     private async Task AddGroovingExternalTool()
     {
         Tools.Add(new GroovingExternalTool(0101, GroovingExternalTool.Types.Cutting, 3, TurningGroovingTool.Point.Left));
-        await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+        await LocalStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
     }
-    private async Task RemoveGroovingExternalTool()
+    private async Task RemoveLastGroovingExternalTool()
     {
         if (GroovingExternalTools.Count > 0) Tools.Remove(GroovingExternalTools[^1]);
-        await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+        await LocalStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
     }
 
     // GroovingFace
     private async Task AddGroovingFaceTool()
     {
         Tools.Add(new GroovingFaceTool(0101, 3, TurningGroovingTool.Point.Top));
-        await localStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
+        await LocalStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
     }
-    private async Task RemoveGroovingFaceTool()
+    private async Task RemoveLastGroovingFaceTool()
     {
         if (GroovingFaceTools.Count > 0) Tools.Remove(GroovingFaceTools[^1]);
-        await localStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
+        await LocalStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
     }
 
     // GroovingInternal
     private async Task AddGroovingInternalTool()
     {
         Tools.Add(new GroovingInternalTool(0101, 20, 3, TurningGroovingTool.Point.Left));
-        await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
+        await LocalStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
     }
-    private async Task RemoveGroovingInternalTool()
+    private async Task RemoveLastGroovingInternalTool()
     {
         if (GroovingInternalTools.Count > 0) Tools.Remove(GroovingInternalTools[^1]);
-        await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
+        await LocalStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
     }
 
     // SpecialTurning
     private async Task AddSpecialTurningTool()
     {
         Tools.Add(new TurningSpecialTool(0101, "UPOR"));
-        await localStorage.SetItemAsync(nameof(TurningSpecialTools), TurningSpecialTools);
+        await LocalStorage.SetItemAsync(nameof(TurningSpecialTools), TurningSpecialTools);
     }
-    private async Task RemoveSpecialTurningTool()
+    private async Task RemoveLastSpecialTurningTool()
     {
         if (TurningSpecialTools.Count > 0) Tools.Remove(TurningSpecialTools[^1]);
-        await localStorage.SetItemAsync(nameof(TurningSpecialTools), TurningSpecialTools);
+        await LocalStorage.SetItemAsync(nameof(TurningSpecialTools), TurningSpecialTools);
     }
 
     // ThreadingExternal
     private async Task AddThreadingExternalTool()
     {
         Tools.Add(new ThreadingExternalTool(0101, 1.5, 1));
-        await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
+        await LocalStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
     }
-    private async Task RemoveThreadingExternalTool()
+    private async Task RemoveLastThreadingExternalTool()
     {
         if (ThreadingExternalTools.Count > 0) Tools.Remove(ThreadingExternalTools[^1]);
-        await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
+        await LocalStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
     }
 
     // ThreadingInternal
     private async Task AddThreadingInternalTool()
     {
         Tools.Add(new ThreadingInternalTool(0101, 20, 1.5, 1));
-        await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
+        await LocalStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
     }
-    private async Task RemoveThreadingInternalTool()
+    private async Task RemoveLastThreadingInternalTool()
     {
         if (ThreadingInternalTools.Count > 0) Tools.Remove(ThreadingInternalTools[^1]);
-        await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
+        await LocalStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
     }
 
     // TurningDrilling
     private async Task AddTurningDrillingTool()
     {
         Tools.Add(new TurningDrillingTool(0101, DrillingTool.Types.Solid, 10, 140));
-        await localStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);
+        await LocalStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);
     }
-    private async Task RemoveTurningDrillingTool()
+    private async Task RemoveLastTurningDrillingTool()
     {
         if (TurningDrillingTools.Count > 0) Tools.Remove(TurningDrillingTools[^1]);
-        await localStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);
+        await LocalStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);
     }
 
     // TurningExternal
     private async Task AddTurningExternalTool()
     {
         Tools.Add(new TurningExternalTool(0101, TurningExternalTool.Types.Bar, 80, 0.8));
-        await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+        await LocalStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
     }
-    private async Task RemoveTurningExternalTool()
+    private async Task RemoveLastTurningExternalTool()
     {
         if (TurningExternalTools.Count > 0) Tools.Remove(TurningExternalTools[^1]);
-        await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+        await LocalStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
     }
 
     // TurningInternal
     private async Task AddTurningInternalTool()
     {
         Tools.Add(new TurningInternalTool(0101, 25, 80, 0.8));
-        await localStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
+        await LocalStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
     }
-    private async Task RemoveTurningInternalTool()
+    private async Task RemoveLastTurningInternalTool()
     {
         if (TurningInternalTools.Count > 0) Tools.Remove(TurningInternalTools[^1]);
-        await localStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
+        await LocalStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
     }
 
     // TurningTapping
     private async Task AddTurningTappingTool()
     {
         Tools.Add(new TurningTappingTool(0101, TappingTool.Types.Cutting, 8, 1.25));
-        await localStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
+        await LocalStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
     }
-    private async Task RemoveTurningTappingTool()
+    private async Task RemoveLastTurningTappingTool()
     {
         if (TurningTappingTools.Count > 0) Tools.Remove(TurningTappingTools[^1]);
-        await localStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
+        await LocalStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
     }
 
     private static double[] _chamferAngleTemplates = { 30, 45, 60, };
@@ -1167,11 +1321,6 @@
         await Task.Delay(5);
 
     // if text is null or empty, show complete list
-        if (string.IsNullOrEmpty(value.ToString()))
-        {
-            return _chamferAngleTemplates;
-        }
-
-        return _chamferAngleTemplates.Where(x => x.ToString(CultureInfo.InvariantCulture).Contains(value.ToString(CultureInfo.InvariantCulture), StringComparison.InvariantCultureIgnoreCase));
+        return string.IsNullOrEmpty(value.ToString(CultureInfo.InvariantCulture)) ? _chamferAngleTemplates : _chamferAngleTemplates.Where(x => x.ToString(CultureInfo.InvariantCulture).Contains(value.ToString(CultureInfo.InvariantCulture), StringComparison.InvariantCultureIgnoreCase));
     }
 }
