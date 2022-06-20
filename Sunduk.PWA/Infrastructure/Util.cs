@@ -20,7 +20,7 @@ namespace Sunduk.PWA.Infrastructure
 
         public enum GetNumberOption { Any, OnlyPositive }
         public enum PrettyStringOption { AsIs, ZeroToEmpty }
-        public enum ToolDescriptionOption { General, L230, GoodwayLeft, GoodwayRight, ToolTable }
+        public enum ToolDescriptionOption { General, L230, GoodwayLeft, GoodwayRight, ToolTable, MillingToolChange }
         public enum NcDecimalPointOption { With, Without }
         public enum TranslateOption { RemoveBadSymbols, OnlyTranslate }
 
@@ -212,30 +212,35 @@ namespace Sunduk.PWA.Infrastructure
                 MillingChamferTool millingChamferTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{millingChamferTool.Position} ({millingChamferTool.Name} D{millingChamferTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingChamferTool.Angle.NC(option: NcDecimalPointOption.Without)})",
+                    ToolDescriptionOption.MillingToolChange => $"T{millingChamferTool.Position} M6 ({millingChamferTool.Name} D{millingChamferTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingChamferTool.Angle.NC(option: NcDecimalPointOption.Without)})",
                     ToolDescriptionOption.ToolTable => millingChamferTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 MillingDrillingTool millingDrillingTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{millingDrillingTool.Position} ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
+                    ToolDescriptionOption.MillingToolChange => $"T{millingDrillingTool.Position} M6 ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
                     ToolDescriptionOption.ToolTable => millingDrillingTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 MillingSpecialTool millingSpecialTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{millingSpecialTool.Position} ({millingSpecialTool.Name})",
+                    ToolDescriptionOption.MillingToolChange => $"T{millingSpecialTool.Position} M6 ({millingSpecialTool.Name})",
                     ToolDescriptionOption.ToolTable => millingSpecialTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 MillingTappingTool millingTappingTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{millingTappingTool.Position} ({millingTappingTool.Name} M{millingTappingTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingTappingTool.Pitch.NC(option: NcDecimalPointOption.Without)})",
+                    ToolDescriptionOption.MillingToolChange => $"T{millingTappingTool.Position} M6 ({millingTappingTool.Name} M{millingTappingTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingTappingTool.Pitch.NC(option: NcDecimalPointOption.Without)})",
                     ToolDescriptionOption.ToolTable => millingTappingTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 MillingTool millingTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{millingTool.Position} ({millingTool.Name} D{millingTool.Diameter.NC(option: NcDecimalPointOption.Without)} L{millingTool.CuttingLength} Z{millingTool.Edges})",
+                    ToolDescriptionOption.MillingToolChange => $"T{millingTool.Position} M6 ({millingTool.Name} D{millingTool.Diameter.NC(option: NcDecimalPointOption.Without)} L{millingTool.CuttingLength} Z{millingTool.Edges})",
                     ToolDescriptionOption.ToolTable => millingTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
@@ -408,10 +413,10 @@ namespace Sunduk.PWA.Infrastructure
                     },
                     Machine.A110 => seq switch
                     {
-                        MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence => $"(T{millingHighSpeedDrillingSequence.Tool.Position:D2} - {millingHighSpeedDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence => $"(T{millingPeckDeepDrillingSequence.Tool.Position:D2} - {millingPeckDeepDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        MillingPeckDrillingSequence millingPeckDrillingSequence => $"(T{millingPeckDrillingSequence.Tool.Position:D2} - {millingPeckDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        MillingCustomSequence millingCustomSequence => $"(T{millingCustomSequence.Tool.Position:D2} - {millingCustomSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence => $"(T{(millingHighSpeedDrillingSequence.Tool.Position > 9 ? millingHighSpeedDrillingSequence.Tool.Position : millingHighSpeedDrillingSequence.Tool.Position + " ")} - {millingHighSpeedDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence => $"(T{(millingPeckDeepDrillingSequence.Tool.Position > 9 ? millingPeckDeepDrillingSequence.Tool.Position : millingPeckDeepDrillingSequence.Tool.Position + " ")} - {millingPeckDeepDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        MillingPeckDrillingSequence millingPeckDrillingSequence => $"(T{(millingPeckDrillingSequence.Tool.Position > 9 ? millingPeckDrillingSequence.Tool.Position : millingPeckDrillingSequence.Tool.Position + " ")} - {millingPeckDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        MillingCustomSequence millingCustomSequence => $"(T{(millingCustomSequence.Tool.Position > 9 ? millingCustomSequence.Tool.Position : millingCustomSequence.Tool.Position + " ")} - {millingCustomSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
                         _ => string.Empty,
                     }, 
                     _ => string.Empty,

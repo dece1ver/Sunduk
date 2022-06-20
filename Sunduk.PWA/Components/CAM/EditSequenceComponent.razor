@@ -749,6 +749,7 @@
     [Parameter] public List<Tool> Tools { get; set; }
     [Parameter] public List<Sequence> Program { get; set; }
     [Parameter] public Sequence Sequence { get; set; }
+    [Parameter] public CoordinateSystem CoordinateSystem { get; set; }
 
     public Sequence CurrentSequence { get; set; }
     private string CurrentThreadTemplate { get; set; }
@@ -861,6 +862,7 @@
                 case MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence:
                     CurrentSequence = new MillingHighSpeedDrillingSequence(
                         millingHighSpeedDrillingSequence.Machine,
+                        millingHighSpeedDrillingSequence.CoordinateSystem,
                         millingHighSpeedDrillingSequence.Material,
                         Tool as MillingDrillingTool,
                         DrillStart,
@@ -872,6 +874,7 @@
                 case MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence:
                     CurrentSequence = new MillingPeckDeepDrillingSequence (
                         millingPeckDeepDrillingSequence.Machine,
+                        millingPeckDeepDrillingSequence.CoordinateSystem,
                         millingPeckDeepDrillingSequence.Material,
                         Tool as MillingDrillingTool,
                         StepOver,
@@ -884,6 +887,7 @@
                 case MillingPeckDrillingSequence millingPeckDrillingSequence:
                     CurrentSequence = new MillingPeckDrillingSequence(
                         millingPeckDrillingSequence.Machine,
+                        millingPeckDrillingSequence.CoordinateSystem,
                         millingPeckDrillingSequence.Material,
                         Tool as MillingDrillingTool,
                         StepOver,
@@ -896,6 +900,7 @@
                 case MillingTappingSequence millingTappingSequence:
                     CurrentSequence = new MillingTappingSequence(
                         millingTappingSequence.Machine,
+                        millingTappingSequence.CoordinateSystem,
                         Tool as MillingTappingTool,
                         TappingCutSpeed,
                         DrillStart,
@@ -907,6 +912,7 @@
                 case MillingCustomSequence millingCustomSequence:
                     CurrentSequence = new MillingCustomSequence(
                         millingCustomSequence.Machine,
+                        millingCustomSequence.CoordinateSystem,
                         Tool,
                         CustomOperation,
                         Coolant,

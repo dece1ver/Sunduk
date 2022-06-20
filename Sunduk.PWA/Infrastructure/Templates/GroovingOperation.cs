@@ -82,7 +82,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"G0 X{(externalDiameter + 2).NC(0)} Z{zPoint.NC()} S{GroovingSpeedRough(material)} {Direction(tool)}\n" +
@@ -90,7 +90,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 cutting +
                 $"G0 X{(externalDiameter + 2).NC(0)}\n" +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
@@ -100,7 +100,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 cutting +
                 $"G0 X{(externalDiameter + 2).NC(0)}\n" +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 _ => string.Empty,
             };
@@ -278,7 +278,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 (external
@@ -290,7 +290,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G0 X{(externalDiameter + clearance * 2).NC(0)}\n" +
                 (external ? string.Empty : "Z2.\n") +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
@@ -304,7 +304,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G0 X{(externalDiameter + clearance * 2).NC(0)}\n" +
                 (external ? string.Empty : "Z2.\n") + 
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 _ => string.Empty,
             };
@@ -479,7 +479,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{GroovingSpeedRough(material)} {Direction(tool)}\n" +
@@ -487,7 +487,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 cutting +
                 $"G0 Z{(startPoint + clearance * 2).NC(0)}\n" +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
@@ -497,7 +497,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 cutting +
                 $"G0 Z{(startPoint + clearance * 2).NC(0)}\n" +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 _ => string.Empty,
             };

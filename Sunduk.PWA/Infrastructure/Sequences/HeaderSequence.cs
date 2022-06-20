@@ -12,12 +12,12 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public string DetailNumber { get; set; }
         public string DetailName { get; set; }
         public string Author { get; set; }
-        public double DrawVersion { get; set; }
+        public string DrawVersion { get; set; }
         public string ToolTable { get; set; }
         public override string Operation => $"{Templates.Operation.Header(Machine, DetailNumber, DetailName, Author, DrawVersion)}{ToolTable}";
         public override MachineType MachineType => MachineType.Any;
 
-        public HeaderSequence(Machine machine, string number, string name, string author, double drawVersion, string toolTable)
+        public HeaderSequence(Machine machine, string number, string name, string author, string drawVersion, string toolTable)
         {
             Machine = machine;
             DetailNumber = number;

@@ -96,7 +96,7 @@
                             <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
                         </MudItem>
                         <MudItem xs="12" sm="4">
-                            <MudTextField @bind-Value="DrawingVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Margin="Margin.Dense" />
+                            <MudTextField @bind-Value="DrawingVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
                         <MudItem xs="12" sm="4">
                             <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
@@ -203,6 +203,7 @@
                     <MudPaper Class="pa-4 rounded-0" Elevation="0" Outlined="false">
                         <AddSequenceComponent Tools="Tools"
                                               Machine="Machine"
+                                              CoordinateSystem="CoordinateSystem"
                                               MachineType="MachineType"
                                               Program="Program"
                                               @bind-Mode="Mode"
@@ -321,7 +322,8 @@
 
     public int OperationNumber { get; set; } = 1;
 
-    public double DrawingVersion { get; set; }
+    public string DrawingVersion { get; set; }
+    public string NcDrawingVersion => !string.IsNullOrEmpty(DrawingVersion) ? DrawingVersion : "0.0";
 
     public int? SpindleLimit { get; set; }
 
@@ -637,29 +639,29 @@
             {
                 switch (Program[i])
                 {
-                    case HeaderSequence headerSequence:
+                    case HeaderSequence:
                         var newHeaderSequence = Program[i] as HeaderSequence;
                         newHeaderSequence.Machine = Machine;
                         newHeaderSequence.DetailNumber = NcDetailNumber;
                         newHeaderSequence.DetailName = NcDetailName;
                         newHeaderSequence.Author = NcAuthor;
-                        newHeaderSequence.DrawVersion = DrawingVersion;
+                        newHeaderSequence.DrawVersion = NcDrawingVersion;
                         newHeaderSequence.ToolTable = Util.GetToolTable(Machine, Program);
                         Program[i] = newHeaderSequence;
                         break;
-                    case SafetyStringSequence safetyStringSequence:
+                    case SafetyStringSequence:
                         var newSafetyStringSequence = Program[i] as SafetyStringSequence;
                         newSafetyStringSequence.Machine = Machine;
                         newSafetyStringSequence.SpeedLimit = SpindleLimit;
                         newSafetyStringSequence.CoordinateSystem = CoordinateSystem;
                         Program[i] = newSafetyStringSequence;
                         break;
-                    case LimiterSequence limiterSequence:
+                    case LimiterSequence:
                         var newLimiterSequence = Program[i] as LimiterSequence;
                         newLimiterSequence.Machine = Machine;
                         Program[i] = newLimiterSequence;
                         break;
-                    case FacingSequence facingSequence:
+                    case FacingSequence:
                         var newFacingSequence = Program[i] as FacingSequence;
                         newFacingSequence.Machine = Machine;
                         newFacingSequence.Material = WorkpieceMaterial;
@@ -667,7 +669,7 @@
                         newFacingSequence.InternalDiameter = GetCurrentInternalDiameter(i);
                         Program[i] = newFacingSequence;
                         break;
-                    case RoughFacingSequence roughFacingSequence:
+                    case RoughFacingSequence:
                         var newRoughFacingSequence = Program[i] as RoughFacingSequence;
                         newRoughFacingSequence.Machine = Machine;
                         newRoughFacingSequence.Material = WorkpieceMaterial;
@@ -675,7 +677,7 @@
                         newRoughFacingSequence.InternalDiameter = GetCurrentInternalDiameter(i);
                         Program[i] = newRoughFacingSequence;
                         break;
-                    case RoughFacingCycleSequence roughFacingCycleSequence:
+                    case RoughFacingCycleSequence:
                         var newRoughFacingCycleSequence = Program[i] as RoughFacingCycleSequence;
                         newRoughFacingCycleSequence.Machine = Machine;
                         newRoughFacingCycleSequence.Material = WorkpieceMaterial;
@@ -683,7 +685,7 @@
                         newRoughFacingCycleSequence.InternalDiameter = GetCurrentInternalDiameter(i);
                         Program[i] = newRoughFacingCycleSequence;
                         break;
-                    case FinishFacingSequence finishFacingSequence:
+                    case FinishFacingSequence:
                         var newFinishFacingSequence = Program[i] as FinishFacingSequence;
                         newFinishFacingSequence.Machine = Machine;
                         newFinishFacingSequence.Material = WorkpieceMaterial;
@@ -691,59 +693,68 @@
                         newFinishFacingSequence.InternalDiameter = GetCurrentInternalDiameter(i);
                         Program[i] = newFinishFacingSequence;
                         break;
-                    case FinishFacingCycleSequence finishFacingCycleSequence:
+                    case FinishFacingCycleSequence:
                         break;
-                    case TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence:
+                    case TurningHighSpeedDrillingSequence:
                         var newTurningHighSpeedDrillingSequence = Program[i] as TurningHighSpeedDrillingSequence;
                         newTurningHighSpeedDrillingSequence.Machine = Machine;
                         newTurningHighSpeedDrillingSequence.Material = WorkpieceMaterial;
                         break;
-                    case MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence:
+                    case MillingHighSpeedDrillingSequence:
                         var newMillingHighSpeedDrillingSequence = Program[i] as MillingHighSpeedDrillingSequence;
                         newMillingHighSpeedDrillingSequence.Machine = Machine;
+                        newMillingHighSpeedDrillingSequence.CoordinateSystem = CoordinateSystem;
                         newMillingHighSpeedDrillingSequence.Material = WorkpieceMaterial;
                         break;
-                    case TurningPeckDrillingSequence turningPeckDrillingSequence:
+                    case TurningPeckDrillingSequence:
                         var newTurningPeckDrillingSequence = Program[i] as TurningPeckDrillingSequence;
                         newTurningPeckDrillingSequence.Machine = Machine;
                         newTurningPeckDrillingSequence.Material = WorkpieceMaterial;
                         break;
-                    case MillingPeckDrillingSequence millingPeckDrillingSequence:
+                    case MillingPeckDrillingSequence:
                         var newMillingPeckDrillingSequence = Program[i] as MillingPeckDrillingSequence;
                         newMillingPeckDrillingSequence.Machine = Machine;
+                        newMillingPeckDrillingSequence.CoordinateSystem = CoordinateSystem;
                         newMillingPeckDrillingSequence.Material = WorkpieceMaterial;
                         break;
-                    case TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence:
+                    case TurningPeckDeepDrillingSequence:
                         var newTurningPeckDeepDrillingSequence = Program[i] as TurningPeckDeepDrillingSequence;
                         newTurningPeckDeepDrillingSequence.Machine = Machine;
                         newTurningPeckDeepDrillingSequence.Material = WorkpieceMaterial;
                         break;
-                    case MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence:
+                    case MillingPeckDeepDrillingSequence:
                         var newMillingPeckDeepDrillingSequence = Program[i] as MillingPeckDeepDrillingSequence;
                         newMillingPeckDeepDrillingSequence.Machine = Machine;
+                        newMillingPeckDeepDrillingSequence.CoordinateSystem = CoordinateSystem;
                         newMillingPeckDeepDrillingSequence.Material = WorkpieceMaterial;
                         break;
-                    case TurningTappingSequence TurningTappingSequence:
+                    case TurningTappingSequence:
                         var newTurningTappingSequence = Program[i] as TurningTappingSequence;
                         newTurningTappingSequence.Machine = Machine;
                         break;
-                    case MillingTappingSequence MillingTappingSequence:
+                    case MillingTappingSequence:
                         var newMillingTappingSequence = Program[i] as MillingTappingSequence;
                         newMillingTappingSequence.Machine = Machine;
+                        newMillingTappingSequence.CoordinateSystem = CoordinateSystem;
                         break;
-                    case ThreadCuttingSequence threadCuttingSequence:
+                    case ThreadCuttingSequence:
                         var newThreadCuttingSequence = Program[i] as ThreadCuttingSequence;
                         newThreadCuttingSequence.Machine = Machine;
                         break;
-                    case CustomSequence toolCallSequence:
-                        var newCustomSequence = Program[i] as CustomSequence;
-                        newCustomSequence.Machine = Machine;
+                    case TurningCustomSequence:
+                        var newTurningCustomSequence = Program[i] as TurningCustomSequence;
+                        newTurningCustomSequence.Machine = Machine;
                         break;
-                    case TurningGroovingSequence turningGroovingSequence:
+                    case MillingCustomSequence:
+                        var newMillingCustomSequence = Program[i] as MillingCustomSequence;
+                        newMillingCustomSequence.Machine = Machine;
+                        newMillingCustomSequence.CoordinateSystem = CoordinateSystem;
+                        break;
+                    case TurningGroovingSequence:
                         var newTurningGroovingSequence = Program[i] as TurningGroovingSequence;
                         newTurningGroovingSequence.Machine = Machine;
                         break;
-                    case TurningCutOffSequence turningCutOffSequence:
+                    case TurningCutOffSequence:
                         var newTurningCutOffSequence = Program[i] as TurningCutOffSequence;
                         newTurningCutOffSequence.Machine = Machine;
                         break;
@@ -755,7 +766,40 @@
             for (int i = 0; i < Program.Count; i++)
             {
                 var sequence = Program[i];
-                result.Add(Program.IndexOf(sequence) == Program.Count - 1 ? sequence.Operation.Replace("/", string.Empty).Replace("M1", string.Empty) : sequence.Operation);
+                if (Program.IndexOf(sequence) == Program.Count - 1)
+                {
+                    result.Add(sequence.Operation.Replace("/G91 G30 Z0\n/G90 G53 X-800 Y0\nM1", "G91 G30 Z0\nG90 G53 X-800 Y0"));
+                }
+                else if (Program.Count > Program.IndexOf(sequence) + 1 && Program.IndexOf(sequence) > 1)
+                {
+                    string first = sequence.Operation.Split('\n', 2)[0], other = sequence.Operation.Split('\n', 2)[1];
+                    var nextSequence = Program[i + 1];
+                    switch (nextSequence)
+                    {
+                        case MillingCustomSequence millingCustomSequence:
+                            result.Add($"{first}\nT{millingCustomSequence.Tool.Position}\n{other}");
+                            break;
+                        case MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence:
+                            result.Add($"{first}\nT{millingHighSpeedDrillingSequence.Tool.Position}\n{other}");
+                            break;
+                        case MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence:
+                            result.Add($"{first}\nT{millingPeckDeepDrillingSequence.Tool.Position}\n{other}");
+                            break;
+                        case MillingPeckDrillingSequence millingPeckDrillingSequence:
+                            result.Add($"{first}\nT{millingPeckDrillingSequence.Tool.Position}\n{other}");
+                            break;
+                        case MillingTappingSequence millingTappingSequence:
+                            result.Add($"{first}\nT{millingTappingSequence.Tool.Position}\n{other}");
+                            break;
+                        default:
+                            result.Add(sequence.Operation);
+                            break;
+                    }
+                }
+                else
+                {
+                    result.Add(sequence.Operation);
+                }
             }
             return string.Join("\n", result.Where(x => !string.IsNullOrEmpty(x))).Trim() + ProgramEnd;
         }

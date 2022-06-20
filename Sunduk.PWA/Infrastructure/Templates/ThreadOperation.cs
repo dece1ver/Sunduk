@@ -21,21 +21,21 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 startZ <= endZ) return string.Empty;
             string approach = startZ > 0
                 ? $"G0 X0. Z{startZ.NC()} S{cutSpeed.ToSpindleSpeed(tool.Diameter, 10)} {Direction(tool)} G97\n"
-                : $"G0 X0. Z{SAFE_APPROACH_DISTANCE.NC()} S{((int)cutSpeed).ToSpindleSpeed(tool.Diameter, 10)} {Direction(tool)} G97\nZ{startZ.NC()}\n";
+                : $"G0 X0. Z{SafeApproachDistance.NC()} S{((int)cutSpeed).ToSpindleSpeed(tool.Diameter, 10)} {Direction(tool)} G97\nZ{startZ.NC()}\n";
             string exit = startZ > 0
                 ? string.Empty
-                : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
+                : $"G0 Z{SafeApproachDistance.NC()}\n";
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 approach +
                 $"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}\n" +
                 $"G80\n" +
                 exit +
                 $"G96 {CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
@@ -45,12 +45,12 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G80\n" +
                 exit +
                 $"G96 {CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
                 _ => string.Empty
             };
         }
 
-        public static string MillingTapping(Machine machine, MillingTappingTool tool, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar = false)
+        public static string MillingTapping(Machine machine, CoordinateSystem coordinateSystem, MillingTappingTool tool, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar = false)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
             var spindleSpeed = cutSpeed.ToSpindleSpeed(tool.Diameter, 10);
@@ -58,10 +58,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
 
                 Machine.A110 =>
-                tool.Description(ToolDescriptionOption.General) + "\n" +
-                $"T00\n" +
-                $"{(polar ? "G16 " : string.Empty)}" +
-                $"G57 G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
+                tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
+                $"{coordinateSystem}{(polar ? "G16 " : string.Empty)} G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
                 $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
                 $"G95 G84 Z{endZ.NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} P500 F{tool.Pitch.NC()}\n",
                 _ => string.Empty
@@ -76,8 +74,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     Machine.A110 =>
                     $"G80\n" +
                     $"{CoolantOff(machine)}\n" +
-                    $"{(polar ? "G15" : string.Empty)}" +
-                    MILLING_REFERENT_POINT,
+                    $"{(polar ? "G15\n" : string.Empty)}" +
+                    SpindleStop + "\n" +
+                    MillingReferentPoint,
                     _ => string.Empty
                 };
             }
@@ -113,13 +112,13 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"G0 X{approachDiameter} Z{startZ.NC()} S{120.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97\n" +
                 $"G76 P0201{Thread.Profile(threadStandart)} Q{minStep} R{lastPass.NC()}\n" +
                 $"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}\n" +
                 $"G96 {CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
@@ -128,7 +127,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G76 P0201{Thread.Profile(threadStandart)} Q{minStep} R{lastPass.NC()}\n" +
                 $"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}\n" +
                 $"G96 {CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 _ => string.Empty,
             };

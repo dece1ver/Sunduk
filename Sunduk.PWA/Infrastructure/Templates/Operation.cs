@@ -15,18 +15,19 @@ namespace Sunduk.PWA.Infrastructure.Templates
 {
     public abstract class Operation
     {
-        public const double SAFE_APPROACH_DISTANCE = 2;
-        public const string TURNING_REFERENT_POINT = "G30 U0 W0\n";
-        public const string TURNING_REFERENT_POINT_CONSISTENTLY = "G30 U0\nG30 W0\n";
-        public const string MILLING_REFERENT_POINT = 
-            "/G90 G30 Z0\n" +
+        public const double SafeApproachDistance = 2;
+        public const string TurningReferentPoint = "G30 U0 W0\n";
+        public const string TurningReferentPointConsistently = "G30 U0\nG30 W0\n";
+        public const string MillingReferentPoint = 
+            "/G91 G30 Z0\n" +
             "/G90 G53 X-800 Y0\n" +
             "M1\n";
-        public const string MILLING_SAFETY_STRING = "G90 G17 G54\n";
-        public const string GOODWAY_RETURN_B = "G55 G30 B0\n";
-        public const string STOP = "M0";
-        public const string OP_STOP = "M1";
-        public const string PROCESSING_SNIPPET = "(---OBRABOTKA---)\n";
+        public const string MillingSafetyString = "G90 G17 G54\n";
+        public const string GoodwayReturnB = "G55 G30 B0\n";
+        public const string SpindleStop = "M5";
+        public const string Stop = "M0";
+        public const string OpStop = "M1";
+        public const string ProcessingSnippet = "(---OBRABOTKA---)\n";
 
 
 
@@ -279,12 +280,12 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// шапка
         /// </summary>
-        public static string Header(Machine machine, string number, string name, string author, double drawVersion) => machine switch
+        public static string Header(Machine machine, string number, string name, string author, string drawVersion) => machine switch
         {
             Machine.GS1500 =>
             "%\n" +
             $"<{number}>({name})\n" +
-            $"({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
+            $"({drawVersion.Replace(',', '.')})\n" +
             "G10 L2 P1 Z-100. B300. (G54)\n" +
             "G10 L2 P2 Z400. (G55)\n" +
             $"({author}) ({DateTime.Now:dd.MM.yy})\n" +
@@ -293,14 +294,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
             Machine.L230A =>
             "%\n" +
             $"O0001 ({number})\n" +
-            $"({name})({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
+            $"({drawVersion.Replace(',', '.')})\n" +
             $"({author})({DateTime.Now:dd.MM.yy})\n" +
             "(0M0S)\n",
 
             Machine.A110 =>
             "%\n" +
             $"O0001 ({number})\n" +
-            $"({name})({drawVersion.ToString(null, CultureInfo.InvariantCulture)})\n" +
+            $"({drawVersion.Replace(',', '.')})\n" +
             $"({author})({DateTime.Now:dd.MM.yy})\n" +
             "(0M0S)\n",
 
@@ -313,14 +314,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public static string SafetyString(Machine machine, int? speedLimit, CoordinateSystem cs) => machine switch
         {
             Machine.GS1500 =>
-            TURNING_REFERENT_POINT_CONSISTENTLY +
-            GOODWAY_RETURN_B +
+            TurningReferentPointConsistently +
+            GoodwayReturnB +
             "G40 G80\n" +
             $"G50 S{((speedLimit ?? 0) > 4000 ? 4000 : speedLimit ?? 3500)}\n" +
             "G96\n",
 
             Machine.L230A =>
-            TURNING_REFERENT_POINT_CONSISTENTLY +
+            TurningReferentPointConsistently +
             $"G40 G80 {cs}\n" +
             $"G50 S{((speedLimit ?? 0) > 5000 ? 5000 : speedLimit ?? 3000)}\n" +
             "G96 G23\n",
@@ -339,21 +340,21 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 $"T{tool.Position.ToolNumber()} G54 ({tool.Name})\n" +
                 $"G0 X{externalDiameter.NC(0)} Z0.5\n" +
                 SpindleUnclamp(machine) + "\n" +
-                STOP + "\n" +
+                Stop + "\n" +
                 "W1.\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 $"T{tool.Position.ToolNumber()} ({tool.Name})\n" +
                 $"G0 X{externalDiameter.NC(0)} Z0.5\n" +
                 SpindleUnclamp(machine) + "\n" +
-                STOP + "\n" +
+                Stop + "\n" +
                 "W1.\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 _ => string.Empty,
             };
@@ -368,19 +369,19 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"{CoolantOn(machine)}\n" +
-                (string.IsNullOrEmpty(customOperation) ? PROCESSING_SNIPPET : customOperation + '\n') +
+                (string.IsNullOrEmpty(customOperation) ? ProcessingSnippet : customOperation + '\n') +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
-                (string.IsNullOrEmpty(customOperation) ? PROCESSING_SNIPPET : customOperation + '\n') +
+                (string.IsNullOrEmpty(customOperation) ? ProcessingSnippet : customOperation + '\n') +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 _ => string.Empty,
             };
@@ -389,7 +390,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Фрезерный вызов инструмента
         /// </summary>
-        public static string MillingCustomOperation(Machine machine, Tool tool, string customOperation, Coolant coolant = Coolant.General, bool polar = false)
+        public static string MillingCustomOperation(Machine machine, CoordinateSystem coordinateSystem, Tool tool, string customOperation, Coolant coolant = Coolant.General, bool polar = false)
         {
             if (tool is null) return string.Empty;
             string direction = string.Empty;
@@ -408,21 +409,19 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.A110 =>
-                tool.Description(ToolDescriptionOption.General) + "\n" +
-                $"T00\n" +
-                $"{(polar ? "G16 " : string.Empty)}" +
-                $"G57 G0 X0 Y0 S3000 {direction}\n" +
-                $"G43 Z100 H{tool.Position} {((direction == "M13" || direction == "M14") ? string.Empty : CoolantOn(machine, coolant))}\n" +
-                (string.IsNullOrEmpty(customOperation) ? PROCESSING_SNIPPET : customOperation + '\n') +
+                tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
+                $"{coordinateSystem}{(polar ? " G16" : string.Empty)} G0 X0 Y0 S3000 {direction}\n" +
+                $"G43 Z100 H{tool.Position} {(direction is "M13" or "M14" ? string.Empty : CoolantOn(machine, coolant))}\n" +
+                (string.IsNullOrEmpty(customOperation) ? ProcessingSnippet : customOperation + '\n') +
                 $"{CoolantOff(machine, coolant)}\n" +
                 $"{(polar ? "G15\n" : string.Empty)}" +
-                MILLING_REFERENT_POINT,
+                SpindleStop + "\n" +
+                MillingReferentPoint,
 
                 _ => string.Empty,
             };
         }
 
-        
 
         /// <summary>
         /// наружная фаска в пределах цикла
@@ -431,27 +430,23 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <param name="angle">Угол фаски</param>
         /// <param name="chamferSize">Размер фаски</param>
         /// <param name="roundCorners">Выполнять ли притупления R0.3 на краях фаски</param>
+        /// <param name="startProfile">Фаска в начале контура?</param>
         /// <returns></returns>
         private static string CycleChamferExternal(double chamferDiameter, double angle, double chamferSize, bool roundCorners = true, bool startProfile = true)
         {
             double result = ((chamferDiameter - (2 * chamferSize * Math.Tan(angle.Radians()))) - 0.8 * Math.Tan(angle.Radians()));
-            if (chamferDiameter > 0 && angle > 0 && chamferSize > 0 && !roundCorners)
+            return chamferDiameter switch
             {
-                return
-                    $"X{result.NC()}\n" +
-                    $"{(startProfile ? "G1 Z0.\n" : string.Empty)}" +
-                    $"X{chamferDiameter.NC()} A-{angle.NC()}";
-            }
-            else if (chamferDiameter > 0 && angle > 0 && chamferSize > 0 && roundCorners)
-            {
-                return
-                    $"G0 X{result - 2 * (0.8 + 0.3)}\n" +
-                    $"G1 Z0.\n" +
-                    $"X{result.NC()} R{(0.8 + 0.3).NC()}\n" +
-                    $"X{chamferDiameter.NC()} A-{angle.NC()} R{(0.8 + 0.3).NC()}\n" +
-                    $"W-{(0.8 + 0.3).NC()}";
-            }
-            return string.Empty;
+                > 0 when angle > 0 && chamferSize > 0 && !roundCorners => $"X{result.NC()}\n" +
+                                                                          $"{(startProfile ? "G1 Z0.\n" : string.Empty)}" +
+                                                                          $"X{chamferDiameter.NC()} A-{angle.NC()}",
+                > 0 when angle > 0 && chamferSize > 0 && roundCorners => $"G0 X{result - 2 * (0.8 + 0.3)}\n" +
+                                                                         $"G1 Z0.\n" +
+                                                                         $"X{result.NC()} R{(0.8 + 0.3).NC()}\n" +
+                                                                         $"X{chamferDiameter.NC()} A-{angle.NC()} R{(0.8 + 0.3).NC()}\n" +
+                                                                         $"W-{(0.8 + 0.3).NC()}",
+                _ => string.Empty
+            };
         }
     }
 }
