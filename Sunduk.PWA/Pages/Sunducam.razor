@@ -312,7 +312,7 @@
 
     public string DetailNumber { get; set; }
 
-    public string NcDetailNumber => $"{(!string.IsNullOrEmpty(DetailNumber) ? DetailNumber.Translate() : "AR000-00-000")}.{ OperationNumber.ToString("D1").Replace(",", ".")}S";
+    public string NcDetailNumber => $"{(!string.IsNullOrEmpty(DetailNumber) ? DetailNumber.Translate() : "AR000-00-000")}{(OperationNumber > 0 ? $".{ OperationNumber.ToString("D1").Replace(",", ".")}S" : string.Empty)}";
 
     public string DetailName { get; set; }
     public string NcDetailName => !string.IsNullOrEmpty(DetailName) ? $"{DetailName.Translate()}" : "DETAIL";
@@ -320,10 +320,10 @@
     public string Author { get; set; }
     public string NcAuthor => !string.IsNullOrEmpty(Author) ? $"{Author.Translate()}" : "AUTHOR";
 
-    public int OperationNumber { get; set; } = 1;
+    public int OperationNumber { get; set; } = 0;
 
     public string DrawingVersion { get; set; }
-    public string NcDrawingVersion => !string.IsNullOrEmpty(DrawingVersion) ? DrawingVersion : "0.0";
+    public string NcDrawingVersion => !string.IsNullOrEmpty(DrawingVersion) ? DrawingVersion.Translate() : "0.0";
 
     public int? SpindleLimit { get; set; }
 

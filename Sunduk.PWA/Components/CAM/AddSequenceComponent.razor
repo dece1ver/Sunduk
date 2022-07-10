@@ -721,7 +721,7 @@
 
     public Sequence CurrentSequence { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task  OnInitializedAsync()
     {
         if (Holes.Count == 0) Holes.Add(new Hole());
         HolesCount = 1;
