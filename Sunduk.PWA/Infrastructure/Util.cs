@@ -446,6 +446,19 @@ namespace Sunduk.PWA.Infrastructure
         };
 
         /// <summary>
+        /// Конвертер углов 0-180 Double
+        /// </summary>
+        public static Converter<double> HalfAngleDoubleConverter = new()
+        {
+            SetFunc = value => 
+            { 
+                if (value > 0 || value <= 180) return value.ToPrettyString();
+                return string.Empty;
+            },
+            GetFunc = text => text.GetDouble(0, GetNumberOption.Any),
+        };
+
+        /// <summary>
         /// Конвертер Double с нулем
         /// </summary>
         public static Converter<double?> NullableDoubleConverterWithZero = new()

@@ -250,6 +250,7 @@
 
     #region Фрезерный инструмент
     
+    public List<MillingBoreTool> MillingBoreTools { get; set; }
     public List<MillingChamferTool> MillingChamferTools { get; set; }
     public List<MillingDrillingTool> MillingDrillingTools { get; set; }
     public List<MillingSpecialTool> MillingSpecialTools { get; set; }
@@ -355,6 +356,14 @@
         Machine = await localStorage.GetItemAsync<Machine>(nameof(Machine));
         OnMachineChanged(Machine);
 
+        //MillingChamfer
+        MillingBoreTools = await localStorage.GetItemAsync<List<MillingBoreTool>>(nameof(MillingBoreTools)) ?? new List<MillingBoreTool>();
+        if (MillingBoreTools.Count == 0)
+        {
+            //await localStorage.SetItemAsync(nameof(MillingBoreTools), MillingBoreTools);
+        }
+        Tools.AddRange(MillingBoreTools);
+
         // MillingChamfer
         MillingChamferTools = await localStorage.GetItemAsync<List<MillingChamferTool>>(nameof(MillingChamferTools)) ?? new List<MillingChamferTool>();
         if (MillingChamferTools.Count == 0)
@@ -389,7 +398,7 @@
         if (MillingTappingTools.Count == 0)
         {
             
-            await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
+            //await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
         }
         Tools.AddRange(MillingTappingTools);
 
@@ -529,6 +538,7 @@
     {
 
         await localStorage.SetItemAsync(nameof(MillingChamferTools), MillingChamferTools);
+        await localStorage.SetItemAsync(nameof(MillingBoreTools), MillingBoreTools);
         await localStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
         await localStorage.SetItemAsync(nameof(MillingSpecialTools), MillingSpecialTools);
         await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);

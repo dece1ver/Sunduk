@@ -18,6 +18,9 @@
                             <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("center-length")" Href="/knowledge/center-length">
                                 <MudText Class="mx-n4" Typo=Typo.body2>Глубина центровки</MudText>
                             </MudListItem>
+                            <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("fanuc-macro")" Href="/knowledge/fanuc-macro">
+                                <MudText Class="mx-n4" Typo=Typo.body2>Fanuc макро</MudText>
+                            </MudListItem>
                             <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("vectors")" Href="/knowledge/vectors">
                                 <MudText Class="mx-n4" Typo=Typo.body2>Вектора</MudText>
                             </MudListItem>
@@ -47,6 +50,7 @@
             {
                 case "about": <AboutKnowledgeComponent/> break;
                 case "center-length": <CenterLengthComponent/> break;
+                case "fanuc-macro": <FanucMacroVariables/> break;
                 case "vectors": <VectorComponent/> break;
                 case "fanuc-general-programming": <GeneralPrograming/> break;
                 case "programming-g00": <ProgrammingG00/> break;
