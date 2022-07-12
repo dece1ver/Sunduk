@@ -58,8 +58,15 @@
     [Parameter] 
     public EventCallback<List<Tool>> ToolsChanged { get; set; }
 
-    [Parameter]
-    public List<TurningTappingTool> TurningTappingTools { get; set; }
+    public List<TurningTappingTool> TurningTappingTools
+    {
+        get => Tools.OfType<TurningTappingTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is TurningTappingTool);
+            Tools.AddRange(value);
+        }
+    }
 
     [Parameter]
     public bool ReadOnly { get; set; }

@@ -16,12 +16,12 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
         public override MachineType MachineType => MachineType.Milling;
 
 
-        public MillingBoreTool(int position, double diameter, double cuttingLength = 0, double cornerRadius = 0, ToolHand hand = ToolHand.Right)
+        public MillingBoreTool(int position, double diameter, double cuttingLength = 0, double radius = -1, ToolHand hand = ToolHand.Right)
         {
             Position = position;
             Diameter = diameter;
             CuttingLength = cuttingLength == 0 ? Math.Round(diameter * 3) : cuttingLength;
-            Radius = cornerRadius == 0 ? 0.2 : cornerRadius;
+            Radius = radius < 0 ? 0.2 : radius;
             Hand = hand;
         }
     }

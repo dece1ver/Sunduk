@@ -14,31 +14,31 @@
             </MudTabPanel>
 
             <MudTabPanel Text="Расточки" Style="font-size: x-small">
-                <MillingBoreToolsComponent @bind-Tools="Tools" MillingBoreTools="MillingBoreTools" ReadOnly="false" />
+                <MillingBoreToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
 
             <MudTabPanel Text="Фасочники" Style="font-size: x-small">
-                <MillingChamferToolsComponent @bind-Tools="Tools" MillingChamferTools="MillingChamferTools" ReadOnly="false"/>
+                <MillingChamferToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
             
             <MudTabPanel Text="Сверла" Style="font-size: x-small">
-                <MillingDrillingToolsComponent @bind-Tools="Tools" MillingDrillingTools="MillingDrillingTools" ReadOnly="false"/>
+                <MillingDrillingToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
 
             <MudTabPanel Text="Специальный" Style="font-size: x-small">
-                <MillingSpecialToolsComponent @bind-Tools="Tools" MillingSpecialTools="MillingSpecialTools" ReadOnly="false"/>
+                <MillingSpecialToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
 
             <MudTabPanel Text="Метчики" Style="font-size: x-small">
-                <MillingTappingToolsComponent @bind-Tools="Tools" MillingTappingTools="MillingTappingTools" ReadOnly="false"/>
+                <MillingTappingToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
 
             <MudTabPanel Text="Резьбофрезы" Style="font-size: x-small">
-                <MillingThreadCuttingToolsComponent @bind-Tools="Tools" MillingThreadCuttingTools="MillingThreadCuttingTools" ReadOnly="false"/>
+                <MillingThreadCuttingToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
 
             <MudTabPanel Text="Фрезы" Style="font-size: x-small">
-                <MillingToolsComponent @bind-Tools="Tools" MillingTools="MillingTools" ReadOnly="false"/>
+                <MillingToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
         }
 
@@ -46,59 +46,59 @@
         {
             // GroovingExternal
             <MudTabPanel Text="Канавки наружные" Style="font-size: x-small">
-                <GroovingExternalToolsComponent @bind-Tools="Tools" GroovingExternalTools="GroovingExternalTools" ReadOnly="false"/>
+                <GroovingExternalToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
 
 
             // GroovingFace
             <MudTabPanel Text="Канавки торцевые" Style="font-size: x-small">
-                 <GroovingFaceToolsComponent @bind-Tools="Tools" GroovingFaceTools="GroovingFaceTools" ReadOnly="false"/>
+                 <GroovingFaceToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
 
 
             // GroovingInternal
             <MudTabPanel Text="Канавки внутренние" Style="font-size: x-small">
-                <GroovingInternalToolsComponent @bind-Tools="Tools" GroovingInternalTools="GroovingInternalTools" ReadOnly="false"/>
+                <GroovingInternalToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
 
 
             // SpecialTurning
             <MudTabPanel Text="Спец" Style="font-size: x-small">
-                <TurningSpecialToolsComponent @bind-Tools="Tools" TurningSpecialTools="TurningSpecialTools" ReadOnly="false" />
+                <TurningSpecialToolsComponent @bind-Tools="Tools" ReadOnly="false" />
             </MudTabPanel>
 
             // ThreadingExternal
             <MudTabPanel Text="Резьбовые наружные" Style="font-size: x-small">
-                <ThreadingExternalToolsComponent @bind-Tools="Tools" ThreadingExternalTools="ThreadingExternalTools" ReadOnly="false"/>
+                <ThreadingExternalToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
 
 
             // ThreadingInternal
             <MudTabPanel Text="Резьбовые внутренние" Style="font-size: x-small">
-                <ThreadingInternalToolsComponent @bind-Tools="Tools" ThreadingInternalTools="ThreadingInternalTools" ReadOnly="false"/>
+                <ThreadingInternalToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
 
 
             // TurningDrilling
             <MudTabPanel Text="Сверла" Style="font-size: x-small">
-                <TurningDrillingToolsComponent @bind-Tools="Tools" TurningDrillingTools="TurningDrillingTools" ReadOnly="false" />
+                <TurningDrillingToolsComponent @bind-Tools="Tools" ReadOnly="false" />
             </MudTabPanel>
 
 
             // TurningExternal
             <MudTabPanel Text="Точение наружное" Style="font-size: x-small">
-                <TurningExternalToolsComponent @bind-Tools="Tools" TurningExternalTools="TurningExternalTools" ReadOnly="false" />
+                <TurningExternalToolsComponent @bind-Tools="Tools" ReadOnly="false" />
             </MudTabPanel>
 
             // TurningInternal
             <MudTabPanel Text="Точение внутреннее" Style="font-size: x-small">
-                <TurningInternalToolsComponent @bind-Tools="Tools" TurningInternalTools="TurningInternalTools" ReadOnly="false" />
+                <TurningInternalToolsComponent @bind-Tools="Tools" ReadOnly="false" />
             </MudTabPanel>
 
 
             // TurningTapping
             <MudTabPanel Text="Метчики" Style="font-size: x-small">
-                <TurningTappingToolsComponent @bind-Tools="Tools" TurningTappingTools="TurningTappingTools" ReadOnly="false" />
+                <TurningTappingToolsComponent @bind-Tools="Tools" ReadOnly="false" />
             </MudTabPanel>
         }
     </MudTabs>
@@ -113,211 +113,6 @@
     public MachineType MachineType { get; set; }
 
     public int Tabs => MachineType == MachineType.Turning ? 9 : 4;
-
-    #region Список расточек
-    public List<MillingBoreTool> MillingBoreTools
-    {
-        get => Tools.OfType<MillingBoreTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is MillingBoreTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список фасочников
-    public List<MillingChamferTool> MillingChamferTools
-    {
-        get => Tools.OfType<MillingChamferTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is MillingChamferTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список сверел (фрезерный)
-    public List<MillingDrillingTool> MillingDrillingTools
-    {
-        get => Tools.OfType<MillingDrillingTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is MillingDrillingTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список спец. инструмента (фрезерный)
-    public List<MillingSpecialTool> MillingSpecialTools
-    {
-        get => Tools.OfType<MillingSpecialTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is MillingSpecialTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список метчиков (фрезерный)
-    public List<MillingTappingTool> MillingTappingTools
-    {
-        get => Tools.OfType<MillingTappingTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is MillingTappingTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список резьбофрез
-    public List<MillingThreadCuttingTool> MillingThreadCuttingTools
-    {
-        get => Tools.OfType<MillingThreadCuttingTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is MillingThreadCuttingTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список фрез
-    public List<MillingTool> MillingTools
-    {
-        get => Tools.OfType<MillingTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is MillingTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-
-    #region Список наружных канавочных
-    public List<GroovingExternalTool> GroovingExternalTools
-    {
-        get => Tools.OfType<GroovingExternalTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is GroovingExternalTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список торцевых канавочных
-    public List<GroovingFaceTool> GroovingFaceTools
-    {
-        get => Tools.OfType<GroovingFaceTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is GroovingFaceTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список внутренних канавочных
-    public List<GroovingInternalTool> GroovingInternalTools
-    {
-        get => Tools.OfType<GroovingInternalTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is GroovingInternalTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список спец/ инструмента (токарный)
-    public List<TurningSpecialTool> TurningSpecialTools
-    {
-        get => Tools.OfType<TurningSpecialTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is TurningSpecialTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список наружных резьбовых
-    public List<ThreadingExternalTool> ThreadingExternalTools
-    {
-        get => Tools.OfType<ThreadingExternalTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is ThreadingExternalTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список внутренних резьбовых
-    public List<ThreadingInternalTool> ThreadingInternalTools
-    {
-        get => Tools.OfType<ThreadingInternalTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is ThreadingInternalTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список сверел (токарный)
-    public List<TurningDrillingTool> TurningDrillingTools
-    {
-        get => Tools.OfType<TurningDrillingTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is TurningDrillingTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список наружных проходных
-    public List<TurningExternalTool> TurningExternalTools
-    {
-        get => Tools.OfType<TurningExternalTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is TurningExternalTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список расточных
-    public List<TurningInternalTool> TurningInternalTools
-    {
-        get => Tools.OfType<TurningInternalTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is TurningInternalTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
-
-    #region Список метчиков (токарный)
-    public List<TurningTappingTool> TurningTappingTools
-    {
-        get => Tools.OfType<TurningTappingTool>().ToList();
-        set
-        {
-            Tools.RemoveAll(x => x is TurningTappingTool);
-            Tools.AddRange(value);
-        }
-    }
-    #endregion
 
     private static double[] _chamferAngleTemplates = { 30, 45, 60, };
 

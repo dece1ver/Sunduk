@@ -72,8 +72,15 @@
     [Parameter] 
     public EventCallback<List<Tool>> ToolsChanged { get; set; }
 
-    [Parameter]
-    public List<GroovingExternalTool> GroovingExternalTools { get; set; }
+    public List<GroovingExternalTool> GroovingExternalTools
+    {
+        get => Tools.OfType<GroovingExternalTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is GroovingExternalTool);
+            Tools.AddRange(value);
+        }
+    }
 
     [Parameter]
     public bool ReadOnly { get; set; }

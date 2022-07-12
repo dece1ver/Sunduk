@@ -51,8 +51,15 @@
     [Parameter] 
     public EventCallback<List<Tool>> ToolsChanged { get; set; }
 
-    [Parameter]
-    public List<TurningExternalTool> TurningExternalTools { get; set; }
+    public List<TurningExternalTool> TurningExternalTools
+    {
+        get => Tools.OfType<TurningExternalTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is TurningExternalTool);
+            Tools.AddRange(value);
+        }
+    }
 
     [Parameter]
     public bool ReadOnly { get; set; }

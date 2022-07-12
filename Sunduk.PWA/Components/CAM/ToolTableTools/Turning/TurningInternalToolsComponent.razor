@@ -48,8 +48,15 @@
     [Parameter] 
     public EventCallback<List<Tool>> ToolsChanged { get; set; }
 
-    [Parameter]
-    public List<TurningInternalTool> TurningInternalTools { get; set; }
+    public List<TurningInternalTool> TurningInternalTools
+    {
+        get => Tools.OfType<TurningInternalTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is TurningInternalTool);
+            Tools.AddRange(value);
+        }
+    }
 
     [Parameter]
     public bool ReadOnly { get; set; }

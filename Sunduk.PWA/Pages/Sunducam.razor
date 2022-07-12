@@ -1,6 +1,6 @@
 ﻿@page "/sunducam"
 @inject IDialogService DialogService
-@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="fas fa-crutch">Раздел в разработке</MudAlert>
     <MudGrid Spacing="1">
@@ -353,48 +353,49 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Machine = await localStorage.GetItemAsync<Machine>(nameof(Machine));
+        Machine = await LocalStorage.GetItemAsync<Machine>(nameof(Machine));
         OnMachineChanged(Machine);
 
-        //MillingChamfer
-        MillingBoreTools = await localStorage.GetItemAsync<List<MillingBoreTool>>(nameof(MillingBoreTools)) ?? new List<MillingBoreTool>();
+        // MillingBore
+        MillingBoreTools = await LocalStorage.GetItemAsync<List<MillingBoreTool>>(nameof(MillingBoreTools)) ?? new List<MillingBoreTool>();
         if (MillingBoreTools.Count == 0)
         {
-            //await localStorage.SetItemAsync(nameof(MillingBoreTools), MillingBoreTools);
+            MillingBoreTools.Add(new MillingBoreTool(05, 16, 50, 0.2));
+            await LocalStorage.SetItemAsync(nameof(MillingBoreTools), MillingBoreTools);
         }
         Tools.AddRange(MillingBoreTools);
 
         // MillingChamfer
-        MillingChamferTools = await localStorage.GetItemAsync<List<MillingChamferTool>>(nameof(MillingChamferTools)) ?? new List<MillingChamferTool>();
+        MillingChamferTools = await LocalStorage.GetItemAsync<List<MillingChamferTool>>(nameof(MillingChamferTools)) ?? new List<MillingChamferTool>();
         if (MillingChamferTools.Count == 0)
         {
             MillingChamferTools.Add(new MillingChamferTool(05, 12, 45, 1));
             MillingChamferTools.Add(new MillingChamferTool(11, 16, 45, 1));
             MillingChamferTools.Add(new MillingChamferTool(16, 6, 45));
-            await localStorage.SetItemAsync(nameof(MillingChamferTools), MillingChamferTools);
+            await LocalStorage.SetItemAsync(nameof(MillingChamferTools), MillingChamferTools);
         }
         Tools.AddRange(MillingChamferTools);
 
         // MillingDrilling
-        MillingDrillingTools = await localStorage.GetItemAsync<List<MillingDrillingTool>>(nameof(MillingDrillingTools)) ?? new List<MillingDrillingTool>();
+        MillingDrillingTools = await LocalStorage.GetItemAsync<List<MillingDrillingTool>>(nameof(MillingDrillingTools)) ?? new List<MillingDrillingTool>();
         if (MillingDrillingTools.Count == 0)
         {
             MillingDrillingTools.Add(new MillingDrillingTool(13, DrillingTool.Types.Solid, 11.2, 140));
-            await localStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+            await LocalStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
         }
         Tools.AddRange(MillingDrillingTools);
 
         // MillingSpecial
-        MillingSpecialTools = await localStorage.GetItemAsync<List<MillingSpecialTool>>(nameof(MillingSpecialTools)) ?? new List<MillingSpecialTool>();
+        MillingSpecialTools = await LocalStorage.GetItemAsync<List<MillingSpecialTool>>(nameof(MillingSpecialTools)) ?? new List<MillingSpecialTool>();
         if (MillingSpecialTools.Count == 0)
         {
             MillingSpecialTools.Add(new MillingSpecialTool(24, "BLUM"));
-            await localStorage.SetItemAsync(nameof(MillingSpecialTools), MillingSpecialTools);
+            await LocalStorage.SetItemAsync(nameof(MillingSpecialTools), MillingSpecialTools);
         }
         Tools.AddRange(MillingSpecialTools);
 
         // MillingTapping
-        MillingTappingTools = await localStorage.GetItemAsync<List<MillingTappingTool>>(nameof(MillingTappingTools)) ?? new List<MillingTappingTool>();
+        MillingTappingTools = await LocalStorage.GetItemAsync<List<MillingTappingTool>>(nameof(MillingTappingTools)) ?? new List<MillingTappingTool>();
         if (MillingTappingTools.Count == 0)
         {
             
@@ -403,121 +404,121 @@
         Tools.AddRange(MillingTappingTools);
 
         // MillingThreadCutting
-        MillingThreadCuttingTools = await localStorage.GetItemAsync<List<MillingThreadCuttingTool>>(nameof(MillingThreadCuttingTools)) ?? new List<MillingThreadCuttingTool>();
+        MillingThreadCuttingTools = await LocalStorage.GetItemAsync<List<MillingThreadCuttingTool>>(nameof(MillingThreadCuttingTools)) ?? new List<MillingThreadCuttingTool>();
         if (MillingThreadCuttingTools.Count == 0)
         {
             MillingThreadCuttingTools.Add(new MillingThreadCuttingTool(14, 9.5, ThreadStandart.NPT, 1.411));
-            await localStorage.SetItemAsync(nameof(MillingThreadCuttingTools), MillingThreadCuttingTools);
+            await LocalStorage.SetItemAsync(nameof(MillingThreadCuttingTools), MillingThreadCuttingTools);
         }
         Tools.AddRange(MillingThreadCuttingTools);
 
         // Milling
-        MillingTools = await localStorage.GetItemAsync<List<MillingTool>>(nameof(MillingTools)) ?? new List<MillingTool>();
+        MillingTools = await LocalStorage.GetItemAsync<List<MillingTool>>(nameof(MillingTools)) ?? new List<MillingTool>();
         if (MillingTools.Count == 0)
         {
             MillingTools.Add(new MillingTool(04, MillingTool.Types.Insert, 63, 5));
             MillingTools.Add(new MillingTool(12, MillingTool.Types.Insert, 32, 3));
             MillingTools.Add(new MillingTool(20, MillingTool.Types.Insert, 80, 6));
-            await localStorage.SetItemAsync(nameof(MillingTools), MillingTools);
+            await LocalStorage.SetItemAsync(nameof(MillingTools), MillingTools);
         }
         Tools.AddRange(MillingTools);
 
         // GroovingExternal
-        GroovingExternalTools = await localStorage.GetItemAsync<List<GroovingExternalTool>>(nameof(GroovingExternalTools)) ?? new List<GroovingExternalTool>();
+        GroovingExternalTools = await LocalStorage.GetItemAsync<List<GroovingExternalTool>>(nameof(GroovingExternalTools)) ?? new List<GroovingExternalTool>();
         if (GroovingExternalTools.Count == 0)
         {
             GroovingExternalTools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Grooving, 3, TurningGroovingTool.Point.Left));
             GroovingExternalTools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Cutting, 3, TurningGroovingTool.Point.Right));
-            await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+            await LocalStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
         }
         Tools.AddRange(GroovingExternalTools);
 
         // GroovingFace
-        GroovingFaceTools = await localStorage.GetItemAsync<List<GroovingFaceTool>>(nameof(GroovingFaceTools)) ?? new List<GroovingFaceTool>();
+        GroovingFaceTools = await LocalStorage.GetItemAsync<List<GroovingFaceTool>>(nameof(GroovingFaceTools)) ?? new List<GroovingFaceTool>();
         if (GroovingFaceTools.Count == 0)
         {
             GroovingFaceTools.Add(new GroovingFaceTool(1212, 4, TurningGroovingTool.Point.Bottom));
-            await localStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
+            await LocalStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
         }
         Tools.AddRange(GroovingFaceTools);
 
         // GroovingInternal
-        GroovingInternalTools = await localStorage.GetItemAsync<List<GroovingInternalTool>>(nameof(GroovingInternalTools)) ?? new List<GroovingInternalTool>();
+        GroovingInternalTools = await LocalStorage.GetItemAsync<List<GroovingInternalTool>>(nameof(GroovingInternalTools)) ?? new List<GroovingInternalTool>();
         if (GroovingInternalTools.Count == 0)
         {
             GroovingInternalTools.Add(new GroovingInternalTool(1212, 20, 3, TurningGroovingTool.Point.Right));
             GroovingInternalTools.Add(new GroovingInternalTool(1212, 40, 4, TurningGroovingTool.Point.Right));
-            await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
+            await LocalStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
         }
         Tools.AddRange(GroovingInternalTools);
 
         // SpecialTurning
-        TurningSpecialTools = await localStorage.GetItemAsync<List<TurningSpecialTool>>(nameof(TurningSpecialTools)) ?? new List<TurningSpecialTool>();
+        TurningSpecialTools = await LocalStorage.GetItemAsync<List<TurningSpecialTool>>(nameof(TurningSpecialTools)) ?? new List<TurningSpecialTool>();
         if (TurningSpecialTools.Count == 0)
         {
             TurningSpecialTools.Add(new TurningSpecialTool(0101, "UPOR"));
-            await localStorage.SetItemAsync(nameof(TurningSpecialTools), TurningSpecialTools);
+            await LocalStorage.SetItemAsync(nameof(TurningSpecialTools), TurningSpecialTools);
         }
         Tools.AddRange(TurningSpecialTools);
 
         // ThreadingExternal
-        ThreadingExternalTools = await localStorage.GetItemAsync<List<ThreadingExternalTool>>(nameof(ThreadingExternalTools)) ?? new List<ThreadingExternalTool>();
+        ThreadingExternalTools = await LocalStorage.GetItemAsync<List<ThreadingExternalTool>>(nameof(ThreadingExternalTools)) ?? new List<ThreadingExternalTool>();
         if (ThreadingExternalTools.Count == 0)
         {
             ThreadingExternalTools.Add(new ThreadingExternalTool(1111, 1.5, 1));
-            await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
+            await LocalStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
         }
         Tools.AddRange(ThreadingExternalTools);
 
         // ThreadingInternal
-        ThreadingInternalTools = await localStorage.GetItemAsync<List<ThreadingInternalTool>>(nameof(ThreadingInternalTools)) ?? new List<ThreadingInternalTool>();
+        ThreadingInternalTools = await LocalStorage.GetItemAsync<List<ThreadingInternalTool>>(nameof(ThreadingInternalTools)) ?? new List<ThreadingInternalTool>();
         if (ThreadingInternalTools.Count == 0)
         {
             ThreadingInternalTools.Add(new ThreadingInternalTool(1111, 16, 1.5, 1));
-            await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
+            await LocalStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
         }
         Tools.AddRange(ThreadingInternalTools);
 
         // TurningDrilling
-        TurningDrillingTools = await localStorage.GetItemAsync<List<TurningDrillingTool>>(nameof(TurningDrillingTools)) ?? new List<TurningDrillingTool>();
+        TurningDrillingTools = await LocalStorage.GetItemAsync<List<TurningDrillingTool>>(nameof(TurningDrillingTools)) ?? new List<TurningDrillingTool>();
         if (TurningDrillingTools.Count == 0)
         {
             TurningDrillingTools.Add(new TurningDrillingTool(0505, DrillingTool.Types.Rapid, 5, 120));
             TurningDrillingTools.Add(new TurningDrillingTool(0707, DrillingTool.Types.Solid, 10, 140));
             TurningDrillingTools.Add(new TurningDrillingTool(0606, DrillingTool.Types.Insert, 25, 180));
-            await localStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);
+            await LocalStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);
         }
         Tools.AddRange(TurningDrillingTools);
 
         // TurningExternal
-        TurningExternalTools = await localStorage.GetItemAsync<List<TurningExternalTool>>(nameof(TurningExternalTools)) ?? new List<TurningExternalTool>();
+        TurningExternalTools = await LocalStorage.GetItemAsync<List<TurningExternalTool>>(nameof(TurningExternalTools)) ?? new List<TurningExternalTool>();
         if (TurningExternalTools.Count == 0)
         {
             TurningExternalTools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Bar, 55, 0.8));
             TurningExternalTools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Face, 100, 0.8));
             TurningExternalTools.Add(new TurningExternalTool(0303, TurningExternalTool.Types.Bar, 35, 0.4));
-            await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+            await LocalStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
         }
         Tools.AddRange(TurningExternalTools);
 
         // TurningInternal
-        TurningInternalTools = await localStorage.GetItemAsync<List<TurningInternalTool>>(nameof(TurningInternalTools)) ?? new List<TurningInternalTool>();
+        TurningInternalTools = await LocalStorage.GetItemAsync<List<TurningInternalTool>>(nameof(TurningInternalTools)) ?? new List<TurningInternalTool>();
         if (TurningInternalTools.Count == 0)
         {
             TurningInternalTools.Add(new TurningInternalTool(0202, 25, 55, 0.8));
             TurningInternalTools.Add(new TurningInternalTool(0202, 32, 80, 0.8));
             TurningInternalTools.Add(new TurningInternalTool(0303, 10, 55, 0.4));
-            await localStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
+            await LocalStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
         }
         Tools.AddRange(TurningInternalTools);
 
         // TurningTapping
-        TurningTappingTools = await localStorage.GetItemAsync<List<TurningTappingTool>>(nameof(TurningTappingTools)) ?? new List<TurningTappingTool>();
+        TurningTappingTools = await LocalStorage.GetItemAsync<List<TurningTappingTool>>(nameof(TurningTappingTools)) ?? new List<TurningTappingTool>();
         if (TurningTappingTools.Count == 0)
         {
             TurningTappingTools.Add(new TurningTappingTool(0909, TappingTool.Types.Cutting, 12, 1.75));
             TurningTappingTools.Add(new TurningTappingTool(0808, TappingTool.Types.Forming, 10, 1.5));
-            await localStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
+            await LocalStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
         }
         Tools.AddRange(TurningTappingTools);
 
@@ -531,29 +532,29 @@
 
     private async Task SaveMachine()
     {
-        await localStorage.SetItemAsync(nameof(Machine), Machine);
+        await LocalStorage.SetItemAsync(nameof(Machine), Machine);
     }
 
     private async Task SaveTools()
     {
 
-        await localStorage.SetItemAsync(nameof(MillingChamferTools), MillingChamferTools);
-        await localStorage.SetItemAsync(nameof(MillingBoreTools), MillingBoreTools);
-        await localStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
-        await localStorage.SetItemAsync(nameof(MillingSpecialTools), MillingSpecialTools);
-        await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
-        await localStorage.SetItemAsync(nameof(MillingThreadCuttingTools), MillingThreadCuttingTools);
-        await localStorage.SetItemAsync(nameof(MillingTools), MillingTools);
-        await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
-        await localStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
-        await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
-        await localStorage.SetItemAsync(nameof(TurningSpecialTools), TurningSpecialTools);
-        await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
-        await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
-        await localStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);
-        await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
-        await localStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
-        await localStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingChamferTools), MillingChamferTools);
+        await LocalStorage.SetItemAsync(nameof(MillingBoreTools), MillingBoreTools);
+        await LocalStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingSpecialTools), MillingSpecialTools);
+        await LocalStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingThreadCuttingTools), MillingThreadCuttingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingTools), MillingTools);
+        await LocalStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+        await LocalStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
+        await LocalStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
+        await LocalStorage.SetItemAsync(nameof(TurningSpecialTools), TurningSpecialTools);
+        await LocalStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
+        await LocalStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
+        await LocalStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);
+        await LocalStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+        await LocalStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
+        await LocalStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
     }
 
     private async Task OpenToolDialog()

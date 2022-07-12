@@ -9,10 +9,10 @@
         <MudTh>Исполнение</MudTh>
         <MudTh/>
     </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Позиция">@context.Position</MudTd>
-        <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
-        <MudTd DataLabel="Шаг">@context.Pitch.ToPrettyString()</MudTd>
+    <RowTemplate> 
+        <MudTd DataLabel="Позиция">T@(context.Position)</MudTd>
+        <MudTd DataLabel="Диаметр">М@(context.Diameter.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs))</MudTd>
+        <MudTd DataLabel="Шаг">@(context.Pitch.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs))мм</MudTd>
         @if (context.Type == TappingTool.Types.Cutting)
         {
             <MudTd DataLabel="Тип">Нарезной</MudTd>
@@ -28,13 +28,13 @@
     </RowTemplate>
     <RowEditingTemplate>
         <MudTd DataLabel="Позиция">
-            <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Required />
+            <MudTextField @bind-Value="@context.Position" Adornment="Adornment.Start" AdornmentText="T" Variant="Variant.Outlined" Margin="Margin.Dense" Required />
         </MudTd>
         <MudTd DataLabel="Диаметр">
-            <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+            <MudTextField @bind-Value="@context.Diameter" Adornment="Adornment.Start" AdornmentText="Ø" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
         </MudTd>
         <MudTd DataLabel="Шаг">
-            <MudTextField @bind-Value="@context.Pitch" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+            <MudTextField @bind-Value="@context.Pitch" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
         </MudTd>
         <MudTd DataLabel="Тип">
             <MudSelect T="TappingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
@@ -53,14 +53,24 @@
 <AddToolButton OnClick="AddMillingTappingTool" />
 
 @code {
+    /// <summary>
+    /// TODO сделать шаблоны и обозначения под разные стандарты резьб
+    /// </summary>
     [Parameter]
     public List<Tool> Tools { get; set; }
 
     [Parameter] 
     public EventCallback<List<Tool>> ToolsChanged { get; set; }
 
-    [Parameter]
-    public List<MillingTappingTool> MillingTappingTools { get; set; }
+    public List<MillingTappingTool> MillingTappingTools
+    {
+        get => Tools.OfType<MillingTappingTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is MillingTappingTool);
+            Tools.AddRange(value);
+        }
+    }
 
     [Parameter]
     public bool ReadOnly { get; set; }

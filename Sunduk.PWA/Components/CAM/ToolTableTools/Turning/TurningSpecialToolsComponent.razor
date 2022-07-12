@@ -30,8 +30,15 @@
     [Parameter] 
     public EventCallback<List<Tool>> ToolsChanged { get; set; }
 
-    [Parameter]
-    public List<TurningSpecialTool> TurningSpecialTools { get; set; }
+    public List<TurningSpecialTool> TurningSpecialTools
+    {
+        get => Tools.OfType<TurningSpecialTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is TurningSpecialTool);
+            Tools.AddRange(value);
+        }
+    }
 
     [Parameter]
     public bool ReadOnly { get; set; }

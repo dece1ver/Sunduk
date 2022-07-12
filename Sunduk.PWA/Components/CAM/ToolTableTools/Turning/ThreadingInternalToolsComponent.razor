@@ -52,8 +52,15 @@
     [Parameter] 
     public EventCallback<List<Tool>> ToolsChanged { get; set; }
 
-    [Parameter]
-    public List<ThreadingInternalTool> ThreadingInternalTools { get; set; }
+    public List<ThreadingInternalTool> ThreadingInternalTools
+    {
+        get => Tools.OfType<ThreadingInternalTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is ThreadingInternalTool);
+            Tools.AddRange(value);
+        }
+    }
 
     [Parameter]
     public bool ReadOnly { get; set; }

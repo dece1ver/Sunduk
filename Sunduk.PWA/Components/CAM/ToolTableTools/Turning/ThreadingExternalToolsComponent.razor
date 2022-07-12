@@ -44,8 +44,15 @@
     [Parameter] 
     public EventCallback<List<Tool>> ToolsChanged { get; set; }
 
-    [Parameter]
-    public List<ThreadingExternalTool> ThreadingExternalTools { get; set; }
+    public List<ThreadingExternalTool> ThreadingExternalTools
+    {
+        get => Tools.OfType<ThreadingExternalTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is ThreadingExternalTool);
+            Tools.AddRange(value);
+        }
+    }
 
     [Parameter]
     public bool ReadOnly { get; set; }

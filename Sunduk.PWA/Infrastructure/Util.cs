@@ -452,8 +452,8 @@ namespace Sunduk.PWA.Infrastructure
         {
             SetFunc = value => 
             { 
-                if (value > 0 || value <= 180) return value.ToPrettyString();
-                return string.Empty;
+                if (value is > 0 and <= 180) return value.ToPrettyString();
+                return "0";
             },
             GetFunc = text => text.GetDouble(0, GetNumberOption.Any),
         };

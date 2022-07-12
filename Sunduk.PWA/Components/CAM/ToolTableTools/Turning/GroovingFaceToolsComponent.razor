@@ -52,8 +52,15 @@
     [Parameter] 
     public EventCallback<List<Tool>> ToolsChanged { get; set; }
 
-    [Parameter]
-    public List<GroovingFaceTool> GroovingFaceTools { get; set; }
+    public List<GroovingFaceTool> GroovingFaceTools
+    {
+        get => Tools.OfType<GroovingFaceTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is GroovingFaceTool);
+            Tools.AddRange(value);
+        }
+    }
 
     [Parameter]
     public bool ReadOnly { get; set; }
