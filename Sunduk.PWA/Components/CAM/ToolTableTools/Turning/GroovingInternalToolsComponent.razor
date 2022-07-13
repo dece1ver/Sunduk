@@ -10,10 +10,10 @@
         <MudTh/>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
-        <MudTd DataLabel="Диаметр">@context.Diameter.ToPrettyString()</MudTd>
-        <MudTd DataLabel="Ширина">@context.Width.ToPrettyString()</MudTd>
-        <MudTd DataLabel="Радиус">@context.CornerRadius.ToPrettyString()</MudTd>
+        <MudTd DataLabel="Позиция">T@(context.Position.ToolNumber())</MudTd>
+        <MudTd DataLabel="Диаметр">Ø@(context.Diameter > 0 ? context.Diameter.ToPrettyString() : "-")</MudTd>
+        <MudTd DataLabel="Ширина">@context.Width.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs)мм</MudTd>
+        <MudTd DataLabel="Радиус">R@(context.CornerRadius > 0 ? context.CornerRadius.ToPrettyString() : "-")</MudTd>
         <MudTd DataLabel="Привязка">@(context.ZeroPoint == TurningGroovingTool.Point.Left ? "Как расточной" : "Как отрезной")</MudTd>
         <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Right ? "Правое" : "Левое")</MudTd>
         <MudTd>
@@ -22,16 +22,16 @@
     </RowTemplate>
     <RowEditingTemplate>
         <MudTd DataLabel="Позиция">
-            <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+            <MudTextField @bind-Value="@context.Position" Adornment="Adornment.Start" AdornmentText="T" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
         </MudTd>
         <MudTd DataLabel="Диаметр">
-            <MudTextField @bind-Value="@context.Diameter" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+            <MudTextField @bind-Value="@context.Diameter" Adornment="Adornment.Start" AdornmentText="Ø" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
         </MudTd>
         <MudTd DataLabel="Ширина">
-            <MudTextField @bind-Value="@context.Width" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+            <MudTextField @bind-Value="@context.Width" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
         </MudTd>
         <MudTd DataLabel="Радиус">
-            <MudTextField @bind-Value="@context.CornerRadius" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+            <MudTextField @bind-Value="@context.CornerRadius" Adornment="Adornment.Start" AdornmentText="R" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
         </MudTd>
         <MudTd DataLabel="Привязка">
             <MudSelect T="TurningGroovingTool.Point" @bind-Value="@context.ZeroPoint" Variant="Variant.Outlined" Margin="Margin.Dense" Required>

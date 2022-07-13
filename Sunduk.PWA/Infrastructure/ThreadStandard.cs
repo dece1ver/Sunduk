@@ -1,6 +1,6 @@
 ﻿namespace Sunduk.PWA.Infrastructure.Sequences
 {
-    public enum ThreadStandart
+    public enum ThreadStandard
     {
         Metric,
         BSPP,

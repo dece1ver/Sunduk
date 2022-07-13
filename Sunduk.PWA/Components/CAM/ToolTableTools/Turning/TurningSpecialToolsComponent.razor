@@ -7,7 +7,7 @@
         <MudTh/>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+        <MudTd DataLabel="Позиция">T@(context.Position.ToolNumber())</MudTd>
         <MudTd DataLabel="Описание">@context.Name</MudTd>
         <MudTd>
             <MudIconButton Class="ma-n3" Variant="Variant.Text" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="(() => RemoveTurningSpecialTool(context))" />
@@ -15,7 +15,7 @@
     </RowTemplate>
     <RowEditingTemplate>
         <MudTd DataLabel="Позиция">
-            <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+            <MudTextField @bind-Value="@context.Position" Adornment="Adornment.Start" AdornmentText="T" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
         </MudTd>
         <MudTd DataLabel="Описание">
             <MudTextField @bind-Value="@context.Name" Variant="Variant.Outlined" Margin="Margin.Dense" />

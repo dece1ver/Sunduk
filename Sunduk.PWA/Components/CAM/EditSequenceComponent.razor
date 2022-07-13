@@ -372,21 +372,21 @@
                     </MudSelect>
                 </MudItem>
             }
-            <MudItem xs="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapezoidal ? 6 : 4)">
+            <MudItem xs="6" md="(ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 6 : 4)">
                 <MudSelect @bind-Value="ThreadType" Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense">
                     <MudSelectItem Value="CuttingType.External">Наружная</MudSelectItem>
                     <MudSelectItem Value="CuttingType.Internal">Внутренняя</MudSelectItem>
                 </MudSelect>
             </MudItem>
-            <MudItem xs="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapezoidal ? 6 : 4)">
-                <MudSelect @bind-Value="ThreadStandart" Label="Тип" T="ThreadStandart" Variant="Variant.Filled" Margin="Margin.Dense">
-                    <MudSelectItem Value="@(ThreadStandart.Metric)">Метрическая 60° (М)</MudSelectItem>
-                    <MudSelectItem Value="@(ThreadStandart.BSPP)">Трубная цилиндрическая 55° (Tr)</MudSelectItem>
-                    <MudSelectItem Value="@(ThreadStandart.Trapezoidal)">Трапецеидальная 30° (G)</MudSelectItem>
-                    <MudSelectItem Value="@(ThreadStandart.NPT)">Коническая 60° (K)</MudSelectItem>
+            <MudItem xs="6" md="(ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 6 : 4)">
+                <MudSelect @bind-Value="ThreadStandard" Label="Тип" T="ThreadStandard" Variant="Variant.Filled" Margin="Margin.Dense">
+                    <MudSelectItem Value="@(ThreadStandard.Metric)">Метрическая 60° (М)</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.BSPP)">Трубная цилиндрическая 55° (Tr)</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">Трапецеидальная 30° (G)</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.NPT)">Коническая 60° (K)</MudSelectItem>
                 </MudSelect>
             </MudItem>
-            @if (ThreadStandart == ThreadStandart.BSPP)
+            @if (ThreadStandard == ThreadStandard.BSPP)
                 {
                 <MudItem xs="6" sm="6" md="4">
                     <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
@@ -399,7 +399,7 @@
                     </MudSelect>
                 </MudItem>
                 }
-                @if (ThreadStandart == ThreadStandart.NPT)
+                @if (ThreadStandard == ThreadStandard.NPT)
                 {
                 <MudItem xs="6" sm="6" md="4">
                     <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
@@ -655,7 +655,7 @@
                 break;
             case ThreadCuttingSequence threadCuttingSequence:
                 Tool = threadCuttingSequence.Tool;
-                ThreadStandart = threadCuttingSequence.ThreadStandart;
+                ThreadStandard = threadCuttingSequence.ThreadStandard;
                 ThreadDiameter = threadCuttingSequence.ThreadDiameter;
                 ThreadPitch = threadCuttingSequence.ThreadPitch;
                 ThreadStart = threadCuttingSequence.StartZ;
@@ -837,7 +837,7 @@
     public List<Hole> Holes { get; set; }
 
     public CuttingType ThreadType { get; set; }
-    public ThreadStandart ThreadStandart { get; set; }
+    public ThreadStandard ThreadStandard { get; set; }
     public double ThreadDiameter { get; set; }
     public double ThreadPitch { get; set; }
     public double ThreadStart { get; set; }
@@ -997,7 +997,7 @@
                     CurrentSequence = new ThreadCuttingSequence(
                         threadCuttingSequence.Machine,
                         Tool as ThreadingTool,
-                        ThreadStandart,
+                        ThreadStandard,
                         ThreadType,
                         ThreadDiameter,
                         ThreadPitch,
@@ -1134,14 +1134,14 @@
     {
         CurrentThreadTemplate = value;
 
-        if (ThreadStandart == ThreadStandart.BSPP)
+        if (ThreadStandard == ThreadStandard.BSPP)
         {
             Thread.GetBsppValues(CurrentThreadTemplate, out string diameter, out string pitch);
             ThreadDiameter = diameter.GetDouble();
             ThreadPitch = pitch.GetDouble();
             ThreadNPTPlane = 0;
         }
-        else if (ThreadStandart == ThreadStandart.NPT)
+        else if (ThreadStandard == ThreadStandard.NPT)
         {
             Thread.GetNptValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
             ThreadDiameter = externalDiameter.GetDouble();

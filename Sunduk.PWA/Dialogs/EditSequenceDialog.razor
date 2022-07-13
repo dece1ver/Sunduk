@@ -256,9 +256,9 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudSelect @bind-Value="ThreadStandart" Label="Тип" T="ThreadStandart">
-                            <MudSelectItem Value="ThreadStandart.Metric">Метрическая 60°</MudSelectItem>
-                            <MudSelectItem Value="ThreadStandart.BSPP">Трубная 55°</MudSelectItem>
+                        <MudSelect @bind-Value="ThreadStandard" Label="Тип" T="ThreadStandard">
+                            <MudSelectItem Value="ThreadStandard.Metric">Метрическая 60°</MudSelectItem>
+                            <MudSelectItem Value="ThreadStandard.BSPP">Трубная 55°</MudSelectItem>
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="6">
@@ -385,7 +385,7 @@
     public double DrillDepth { get; set; }
 
     public CuttingType ThreadType { get; set; }
-    public ThreadStandart ThreadStandart { get; set; }
+    public ThreadStandard ThreadStandard { get; set; }
     public double ThreadDiameter { get; set; }
     public double ThreadPitch { get; set; }
     public double ThreadStart { get; set; }

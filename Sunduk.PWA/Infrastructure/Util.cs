@@ -232,8 +232,8 @@ namespace Sunduk.PWA.Infrastructure
                 },
                 MillingTappingTool millingTappingTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{millingTappingTool.Position} ({millingTappingTool.Name} M{millingTappingTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingTappingTool.Pitch.NC(option: NcDecimalPointOption.Without)})",
-                    ToolDescriptionOption.MillingToolChange => $"T{millingTappingTool.Position} M6 ({millingTappingTool.Name} M{millingTappingTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingTappingTool.Pitch.NC(option: NcDecimalPointOption.Without)})",
+                    ToolDescriptionOption.General => $"T{millingTappingTool.Position} ({millingTappingTool.Name})",
+                    ToolDescriptionOption.MillingToolChange => $"T{millingTappingTool.Position} M6 ({millingTappingTool.Name})",
                     ToolDescriptionOption.ToolTable => millingTappingTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
@@ -328,10 +328,10 @@ namespace Sunduk.PWA.Infrastructure
                 },
                 TurningTappingTool turningTappingTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{turningTappingTool.Position.ToolNumber()} ({turningTappingTool.Name} M{turningTappingTool.Diameter}x{turningTappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{turningTappingTool.Position.ToolNumber()} ({turningTappingTool.Name} M{turningTappingTool.Diameter}x{turningTappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{turningTappingTool.Position.ToolNumber()} G54 M58 ({turningTappingTool.Name} M{turningTappingTool.Diameter}x{turningTappingTool.Pitch})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{turningTappingTool.Position.ToolNumber()} G55 M58 ({turningTappingTool.Name} M{turningTappingTool.Diameter}x{turningTappingTool.Pitch})".Replace(',', '.'),
+                    ToolDescriptionOption.General => $"T{turningTappingTool.Position.ToolNumber()} ({turningTappingTool.Name})",
+                    ToolDescriptionOption.L230 => $"T{turningTappingTool.Position.ToolNumber()} ({turningTappingTool.Name})",
+                    ToolDescriptionOption.GoodwayLeft => $"T{turningTappingTool.Position.ToolNumber()} G54 M58 ({turningTappingTool.Name})",
+                    ToolDescriptionOption.GoodwayRight => $"T{turningTappingTool.Position.ToolNumber()} G55 M58 ({turningTappingTool.Name})",
                     ToolDescriptionOption.ToolTable => turningTappingTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },

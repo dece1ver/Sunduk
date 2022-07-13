@@ -9,7 +9,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
         public TurningSpecialTool(int position, string name, ToolHand hand = ToolHand.Right)
         {
             Position = position;
-            Name = name;
+            Name = name.Translate();
             Hand = hand;
         }
     }

@@ -381,21 +381,21 @@
                         </MudSelect>
                     </MudItem>
                 }
-                <MudItem xs="6" sm="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapezoidal ? 6 : 4)">
-                    <MudSelect Label="Стандарт" T="ThreadStandart" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="ThreadStandart">
-                        <MudSelectItem Value="@(ThreadStandart.Metric)">Метрическая 60° (М)</MudSelectItem>
-                        <MudSelectItem Value="@(ThreadStandart.BSPP)">Трубная цилиндрическая 55° (G)</MudSelectItem>
-                        <MudSelectItem Value="@(ThreadStandart.Trapezoidal)">Трапецеидальная 30° (Tr)</MudSelectItem>
-                        <MudSelectItem Value="@(ThreadStandart.NPT)">Коническая 60° (K)</MudSelectItem>
+                <MudItem xs="6" sm="6" md="(ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 6 : 4)">
+                    <MudSelect Label="Стандарт" T="ThreadStandard" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="ThreadStandard">
+                        <MudSelectItem Value="@(ThreadStandard.Metric)">Метрическая 60° (М)</MudSelectItem>
+                        <MudSelectItem Value="@(ThreadStandard.BSPP)">Трубная цилиндрическая 55° (G)</MudSelectItem>
+                        <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">Трапецеидальная 30° (Tr)</MudSelectItem>
+                        <MudSelectItem Value="@(ThreadStandard.NPT)">Коническая 60° (K)</MudSelectItem>
                     </MudSelect>
                 </MudItem>
-                <MudItem xs="6" sm="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapezoidal ? 6 : 4)">
+                <MudItem xs="6" sm="6" md="(ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 6 : 4)">
                     <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnThreadCuttingTypeChanged">
                         <MudSelectItem Value="@(CuttingType.External)">Наружная</MudSelectItem>
                         <MudSelectItem Value="@(CuttingType.Internal)">Внутренняя</MudSelectItem>
                     </MudSelect>
                 </MudItem>
-                @if (ThreadStandart == ThreadStandart.BSPP)
+                @if (ThreadStandard == ThreadStandard.BSPP)
                 {
                 <MudItem xs="6" sm="6" md="4">
                     <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
@@ -408,7 +408,7 @@
                     </MudSelect>
                 </MudItem>
                 }
-                @if (ThreadStandart == ThreadStandart.NPT)
+                @if (ThreadStandard == ThreadStandard.NPT)
                 {
                 <MudItem xs="6" sm="6" md="4">
                     <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
@@ -799,9 +799,9 @@
     private void OnTemplateChanged(string value)
     {
         CurrentThreadTemplate = value;
-        switch (ThreadStandart)
+        switch (ThreadStandard)
         {
-            case ThreadStandart.Metric:
+            case ThreadStandard.Metric:
             {
                 Thread.GetMetricValues(CurrentThreadTemplate, out string diameter, out string pitch);
                 _ThreadDiameter = diameter;
@@ -809,7 +809,7 @@
                 ThreadNPTPlane = 0;
                 break;
             }
-            case ThreadStandart.BSPP:
+            case ThreadStandard.BSPP:
             {
                 Thread.GetBsppValues(CurrentThreadTemplate, out string diameter, out string pitch);
                 _ThreadDiameter = diameter;
@@ -817,7 +817,7 @@
                 ThreadNPTPlane = 0;
                 break;
             }
-            case ThreadStandart.Trapezoidal:
+            case ThreadStandard.Trapezoidal:
             {
                 Thread.GetTrapezoidalValues(CurrentThreadTemplate, out string diameter, out string pitch);
                 _ThreadDiameter = diameter;
@@ -825,7 +825,7 @@
                 ThreadNPTPlane = 0;
                 break;
             }
-            case ThreadStandart.NPT:
+            case ThreadStandard.NPT:
             {
                 Thread.GetNptValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
                 _ThreadDiameter = externalDiameter;
@@ -878,7 +878,7 @@
     private string CurrentThreadTemplate { get; set; }
 
     //Точение резьбы
-    private ThreadStandart ThreadStandart { get; set; }
+    private ThreadStandard ThreadStandard { get; set; }
     private CuttingType ThreadType { get; set; }
 
     private string _ThreadDiameter { get; set; }
@@ -1304,7 +1304,7 @@
                 CurrentSequence = new ThreadCuttingSequence(
                     Machine,
                     Tool as ThreadingExternalTool,
-                    ThreadStandart,
+                    ThreadStandard,
                     ThreadType,
                     ThreadDiameter,
                     ThreadPitch,
@@ -1318,7 +1318,7 @@
                 CurrentSequence = new ThreadCuttingSequence(
                     Machine,
                     Tool as ThreadingInternalTool,
-                    ThreadStandart,
+                    ThreadStandard,
                     ThreadType,
                     ThreadDiameter,
                     ThreadPitch,

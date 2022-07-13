@@ -407,7 +407,7 @@
         MillingThreadCuttingTools = await LocalStorage.GetItemAsync<List<MillingThreadCuttingTool>>(nameof(MillingThreadCuttingTools)) ?? new List<MillingThreadCuttingTool>();
         if (MillingThreadCuttingTools.Count == 0)
         {
-            MillingThreadCuttingTools.Add(new MillingThreadCuttingTool(14, 9.5, ThreadStandart.NPT, 1.411));
+            MillingThreadCuttingTools.Add(new MillingThreadCuttingTool(14, 9.5, ThreadStandard.NPT, 1.411));
             await LocalStorage.SetItemAsync(nameof(MillingThreadCuttingTools), MillingThreadCuttingTools);
         }
         Tools.AddRange(MillingThreadCuttingTools);
@@ -516,8 +516,8 @@
         TurningTappingTools = await LocalStorage.GetItemAsync<List<TurningTappingTool>>(nameof(TurningTappingTools)) ?? new List<TurningTappingTool>();
         if (TurningTappingTools.Count == 0)
         {
-            TurningTappingTools.Add(new TurningTappingTool(0909, TappingTool.Types.Cutting, 12, 1.75));
-            TurningTappingTools.Add(new TurningTappingTool(0808, TappingTool.Types.Forming, 10, 1.5));
+            TurningTappingTools.Add(new TurningTappingTool(0909, TappingTool.Types.Cutting, 12, 1.75, ThreadStandard.Metric));
+            TurningTappingTools.Add(new TurningTappingTool(0808, TappingTool.Types.Forming, 10, 1.5, ThreadStandard.Metric));
             await LocalStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
         }
         Tools.AddRange(TurningTappingTools);

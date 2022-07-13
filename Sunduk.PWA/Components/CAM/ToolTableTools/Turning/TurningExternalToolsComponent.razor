@@ -4,16 +4,16 @@
     <HeaderContent>
         <MudTh>Позиция</MudTh>
         <MudTh>Описание</MudTh>
-        <MudTh>Угол кромки</MudTh>
-        <MudTh>Радиус кромки</MudTh>
+        <MudTh>Угол при вершине</MudTh>
+        <MudTh>Радиус при вершине</MudTh>
         <MudTh>Исполнение</MudTh>
         <MudTh/>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Позиция">@context.Position.ToolNumber()</MudTd>
+        <MudTd DataLabel="Позиция">T@(context.Position.ToolNumber())</MudTd>
         <MudTd DataLabel="Тип">@(context.Type == TurningExternalTool.Types.Bar ? "Проходной" : "Подрезной")</MudTd>
-        <MudTd DataLabel="Угол кромки">@context.Angle.ToPrettyString()</MudTd>
-        <MudTd DataLabel="Радиус кромки">@context.Radius.ToPrettyString()</MudTd>
+        <MudTd DataLabel="Угол при вершине">@context.Angle.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs)°</MudTd>
+        <MudTd DataLabel="Радиус при вершине">R@(context.Radius > 0 ? context.Radius.ToPrettyString() : "-")</MudTd>
         <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Right ? "Правое" : "Левое")</MudTd>
         <MudTd>
             <MudIconButton Class="ma-n3" Variant="Variant.Text" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="(() => RemoveTurningExternalTool(context))" />
@@ -21,7 +21,7 @@
     </RowTemplate>
     <RowEditingTemplate>
         <MudTd DataLabel="Позиция">
-            <MudTextField @bind-Value="@context.Position" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+            <MudTextField @bind-Value="@context.Position" Adornment="Adornment.Start" AdornmentText="T" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
         </MudTd>
         <MudTd DataLabel="Тип">
             <MudSelect T="TurningExternalTool.Types" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="@context.Type" Required>
@@ -29,11 +29,11 @@
                 <MudSelectItem Value="@TurningExternalTool.Types.Face">Подрезной</MudSelectItem>
             </MudSelect>
         </MudTd>
-        <MudTd DataLabel="Угол кромки">
-            <MudTextField @bind-Value="@context.Angle" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+        <MudTd DataLabel="Угол при вершине">
+            <MudTextField @bind-Value="@context.Angle" Adornment="Adornment.End" AdornmentText="°" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
         </MudTd>
-        <MudTd DataLabel="Радиус кромки">
-            <MudTextField @bind-Value="@context.Radius" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+        <MudTd DataLabel="Радиус при вершине">
+            <MudTextField @bind-Value="@context.Radius" Adornment="Adornment.Start" AdornmentText="R" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
         </MudTd>
         <MudTd DataLabel="Исполнение">
             <MudSelect T="Tool.ToolHand" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="@context.Hand" Required>

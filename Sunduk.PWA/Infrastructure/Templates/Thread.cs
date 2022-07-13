@@ -302,7 +302,17 @@ namespace Sunduk.PWA.Infrastructure.Templates
             "K1¼",
             "K1½",
             "K2"
-        }; 
+        };
+
+        public static string SimpleThreadTemplate(string template)
+        {
+            return template
+                .Replace("½", " 1/2")
+                .Replace("¼", " 1/4")
+                .Replace("¾", " 3/4")
+                .Replace("⅜", " 3/8")
+                .Replace("⅛", " 1/8");
+        }
         #endregion
 
         #region Чтение шаблонов
@@ -543,17 +553,17 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Номинальная высота профиля
         /// </summary>
-        /// <param name="threadStandart">Стандарт резьбы</param>
+        /// <param name="threadStandard">Стандарт резьбы</param>
         /// <param name="threadPitch">Шаг резьбы</param>
         /// <returns></returns>
-        public static double NominalHeight(ThreadStandart threadStandart, double threadPitch)
+        public static double NominalHeight(ThreadStandard threadStandard, double threadPitch)
         {
-            return threadStandart switch
+            return threadStandard switch
             {
-                ThreadStandart.Metric => Math.Sqrt(3) / 2 * threadPitch,
-                ThreadStandart.BSPP => 0.960491 * threadPitch,
-                ThreadStandart.Trapezoidal => 1.866 * threadPitch,
-                ThreadStandart.NPT => 0.866 * threadPitch,
+                ThreadStandard.Metric => Math.Sqrt(3) / 2 * threadPitch,
+                ThreadStandard.BSPP => 0.960491 * threadPitch,
+                ThreadStandard.Trapezoidal => 1.866 * threadPitch,
+                ThreadStandard.NPT => 0.866 * threadPitch,
                 _ => 0,
             };
         }
@@ -561,20 +571,20 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Рабочая высота профиля
         /// </summary>
-        /// <param name="threadStandart">Стандарт резьбы</param>
+        /// <param name="threadStandard">Стандарт резьбы</param>
         /// <param name="type">Тип резьбы</param>
         /// <param name="threadPitch">Шаг резьбы</param>
         /// <returns></returns>
-        public static double ProfileHeight(ThreadStandart threadStandart, CuttingType type, double threadPitch)
+        public static double ProfileHeight(ThreadStandard threadStandard, CuttingType type, double threadPitch)
         {
-            return threadStandart switch
+            return threadStandard switch
             {
-                ThreadStandart.Metric => type == CuttingType.External
-                ? (17.0 / 24.0 * NominalHeight(threadStandart, threadPitch))
-                : (5.0 / 8.0 * NominalHeight(threadStandart, threadPitch)),
-                ThreadStandart.BSPP => 0.640327 * threadPitch,
-                ThreadStandart.Trapezoidal => 0.5 * threadPitch + TrapezoidalClearance(threadPitch),
-                ThreadStandart.NPT => 0.8 * threadPitch,
+                ThreadStandard.Metric => type == CuttingType.External
+                ? (17.0 / 24.0 * NominalHeight(threadStandard, threadPitch))
+                : (5.0 / 8.0 * NominalHeight(threadStandard, threadPitch)),
+                ThreadStandard.BSPP => 0.640327 * threadPitch,
+                ThreadStandard.Trapezoidal => 0.5 * threadPitch + TrapezoidalClearance(threadPitch),
+                ThreadStandard.NPT => 0.8 * threadPitch,
                 _ => 0,
             };
         }
@@ -617,12 +627,12 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Число проходов в зависимости от шага
         /// </summary>
-        /// <param name="threadStandart">Стандарт резьбы</param>
+        /// <param name="threadStandard">Стандарт резьбы</param>
         /// <param name="threadPitch">Шаг резьбы</param>
         /// <returns></returns>
-        public static int PassesCount(ThreadStandart threadStandart, double threadPitch)
+        public static int PassesCount(ThreadStandard threadStandard, double threadPitch)
         {
-            if (threadStandart == ThreadStandart.Metric)
+            if (threadStandard == ThreadStandard.Metric)
             {
                 return threadPitch switch
                 {
@@ -637,7 +647,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     _ => 0,
                 };
             }
-            else if (threadStandart == ThreadStandart.BSPP)
+            else if (threadStandard == ThreadStandard.BSPP)
             {
                 return Math.Round(threadPitch.ThreadConvert(), 1) switch
                 {
@@ -649,7 +659,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     _ => 0,
                 };
             }
-            else if (threadStandart == ThreadStandart.Trapezoidal)
+            else if (threadStandard == ThreadStandard.Trapezoidal)
             {
                 return threadPitch switch
                 {
@@ -663,7 +673,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     _ => 0,
                 };
             }
-            else if (threadStandart == ThreadStandart.NPT)
+            else if (threadStandard == ThreadStandard.NPT)
             {
                 return Math.Round(threadPitch.ThreadConvert(), 1) switch
                 {
@@ -684,15 +694,15 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Размеры фасок по ГОСТ 10549-80
         /// </summary>
-        /// <param name="threadStandart"></param>
+        /// <param name="threadStandard"></param>
         /// <param name="threadPitch"></param>
         /// <param name="threadType"></param>
         /// <returns></returns>
-        public static double ThreadChamfer(ThreadStandart threadStandart, double threadPitch, CuttingType threadType)
+        public static double ThreadChamfer(ThreadStandard threadStandard, double threadPitch, CuttingType threadType)
         {
-            switch (threadStandart)
+            switch (threadStandard)
             {
-                case ThreadStandart.Metric:
+                case ThreadStandard.Metric:
                     return threadType switch
                     {
                         CuttingType.External => threadPitch switch
@@ -723,7 +733,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         },
                         _ => 0
                     };
-                case ThreadStandart.BSPP:
+                case ThreadStandard.BSPP:
                     switch (threadType)
                     {
                         case CuttingType.External:
@@ -749,7 +759,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         default:
                             return 0;
                     }
-                case ThreadStandart.NPT:
+                case ThreadStandard.NPT:
                     return threadPitch switch
                     {
                         <= 0.941 => // 27
@@ -760,7 +770,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                             2,
                         _ => 0
                     };
-                case ThreadStandart.Trapezoidal:
+                case ThreadStandard.Trapezoidal:
                     return threadPitch switch
                     {
                         <= 1.5 => 1,
@@ -795,17 +805,17 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Размеры сбегов по ГОСТ 10549-80
         /// </summary>
-        /// <param name="threadStandart">Стандарт резьба</param>
+        /// <param name="threadStandard">Стандарт резьба</param>
         /// <param name="threadPitch">Шаг резьбы</param>
         /// <param name="threadType">Тип резьбы</param>
         /// <returns></returns>
-        public static double ThreadRunout(ThreadStandart threadStandart, double threadPitch, CuttingType threadType)
+        public static double ThreadRunout(ThreadStandard threadStandard, double threadPitch, CuttingType threadType)
         {
-            switch (threadStandart)
+            switch (threadStandard)
             {
-                case ThreadStandart.Metric:
+                case ThreadStandard.Metric:
                     return Math.Round(1.25 * threadPitch, 2);
-                case ThreadStandart.BSPP:
+                case ThreadStandard.BSPP:
                     return threadType switch
                     {
                         CuttingType.External => threadPitch switch
@@ -834,7 +844,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         },
                         _ => 0
                     };
-                case ThreadStandart.NPT:
+                case ThreadStandard.NPT:
                     return threadPitch switch
                     {
                         <= 0.941 => // 27
@@ -847,7 +857,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                             5.5,
                         _ => 0
                     };
-                case ThreadStandart.Trapezoidal:
+                case ThreadStandard.Trapezoidal:
                     return 0;
                 default:
                     return 0;
@@ -892,25 +902,25 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
         }
 
-        public static double[] Passes(ThreadStandart threadStandart, CuttingType type, double threadPitch)
-            => CalcPasses(ProfileHeight(threadStandart, type, threadPitch), PassesCount(threadStandart, threadPitch), PassesOption.Infeed);
+        public static double[] Passes(ThreadStandard threadStandard, CuttingType type, double threadPitch)
+            => CalcPasses(ProfileHeight(threadStandard, type, threadPitch), PassesCount(threadStandard, threadPitch), PassesOption.Infeed);
 
-        public static double[] TotalPasses(ThreadStandart threadStandart, CuttingType type, double threadPitch)
-            => CalcPasses(ProfileHeight(threadStandart, type, threadPitch), PassesCount(threadStandart, threadPitch));
+        public static double[] TotalPasses(ThreadStandard threadStandard, CuttingType type, double threadPitch)
+            => CalcPasses(ProfileHeight(threadStandard, type, threadPitch), PassesCount(threadStandard, threadPitch));
 
         /// <summary>
         /// Профиль резьбы для записи в УП
         /// </summary>
-        /// <param name="threadStandart">Стандарт резьбы</param>
+        /// <param name="threadStandard">Стандарт резьбы</param>
         /// <returns></returns>
-        public static string Profile(ThreadStandart threadStandart)
+        public static string Profile(ThreadStandard threadStandard)
         {
-            return threadStandart switch
+            return threadStandard switch
             {
-                ThreadStandart.Metric => "60",
-                ThreadStandart.BSPP => "55",
-                ThreadStandart.Trapezoidal => "30",
-                ThreadStandart.NPT => "60",
+                ThreadStandard.Metric => "60",
+                ThreadStandard.BSPP => "55",
+                ThreadStandard.Trapezoidal => "30",
+                ThreadStandard.NPT => "60",
                 _ => string.Empty,
             };
         }
@@ -918,19 +928,19 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Высота профиля полученная суммой рассчитанных проходов
         /// </summary>
-        /// <param name="threadStandart">Стандарт резьбы</param>
+        /// <param name="threadStandard">Стандарт резьбы</param>
         /// <param name="type">Тип резьбы</param>
         /// <param name="threadPitch">Шаг резьбы</param>
         /// <returns></returns>
-        private static double CalculatedProfile(ThreadStandart threadStandart, CuttingType type, double threadPitch)
+        private static double CalculatedProfile(ThreadStandard threadStandard, CuttingType type, double threadPitch)
         {
-            return 2 * Passes(threadStandart, type, threadPitch).Sum();
+            return 2 * Passes(threadStandard, type, threadPitch).Sum();
         }
 
         /// <summary>
         /// Диаметр подвода 
         /// </summary>
-        /// <param name="threadStandart">Стандарт резьбы</param>
+        /// <param name="threadStandard">Стандарт резьбы</param>
         /// <param name="type">Тип резьбы</param>
         /// <param name="threadDiameter">Номинальный диаметр резьбы (для NPT наружный диаметр в основной плоскости)</param>
         /// <param name="threadPitch">Шаг резьбы</param>
@@ -938,22 +948,22 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <param name="planeLength">Длина до основной плоскости (только для NPT)</param>
         /// <param name="threadLength">Длина резьбы</param>
         /// <returns></returns>
-        public static double ApproachDiameter(ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch, double threadLength, double startPointZ, double planeLength = 0)
+        public static double ApproachDiameter(ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double threadLength, double startPointZ, double planeLength = 0)
         {
-            return threadStandart switch
+            return threadStandard switch
             {
-                ThreadStandart.Metric => type == CuttingType.External
+                ThreadStandard.Metric => type == CuttingType.External
                 ? threadDiameter + 1
                 : threadDiameter - threadPitch - 1,
-                ThreadStandart.BSPP => type == CuttingType.External
+                ThreadStandard.BSPP => type == CuttingType.External
                 ? threadDiameter + 1
                 : threadDiameter - threadPitch - 1,
-                ThreadStandart.Trapezoidal => type == CuttingType.External
+                ThreadStandard.Trapezoidal => type == CuttingType.External
                 ? threadDiameter + 1
                 : threadDiameter - threadPitch - 1,
-                ThreadStandart.NPT => type == CuttingType.External
+                ThreadStandard.NPT => type == CuttingType.External
                 ? threadDiameter + 2 * ExtNptThreadShift(threadLength, planeLength) + 1
-                : threadDiameter - CalculatedProfile(threadStandart, type, threadPitch) - 2 * IntNptThreadShift(threadLength, 0) - 1,
+                : threadDiameter - CalculatedProfile(threadStandard, type, threadPitch) - 2 * IntNptThreadShift(threadLength, 0) - 1,
                 _ => double.NaN,
             };
         }
@@ -961,7 +971,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Конечный диаметр резьбы (вторая строка G76)
         /// </summary>
-        /// <param name="threadStandart">Стандарт резьбы</param>
+        /// <param name="threadStandard">Стандарт резьбы</param>
         /// <param name="type">Тип резьбы</param>
         /// <param name="threadDiameter">Номинальный диаметр резьбы (для NPT наружный диаметр в основной плоскости)</param>
         /// <param name="threadPitch">Шаг резьбы</param>
@@ -969,21 +979,21 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <param name="planeLength">Длина до основной плоскости (только для NPT)</param>
         /// <param name="threadLength">Длина резьбы</param>
         /// <returns></returns>
-        public static double EndDiameter(ThreadStandart threadStandart, CuttingType type, double threadDiameter, double threadPitch, double threadLength, double startPointZ, double planeLength = 0)
+        public static double EndDiameter(ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double threadLength, double startPointZ, double planeLength = 0)
         {
-            return threadStandart switch
+            return threadStandard switch
             {
-                ThreadStandart.Metric => type == CuttingType.External
-                ? threadDiameter - CalculatedProfile(threadStandart, type, threadPitch)
+                ThreadStandard.Metric => type == CuttingType.External
+                ? threadDiameter - CalculatedProfile(threadStandard, type, threadPitch)
                 : threadDiameter + threadPitch / 16 / Math.Sin(60.Radians()),
-                ThreadStandart.BSPP => type == CuttingType.External
-                ? threadDiameter - CalculatedProfile(threadStandart, type, threadPitch)
+                ThreadStandard.BSPP => type == CuttingType.External
+                ? threadDiameter - CalculatedProfile(threadStandard, type, threadPitch)
                 : threadDiameter,
-                ThreadStandart.Trapezoidal => type == CuttingType.External
-                ? threadDiameter - CalculatedProfile(threadStandart, type, threadPitch)
+                ThreadStandard.Trapezoidal => type == CuttingType.External
+                ? threadDiameter - CalculatedProfile(threadStandard, type, threadPitch)
                 : threadDiameter + 2 * TrapezoidalClearance(threadPitch),
-                ThreadStandart.NPT => type == CuttingType.External
-                ? threadDiameter - CalculatedProfile(threadStandart, type, threadPitch) + 2 * ExtNptThreadShift(threadLength, planeLength)
+                ThreadStandard.NPT => type == CuttingType.External
+                ? threadDiameter - CalculatedProfile(threadStandard, type, threadPitch) + 2 * ExtNptThreadShift(threadLength, planeLength)
                 : threadDiameter - 2 * IntNptThreadShift(threadLength, 0),
                 _ => double.NaN,
             };
