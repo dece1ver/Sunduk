@@ -1,26 +1,75 @@
-﻿<MudSimpleTable Dense="true" Style="overflow-x: auto;" Elevation=0 Square=true>
-    <thead>
-        <tr>
-            @foreach (var h in headings)
-            {
-                <th>@h</th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var row in rows)
-        {
-            <tr>
-                @foreach (var x in row.Split())
-                {
-                    <td>@x</td>
-                }
-            </tr>
-        }
-    </tbody>
-</MudSimpleTable>
+﻿@using MudBlazor.Services
+<style>
+    .ex{font-family: 'Roboto Mono', monospace; font-size: 12px; padding-right: 10px; padding-left: 5px}
+    .desc{font-size: 12px; font-style: italic; font-weight: lighter; padding-right: 10px; padding-left: 5px}
+    table, th, td {
+        border: 1px solid gray;
+        border-collapse: collapse;
+    }
+</style>
+
+<MudContainer>
+    <MudGrid>
+        <MudItem xs="12">
+            <MudField Variant=Variant.Filled Label="Группы переменных" DisableUnderLine=true>
+                <table>
+                    <tbody>
+                    <tr>
+                        <td class="ex">#0</td>
+                        <td class="desc">null</td>
+                    </tr>
+                    <tr>
+                        <td class="ex">#1-#33</td>
+                        <td class="desc">Локальные</td>
+                    </tr>
+                    <tr>
+                        <td class="ex">#100-#199</td>
+                        <td class="desc" rowspan="2">Общие</td>
+                    </tr>
+                    <tr>
+                        <td class="ex">#500-#999</td>
+                    </tr>
+                    <tr>
+                        <td class="ex">#1000+</td>
+                        <td class="desc">Системные</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </MudField>
+        </MudItem>
+        <MudItem xs="12">
+            <MudField Variant=Variant.Filled Label="Аргументы" DisableUnderLine=true>
+                <table>
+                    <thead>
+                    <tr>
+                        @foreach (var h in headings)
+                        {
+                            <th class="ex">@h</th>
+                        }
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var row in rows)
+                    {
+                        <tr>
+                            @foreach (var x in row.Split())
+                            {
+                                <td class="ex">@x</td>
+                            }
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </MudField>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 
 @code {
+    [Inject] IBreakpointService BreakpointListener { get; set; }
+
+    private Breakpoint breakpoint;
+
     string[] headings = { "Аргумент", "Номер"};
     string[] rows = {
         "A #1",
