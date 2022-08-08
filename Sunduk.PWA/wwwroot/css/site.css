@@ -1,0 +1,39 @@
+﻿body {
+}
+
+.monotext14 {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+    padding-right: 10px;
+    padding-left: 5px
+}
+
+.text12 {
+    font-family: 'Roboto';
+    font-size: 12px;
+    padding-right: 10px;
+    padding-left: 5px
+}
+
+.text14 {
+    font-family: 'Roboto';
+    font-size: 14px;
+    padding-right: 10px;
+    padding-left: 5px
+}
+
+.italtext12 {
+    font-size: 12px;
+    font-style: italic;
+    font-weight: lighter;
+    padding-right: 10px;
+    padding-left: 5px
+}
+
+.italtext14 {
+    font-size: 14px;
+    font-style: italic;
+    font-weight: lighter;
+    padding-right: 10px;
+    padding-left: 5px
+}
