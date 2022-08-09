@@ -1,0 +1,117 @@
+﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudGrid Spacing="1">
+        <MudItem xs="12" sm="6">
+            <MudField Label="Параметры" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1"
+                      @onfocusout="(() => CurrentImage = Images.Base)">
+                <MudGrid Spacing="0">
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_PartDiameter" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                                      @onfocus="() => CurrentImage = Images.PartDiameter" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_ArcRadius" T="string" Label="Радиус дуги" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                                      @onfocus="() => CurrentImage = Images.ArcRadius" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_ToolRadius" T="string" Label="Радиус инструмента" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                                      @onfocus="() => CurrentImage = Images.ToolRadius" Margin="Margin.Dense"/>
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+
+        </MudItem>
+
+        <MudHidden Breakpoint="Breakpoint.Xs">
+            <MudItem xs="12" sm="6">
+                <MudCard Elevation="0" Outlined="true" Class="mt-1 rounded-0">
+                    <MudCardContent>
+                        @if (CurrentImage == Images.Base)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/arc_chord/arc_lenght.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeight" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.ArcRadius)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/arc_chord/arc_lenght_arc_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeight" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.ChordHeight)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/arc_chord/arc_lenght_arc_lenght.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeight" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.PartDiameter)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/arc_chord/arc_lenght_part_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeight" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.ToolRadius)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/arc_chord/arc_lenght_tool_radius.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeight" />
+                            </center>
+                        }
+
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <div>
+                <img src="/img/stuffimages/arc_chord/arc_lenght.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/arc_chord/arc_lenght_arc_lenght.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/arc_chord/arc_lenght_arc_radius.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/arc_chord/arc_lenght_part_diam.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/arc_chord/arc_lenght_tool_radius.svg" asp-append-version="true" width="0" height="0" />
+            </div>
+        </MudHidden>
+        <MudItem xs="12">
+            <MudField Label="Результат" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n1">
+                <MudGrid Spacing="1">
+                    <MudItem xs="12" Class="mt-2">
+                        @if (Valid())
+                        {
+                            <MudText Typo="Typo.body2">@($"Высота хорды: {_ChordHeight} мм")</MudText>
+                        }
+                        @if (!Valid())
+                        {
+                            <MudText Typo="Typo.body2">@($"Высота хорды: -")</MudText>
+                        }
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code
+{
+    readonly int _imgHeight = 147;
+    readonly int _imgWidth = 250;
+
+    bool _calcHeight = true;
+
+    public enum Images { Base, PartDiameter, ArcRadius, ChordHeight, ToolRadius };
+    public Images CurrentImage { get; set; } = Images.Base;
+
+    public string _PartDiameter { get; set; } = string.Empty;
+    public double PartDiameter => _PartDiameter.GetDouble();
+
+    public string _ArcRadius { get; set; } = string.Empty;
+    public double ArcRadius => _ArcRadius.GetDouble();
+
+    public string _ToolRadius { get; set; } = string.Empty;
+    public double ToolRadius => _ToolRadius.GetDouble();
+
+
+    public string _ChordHeight => (ArcRadius - Math.Sqrt(Math.Pow(ArcRadius, 2) - Math.Pow(PartDiameter, 2) / 4)).ToPrettyString();
+    public double ChordHeight => _ChordHeight.GetDouble();
+
+    bool Valid()
+    {
+        return PartDiameter > 0 && ArcRadius > 0 && ChordHeight > 0;
+    }
+
+}

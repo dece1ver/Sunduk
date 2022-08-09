@@ -1,6 +1,10 @@
 ﻿body {
 }
 
+.monofield {
+    font-family: 'Roboto Mono', monospace;
+}
+
 .monotext14 {
     font-family: 'Roboto Mono', monospace;
     font-size: 14px;
