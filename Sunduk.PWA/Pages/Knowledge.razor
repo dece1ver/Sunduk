@@ -32,6 +32,9 @@
                             <MudText Class="mx-n4" Typo=Typo.body2>Программирование Fanuc</MudText>
                         </ChildContent>
                         <NestedList>
+                            <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("custom-victor-cycles")" Href="/knowledge/custom-victor-cycles">
+                                <MudText Class="mx-n4" Typo=Typo.body2>Циклы Victor</MudText>
+                            </MudListItem>
                             <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("fanuc-general-programming")" Href="/knowledge/fanuc-general-programming">
                                 <MudText Class="mx-n4" Typo=Typo.body2>Общая информация</MudText>
                             </MudListItem>
@@ -52,6 +55,7 @@
                 case "center-length": <CenterLengthComponent/> break;
                 case "fanuc-macro": <FanucMacroVariables/> break;
                 case "vectors": <VectorComponent/> break;
+                case "custom-victor-cycles": <CustomVictorCycles/> break;
                 case "fanuc-general-programming": <GeneralPrograming/> break;
                 case "programming-g00": <ProgrammingG00/> break;
                 case "programming-g01": <ProgrammingG01/> break;
