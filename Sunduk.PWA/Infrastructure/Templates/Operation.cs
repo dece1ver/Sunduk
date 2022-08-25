@@ -61,6 +61,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 {
                     Coolant.General => "M8",
                     Coolant.Through => "M50",
+                    Coolant.Full => "M50",
                     Coolant.Blow => "M57",
                     _ => string.Empty,
                 },
@@ -78,6 +79,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 {
                     Coolant.General => "M9",
                     Coolant.Through => "M51",
+                    Coolant.Full => "M9 M51",
                     Coolant.Blow => "M59",
                     _ => string.Empty,
                 },
@@ -294,14 +296,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
             Machine.L230A =>
             "%\n" +
             $"O0001 ({number})\n" +
-            $"({drawVersion.Replace(',', '.')})\n" +
+            $"({name})({drawVersion.Replace(',', '.')})\n" +
             $"({author})({DateTime.Now:dd.MM.yy})\n" +
             "(0M0S)\n",
 
             Machine.A110 =>
             "%\n" +
             $"O0001 ({number})\n" +
-            $"({drawVersion.Replace(',', '.')})\n" +
+            $"({name})({drawVersion.Replace(',', '.')})\n" +
             $"({author})({DateTime.Now:dd.MM.yy})\n" +
             "(0M0S)\n",
 
@@ -390,19 +392,19 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Фрезерный вызов инструмента
         /// </summary>
-        public static string MillingCustomOperation(Machine machine, CoordinateSystem coordinateSystem, Tool tool, string customOperation, Coolant coolant = Coolant.General, bool polar = false)
+        public static string MillingCustomOperation(Machine machine, CoordinateSystem coordinateSystem, Tool tool, string customOperation, Coolant coolant, bool polar, double safePlane)
         {
             if (tool is null) return string.Empty;
             string direction = string.Empty;
-            if (coolant != Coolant.General)
+            if (coolant is not Coolant.General and not Coolant.Full)
             {
                 direction = Direction(tool);
             }
-            else if (coolant == Coolant.General || tool.Hand == Tool.ToolHand.Right)
+            else if ((coolant is Coolant.General or Coolant.Full) && tool.Hand == Tool.ToolHand.Right)
             {
                 direction = "M13";
             }
-            else if (coolant == Coolant.General || tool.Hand == Tool.ToolHand.Left)
+            else if ((coolant is Coolant.General or Coolant.Full) && tool.Hand == Tool.ToolHand.Left)
             {
                 direction = "M14";
             }
@@ -411,7 +413,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machine.A110 =>
                 tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
                 $"{coordinateSystem}{(polar ? " G16" : string.Empty)} G0 X0 Y0 S3000 {direction}\n" +
-                $"G43 Z100 H{tool.Position} {(direction is "M13" or "M14" ? string.Empty : CoolantOn(machine, coolant))}\n" +
+                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {(coolant is Coolant.General ? string.Empty : CoolantOn(machine, coolant))}\n" +
                 (string.IsNullOrEmpty(customOperation) ? ProcessingSnippet : customOperation + '\n') +
                 $"{CoolantOff(machine, coolant)}\n" +
                 $"{(polar ? "G15\n" : string.Empty)}" +

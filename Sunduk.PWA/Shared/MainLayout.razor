@@ -28,7 +28,7 @@
         </MudTooltip>
         
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+    <MudDrawer @bind-Open="_drawerOpen" Breakpoint="Breakpoint.Lg" ClipMode="DrawerClipMode.Always" Elevation="2">
         <CascadingValue Value="ExperimentalMode" Name="ExperimantalMode">
             <NavMenu />
         </CascadingValue>

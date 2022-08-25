@@ -47,7 +47,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        public static string MillingHighSpeedDrilling(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double startZ, double endZ, List<Hole> holes, bool polar = false)
+        public static string MillingHighSpeedDrilling(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
             int spindleSpeed = DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100);
@@ -58,7 +58,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machine.A110 =>
                 tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
                 $"{coordinateSystem} {(polar ? "G16 " : string.Empty)}G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
                 $"G81 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} Z{(endZ - tool.PointLength()).NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} F{feed}\n",
                 _ => string.Empty
             };
@@ -122,7 +123,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        public static string MillingPeckDrilling(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes, bool polar = false)
+        public static string MillingPeckDrilling(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
             int spindleSpeed = DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100);
@@ -133,7 +134,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machine.A110 =>
                 tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
                 $"{coordinateSystem} {(polar ? "G16 " : string.Empty)}G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
                 $"G82 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} Z{(endZ - tool.PointLength()).NC(option: NcDecimalPointOption.Without)} Q{depth.Microns()} R{startZ.NC(option: NcDecimalPointOption.Without)} F{feed}\n",
                 _ => string.Empty
             };
@@ -195,7 +197,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        public static string MillingPeckDeepDrilling(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes, bool polar = false)
+        public static string MillingPeckDeepDrilling(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
             int spindleSpeed = DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100);
@@ -206,7 +208,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machine.A110 =>
                 tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
                 $"{coordinateSystem} {(polar ? "G16 " : string.Empty)}G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
                 $"G83 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} Z{(endZ - tool.PointLength()).NC(option: NcDecimalPointOption.Without)} Q{depth.Microns()} R{startZ.NC(option: NcDecimalPointOption.Without)} F{feed}\n",
                 _ => string.Empty
             };

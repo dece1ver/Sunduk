@@ -209,6 +209,13 @@ namespace Sunduk.PWA.Infrastructure
         {
             return tool switch
             {
+                MillingBoreTool millingBoreTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{millingBoreTool.Position} ({millingBoreTool.Name} D{millingBoreTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
+                    ToolDescriptionOption.MillingToolChange => $"T{millingBoreTool.Position} M6 ({millingBoreTool.Name} D{millingBoreTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
+                    ToolDescriptionOption.ToolTable => millingBoreTool.Description().Split('(')[1].TrimEnd(')'),
+                    _ => string.Empty,
+                },
                 MillingChamferTool millingChamferTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{millingChamferTool.Position} ({millingChamferTool.Name} D{millingChamferTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingChamferTool.Angle.NC(option: NcDecimalPointOption.Without)})",
@@ -235,6 +242,13 @@ namespace Sunduk.PWA.Infrastructure
                     ToolDescriptionOption.General => $"T{millingTappingTool.Position} ({millingTappingTool.Name})",
                     ToolDescriptionOption.MillingToolChange => $"T{millingTappingTool.Position} M6 ({millingTappingTool.Name})",
                     ToolDescriptionOption.ToolTable => millingTappingTool.Description().Split('(')[1].TrimEnd(')'),
+                    _ => string.Empty,
+                },
+                MillingThreadCuttingTool millingThreadCuttingTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{millingThreadCuttingTool.Position} ({millingThreadCuttingTool.Name})",
+                    ToolDescriptionOption.MillingToolChange => $"T{millingThreadCuttingTool.Position} M6 ({millingThreadCuttingTool.Name})",
+                    ToolDescriptionOption.ToolTable => millingThreadCuttingTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 MillingTool millingTool => option switch

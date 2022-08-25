@@ -90,15 +90,17 @@
                         }
                         else
                         {
-
+                            <MudItem xs="6" sm="3">
+                                <MudTextField @bind-Value="_SafePlane" Label="Плоскость безопасности" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
                         }
-                        <MudItem xs="12" sm="4">
+                        <MudItem xs="6" sm="3">
                             <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
                         </MudItem>
-                        <MudItem xs="12" sm="4">
+                        <MudItem xs="12" sm="Machine is Machine.A110 ? 3 : 4">
                             <MudTextField @bind-Value="DrawingVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
-                        <MudItem xs="12" sm="4">
+                        <MudItem xs="12" sm="Machine is Machine.A110 ? 3 : 4">
                             <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
                     </MudGrid>
@@ -212,7 +214,9 @@
                                               WorkpieceInternalDiameter="WorkpieceInternalDiameter"
                                               WorkpieceCurrentInternalDiameter="WorkpieceCurrentInternalDiameter"
                                               WorkpieceLength="WorkpieceLength"
-                                              CyclesCount="CyclesCount" />
+                                              CyclesCount="CyclesCount"
+                                              SafePlane="SafePlane"
+                                              />
                     </MudPaper>
                 </MudItem>
                 break;
@@ -716,6 +720,7 @@
                         newMillingHighSpeedDrillingSequence.Machine = Machine;
                         newMillingHighSpeedDrillingSequence.CoordinateSystem = CoordinateSystem;
                         newMillingHighSpeedDrillingSequence.Material = WorkpieceMaterial;
+                        newMillingHighSpeedDrillingSequence.SafePlane = SafePlane;
                         break;
                     case TurningPeckDrillingSequence:
                         var newTurningPeckDrillingSequence = Program[i] as TurningPeckDrillingSequence;
@@ -727,6 +732,7 @@
                         newMillingPeckDrillingSequence.Machine = Machine;
                         newMillingPeckDrillingSequence.CoordinateSystem = CoordinateSystem;
                         newMillingPeckDrillingSequence.Material = WorkpieceMaterial;
+                        newMillingPeckDrillingSequence.SafePlane = SafePlane;
                         break;
                     case TurningPeckDeepDrillingSequence:
                         var newTurningPeckDeepDrillingSequence = Program[i] as TurningPeckDeepDrillingSequence;
@@ -738,6 +744,7 @@
                         newMillingPeckDeepDrillingSequence.Machine = Machine;
                         newMillingPeckDeepDrillingSequence.CoordinateSystem = CoordinateSystem;
                         newMillingPeckDeepDrillingSequence.Material = WorkpieceMaterial;
+                        newMillingPeckDeepDrillingSequence.SafePlane = SafePlane;
                         break;
                     case TurningTappingSequence:
                         var newTurningTappingSequence = Program[i] as TurningTappingSequence;
@@ -747,6 +754,7 @@
                         var newMillingTappingSequence = Program[i] as MillingTappingSequence;
                         newMillingTappingSequence.Machine = Machine;
                         newMillingTappingSequence.CoordinateSystem = CoordinateSystem;
+                        newMillingTappingSequence.SafePlane = SafePlane;
                         break;
                     case ThreadCuttingSequence:
                         var newThreadCuttingSequence = Program[i] as ThreadCuttingSequence;
@@ -760,6 +768,7 @@
                         var newMillingCustomSequence = Program[i] as MillingCustomSequence;
                         newMillingCustomSequence.Machine = Machine;
                         newMillingCustomSequence.CoordinateSystem = CoordinateSystem;
+                        newMillingCustomSequence.SafePlane = SafePlane;
                         break;
                     case TurningGroovingSequence:
                         var newTurningGroovingSequence = Program[i] as TurningGroovingSequence;

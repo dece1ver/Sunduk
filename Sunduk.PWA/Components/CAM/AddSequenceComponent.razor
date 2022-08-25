@@ -51,6 +51,7 @@
                     <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="Coolant">
                         <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
                         <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
+                        <MudSelectItem Value="@(Coolant.Full)">Вся подача СОЖ</MudSelectItem>
                         <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
                     </MudSelect>
                 </MudItem>
@@ -717,6 +718,9 @@
     public int CyclesCount { get; set; }
 
     [Parameter]
+    public double SafePlane { get; set; }
+
+    [Parameter]
     public EventCallback<Mode> ModeChanged { get; set; }
 
     public Sequence CurrentSequence { get; set; }
@@ -1134,7 +1138,7 @@
                         CurrentSequence = new TurningCustomSequence(Machine, Tool, CustomOperation);
                         return CurrentSequence.Operation;
                     case MachineType.Milling:
-                        CurrentSequence = new MillingCustomSequence(Machine, CoordinateSystem, Tool, CustomOperation, Coolant, ToolCallPolar);
+                        CurrentSequence = new MillingCustomSequence(Machine, CoordinateSystem, Tool, CustomOperation, Coolant, ToolCallPolar, SafePlane);
                         return CurrentSequence.Operation;
                 }
             }
@@ -1236,7 +1240,8 @@
                             DrillEnd,
                             HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ? 
                                 PolarHoles(HolesCount, HolesRadius, StartAngle, HolesSetter is HolesSetterType.EvenlyCylinder) : Holes,
-                            HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder);
+                            HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder,
+                            SafePlane);
                         return CurrentSequence.Operation;
                 }
             }
@@ -1265,7 +1270,8 @@
                             DrillEnd,
                             HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ? 
                                 PolarHoles(HolesCount, HolesRadius, StartAngle, HolesSetter is HolesSetterType.EvenlyCylinder) : Holes,
-                            HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder);
+                            HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder, 
+                            SafePlane);
                         return CurrentSequence.Operation;
                 }
             }
@@ -1294,7 +1300,8 @@
                             DrillEnd,
                             HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ? 
                                 PolarHoles(HolesCount, HolesRadius, StartAngle, HolesSetter is HolesSetterType.EvenlyCylinder) : Holes,
-                            HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder);
+                            HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder, 
+                            SafePlane);
                         return CurrentSequence.Operation;
                 }
             }
@@ -1345,7 +1352,8 @@
                         TapEnd,
                         HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ? 
                             PolarHoles(HolesCount, HolesRadius, StartAngle, HolesSetter is HolesSetterType.EvenlyCylinder) : Holes,
-                        HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder);
+                        HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder, 
+                        SafePlane);
                         return CurrentSequence.Operation;
 
                 }

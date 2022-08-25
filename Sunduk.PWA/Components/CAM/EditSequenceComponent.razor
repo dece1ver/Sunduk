@@ -868,7 +868,8 @@
                         DrillStart,
                         DrillEnd,
                         millingHighSpeedDrillingSequence.Holes,
-                        millingHighSpeedDrillingSequence.Polar);
+                        millingHighSpeedDrillingSequence.Polar, 
+                        millingHighSpeedDrillingSequence.SafePlane);
                     return CurrentSequence.Operation;
 
                 case MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence:
@@ -881,7 +882,8 @@
                         DrillStart,
                         DrillEnd,
                         millingPeckDeepDrillingSequence.Holes,
-                        millingPeckDeepDrillingSequence.Polar);
+                        millingPeckDeepDrillingSequence.Polar, 
+                        millingPeckDeepDrillingSequence.SafePlane);
                     return CurrentSequence.Operation;
 
                 case MillingPeckDrillingSequence millingPeckDrillingSequence:
@@ -894,7 +896,8 @@
                         DrillStart,
                         DrillEnd,
                         millingPeckDrillingSequence.Holes,
-                        millingPeckDrillingSequence.Polar);
+                        millingPeckDrillingSequence.Polar, 
+                        millingPeckDrillingSequence.SafePlane);
                     return CurrentSequence.Operation;
 
                 case MillingTappingSequence millingTappingSequence:
@@ -906,7 +909,8 @@
                         DrillStart,
                         DrillEnd,
                         millingTappingSequence.Holes,
-                        millingTappingSequence.Polar);
+                        millingTappingSequence.Polar, 
+                        millingTappingSequence.SafePlane);
                     return CurrentSequence.Operation;
 
                 case MillingCustomSequence millingCustomSequence:
@@ -916,7 +920,8 @@
                         Tool,
                         CustomOperation,
                         Coolant,
-                        millingCustomSequence.Polar);
+                        millingCustomSequence.Polar, 
+                        millingCustomSequence.SafePlane);
                     return CurrentSequence.Operation;
 
                 // токарные

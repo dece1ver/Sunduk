@@ -50,7 +50,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
-        public static string MillingTapping(Machine machine, CoordinateSystem coordinateSystem, MillingTappingTool tool, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar = false)
+        public static string MillingTapping(Machine machine, CoordinateSystem coordinateSystem, MillingTappingTool tool, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
             var spindleSpeed = cutSpeed.ToSpindleSpeed(tool.Diameter, 10);
@@ -60,7 +60,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machine.A110 =>
                 tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
                 $"{coordinateSystem}{(polar ? "G16 " : string.Empty)} G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
                 $"G95 G84 Z{endZ.NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} P500 F{tool.Pitch.NC()}\n",
                 _ => string.Empty
             };
