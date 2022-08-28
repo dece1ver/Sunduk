@@ -1,4 +1,7 @@
 ﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudHidden Breakpoint="Breakpoint.Xs">
+        <MudAlert Class="rounded-0" Severity="Severity.Warning">Картинки неактуальные, переделаю</MudAlert>
+    </MudHidden>
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="6">
             <MudField Label="Параметры" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1"
@@ -135,7 +138,7 @@
 
 @code 
 {
-    readonly int _imgHeigth = 147;
+    readonly int _imgHeigth = 196;
     readonly int _imgWidth = 250;
 
     public bool RoundCorner { get; set; } = false;

@@ -1,5 +1,198 @@
-﻿<h3>TurningTimeComponent</h3>
+﻿@using _Imports = MudBlazor._Imports
+<MudContainer>
+    <MudGrid Spacing="1">
+        <MudItem xs="12" sm="5" md="4">
+            <MudSelect @bind-Value="Material" Label="Материал детали" T="Material" Variant="Variant.Filled" Margin="Margin.Dense">
+                <MudSelectItem Value="@Material.Steel">Черная сталь</MudSelectItem>
+                <MudSelectItem Value="@Material.Stainless">Нержавеющая сталь</MudSelectItem>
+                <MudSelectItem Value="@Material.Brass">Бронза</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudSelect Label="Тип" T="SequenceType" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SequenceType">
+                <MudSelectItem Value="@SequenceType.Facing">Обработка торца</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.ExternalTurning">Наружное точение</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.Threading">Нарезание резьбы</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        @switch (SequenceType)
+        {
+            case SequenceType.Facing:
+                break;
+            case SequenceType.ExternalTurning:
+                break;
+            case SequenceType.InternalTurning:
+                break;
+            case SequenceType.Drilling:
+                <MudItem xs="12" md="4">
+                    <MudSelect Label="Переход" T="DrillingSequences" @bind-Value="DrillingSequence" Variant="Variant.Filled" Margin="Margin.Dense">
+                        <MudSelectItem Value="@(DrillingSequences.HighSpeedDrilling)">Высокоскоростное сверление</MudSelectItem>
+                        <MudSelectItem Value="@(DrillingSequences.PeckingDrilling)">Прерывистое сверление</MudSelectItem>
+                        <MudSelectItem Value="@(DrillingSequences.PeckingDeepDrilling)">Глубокое сверление</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField Label="Диаметр" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter"/>
+                </MudItem>
+                <MudItem xs="12" sm="5" md="4">
+                    <MudSelect @bind-Value="DrillingToolType" Label="Тип сверла" T="DrillingTool.Types" Variant="Variant.Filled" Margin="Margin.Dense">
+                        <MudSelectItem Value="@DrillingTool.Types.Solid">Твердосплавное</MudSelectItem>
+                        <MudSelectItem Value="@DrillingTool.Types.Insert">Корпусное с пластинами</MudSelectItem>
+                        <MudSelectItem Value="@DrillingTool.Types.Center">Центровочное</MudSelectItem>
+                        <MudSelectItem Value="@DrillingTool.Types.Rapid">Быстрорез</MudSelectItem>
+                        <MudSelectItem Value="@DrillingTool.Types.Tip">Корпусное с головкой</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField Label="Глубина" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
+                switch (DrillingSequence)
+                {
+                    case DrillingSequences.PeckingDrilling or DrillingSequences.PeckingDeepDrilling:
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudTextField Label="Глубина за проход" @bind-Value="StepOver" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                        </MudItem>
+                        break;
+                }
+                break;
+            case SequenceType.Tapping:
+                break;
+            case SequenceType.Threading:
+                break;
+            case SequenceType.Grooving:
+                break;
+        }
+    </MudGrid>
+    <MudItem Class="mt-4" xs="12" sm="12" md="12">
+        <MudTextField T="string" DisableUnderLine="true" Label="Предпросмотр" Style="font-family: 'Roboto Mono', monospace; font-size: medium;"
+                      ReadOnly="true" Variant="Variant.Filled" Text="@("\n" + ExampleText.Trim('\n'))"/>
+    </MudItem>
+    <MudItem Class="d-flex flex-row-reverse py-0 px-0 mt-4">
+        <MudButton Variant="Variant.Outlined" Size="Size.Large" 
+                   EndIcon="@Icons.TwoTone.PlaylistAdd" Color="Color.Primary" 
+                   OnClick="(() => Sequences.Add(CurrentSequence))" Disabled="@(string.IsNullOrEmpty(ExampleText))">Добавить</MudButton>
+    </MudItem>
+    @if (Sequences.Count > 0)
+    {
+        <MudItem Class="mt-4" xs="12">
+            <MudField DisableUnderLine="true" Label="Список операций" Variant="Variant.Filled">
+            @foreach (var sequence in Sequences)
+                {
+                    <MudPaper Outlined="true" Class="ma-1">
+                        <MudGrid Justify="Justify.FlexStart" Spacing="1">
+                            @switch (sequence)
+                            {
+                                case TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Высокоскоростное сверление Ø{turningHighSpeedDrillingSequence.Tool.Diameter} на глубину {Math.Abs(turningHighSpeedDrillingSequence.EndZ)} мм")</MudText>
+                                    </MudItem>
+                                    break;
+                                case TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Глубокое сверление Ø{turningPeckDeepDrillingSequence.Tool.Diameter} на глубину {Math.Abs(turningPeckDeepDrillingSequence.EndZ)} мм")</MudText>
+                                    </MudItem>
+                                    break;
+                                case TurningPeckDrillingSequence turningPeckDrillingSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Прерывистое сверление Ø{turningPeckDrillingSequence.Tool.Diameter} на глубину {Math.Abs(turningPeckDrillingSequence.EndZ)} мм")</MudText>
+                                    </MudItem>
+                                    break;
+                            }
+                            <MudItem Class="d-flex justify-end flex-grow-1 gap-4">
+                                <MudItem>
+                                    <MudText Style="margin-top: 10px; margin-right: 10px;" Typo="Typo.body2">@($"[{(sequence.MachineTime + 5).ToPrettyString(2)}]")</MudText>
+                                </MudItem>
+                                <MudItem>
+                                    <MudIconButton Style="@($"margin-top: 1px; margin-left: 4px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true"
+                                       Icon="@Icons.Material.Filled.Remove" OnClick="(() => Sequences.Remove(sequence))" />
+                                </MudItem>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                }
+                <MudPaper Outlined="true" Class="ma-1">
+                    <MudGrid Justify="Justify.FlexStart" Spacing="1">
+                        <MudItem Class="my-2">
+                            <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Суммарное время: {(Sequences.Sum(x => x.MachineTime) + 5 * Sequences.Count).ToPrettyString( 2)} сек")</MudText>
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+            </MudField>
+        </MudItem>
+    }
+</MudContainer>
 
 @code {
+    public Variant ButtonsVariant => Variant.Filled;
+    public bool FirstFieldsUnderline => false;
+    public int ButtonSize => 35;
+
+    public List<Sequence> Sequences { get; set; } = new();
+    public Sequence CurrentSequence { get; set; }
+    public Material Material { get; set; }
+
+    public SequenceType SequenceType { get; set; }
+    private GeneralSequences GeneralSequence { get; set; }
+    private TurningSequences TurningSequence { get; set; }
+    private DrillingSequences DrillingSequence { get; set; }
+    private ThreadingSequences ThreadingSequence { get; set; }
+    private TurningGroovingSequences GroovingSequence { get; set; }
+
+    public double StartZ { get; set; } = 2;
+    public double EndZ { get; set; }
+    public double StartX { get; set; }
+    public double EndX { get; set; }
+    public double StepOver { get; set; }
+    public double Escaping { get; set; }
+    public DrillingTool.Types DrillingToolType { get; set; }
+
+    public string ExampleText
+    {
+        get
+        {
+            string result = string.Empty;
+            switch (SequenceType)
+            {
+                case SequenceType.General:
+                    break;
+                case SequenceType.Facing:
+                    break;
+                case SequenceType.ExternalTurning:
+                    break;
+                case SequenceType.InternalTurning:
+                    break;
+                case SequenceType.Drilling:
+                    switch (DrillingSequence)
+                    {
+                        case DrillingSequences.HighSpeedDrilling:
+                            if (EndZ is 0 || EndX is 0) break;
+                            CurrentSequence = new TurningHighSpeedDrillingSequence(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180), StartZ, EndZ);
+                            if (((TurningHighSpeedDrillingSequence)CurrentSequence).MachineTime > 0) result += $"Время резания: {((TurningHighSpeedDrillingSequence)CurrentSequence).MachineTime.ToPrettyString(2)} сек";
+                            return result;
+                        case DrillingSequences.PeckingDrilling:
+                            if (EndZ is 0 || EndX is 0 || StepOver is 0) break;
+                            CurrentSequence = new TurningPeckDeepDrillingSequence(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180), StepOver, StartZ, EndZ);
+                            if (((TurningPeckDeepDrillingSequence)CurrentSequence).MachineTime > 0) result += $"Время резания: {((TurningPeckDeepDrillingSequence)CurrentSequence).MachineTime.ToPrettyString(2)} сек";
+                            return result;
+                        case DrillingSequences.PeckingDeepDrilling:
+                            if (EndZ is 0 || EndX is 0 || StepOver is 0) break;
+                            CurrentSequence = new TurningPeckDrillingSequence(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180), StepOver, StartZ, EndZ);
+                            if (((TurningPeckDrillingSequence)CurrentSequence).MachineTime > 0) result += $"Время резания: {((TurningPeckDrillingSequence)CurrentSequence).MachineTime.ToPrettyString(2)} сек";
+                            return result;
+                    }
+                    break;
+                case SequenceType.Tapping:
+                    break;
+                case SequenceType.Threading:
+                    break;
+                case SequenceType.Grooving:
+                    break;
+            }
+
+            return result;
+        }
+    }
 
 }

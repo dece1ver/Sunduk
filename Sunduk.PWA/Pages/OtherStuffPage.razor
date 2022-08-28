@@ -8,14 +8,8 @@
         <MudTabPanel Text="Фаска">
             <ChamferComponent />
         </MudTabPanel>
-        <MudTabPanel Text="Скругление">
-            <RadiusComponent />
-        </MudTabPanel>
-        <MudTabPanel Text="Сфера ниппеля">
-            <NippleComponent />
-        </MudTabPanel>
-        <MudTabPanel Text="Высота хорды">
-            <ArcChordComponent />
+        <MudTabPanel Text="Дуги">
+            <ArcsComponent />
         </MudTabPanel>
         <MudTabPanel Text="Конус сверла">
             <DrillAngleComponent />
@@ -42,7 +36,7 @@
         }
         else if (direction == SwipeDirection.RightToLeft)
         {
-            if(tabs.ActivePanelIndex < 6)
+            if(tabs.ActivePanelIndex < 4)
             {
                 tabs.ActivatePanel(tabs.ActivePanelIndex + 1);
             }

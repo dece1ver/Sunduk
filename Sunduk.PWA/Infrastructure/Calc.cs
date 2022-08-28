@@ -1,4 +1,7 @@
-﻿using Sunduk.PWA.Infrastructure.Tools.Base;
+﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Sequences.Turning;
+using Sunduk.PWA.Infrastructure.Templates;
+using Sunduk.PWA.Infrastructure.Tools.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -178,5 +181,49 @@ namespace Sunduk.PWA.Infrastructure
                 (Math.Tan(angle.Radians()) * (radius - radius / Math.Tan((90 - angle / 2).Radians())),
                 radius - radius / Math.Tan((90 - angle / 2).Radians()));
         }
+
+        public static double OperationTime(this HighSpeedDrillingSequence highSpeedDrillingSequence, Material material)
+        {
+            var fullLength = (Math.Abs(highSpeedDrillingSequence.EndZ) + Math.Abs(highSpeedDrillingSequence.StartZ));
+            var feed = Operation.DrillFeed(Machine.L230A, material, highSpeedDrillingSequence.Tool);
+            var speed = Operation.DrillCuttingSpeed(material, highSpeedDrillingSequence.Tool);
+            return (60 * Math.PI * fullLength * highSpeedDrillingSequence.Tool.Diameter) / 
+                   (1000 * feed * speed);
+        }
+
+        
+        public static double OperationTime(this PeckDeepDrillingSequence peckDeepDrillingSequence, Material material)
+        {
+            var fullLength = (Math.Abs(peckDeepDrillingSequence.EndZ) + Math.Abs(peckDeepDrillingSequence.StartZ));
+            var steps = Math.Round(fullLength / peckDeepDrillingSequence.Depth, MidpointRounding.ToPositiveInfinity);
+            var stepLength = peckDeepDrillingSequence.Depth + Operation.Escaping();
+            double currentLength = 0;
+            // время резания
+            var result = steps *
+                         (60 * Math.PI * (stepLength + Operation.Escaping()) * peckDeepDrillingSequence.Tool.Diameter) /
+                         (1000 * Operation.DrillFeed(Machine.L230A, material, peckDeepDrillingSequence.Tool) * Operation.DrillCuttingSpeed(material, peckDeepDrillingSequence.Tool));
+            // время ввода/вывода сверла
+            for (int i = 0; i < steps; i++)
+            {
+                currentLength += stepLength;
+                result += 2 * (60 * (currentLength)) / Operation.RapidSpeed();
+            }
+
+            return result;
+        }
+
+        public static double OperationTime(this PeckDrillingSequence peckDrillingSequence, Material material)
+        {
+            var steps = Math.Round((Math.Abs(peckDrillingSequence.EndZ) + Math.Abs(peckDrillingSequence.StartZ)) /
+                                   peckDrillingSequence.Depth, MidpointRounding.ToPositiveInfinity);
+            var stepLength = peckDrillingSequence.Depth + Operation.Escaping();
+            return steps *
+                   (60 * Math.PI * (stepLength) * peckDrillingSequence.Tool.Diameter) 
+                   /
+                   (1000 * Operation.DrillFeed(Machine.L230A, material, peckDrillingSequence.Tool) * Operation.DrillCuttingSpeed(material, peckDrillingSequence.Tool)) + 
+                   steps * 
+                   (60 * Operation.Escaping()) / Operation.RapidSpeed();
+        }
+
     }
 }

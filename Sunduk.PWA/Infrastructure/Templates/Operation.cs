@@ -29,7 +29,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public const string OpStop = "M1";
         public const string ProcessingSnippet = "(---OBRABOTKA---)\n";
 
-
+        public static double RapidSpeed() => 15000;
+        public static double Escaping() => 0.3;
 
         public static string SpindleUnclamp(Machine machine)
         {

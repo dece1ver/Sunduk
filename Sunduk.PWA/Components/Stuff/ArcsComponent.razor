@@ -1,17 +1,16 @@
-﻿@page "/timecalc"
-
-<MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="fas fa-crutch">Раздел в разработке</MudAlert>
-<MudSwipeArea OnSwipe="@OnSwipe">
-    <MudTabs Elevation="2" @ref="tabs">
-        <MudTabPanel Text="Распиловка">
-            <SawingTimeComponent/>
+﻿<MudSwipeArea OnSwipe="@OnSwipe">
+    <MudTabs Elevation="2" @ref="tabs" Style="font-size: small">
+        <MudTabPanel Text="Скругление">
+            <ThreadTurningComponent />
         </MudTabPanel>
-        <MudTabPanel Text="Точение">
-            <TurningTimeComponent/>
+        <MudTabPanel Text="@("\"Ниппель\"")">
+            <NippleComponent />
+        </MudTabPanel>
+        <MudTabPanel Text="@("\"Затвор\"")">
+            <Arc2Component />
         </MudTabPanel>
     </MudTabs>
 </MudSwipeArea>
-
 
 @code
 {
@@ -28,10 +27,14 @@
         }
         else if (direction == SwipeDirection.RightToLeft)
         {
-            if (tabs.ActivePanelIndex < 1)
+            if (tabs.ActivePanelIndex < 2)
             {
                 tabs.ActivatePanel(tabs.ActivePanelIndex + 1);
             }
         }
     }
+}
+
+@code {
+
 }

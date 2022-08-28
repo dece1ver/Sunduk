@@ -17,6 +17,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
         public double StartZ { get; set; }
         public double EndZ { get; set; }
         public override string Name => $"Глубокое сверление";
+        public override double MachineTime => this.OperationTime(Material);
         public PeckDeepDrillingSequence(Machine machine, Material material, DrillingTool tool, double depth, double startZ, double endZ)
         {
             Machine = machine;
