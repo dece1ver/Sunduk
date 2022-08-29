@@ -32,6 +32,20 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public static double RapidSpeed() => 15000;
         public static double Escaping() => 0.3;
 
+        public static string TailstockOn(Machine machine) => machine switch
+        {
+            Machine.L230A => "M25",
+            Machine.GS1500 => "M225",
+            _ => string.Empty,
+        };
+
+        public static string TailstockOff(Machine machine) => machine switch
+        {
+            Machine.L230A => "M28",
+            Machine.GS1500 => "M226",
+            _ => string.Empty,
+        };
+
         public static string SpindleUnclamp(Machine machine)
         {
             return machine switch
@@ -47,7 +61,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 => "M11",
-                Machine.L230A => "M68", //????????
+                Machine.L230A => "M68",
                 _ => string.Empty,
             };
         }
@@ -99,9 +113,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
         {
             return material switch
             {
-                Material.Steel => 280,
-                Material.Stainless => 180,
-                Material.Brass => 350,
+                Material.Steel => 230,
+                Material.Stainless => 160,
+                Material.Brass => 300,
                 _ => 0,
             };
         }
@@ -114,7 +128,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return material switch
             {
                 Material.Steel => 350,
-                Material.Stainless => 230,
+                Material.Stainless => 220,
                 Material.Brass => 450,
                 _ => 0,
             };
@@ -164,11 +178,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
                 Material.Steel => drillingTool.Type switch
                 {
-                    TurningDrillingTool.Types.Insert => 200,
+                    TurningDrillingTool.Types.Insert => 180,
                     TurningDrillingTool.Types.Solid => 100,
                     TurningDrillingTool.Types.Tip => 100,
-                    TurningDrillingTool.Types.Rapid => 20,
-                    TurningDrillingTool.Types.Center => 20,
+                    TurningDrillingTool.Types.Rapid => 15,
+                    TurningDrillingTool.Types.Center => 15,
                     _ => 0,
                 },
                 Material.Stainless => drillingTool.Type switch
@@ -177,7 +191,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     TurningDrillingTool.Types.Solid => 60,
                     TurningDrillingTool.Types.Tip => 80,
                     TurningDrillingTool.Types.Rapid => 12,
-                    TurningDrillingTool.Types.Center => 12,
+                    TurningDrillingTool.Types.Center => 8,
                     _ => 0,
                 },
                 Material.Brass => drillingTool.Type switch

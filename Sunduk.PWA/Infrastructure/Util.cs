@@ -353,6 +353,9 @@ namespace Sunduk.PWA.Infrastructure
             };
         }
 
+        /// <summary>
+        /// Описание перехода
+        /// </summary>
         public static string Description(this Sequence sequence)
         {
             return sequence switch
@@ -361,6 +364,22 @@ namespace Sunduk.PWA.Infrastructure
                 RoughFacingSequence roughFacingSequence => $"{roughFacingSequence.Name} [ T{roughFacingSequence.Tool.Position:D4} Z{roughFacingSequence.RoughStockAllow.NC()} => Z{roughFacingSequence.ProfStockAllow.NC()} | W = {roughFacingSequence.StepOver}]",
                 RoughFacingCycleSequence roughFacingCycleSequence => $"{roughFacingCycleSequence.Name} [ T{roughFacingCycleSequence.Tool.Position:D4} Z{roughFacingCycleSequence.RoughStockAllow.NC()} => Z{roughFacingCycleSequence.ProfStockAllow.NC()} | W = {roughFacingCycleSequence.StepOver}]",
                 _ => sequence.Name,
+            };
+        }
+
+        /// <summary>
+        /// Описание типа сверла
+        /// </summary>
+        public static string Description(this DrillingTool.Types drillType)
+        {
+            return drillType switch
+            {
+                DrillingTool.Types.Insert => "Корпусное с пластинами",
+                DrillingTool.Types.Solid => "Твёрдосплавное",
+                DrillingTool.Types.Tip => "Корпусное с головкой",
+                DrillingTool.Types.Center => "Центровочное",
+                DrillingTool.Types.Rapid => "Быстрорежущее",
+                _ => string.Empty,
             };
         }
 
