@@ -1,4 +1,5 @@
-﻿using Sunduk.PWA.Infrastructure.Tools.Base;
+﻿using Sunduk.PWA.Infrastructure.Time;
+using Sunduk.PWA.Infrastructure.Tools.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
         public double StartZ { get; set; }
         public double EndZ { get; set; }
         public override string Name => $"Резьба метчиком";
+        public override OperationTime MachineTime => this.OperationTime();
         public TappingSequence(Machine machine, TappingTool tool, double cutSpeed, double startZ, double endZ)
         {
             Machine = machine;

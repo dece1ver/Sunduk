@@ -1,4 +1,5 @@
-﻿using Sunduk.PWA.Infrastructure.Tools;
+﻿using Sunduk.PWA.Infrastructure.Time;
+using Sunduk.PWA.Infrastructure.Tools;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 using System;
@@ -17,7 +18,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
         public double StartZ { get; set; }
         public double EndZ { get; set; }
         public override string Name => $"Прерывистое сверление";
-        public override double MachineTime => this.OperationTime(Material);
+        public override OperationTime MachineTime => this.OperationTime(Material);
         public PeckDrillingSequence(Machine machine, Material material, DrillingTool tool, double depth, double startZ, double endZ)
         {
             Machine = machine;

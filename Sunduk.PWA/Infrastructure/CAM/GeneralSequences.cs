@@ -6,5 +6,6 @@
         CustomOperation,
         TailStockOn,
         TailStockOff,
+        Stop,
     }
 }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Sunduk.PWA.Infrastructure.Time;
 
 namespace Sunduk.PWA.Infrastructure
 {
@@ -186,21 +187,27 @@ namespace Sunduk.PWA.Infrastructure
         /// <summary>
         /// Время обработки при высокоскоростном сверлении
         /// </summary>
-        public static double OperationTime(this HighSpeedDrillingSequence highSpeedDrillingSequence, Material material)
+        public static OperationTime OperationTime(this HighSpeedDrillingSequence highSpeedDrillingSequence, Material material)
         {
+            double cuttingTime = 0;
+            double rapidTime = 5;
             var fullLength = (Math.Abs(highSpeedDrillingSequence.EndZ) + Math.Abs(highSpeedDrillingSequence.StartZ));
             var feed = Operation.DrillFeed(Machine.L230A, material, highSpeedDrillingSequence.Tool);
             var speed = Operation.DrillCuttingSpeed(material, highSpeedDrillingSequence.Tool);
             var spins = (speed * 1000) / (Math.PI * highSpeedDrillingSequence.Tool.Diameter);
             if (spins > 3000) spins = 3000;
-            return (60 * fullLength) / (feed * spins);
+            cuttingTime += (60 * fullLength) / (feed * spins);
+            rapidTime += (60 * fullLength) / Operation.RapidSpeed();
+            return new OperationTime(cuttingTime, rapidTime);
         }
 
         /// <summary>
         /// Время обработки при глубоком сверлении
         /// </summary>
-        public static double OperationTime(this PeckDeepDrillingSequence peckDeepDrillingSequence, Material material)
+        public static OperationTime OperationTime(this PeckDeepDrillingSequence peckDeepDrillingSequence, Material material)
         {
+            double cuttingTime = 0;
+            double rapidTime = 5;
             var fullLength = (Math.Abs(peckDeepDrillingSequence.EndZ) + Math.Abs(peckDeepDrillingSequence.StartZ));
             var steps = (int)Math.Round(fullLength / peckDeepDrillingSequence.Depth, MidpointRounding.ToPositiveInfinity);
             var stepLength = peckDeepDrillingSequence.Depth + Operation.Escaping();
@@ -209,42 +216,37 @@ namespace Sunduk.PWA.Infrastructure
                 stepLength = fullLength;
                 steps = 1;
             }
-            switch (steps)
-            {
-                case 2:
-                    stepLength = fullLength / 2;
-                    break;
-                case > 2:
-                    steps -= 1;
-                    break;
-            }
 
-            var lastStep = fullLength - steps * peckDeepDrillingSequence.Depth;
+            if (steps > 2) steps -= 1;
+
+            var lastStep = fullLength - steps * peckDeepDrillingSequence.Depth + Operation.Escaping();
             var feed = Operation.DrillFeed(Machine.L230A, material, peckDeepDrillingSequence.Tool);
             var speed = Operation.DrillCuttingSpeed(material, peckDeepDrillingSequence.Tool);
             var spins = (speed * 1000) / (Math.PI * peckDeepDrillingSequence.Tool.Diameter);
             if (spins > 3000) spins = 3000;
             double currentLength = 0;
             // время резания
-            var result = steps *
-                (60 * stepLength) / (feed * spins) + 
-                (60 * lastStep) / (feed * spins);
+            cuttingTime += steps *
+                          (60 * stepLength) / (feed * spins) + 
+                          (60 * lastStep) / (feed * spins);
             // время ввода/вывода сверла
             if (steps > 1) steps++;
             for (var i = 0; i < steps; i++)
             {
                 currentLength += stepLength;
-                result += 2 * (60 * (currentLength)) / Operation.RapidSpeed();
+                rapidTime += 2 * (60 * currentLength) / Operation.RapidSpeed();
             }
 
-            return result;
+            return new OperationTime(cuttingTime, rapidTime);
         }
 
         /// <summary>
         /// Время обработки при прерывистом сверлении
         /// </summary>
-        public static double OperationTime(this PeckDrillingSequence peckDrillingSequence, Material material)
+        public static OperationTime OperationTime(this PeckDrillingSequence peckDrillingSequence, Material material)
         {
+            double cuttingTime = 0;
+            double rapidTime = 5;
             var fullLength = (Math.Abs(peckDrillingSequence.EndZ) + Math.Abs(peckDrillingSequence.StartZ));
             var steps = (int)Math.Round(fullLength / peckDrillingSequence.Depth, MidpointRounding.ToPositiveInfinity);
             var feed = Operation.DrillFeed(Machine.L230A, material, peckDrillingSequence.Tool);
@@ -268,28 +270,50 @@ namespace Sunduk.PWA.Infrastructure
             }
 
             var lastStep = fullLength - steps * stepLength;
-            
-            return steps *
-                   (60 * stepLength) / (feed * spins) +
-                   (60 * lastStep) / (feed * spins) +
-                   steps * 
-                   (60 * Operation.Escaping()) / Operation.RapidSpeed();
+            cuttingTime += steps *
+                          (60 * stepLength) / (feed * spins) +
+                          (60 * lastStep) / (feed * spins);
+            rapidTime += steps * 
+                (60 * Operation.Escaping()) / Operation.RapidSpeed();
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        /// <summary>
+        /// Время обработки при нарезании резьбы метчиком
+        /// </summary>
+        public static OperationTime OperationTime(this TappingSequence tappingSequence)
+        {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            var fullLength = (Math.Abs(tappingSequence.EndZ) + Math.Abs(tappingSequence.StartZ));
+            var feed = tappingSequence.Tool.Pitch;
+            var speed = tappingSequence.CutSpeed;
+            var spins = (speed * 1000) / (Math.PI * tappingSequence.Tool.Diameter);
+            if (spins > 3000) spins = 3000;
+            cuttingTime += 2 * (60 * fullLength) / (feed * spins);
+            rapidTime += 1;
+            return new OperationTime(cuttingTime, rapidTime);
         }
 
         /// <summary>
         /// Время работы упора
         /// </summary>
-        public static double OperationTime(this LimiterSequence _) => 30;
+        public static OperationTime OperationTime(this LimiterSequence _) => new(0, 15);
+
+        /// <summary>
+        /// Время работы останова
+        /// </summary>
+        public static OperationTime OperationTime(this StopSequence _) => new(0, 30);
 
         /// <summary>
         /// Время подвода задней бабки
         /// </summary>
-        public static double OperationTime(this TailstockOnSequence _) => 15;
+        public static OperationTime OperationTime(this TailstockOnSequence _) => new(0, 15);
 
         /// <summary>
         /// Время отвода задней бабки
         /// </summary>
-        public static double OperationTime(this TailstockOffSequence _) => 15;
+        public static OperationTime OperationTime(this TailstockOffSequence _) => new(0, 15);
 
 
 
@@ -297,15 +321,19 @@ namespace Sunduk.PWA.Infrastructure
         /// <summary>
         /// Общее время обработки
         /// </summary>
-        public static (double, double, double) FullOperationTime(this List<Sequence> sequences)
+        public static OperationTime FullOperationTime(this List<Sequence> sequences)
         {
-            if (sequences is null || sequences.Count < 1) return (0, 0, 0);
-            var fullCuttingTime = sequences.Sum(x => x.MachineTime);
-            var sequencesWithRapidMovement = sequences.Count(x => x is not TailstockOnSequence and not TailstockOffSequence);
-            var rapidTime = sequencesWithRapidMovement * 5;
+            if (sequences is null || sequences.Count < 1) return new OperationTime(0,0);
+            var cuttingTime = sequences.Sum(x => x.MachineTime.CuttingTime);
+            var rapidTime = sequences.Sum(x => x.MachineTime.RapidTime);
+            var sequencesWithRapidMovement = sequences.Count(x => x is 
+                not TailstockOnSequence and 
+                not TailstockOffSequence and 
+                not StopSequence);
             var toolChangeTime = (sequencesWithRapidMovement - 1) * 2;
             if (toolChangeTime < 0) toolChangeTime = 0;
-            return (fullCuttingTime, rapidTime, toolChangeTime);
+            rapidTime += toolChangeTime;
+            return new OperationTime(cuttingTime, rapidTime);
         }
     }
 }

@@ -25,12 +25,24 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public const string MillingSafetyString = "G90 G17 G54\n";
         public const string GoodwayReturnB = "G55 G30 B0\n";
         public const string SpindleStop = "M5";
-        public const string Stop = "M0";
-        public const string OpStop = "M1";
+        public const string AbsStop = "M0";
+        public const string OptionalStop = "M1";
         public const string ProcessingSnippet = "(---OBRABOTKA---)\n";
 
         public static double RapidSpeed() => 15000;
         public static double Escaping() => 0.3;
+
+        public static string Stop(bool optional, string comment)
+        {
+            string result = string.Empty;
+            result += optional switch
+            {
+                true => OptionalStop,
+                false => AbsStop,
+            };
+            if (!string.IsNullOrEmpty(comment)) result += $" ({comment.Translate()})";
+            return result;
+        }
 
         public static string TailstockOn(Machine machine) => machine switch
         {
@@ -361,7 +373,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"T{tool.Position.ToolNumber()} G54 ({tool.Name})\n" +
                 $"G0 X{externalDiameter.NC(0)} Z0.5\n" +
                 SpindleUnclamp(machine) + "\n" +
-                Stop + "\n" +
+                AbsStop + "\n" +
                 "W1.\n" +
                 TurningReferentPoint,
 
@@ -369,7 +381,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"T{tool.Position.ToolNumber()} ({tool.Name})\n" +
                 $"G0 X{externalDiameter.NC(0)} Z0.5\n" +
                 SpindleUnclamp(machine) + "\n" +
-                Stop + "\n" +
+                AbsStop + "\n" +
                 "W1.\n" +
                 TurningReferentPoint,
 

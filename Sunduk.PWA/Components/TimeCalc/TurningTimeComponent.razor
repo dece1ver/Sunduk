@@ -1,4 +1,5 @@
 ﻿@using _Imports = MudBlazor._Imports
+@using Sunduk.PWA.Infrastructure.Time
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="5" md="4">
@@ -24,6 +25,7 @@
                 <MudItem xs="12" md="4">
                     <MudSelect Label="Переход" T="GeneralSequences" @bind-Value="GeneralSequence" Variant="Variant.Filled" Margin="Margin.Dense">
                         <MudSelectItem Value="@(GeneralSequences.Limiter)">Упор</MudSelectItem>
+                        <MudSelectItem Value="@(GeneralSequences.Stop)">Остановка</MudSelectItem>
                         <MudSelectItem Value="@(GeneralSequences.TailStockOn)">Подвод задней бабки</MudSelectItem>
                         <MudSelectItem Value="@(GeneralSequences.TailStockOff)">Отвод задней бабки</MudSelectItem>
                     </MudSelect>
@@ -76,8 +78,7 @@
         }
     </MudGrid>
     <MudItem Class="mt-4" xs="12" sm="12" md="12">
-        <MudTextField T="string" DisableUnderLine="true" Label="Предпросмотр" Style="font-family: 'Roboto Mono', monospace; font-size: medium;"
-                      ReadOnly="true" Variant="Variant.Filled" Text="@("\n" + ExampleText.Trim('\n'))"/>
+        <MudTextField T="string" DisableUnderLine="true" Label="Предпросмотр" ReadOnly="true" Variant="Variant.Filled" Text="@("\n" + ExampleText.Trim('\n'))"/>
     </MudItem>
     <MudItem Class="d-flex flex-row-reverse py-0 px-0 mt-4">
         <MudButton Variant="Variant.Outlined" Size="Size.Large" 
@@ -96,19 +97,24 @@
                             {
                                 case FinishTurningSequence finishTurningSequence:
                                     break;
-                                case LimiterSequence limiterSequence:
+                                case LimiterSequence:
                                     <MudItem>
                                         <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Упор")</MudText>
                                     </MudItem>
                                     break;
-                                case TailstockOffSequence tailstockOffSequence:
+                                case TailstockOffSequence:
                                     <MudItem>
                                         <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Отвод бабки")</MudText>
                                     </MudItem>
                                     break;
-                                case TailstockOnSequence tailstockOnSequence:
+                                case TailstockOnSequence:
                                     <MudItem>
                                         <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Подвод бабки")</MudText>
+                                    </MudItem>
+                                    break;
+                                case StopSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Остановка")</MudText>
                                     </MudItem>
                                     break;
                                 case TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence:
@@ -138,7 +144,7 @@
                             <MudItem Class="d-flex justify-end flex-grow-1 gap-4">
                                 <MudItem>
                                     <MudText Style="margin-top: 10px; margin-right: 10px;" Typo="Typo.body2">
-                                        @($"[{sequence.MachineTime.ToPrettyString(2)}]")
+                                        @(TimeInfo(sequence))
                                     </MudText>
                                 </MudItem>
                                 <MudItem>
@@ -152,7 +158,7 @@
                 <MudPaper Outlined="true" Class="ma-1">
                     <MudGrid Justify="Justify.FlexStart" Spacing="1">
                         <MudItem Class="my-2">
-                            <MudText Style="margin-top: 7px; margin-left: 10px;" Typo="Typo.body2">@($"Суммарное время: {(FullOperationTime.cuttingTime + FullOperationTime.rapidTime + FullOperationTime.toolChangesTime).ToPrettyString(2)} сек")</MudText>
+                            <MudText Style="margin-top: 7px; margin-left: 10px;" Typo="Typo.body2">@($"Суммарное время с учетом смены инструмента: {(FullOperationTime.FullTime).ToPrettyString(2)} сек")</MudText>
                         </MudItem>
                     </MudGrid>
                 </MudPaper>
@@ -185,7 +191,25 @@
     public double Escaping { get; set; }
     public DrillingTool.Types DrillingToolType { get; set; }
 
-    public (double cuttingTime, double rapidTime, double toolChangesTime) FullOperationTime => Sequences.FullOperationTime();
+    public OperationTime FullOperationTime => Sequences.FullOperationTime();
+
+    private string TimeInfo(Sequence sequence)
+    {
+        string result = string.Empty;
+        switch (sequence.MachineTime.CuttingTime, sequence.MachineTime.RapidTime)
+        {
+            case (> 0, > 0):
+                result = $"[ {sequence.MachineTime.CuttingTime.ToPrettyString(2)} + {sequence.MachineTime.RapidTime.ToPrettyString(2)} = {sequence.MachineTime.FullTime.ToPrettyString(2)} ]";
+                break;
+            case (0, > 0):
+                result = $"[ {sequence.MachineTime.RapidTime.ToPrettyString()} ]";
+                break;
+            default:
+                result = string.Empty;
+                break;
+        }
+        return result;
+    }
 
     public string ExampleText
     {
@@ -195,23 +219,15 @@
             switch (SequenceType)
             {
                 case SequenceType.General:
-                    switch (GeneralSequence)
+                    CurrentSequence = GeneralSequence switch
                     {
-                        case GeneralSequences.Limiter:
-                            CurrentSequence = new LimiterSequence(Machine.L230A, new Tool(), 0);
-                            result += $"Время: {((LimiterSequence)CurrentSequence).MachineTime.ToPrettyString(2)} сек";
-                            break;
-                        case GeneralSequences.CustomOperation:
-                            break;
-                        case GeneralSequences.TailStockOn:
-                            CurrentSequence = new TailstockOnSequence(Machine.L230A);
-                            result += $"Время: {((TailstockOnSequence)CurrentSequence).MachineTime.ToPrettyString(2)} сек";
-                            break;
-                        case GeneralSequences.TailStockOff:
-                            CurrentSequence = new TailstockOffSequence(Machine.L230A);
-                            result += $"Время: {((TailstockOffSequence)CurrentSequence).MachineTime.ToPrettyString(2)} сек";
-                            break;
-                    }
+                        GeneralSequences.Limiter => new LimiterSequence(Machine.L230A, new Tool(), 0),
+                        GeneralSequences.Stop => new StopSequence(false, string.Empty),
+                        GeneralSequences.TailStockOn => new TailstockOnSequence(Machine.L230A),
+                        GeneralSequences.TailStockOff => new TailstockOffSequence(Machine.L230A),
+                        _ => CurrentSequence
+                        };
+                    result += $"Время: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек";
                     break;
                 case SequenceType.Facing:
                     break;
@@ -225,19 +241,18 @@
                         case DrillingSequences.HighSpeedDrilling:
                             if (EndZ is 0 || EndX is 0) break;
                             CurrentSequence = new TurningHighSpeedDrillingSequence(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180), StartZ, EndZ);
-                            if (((TurningHighSpeedDrillingSequence)CurrentSequence).MachineTime > 0) result += $"Время резания: {((TurningHighSpeedDrillingSequence)CurrentSequence).MachineTime.ToPrettyString(2)} сек";
-                            return result;
+                            break;
                         case DrillingSequences.PeckingDeepDrilling:
                             if (EndZ is 0 || EndX is 0 || StepOver is 0) break;
                             CurrentSequence = new TurningPeckDeepDrillingSequence(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180), StepOver, StartZ, EndZ);
-                            if (((TurningPeckDeepDrillingSequence)CurrentSequence).MachineTime > 0) result += $"Время резания: {((TurningPeckDeepDrillingSequence)CurrentSequence).MachineTime.ToPrettyString(2)} сек";
-                            return result;
+                            break;
                         case DrillingSequences.PeckingDrilling:
                             if (EndZ is 0 || EndX is 0 || StepOver is 0) break;
                             CurrentSequence = new TurningPeckDrillingSequence(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180), StepOver, StartZ, EndZ);
-                            if (((TurningPeckDrillingSequence)CurrentSequence).MachineTime > 0) result += $"Время резания: {((TurningPeckDrillingSequence)CurrentSequence).MachineTime.ToPrettyString(2)} сек";
-                            return result;
+                            break;
                     }
+                    if (CurrentSequence.MachineTime.FullTime > 0)
+                        result += $"Время резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString(2)} сек. Время перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString(2)} сек. Общее: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек.";
                     break;
                 case SequenceType.Tapping:
                     break;
