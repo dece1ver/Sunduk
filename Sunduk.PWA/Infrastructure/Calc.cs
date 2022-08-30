@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Sunduk.PWA.Components.Knowledge;
 using Sunduk.PWA.Infrastructure.Time;
 
 namespace Sunduk.PWA.Infrastructure
@@ -182,6 +183,27 @@ namespace Sunduk.PWA.Infrastructure
                 (Math.Tan(angle.Radians()) * (radius - radius / Math.Tan((90 - angle / 2).Radians())),
                 radius - radius / Math.Tan((90 - angle / 2).Radians()));
         }
+        
+
+        public static double AxialTurningTime(this double length, double spins, double feed)
+        {
+            return 60 * length / (feed * spins);
+        }
+
+        public static double AxialRapidTime(this double length)
+        {
+            return 60 * length / (Operation.RapidSpeed());
+        }
+
+        public static double CrossTurningTime(double maxDiam, double minDiam, double spins, double feed)
+        {
+            return 60 * Math.Abs(maxDiam - minDiam) / (2 * feed * spins);
+        }
+
+        public static double CrossRapidTime(double maxDiam, double minDiam)
+        {
+            return 60 * Math.Abs(maxDiam - minDiam) / (2 * Operation.RapidSpeed());
+        }
 
 
         /// <summary>
@@ -196,8 +218,8 @@ namespace Sunduk.PWA.Infrastructure
             var speed = Operation.DrillCuttingSpeed(material, highSpeedDrillingSequence.Tool);
             var spins = (speed * 1000) / (Math.PI * highSpeedDrillingSequence.Tool.Diameter);
             if (spins > 3000) spins = 3000;
-            cuttingTime += (60 * fullLength) / (feed * spins);
-            rapidTime += (60 * fullLength) / Operation.RapidSpeed();
+            cuttingTime += fullLength.AxialTurningTime(spins, feed);
+            rapidTime += fullLength.AxialRapidTime();
             return new OperationTime(cuttingTime, rapidTime);
         }
 
@@ -226,15 +248,14 @@ namespace Sunduk.PWA.Infrastructure
             if (spins > 3000) spins = 3000;
             double currentLength = 0;
             // время резания
-            cuttingTime += steps *
-                          (60 * stepLength) / (feed * spins) + 
-                          (60 * lastStep) / (feed * spins);
+            cuttingTime += steps * stepLength.AxialTurningTime(spins, feed) + 
+                          lastStep.AxialTurningTime(spins, feed);
             // время ввода/вывода сверла
             if (steps > 1) steps++;
             for (var i = 0; i < steps; i++)
             {
                 currentLength += stepLength;
-                rapidTime += 2 * (60 * currentLength) / Operation.RapidSpeed();
+                rapidTime += 2 * currentLength.AxialRapidTime();
             }
 
             return new OperationTime(cuttingTime, rapidTime);
@@ -259,22 +280,43 @@ namespace Sunduk.PWA.Infrastructure
                 stepLength = fullLength;
                 steps = 1;
             }
-            switch (steps)
-            {
-                case 2:
-                    stepLength = fullLength / 2;
-                    break;
-                case > 2:
-                    steps -= 1;
-                    break;
-            }
+            if (steps > 2) steps -= 1;
 
-            var lastStep = fullLength - steps * stepLength;
-            cuttingTime += steps *
-                          (60 * stepLength) / (feed * spins) +
-                          (60 * lastStep) / (feed * spins);
-            rapidTime += steps * 
-                (60 * Operation.Escaping()) / Operation.RapidSpeed();
+            var lastStep = fullLength - steps * peckDrillingSequence.Depth + Operation.Escaping();
+
+            // время резания
+            cuttingTime += steps * stepLength.AxialTurningTime(spins, feed) + 
+                           lastStep.AxialTurningTime(spins, feed);
+            // время ввода/вывода сверла
+            if (steps > 1) steps++;
+            rapidTime += steps * Operation.Escaping().AxialRapidTime();
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        
+
+        /// <summary>
+        /// Время обработки при черновом торцевании
+        /// </summary>
+        public static OperationTime OperationTime(this RoughFacingSequence roughFacingSequence, Material material)
+        {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            
+            var startX = roughFacingSequence.ExternalDiameter;
+            var endX = roughFacingSequence.InternalDiameter;
+            var startZ = roughFacingSequence.RoughStockAllow;
+            var endZ = roughFacingSequence.ProfStockAllow;
+            var fullLength = startZ - endZ;
+            var steps = (int)Math.Round(fullLength / roughFacingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            var speed = Operation.CuttingSpeedRough(material);
+            var feed = Operation.FeedRough(roughFacingSequence.Tool.Radius);
+            var spins = (speed * 1000) / (Math.PI * ((startX - endX) / 2));
+            if (spins > 3000) spins = 3000;
+            cuttingTime += steps * CrossTurningTime(startX, endX, spins, feed);
+
+            rapidTime += steps * CrossRapidTime(startX, endX);
+
             return new OperationTime(cuttingTime, rapidTime);
         }
 
@@ -290,7 +332,7 @@ namespace Sunduk.PWA.Infrastructure
             var speed = tappingSequence.CutSpeed;
             var spins = (speed * 1000) / (Math.PI * tappingSequence.Tool.Diameter);
             if (spins > 3000) spins = 3000;
-            cuttingTime += 2 * (60 * fullLength) / (feed * spins);
+            cuttingTime += 2 * fullLength.AxialTurningTime(spins, feed);
             rapidTime += 1;
             return new OperationTime(cuttingTime, rapidTime);
         }

@@ -29,8 +29,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public const string OptionalStop = "M1";
         public const string ProcessingSnippet = "(---OBRABOTKA---)\n";
 
-        public static double RapidSpeed() => 15000;
-        public static double Escaping() => 0.3;
+        public static double RapidSpeed() => 7500;
+        public static double Escaping() => 0.2;
 
         public static string Stop(bool optional, string comment)
         {
@@ -190,29 +190,29 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
                 Material.Steel => drillingTool.Type switch
                 {
-                    TurningDrillingTool.Types.Insert => 180,
-                    TurningDrillingTool.Types.Solid => 100,
-                    TurningDrillingTool.Types.Tip => 100,
-                    TurningDrillingTool.Types.Rapid => 15,
-                    TurningDrillingTool.Types.Center => 15,
+                    DrillingTool.Types.Insert => 180,
+                    DrillingTool.Types.Solid => 100,
+                    DrillingTool.Types.Tip => 100,
+                    DrillingTool.Types.Rapid => 15,
+                    DrillingTool.Types.Center => 15,
                     _ => 0,
                 },
                 Material.Stainless => drillingTool.Type switch
                 {
-                    TurningDrillingTool.Types.Insert => 150,
-                    TurningDrillingTool.Types.Solid => 60,
-                    TurningDrillingTool.Types.Tip => 80,
-                    TurningDrillingTool.Types.Rapid => 12,
-                    TurningDrillingTool.Types.Center => 8,
+                    DrillingTool.Types.Insert => 150,
+                    DrillingTool.Types.Solid => 60,
+                    DrillingTool.Types.Tip => 80,
+                    DrillingTool.Types.Rapid => 12,
+                    DrillingTool.Types.Center => 8,
                     _ => 0,
                 },
                 Material.Brass => drillingTool.Type switch
                 {
-                    TurningDrillingTool.Types.Insert => 200,
-                    TurningDrillingTool.Types.Solid => 120,
-                    TurningDrillingTool.Types.Tip => 120,
-                    TurningDrillingTool.Types.Rapid => 20,
-                    TurningDrillingTool.Types.Center => 20,
+                    DrillingTool.Types.Insert => 200,
+                    DrillingTool.Types.Solid => 120,
+                    DrillingTool.Types.Tip => 120,
+                    DrillingTool.Types.Rapid => 20,
+                    DrillingTool.Types.Center => 20,
                     _ => 0,
                 },
                 _ => 0
@@ -272,29 +272,29 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 {
                     Material.Steel => drillingTool.Type switch
                     {
-                        TurningDrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
-                        TurningDrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
-                        TurningDrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
-                        TurningDrillingTool.Types.Rapid => (drillingTool.Diameter * 0.015),
-                        TurningDrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
+                        DrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
+                        DrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Rapid => (drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
                         _ => 0,
                     },
                     Material.Stainless => drillingTool.Type switch
                     {
-                        TurningDrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
-                        TurningDrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
-                        TurningDrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
-                        TurningDrillingTool.Types.Rapid => (drillingTool.Diameter * 0.015),
-                        TurningDrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
+                        DrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
+                        DrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Rapid => (drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
                         _ => 0,
                     },
                     Material.Brass => drillingTool.Type switch
                     {
-                        TurningDrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
-                        TurningDrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
-                        TurningDrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
-                        TurningDrillingTool.Types.Rapid => (drillingTool.Diameter * 0.015),
-                        TurningDrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
+                        DrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
+                        DrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Rapid => (drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
                         _ => 0,
                     },
                     _ => 0

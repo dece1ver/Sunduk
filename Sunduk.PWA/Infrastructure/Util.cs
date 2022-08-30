@@ -472,6 +472,15 @@ namespace Sunduk.PWA.Infrastructure
         /// <summary>
         /// Конвертер Double
         /// </summary>
+        public static Converter<int> IntConverterFromOne = new()
+        {
+            SetFunc = value => value.ToString(),
+            GetFunc = text => text.GetInt(1, GetNumberOption.OnlyPositive),
+        };
+
+        /// <summary>
+        /// Конвертер Double
+        /// </summary>
         public static Converter<double> DoubleConverter = new()
         {
             SetFunc = value => value.ToPrettyString(),

@@ -1,5 +1,6 @@
 ﻿using Sunduk.PWA.Infrastructure.CAM;
 using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
@@ -37,6 +38,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             false);
         public override MachineType MachineType => MachineType.Turning;
         public override string Name => ProfStockAllow > 0 ? $"Торцовка черновая" : $"Торцовка";
+        public override OperationTime MachineTime => this.OperationTime(Material);
 
         public RoughFacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter,
             double roughStockAllow, double profStockAllow, double stepOver, (int, int) seqNumbers, Blunt bluntType = default, double bluntCustomAngle = 0, double bluntCustomRadius = 0, double cornerBlunt = 0)

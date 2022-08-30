@@ -1,5 +1,6 @@
 ﻿@using _Imports = MudBlazor._Imports
 @using Sunduk.PWA.Infrastructure.Time
+@using Sunduk.PWA.Infrastructure.Sequences.Turning.Base
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="5" md="4">
@@ -32,6 +33,20 @@
                 </MudItem>
                 break;
             case SequenceType.Facing:
+                <MudItem xs="12" md="4">
+                    <MudSelect Label="Переход" T="TurningSequences" @bind-Value="TurningSequence" Variant="Variant.Filled" Margin="Margin.Dense">
+                        <MudSelectItem Value="@(TurningSequences.RoughFacing)">Черновая</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField Label="Начальный диаметр" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter"/>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField Label="Конечный диаметр" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter"/>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField Label="Проходы" @bind-Value="Steps" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.IntConverterFromOne" />
+                </MudItem>
                 break;
             case SequenceType.ExternalTurning:
                 break;
@@ -96,11 +111,36 @@
                             @switch (sequence)
                             {
                                 case FinishTurningSequence finishTurningSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Чистовое точение")</MudText>
+                                    </MudItem>
+                                    break;
+                                case RoughTurningSequence roughTurningSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Черновое точение")</MudText>
+                                    </MudItem>
+                                    break;
+                                case TurningSequence turningSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Точение")</MudText>
+                                    </MudItem>
+                                    break;
+                                case FacingSequence facingSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Торцевание")</MudText>
+                                        </MudItem>
+                                    break;
+                                case FinishFacingSequence finishFacingSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Чистовое торцевание")</MudText>
+                                    </MudItem>
                                     break;
                                 case LimiterSequence:
                                     <MudItem>
                                         <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Упор")</MudText>
                                     </MudItem>
+                                    break;
+                                case RoughFacingSequence roughFacingSequence:
                                     break;
                                 case TailstockOffSequence:
                                     <MudItem>
@@ -188,7 +228,7 @@
     public double StartX { get; set; }
     public double EndX { get; set; }
     public double StepOver { get; set; }
-    public double Escaping { get; set; }
+    public int Steps { get; set; }
     public DrillingTool.Types DrillingToolType { get; set; }
 
     public OperationTime FullOperationTime => Sequences.FullOperationTime();
@@ -230,6 +270,18 @@
                     result += $"Время: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек";
                     break;
                 case SequenceType.Facing:
+                    switch (TurningSequence)
+                    {
+                        case TurningSequences.RoughFacing:
+
+                            break;
+                        case TurningSequences.FinishFacing:
+                            break;
+                        case TurningSequences.RoughTurning:
+                            break;
+                        case TurningSequences.FinishTurning:
+                            break;
+                    }
                     break;
                 case SequenceType.ExternalTurning:
                     break;
