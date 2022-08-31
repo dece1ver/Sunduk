@@ -734,31 +734,28 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         _ => 0
                     };
                 case ThreadStandard.BSPP:
-                    switch (threadType)
+                    return threadType switch
                     {
-                        case CuttingType.External:
-                            return threadPitch switch
-                            {
-                                <= 0.907 => // 28
-                                    1,
-                                <= 1.337 => // 19
-                                    1.6,
-                                <= 1.814 => // 14
-                                    2,
-                                > 1.814 => //>14
-                                    2.5,
-                                _ => 0
-                            };
-                        case CuttingType.Internal:
-                            return threadPitch switch
-                            {
-                                <= 1.814 => 1,
-                                > 1.814 => 1.6,
-                                _ => 0
-                            };
-                        default:
-                            return 0;
-                    }
+                        CuttingType.External => threadPitch switch
+                        {
+                            <= 0.907 => // 28
+                                1,
+                            <= 1.337 => // 19
+                                1.6,
+                            <= 1.814 => // 14
+                                2,
+                            > 1.814 => //>14
+                                2.5,
+                            _ => 0
+                        },
+                        CuttingType.Internal => threadPitch switch
+                        {
+                            <= 1.814 => 1,
+                            > 1.814 => 1.6,
+                            _ => 0
+                        },
+                        _ => 0
+                    };
                 case ThreadStandard.NPT:
                     return threadPitch switch
                     {
@@ -913,7 +910,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// </summary>
         /// <param name="threadStandard">Стандарт резьбы</param>
         /// <returns></returns>
-        public static string Profile(ThreadStandard threadStandard)
+        public static string Profile(this ThreadStandard threadStandard)
         {
             return threadStandard switch
             {

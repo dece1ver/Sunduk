@@ -64,10 +64,10 @@
         </MudTd>
         <MudTd DataLabel="Стандарт">
             <MudSelect T="ThreadStandard" ValueChanged="s => OnThreadStandardChanged(s, context)" Margin="Margin.Dense" Variant="Variant.Outlined" Required>
-                <MudSelectItem Value="@(ThreadStandard.Metric)">Метрическая 60° (М)</MudSelectItem>
-                <MudSelectItem Value="@(ThreadStandard.BSPP)">Трубная цилиндрическая 55° (G)</MudSelectItem>
-                <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">Трапецеидальная 30° (Tr)</MudSelectItem>
-                <MudSelectItem Value="@(ThreadStandard.NPT)">Коническая 60° (K)</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.Metric)">@(ThreadStandard.Metric.Description())</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.BSPP)">@(ThreadStandard.BSPP.Description())</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">@(ThreadStandard.Trapezoidal.Description())</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.NPT)">@(ThreadStandard.NPT.Description())</MudSelectItem>
             </MudSelect>
         </MudTd>
         <MudTd DataLabel="Диаметр">

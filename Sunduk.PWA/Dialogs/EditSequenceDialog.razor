@@ -460,7 +460,7 @@
                 break;
             // точение резьбы
             case ThreadCuttingSequence threadCuttingSequence:
-                threadCuttingSequence.Tool = Tool;
+                threadCuttingSequence.Tool = Tool as ThreadingTool;
                 threadCuttingSequence.ThreadDiameter = ThreadDiameter;
                 threadCuttingSequence.ThreadPitch = ThreadPitch;
                 threadCuttingSequence.StartZ = ThreadStart;

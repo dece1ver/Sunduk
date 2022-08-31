@@ -7,7 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Sunduk.PWA.Components.Knowledge;
+using Sunduk.PWA.Infrastructure.CAM;
 using Sunduk.PWA.Infrastructure.Time;
+using Sunduk.PWA.Infrastructure.Tools.Turning;
+using static MudBlazor.Defaults;
 
 namespace Sunduk.PWA.Infrastructure
 {
@@ -75,8 +78,9 @@ namespace Sunduk.PWA.Infrastructure
         /// </summary>
         /// <param name="rounder">Значение округления</param>
         /// <returns>Радиан</returns>
-        public static int Round(this int value, int rounder = 10)
+        public static int Round(this int value, int rounder = 1)
         {
+            if (rounder < 1) rounder = 1;
             if (value < rounder) return value;
             return value / rounder * rounder;
         }
@@ -86,8 +90,9 @@ namespace Sunduk.PWA.Infrastructure
         /// </summary>
         /// <param name="rounder">Значение округления</param>
         /// <returns>Радиан</returns>
-        public static int Round(this double value, int rounder = 10)
+        public static int Round(this double value, int rounder = 1)
         {
+            if (rounder < 1) rounder = 1;
             if (value < rounder) return (int)value;
             return (int)Math.Round(value / rounder) * rounder;
         }
@@ -321,6 +326,32 @@ namespace Sunduk.PWA.Infrastructure
         }
 
         /// <summary>
+        /// Время обработки при черновом точении
+        /// </summary>
+        public static OperationTime OperationTime(this RoughTurningSequence roughTurningSequence, Material material)
+        {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            var tool = roughTurningSequence.Tool as TurningExternalTool;
+            var startX = Math.Abs(roughTurningSequence.Contour[0].X ?? 0);
+            var endX = Math.Abs(roughTurningSequence.Contour[1].X ?? 0);
+            var startZ = Math.Abs(roughTurningSequence.Contour[0].Z ?? 0);
+            var endZ = Math.Abs(roughTurningSequence.Contour[1].Z ?? 0);
+            var fullLength = startZ + endZ;
+            var steps = (int)Math.Round((startX - endX) / 2 / roughTurningSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            var speed = Operation.CuttingSpeedRough(material);
+            var feed = Operation.FeedRough(tool!.Radius);
+            var spins = (speed * 1000) / (Math.PI * ((startX + endX) / 2));
+            if (spins > 3000) spins = 3000;
+            cuttingTime += steps * AxialTurningTime(fullLength, spins, feed);
+
+            rapidTime += steps * AxialRapidTime(fullLength);
+            rapidTime += steps * 2 * (roughTurningSequence.StepOver.AxialRapidTime()); // подъемы и опускания между проходами
+
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        /// <summary>
         /// Время обработки при нарезании резьбы метчиком
         /// </summary>
         public static OperationTime OperationTime(this TappingSequence tappingSequence)
@@ -334,6 +365,24 @@ namespace Sunduk.PWA.Infrastructure
             if (spins > 3000) spins = 3000;
             cuttingTime += 2 * fullLength.AxialTurningTime(spins, feed);
             rapidTime += 1;
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        /// <summary>
+        /// Время обработки при нарезании резьбы резцом
+        /// </summary>
+        public static OperationTime OperationTime(this ThreadCuttingSequence threadCuttingSequence)
+        {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            var fullLength = Math.Abs(threadCuttingSequence.EndZ) + Math.Abs(threadCuttingSequence.StartZ) + Thread.ThreadRunout(threadCuttingSequence.ThreadStandard, threadCuttingSequence.ThreadPitch, CuttingType.External);
+            var feed = threadCuttingSequence.ThreadPitch;
+            var spins = 120.ToSpindleSpeed(threadCuttingSequence.ThreadDiameter);
+            if (spins > 1300) spins = 1300;
+            var passes = Thread.PassesCount(threadCuttingSequence.ThreadStandard, threadCuttingSequence.ThreadPitch) + 3;
+            cuttingTime += passes * fullLength.AxialTurningTime(spins, feed);
+            rapidTime += passes * fullLength.AxialRapidTime();
+            rapidTime += passes * 2 * (2.0.AxialRapidTime()); // 2 мм подъемы и опускания между проходами
             return new OperationTime(cuttingTime, rapidTime);
         }
 

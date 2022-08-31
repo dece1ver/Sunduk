@@ -156,7 +156,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 < 0.2 => 0.07,
                 < 0.4 => 0.11,
                 < 0.8 => 0.15,
-                < 1.2 => 0.25,
+                < 1.2 => 0.22,
                 < 1.6 => 0.3,
                 < 2 => 0.4,
                 _ => 0,
@@ -171,9 +171,9 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return toolRadius switch
             {
                 < 0.2 => 0.03,
-                < 0.4 => 0.05,
-                < 0.8 => 0.1,
-                < 1.2 => 0.15,
+                < 0.4 => 0.04,
+                < 0.8 => 0.08,
+                < 1.2 => 0.13,
                 < 1.6 => 0.2,
                 < 2 => 0.25,
                 _ => 0,
@@ -267,12 +267,12 @@ namespace Sunduk.PWA.Infrastructure.Templates
         {
             return machine.GetMachineType() switch
             {
-                MachineType.Turning =>
+                MachineType.Turning => 
                 material switch
                 {
                     Material.Steel => drillingTool.Type switch
                     {
-                        DrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
+                        DrillingTool.Types.Insert => Math.Round(drillingTool.Diameter * 0.0028, 2),
                         DrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
                         DrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
                         DrillingTool.Types.Rapid => (drillingTool.Diameter * 0.01),
@@ -281,7 +281,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     },
                     Material.Stainless => drillingTool.Type switch
                     {
-                        DrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
+                        DrillingTool.Types.Insert => Math.Round(drillingTool.Diameter * 0.0028, 2),
                         DrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
                         DrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
                         DrillingTool.Types.Rapid => (drillingTool.Diameter * 0.01),
@@ -290,7 +290,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     },
                     Material.Brass => drillingTool.Type switch
                     {
-                        DrillingTool.Types.Insert => (drillingTool.Diameter * 0.0028),
+                        DrillingTool.Types.Insert => Math.Round(drillingTool.Diameter * 0.0028, 2),
                         DrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
                         DrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
                         DrillingTool.Types.Rapid => (drillingTool.Diameter * 0.01),

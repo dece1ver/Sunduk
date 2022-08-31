@@ -11,10 +11,10 @@
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="6">
             <MudSelect Label="Стандарт" T="ThreadStandard" Value="ThreadStandard" Variant="Variant.Filled" ValueChanged="OnStandartChanged">
-                <MudSelectItem Value="@(ThreadStandard.Metric)">Метрическая 60° (М)</MudSelectItem>
-                <MudSelectItem Value="@(ThreadStandard.BSPP)">Трубная цилиндрическая 55° (G)</MudSelectItem>
-                <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">Трапецеидальная 30° (Tr)</MudSelectItem>
-                <MudSelectItem Value="@(ThreadStandard.NPT)">Коническая 60° (K)</MudSelectItem>
+                <MudSelectItem Value="@(ThreadStandard.Metric)">@(ThreadStandard.Metric.Description())</MudSelectItem>
+                <MudSelectItem Value="@(ThreadStandard.BSPP)">@(ThreadStandard.BSPP.Description())</MudSelectItem>
+                <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">@(ThreadStandard.Trapezoidal.Description())</MudSelectItem>
+                <MudSelectItem Value="@(ThreadStandard.NPT)">@(ThreadStandard.NPT.Description())</MudSelectItem>
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="6">
@@ -151,26 +151,14 @@
     {
         get
         {
-            if (ThreadStandard == ThreadStandard.Metric)
+            return ThreadStandard switch
             {
-                return Thread.MetricTemplates;
-            }
-            else if (ThreadStandard == ThreadStandard.BSPP)
-            {
-                return Thread.BsppTemplates;
-            }
-            else if (ThreadStandard == ThreadStandard.Trapezoidal)
-            {
-                return Thread.TrapezoidalTemplates;
-            }
-            else if (ThreadStandard == ThreadStandard.NPT)
-            {
-                return Thread.NptTemplates;
-            }
-            else
-            {
-                return new HashSet<string> { };
-            }
+                ThreadStandard.Metric => Thread.MetricTemplates,
+                ThreadStandard.BSPP => Thread.BsppTemplates,
+                ThreadStandard.Trapezoidal => Thread.TrapezoidalTemplates,
+                ThreadStandard.NPT => Thread.NptTemplates,
+                _ => new HashSet<string> { }
+                };
         }
     }
     public string CurrentThreadTemplate { get; set; }

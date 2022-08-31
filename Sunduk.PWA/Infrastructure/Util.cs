@@ -384,6 +384,21 @@ namespace Sunduk.PWA.Infrastructure
         }
 
         /// <summary>
+        /// Описание типа резьбы
+        /// </summary>
+        public static string Description(this ThreadStandard threadStandard)
+        {
+            return threadStandard switch
+            {
+                ThreadStandard.Metric => "Метрическая 60° (М)",
+                ThreadStandard.BSPP => "Трубная цилиндрическая 55° (G)",
+                ThreadStandard.Trapezoidal => "Трапециедальная 30° (Tr)",
+                ThreadStandard.NPT => "Коническая 60° (K)",
+                _ => string.Empty,
+            };
+        }
+
+        /// <summary>
         /// Форматирует число в такую строку, какую хочу я
         /// </summary>
         /// <param name="value">Число</param>

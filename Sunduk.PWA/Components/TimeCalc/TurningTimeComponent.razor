@@ -1,6 +1,7 @@
 ﻿@using _Imports = MudBlazor._Imports
 @using Sunduk.PWA.Infrastructure.Time
 @using Sunduk.PWA.Infrastructure.Sequences.Turning.Base
+@using System.Reflection.Metadata.Ecma335
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="5" md="4">
@@ -14,10 +15,10 @@
             <MudSelect Label="Тип" T="SequenceType" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SequenceType">
                 <MudSelectItem Value="@SequenceType.General">Общие</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.Facing">Обработка торца</MudSelectItem>
-                <MudSelectItem Value="@SequenceType.ExternalTurning">Наружное точение</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.ExternalTurning">Точение</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
-                <MudSelectItem Value="@SequenceType.Threading">Нарезание резьбы</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.Threading">Обработка резьбы</MudSelectItem>
             </MudSelect>
         </MudItem>
         @switch (SequenceType)
@@ -33,24 +34,30 @@
                 </MudItem>
                 break;
             case SequenceType.Facing:
-                <MudItem xs="12" md="4">
-                    <MudSelect Label="Переход" T="TurningSequences" @bind-Value="TurningSequence" Variant="Variant.Filled" Margin="Margin.Dense">
-                        <MudSelectItem Value="@(TurningSequences.RoughFacing)">Черновая</MudSelectItem>
-                    </MudSelect>
+                <MudItem xs="12" md="6" lg="2">
+                    <MudTextField Label="Диаметр заготовки" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
-                <MudItem xs="12" sm="6" md="4">
-                    <MudTextField Label="Начальный диаметр" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter"/>
-                </MudItem>
-                <MudItem xs="12" sm="6" md="4">
-                    <MudTextField Label="Конечный диаметр" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter"/>
-                </MudItem>
-                <MudItem xs="12" sm="6" md="4">
-                    <MudTextField Label="Проходы" @bind-Value="Steps" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.IntConverterFromOne" />
+                <MudItem xs="12" md="6" lg="2"> 
+                    <MudTextField Label="Проходы" @bind-Value="Steps" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.IntConverterFromOne" />
                 </MudItem>
                 break;
             case SequenceType.ExternalTurning:
-                break;
-            case SequenceType.InternalTurning:
+                <MudItem xs="12" md="4">
+                    <MudSelect Label="Тип обработки" T="TurningTypes" @bind-Value="TurningType" Variant="Variant.Filled" Margin="Margin.Dense">
+                        <MudSelectItem Value="@(TurningTypes.Rough)">Обдирка</MudSelectItem>
+                        <MudSelectItem Value="@(TurningTypes.Medium)">Ковыряние</MudSelectItem>
+                        <MudSelectItem Value="@(TurningTypes.Gentle)">Нежное ковыряние</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" md="6" lg="2">
+                    <MudTextField Label="Верхний диаметр" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
+                <MudItem xs="12" md="6" lg="2">
+                    <MudTextField Label="Нижний диаметр" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
+                <MudItem xs="12" md="6" lg="2">
+                    <MudTextField Label="Глубина" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
                 break;
             case SequenceType.Drilling:
                 <MudItem xs="12" md="4">
@@ -73,7 +80,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6" md="4">
-                    <MudTextField Label="Глубина" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                    <MudTextField Label="Глубина отверстия" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 switch (DrillingSequence)
                 {
@@ -84,9 +91,50 @@
                         break;
                 }
                 break;
-            case SequenceType.Tapping:
-                break;
             case SequenceType.Threading:
+                <MudItem xs="12" sm="5" md="4">
+                    <MudSelect @bind-Value="Tapping" Label="Тип обработки" T="bool" Variant="Variant.Filled" Margin="Margin.Dense">
+                        <MudSelectItem Value="true">Метчиком</MudSelectItem>
+                        <MudSelectItem Value="false">Резцом</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" md="6" lg="@(ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 3 : 6)">
+                    <MudSelect Label="Стандарт" T="ThreadStandard" Value="ThreadStandard" Variant="Variant.Filled" ValueChanged="OnStandartChanged" Margin="Margin.Dense">
+                        <MudSelectItem Value="@(ThreadStandard.Metric)">@(ThreadStandard.Metric.Description())</MudSelectItem>
+                        <MudSelectItem Value="@(ThreadStandard.BSPP)">@(ThreadStandard.BSPP.Description())</MudSelectItem>
+                        <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">@(ThreadStandard.Trapezoidal.Description())</MudSelectItem>
+                        @if (!Tapping)
+                        {
+                            <MudSelectItem Value="@(ThreadStandard.NPT)">@(ThreadStandard.NPT.Description())</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                @switch (ThreadStandard)
+                {
+                    case ThreadStandard.Metric or ThreadStandard.Trapezoidal:
+                        <MudItem xs="12" md="6" lg="3">
+                            <MudTextField Label="Диаметр" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter"/>
+                        </MudItem>
+                        <MudItem xs="12" md="6" lg="3">
+                            <MudTextField Label="Шаг" @bind-Value="Pitch" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                        </MudItem>
+                        <MudItem xs="12" md="6" lg="3">
+                            <MudTextField Label="Глубина" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                        </MudItem>
+                        break;
+                    case ThreadStandard.BSPP or ThreadStandard.NPT:
+                        <MudItem xs="12" md="6">
+                            <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" ValueChanged="OnTemplateChanged" Margin="Margin.Dense">
+                                @foreach (var item in ThreadTemplates)
+                                {
+                                    <MudSelectItem Value="@(item)">
+                                        <MudText>@item</MudText>
+                                    </MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        break;
+                }
                 break;
             case SequenceType.Grooving:
                 break;
@@ -125,11 +173,6 @@
                                         <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Точение")</MudText>
                                     </MudItem>
                                     break;
-                                case FacingSequence facingSequence:
-                                    <MudItem>
-                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Торцевание")</MudText>
-                                        </MudItem>
-                                    break;
                                 case FinishFacingSequence finishFacingSequence:
                                     <MudItem>
                                         <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Чистовое торцевание")</MudText>
@@ -141,6 +184,9 @@
                                     </MudItem>
                                     break;
                                 case RoughFacingSequence roughFacingSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Торцевание")</MudText>
+                                    </MudItem>
                                     break;
                                 case TailstockOffSequence:
                                     <MudItem>
@@ -160,25 +206,37 @@
                                 case TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence:
                                     <MudItem>
                                         <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">
-                                            @($"Высокоскоростное сверление Ø{turningHighSpeedDrillingSequence.Tool.Diameter} на глубину {Math.Abs(turningHighSpeedDrillingSequence.EndZ)} мм. ({turningHighSpeedDrillingSequence.Tool.Type.Description()})")
+                                            @(turningHighSpeedDrillingSequence.Name)
                                         </MudText>
                                     </MudItem>
                                     break;
                                 case TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence:
                                     <MudItem>
                                         <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">
-                                            @($"Глубокое сверление Ø{turningPeckDeepDrillingSequence.Tool.Diameter} на глубину {Math.Abs(turningPeckDeepDrillingSequence.EndZ)} мм. ({turningPeckDeepDrillingSequence.Tool.Type.Description()})")
+                                            @(turningPeckDeepDrillingSequence.Name)
                                         </MudText>
                                     </MudItem>
                                     break;
                                 case TurningPeckDrillingSequence turningPeckDrillingSequence:
                                     <MudItem>
                                         <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">
-                                            @($"Прерывистое сверление Ø{turningPeckDrillingSequence.Tool.Diameter} на глубину {Math.Abs(turningPeckDrillingSequence.EndZ)} мм. ({turningPeckDrillingSequence.Tool.Type.Description()})")
+                                            @(turningPeckDrillingSequence.Name)
                                         </MudText>
                                     </MudItem>
                                     break;
                                 case TurningTappingSequence turningTappingSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">
+                                            @(turningTappingSequence.Name)
+                                        </MudText>
+                                    </MudItem>
+                                    break;
+                                case ThreadCuttingSequence threadCuttingSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">
+                                            @(threadCuttingSequence.Name)
+                                        </MudText>
+                                    </MudItem>
                                     break;
                             }
                             <MudItem Class="d-flex justify-end flex-grow-1 gap-4">
@@ -198,7 +256,7 @@
                 <MudPaper Outlined="true" Class="ma-1">
                     <MudGrid Justify="Justify.FlexStart" Spacing="1">
                         <MudItem Class="my-2">
-                            <MudText Style="margin-top: 7px; margin-left: 10px;" Typo="Typo.body2">@($"Суммарное время с учетом смены инструмента: {(FullOperationTime.FullTime).ToPrettyString(2)} сек")</MudText>
+                            <MudText Style="margin-top: 7px; margin-left: 10px;" Typo="Typo.body2">@($"Суммарное время с учетом смены инструмента: {(FullOperationTime.FullTime / 60).ToPrettyString(2)} мин. ({FullOperationTime.FullTime.ToPrettyString(2)} сек.)")</MudText>
                         </MudItem>
                     </MudGrid>
                 </MudPaper>
@@ -212,6 +270,15 @@
     public bool FirstFieldsUnderline => false;
     public int ButtonSize => 35;
 
+    private enum TurningTypes {Rough, Medium, Gentle}
+
+    private TurningTypes TurningType { get; set; }
+
+    private double ToolRadius() => TurningType switch
+    {
+        TurningTypes.Rough => 0.8,TurningTypes.Medium => 0.4,TurningTypes.Gentle => 0.2,_ => 0,
+    };
+
     public List<Sequence> Sequences { get; set; } = new();
     public Sequence CurrentSequence { get; set; }
     public Material Material { get; set; }
@@ -221,6 +288,7 @@
     private TurningSequences TurningSequence { get; set; }
     private DrillingSequences DrillingSequence { get; set; }
     private ThreadingSequences ThreadingSequence { get; set; }
+    private bool Tapping { get; set; } = true;
     private TurningGroovingSequences GroovingSequence { get; set; }
 
     public double StartZ { get; set; } = 2;
@@ -228,8 +296,26 @@
     public double StartX { get; set; }
     public double EndX { get; set; }
     public double StepOver { get; set; }
-    public int Steps { get; set; }
+    public double Pitch { get; set; }
+    public double PlaneLength { get; set; }
+    public string CurrentThreadTemplate { get; set; }
+    public ICollection<string> ThreadTemplates
+    {
+        get
+        {
+            return ThreadStandard switch
+            {
+                ThreadStandard.Metric => Thread.MetricTemplates,
+                ThreadStandard.BSPP => Thread.BsppTemplates,
+                ThreadStandard.Trapezoidal => Thread.TrapezoidalTemplates,
+                ThreadStandard.NPT => Thread.NptTemplates,
+                _ => new HashSet<string> { }
+            };
+        }
+    }
+    public int Steps { get; set; } = 1;
     public DrillingTool.Types DrillingToolType { get; set; }
+    public ThreadStandard ThreadStandard { get; set; }
 
     public OperationTime FullOperationTime => Sequences.FullOperationTime();
 
@@ -270,20 +356,27 @@
                     result += $"Время: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек";
                     break;
                 case SequenceType.Facing:
-                    switch (TurningSequence)
-                    {
-                        case TurningSequences.RoughFacing:
-
-                            break;
-                        case TurningSequences.FinishFacing:
-                            break;
-                        case TurningSequences.RoughTurning:
-                            break;
-                        case TurningSequences.FinishTurning:
-                            break;
-                    }
+                    if (StartX <= 0 || Steps <= 0) break;
+                    CurrentSequence = new RoughFacingSequence(
+                        Machine.L230A,
+                        Material,
+                        new TurningExternalTool(0, TurningExternalTool.Types.Face, 80, 0.8),
+                        StartX, 0, Steps, 0, 1, (0,0));
+                    if (CurrentSequence.MachineTime.CuttingTime > 0)
+                        result += $"Время резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString(2)} сек. Время перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString(2)} сек. Общее: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек.";
                     break;
                 case SequenceType.ExternalTurning:
+                    if (StartX <= 0 || EndX <= 0) break;
+                    CurrentSequence = new RoughTurningSequence(
+                        Machine.L230A,
+                        Material,
+                        new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
+                        new List<Element>(2){new Point(StartX, StartZ), new Point(EndX, EndZ)}, 
+                        ToolRadius() is 0.8 ? ToolRadius() * 2.5 : ToolRadius() * 2, 
+                        0, 
+                        0);
+                    if (CurrentSequence.MachineTime.FullTime > 0)
+                        result += $"Время резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString(2)} сек. Время перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString(2)} сек. Общее: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек.";
                     break;
                 case SequenceType.InternalTurning:
                     break;
@@ -306,9 +399,33 @@
                     if (CurrentSequence.MachineTime.FullTime > 0)
                         result += $"Время резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString(2)} сек. Время перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString(2)} сек. Общее: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек.";
                     break;
-                case SequenceType.Tapping:
-                    break;
                 case SequenceType.Threading:
+                    if (StartX <= 0 || Pitch <= 0) break;
+                    switch (Tapping)
+                    {
+                        case true:
+                            CurrentSequence = new TurningTappingSequence(
+                                Machine.L230A, 
+                                new TurningTappingTool(0, TappingTool.Types.Cutting, StartX, Pitch, ThreadStandard, CurrentThreadTemplate), 
+                                5, 
+                                StartZ, 
+                                EndZ);
+                            break;
+                        case false:
+                            CurrentSequence = new ThreadCuttingSequence(
+                                Machine.L230A,
+                                new ThreadingTool(1, Pitch, ThreadStandard.Profile().GetDouble()),
+                                ThreadStandard,
+                                CuttingType.External,
+                                StartX,
+                                Pitch,
+                                StartZ,
+                                EndZ,
+                                PlaneLength,
+                                CurrentThreadTemplate);
+                            break;
+                    }
+                    result += $"Время резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString(2)} сек. Время перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString(2)} сек. Общее: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек.";
                     break;
                 case SequenceType.Grooving:
                     break;
@@ -318,4 +435,58 @@
         }
     }
 
+    private void OnStandartChanged(ThreadStandard value)
+    {
+        if (ThreadStandard != value)
+        {
+            ThreadStandard = value;
+            Pitch = 0;
+            StartX = 0;
+            CurrentThreadTemplate = null;
+        }
+    }
+
+    private void OnTemplateChanged(string value)
+    {
+        CurrentThreadTemplate = value;
+        switch (ThreadStandard)
+        {
+            case ThreadStandard.Metric:
+            {
+                Thread.GetMetricValues(CurrentThreadTemplate, out var diameter, out var pitch);
+                StartX = diameter.GetDouble();
+                Pitch = pitch.GetDouble();
+                PlaneLength = 0;
+                EndZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, Pitch, CuttingType.External), 1);
+                break;
+            }
+            case ThreadStandard.BSPP:
+            {
+                Thread.GetBsppValues(CurrentThreadTemplate, out var diameter, out var pitch);
+                StartX = diameter.GetDouble();
+                Pitch = pitch.GetDouble();
+                PlaneLength = 0;
+                EndZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, Pitch, CuttingType.External), 1);
+                break;
+            }
+            case ThreadStandard.Trapezoidal:
+            {
+                Thread.GetTrapezoidalValues(CurrentThreadTemplate, out var diameter, out var pitch);
+                StartX = diameter.GetDouble();
+                Pitch = pitch.GetDouble();
+                PlaneLength = 0;
+                EndZ = -30;
+                break;
+            }
+            case ThreadStandard.NPT:
+            {
+                Thread.GetNptValues(CurrentThreadTemplate, out var externalDiameter, out var internalDiameter, out var pitch, out var planeLength, out var threadLength);
+                StartX = externalDiameter.GetDouble();
+                Pitch = pitch.GetDouble();
+                PlaneLength = planeLength;
+                EndZ = -threadLength - Math.Round(Thread.ThreadRunout(ThreadStandard, Pitch, CuttingType.External), 1);
+                break;
+            }
+        }
+    }
 }
