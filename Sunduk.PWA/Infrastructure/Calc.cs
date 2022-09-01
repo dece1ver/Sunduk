@@ -295,6 +295,7 @@ namespace Sunduk.PWA.Infrastructure
             // время ввода/вывода сверла
             if (steps > 1) steps++;
             rapidTime += steps * Operation.Escaping().AxialRapidTime();
+            rapidTime += fullLength.AxialRapidTime();
             return new OperationTime(cuttingTime, rapidTime);
         }
 
@@ -351,7 +352,7 @@ namespace Sunduk.PWA.Infrastructure
         }
 
         /// <summary>
-        /// Время обработки при черновом точении
+        /// Время обработки при чистовом точении
         /// </summary>
         public static OperationTime OperationTime(this FinishTurningSequence finishTurningSequence, Material material)
         {
@@ -374,6 +375,30 @@ namespace Sunduk.PWA.Infrastructure
             return new OperationTime(cuttingTime, rapidTime);
         }
 
+        /// <summary>
+        /// Время обработки при отрезке
+        /// </summary>
+        public static OperationTime OperationTime(this TurningCutOffSequence turningCutOffSequence, Material material)
+        {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            var startX = turningCutOffSequence.ExternalDiameter;
+            var endX = turningCutOffSequence.InternalDiameter;
+            var fullLength = (startX - endX) / 2;
+            var steps = (int)Math.Round(fullLength / turningCutOffSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            var speed = Operation.GroovingSpeedRough(material);
+            var feed = Operation.GroovingFeedRough();
+            var spins = (speed * 1000) / (Math.PI * ((startX + endX) / 2));
+            if (spins > 3000) spins = 3000;
+            cuttingTime += steps * (turningCutOffSequence.StepOver + Operation.Escaping()).AxialTurningTime(spins, feed);
+
+            rapidTime += steps * AxialRapidTime(turningCutOffSequence.StepOver + Operation.Escaping());
+            rapidTime += AxialRapidTime(fullLength);
+
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        
         /// <summary>
         /// Время обработки при нарезании резьбы метчиком
         /// </summary>

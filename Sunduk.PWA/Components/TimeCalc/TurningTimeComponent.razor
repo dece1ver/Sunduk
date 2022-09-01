@@ -24,6 +24,7 @@
         @switch (SequenceType)
         {
             case SequenceType.General:
+
                 <MudItem xs="12" md="4">
                     <MudSelect Label="Переход" T="GeneralSequences" @bind-Value="GeneralSequence" Variant="Variant.Filled" Margin="Margin.Dense">
                         <MudSelectItem Value="@(GeneralSequences.Limiter)">Упор</MudSelectItem>
@@ -34,6 +35,7 @@
                 </MudItem>
                 break;
             case SequenceType.Facing:
+
                 <MudItem xs="12" md="6" lg="2">
                     <MudTextField Label="Диаметр заготовки" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
@@ -41,6 +43,7 @@
                     <MudTextField Label="Проходы" @bind-Value="Steps" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.IntConverterFromOne" />
                 </MudItem>
                 break;
+
             case SequenceType.ExternalTurning:
                 <MudItem xs="12" md="4">
                     <MudSelect Label="Тип обработки" T="TurningTypes" @bind-Value="TurningType" Variant="Variant.Filled" Margin="Margin.Dense">
@@ -59,6 +62,34 @@
                     <MudTextField Label="Глубина" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 break;
+
+            case SequenceType.Grooving:
+                <MudItem xs="12" md="4">
+                    <MudSelect Label="Тип обработки" T="TurningGroovingSequences" @bind-Value="GroovingSequence" Variant="Variant.Filled" Margin="Margin.Dense">
+                        <MudSelectItem Value="@(TurningGroovingSequences.Cutting)">Отрезка</MudSelectItem>
+                        <MudSelectItem Value="@(TurningGroovingSequences.Grooving)">Канавка</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                @if (GroovingSequence is TurningGroovingSequences.Grooving)
+                {
+                    <MudItem xs="12" md="4">
+                        <MudSelect Label="Тип канавки" T="CuttingType" @bind-Value="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense">
+                            <MudSelectItem Value="@(CuttingType.Radial)">Радиальная</MudSelectItem>
+                            <MudSelectItem Value="@(CuttingType.Face)">Торцевая</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                }
+                <MudItem xs="12" md="6" lg="4">
+                    <MudTextField Label="@($"{(CuttingType is CuttingType.Radial ? "Начальный диаметр" : "Верхний диаметр")}")" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
+                <MudItem xs="12" md="6" lg="4">
+                    <MudTextField Label="@($"{(CuttingType is CuttingType.Radial ? "Конечный диаметр" : "Нижний диаметр")}")" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
+                <MudItem xs="12" md="6" lg="4">
+                    <MudTextField Label="@($"{(CuttingType is CuttingType.Radial ? "Ширина" : "Глубина")}")" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
+                break;
+
             case SequenceType.Drilling:
                 <MudItem xs="12" md="4">
                     <MudSelect Label="Переход" T="DrillingSequences" @bind-Value="DrillingSequence" Variant="Variant.Filled" Margin="Margin.Dense">
@@ -91,6 +122,7 @@
                         break;
                 }
                 break;
+
             case SequenceType.Threading:
                 <MudItem xs="12" sm="5" md="4">
                     <MudSelect @bind-Value="Tapping" Label="Тип обработки" T="bool" Variant="Variant.Filled" Margin="Margin.Dense">
@@ -136,8 +168,6 @@
                         break;
                 }
                 break;
-            case SequenceType.Grooving:
-                break;
         }
     </MudGrid>
     <MudItem Class="mt-4" xs="12" sm="12" md="12">
@@ -158,6 +188,21 @@
                         <MudGrid Justify="Justify.FlexStart" Spacing="1">
                             @switch (sequence)
                             {
+                                case TailstockOffSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Отвод бабки")</MudText>
+                                        </MudItem>
+                                    break;
+                                case TailstockOnSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Подвод бабки")</MudText>
+                                        </MudItem>
+                                    break;
+                                case StopSequence:
+                                    <MudItem>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Остановка")</MudText>
+                                        </MudItem>
+                                    break;
                                 case FinishTurningSequence finishTurningSequence:
                                     <MudItem>
                                         <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Чистовое точение")</MudText>
@@ -188,19 +233,14 @@
                                         <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Торцевание")</MudText>
                                     </MudItem>
                                     break;
-                                case TailstockOffSequence:
+                                case TurningExternalGroovingSequence turningExternalGroovingSequence:
                                     <MudItem>
-                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Отвод бабки")</MudText>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Наружная канавка")</MudText>
                                     </MudItem>
                                     break;
-                                case TailstockOnSequence:
+                                case TurningFaceGroovingSequence turningFaceGroovingSequence:
                                     <MudItem>
-                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Подвод бабки")</MudText>
-                                    </MudItem>
-                                    break;
-                                case StopSequence:
-                                    <MudItem>
-                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Остановка")</MudText>
+                                        <MudText Style="margin-top: 10px; margin-left: 10px;" Typo="Typo.body2">@($"Торцевая канавка")</MudText>
                                     </MudItem>
                                     break;
                                 case TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence:
@@ -284,11 +324,13 @@
     public Material Material { get; set; }
 
     public SequenceType SequenceType { get; set; }
+    public CuttingType CuttingType { get; set; }
     private GeneralSequences GeneralSequence { get; set; }
     private TurningSequences TurningSequence { get; set; }
     private DrillingSequences DrillingSequence { get; set; }
     private ThreadingSequences ThreadingSequence { get; set; }
     private bool Tapping { get; set; } = true;
+    private bool RadialGroove { get; set; } = true;
     private TurningGroovingSequences GroovingSequence { get; set; }
 
     public double StartZ { get; set; } = 2;
@@ -367,7 +409,7 @@
                     break;
                 case SequenceType.ExternalTurning:
                     if (StartX <= 0 || EndX <= 0 || StartX < EndX || EndZ is 0) break;
-                    if (Math.Abs(StartX - EndX) < 0.02)
+                    if (Math.Abs(StartX - EndX) < 0.001)
                     {
                         CurrentSequence = new FinishTurningSequence(
                             Machine.L230A,
@@ -392,7 +434,83 @@
                     if (CurrentSequence.MachineTime.FullTime > 0)
                         result += $"Время резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString(2)} сек. Время перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString(2)} сек. Общее: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек.";
                     break;
-                case SequenceType.InternalTurning:
+                case SequenceType.Grooving:
+                    switch (GroovingSequence)
+                    {
+                        case TurningGroovingSequences.Grooving:
+                            if (Math.Abs(StartX - EndX) < 0.001) break;
+                            if (CuttingType is CuttingType.Radial && StartX > EndX)
+                            {
+                                CurrentSequence = new TurningExternalGroovingSequence(
+                                    Machine.L230A,
+                                    Material,
+                                    new GroovingExternalTool(0, GroovingExternalTool.Types.Grooving, 1, TurningGroovingTool.Point.Right),
+                                    0,
+                                    StartX, 
+                                    EndX, 
+                                    EndZ, 
+                                    StepOver, 
+                                    0, 
+                                    0, 
+                                    0, 
+                                    Blunt.SimpleChamfer, 
+                                    Blunt.SimpleChamfer
+                                    );
+                            }
+                            else if (CuttingType is CuttingType.Radial && StartX < EndX)
+                            {
+                                CurrentSequence = new TurningInternalGroovingSequence(
+                                    Machine.L230A,
+                                    Material,
+                                    new GroovingInternalTool(0, 0, 1, TurningGroovingTool.Point.Right),
+                                    0,
+                                    EndX,
+                                    StartX,
+                                    EndZ,
+                                    StepOver,
+                                    0,
+                                    0,
+                                    0,
+                                    Blunt.SimpleChamfer,
+                                    Blunt.SimpleChamfer
+                                    );
+                            }
+                            else
+                            {
+                                CurrentSequence = new TurningFaceGroovingSequence(
+                                    Machine.L230A,
+                                    Material,
+                                    new GroovingFaceTool(0, 1, TurningGroovingTool.Point.Right),
+                                    0, 
+                                    StartX, 
+                                    EndX, 
+                                    EndZ, 
+                                    StepOver, 
+                                    0, 
+                                    0,
+                                    0, 
+                                    Blunt.CustomChamfer, 
+                                    Blunt.CustomChamfer);
+                            }
+                            
+                            break;
+
+                        case TurningGroovingSequences.Cutting:
+                            if (Math.Abs(StartX - EndX) < 0.001) break;
+                            CurrentSequence = new TurningCutOffSequence(
+                                Machine.L230A,
+                                Material,
+                                new GroovingExternalTool(0, GroovingExternalTool.Types.Cutting, 1, TurningGroovingTool.Point.Right),
+                                0,
+                                StartX,
+                                EndX,
+                                0,
+                                0.25,
+                                Blunt.SimpleChamfer,
+                                0,
+                                0);
+                            break;
+                    }
                     break;
                 case SequenceType.Drilling:
                     switch (DrillingSequence)
@@ -440,8 +558,6 @@
                             break;
                     }
                     result += $"Время резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString(2)} сек. Время перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString(2)} сек. Общее: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек.";
-                    break;
-                case SequenceType.Grooving:
                     break;
             }
 
