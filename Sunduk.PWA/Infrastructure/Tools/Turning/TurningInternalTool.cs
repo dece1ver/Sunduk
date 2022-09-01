@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace Sunduk.PWA.Infrastructure.Tools.Turning
 {
-    public sealed class TurningInternalTool : Tool
+    public sealed class TurningInternalTool : TurningTool
     {
         public double Diameter { get; set; }
-        public double Radius { get; set; }
-        public double Angle { get; set; }
+
         public override string Name => "RAST";
 
         public override MachineType MachineType => MachineType.Turning;

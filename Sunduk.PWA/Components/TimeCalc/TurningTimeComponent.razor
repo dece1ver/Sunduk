@@ -49,13 +49,13 @@
                         <MudSelectItem Value="@(TurningTypes.Gentle)">Нежное ковыряние</MudSelectItem>
                     </MudSelect>
                 </MudItem>
-                <MudItem xs="12" md="6" lg="2">
+                <MudItem xs="12" md="6" lg="4">
                     <MudTextField Label="Верхний диаметр" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
-                <MudItem xs="12" md="6" lg="2">
+                <MudItem xs="12" md="6" lg="4">
                     <MudTextField Label="Нижний диаметр" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
-                <MudItem xs="12" md="6" lg="2">
+                <MudItem xs="12" md="6" lg="4">
                     <MudTextField Label="Глубина" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 break;
@@ -366,15 +366,29 @@
                         result += $"Время резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString(2)} сек. Время перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString(2)} сек. Общее: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек.";
                     break;
                 case SequenceType.ExternalTurning:
-                    if (StartX <= 0 || EndX <= 0) break;
-                    CurrentSequence = new RoughTurningSequence(
-                        Machine.L230A,
-                        Material,
-                        new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
-                        new List<Element>(2){new Point(StartX, StartZ), new Point(EndX, EndZ)}, 
-                        ToolRadius() is 0.8 ? ToolRadius() * 2.5 : ToolRadius() * 2, 
-                        0, 
-                        0);
+                    if (StartX <= 0 || EndX <= 0 || StartX < EndX || EndZ is 0) break;
+                    if (Math.Abs(StartX - EndX) < 0.02)
+                    {
+                        CurrentSequence = new FinishTurningSequence(
+                            Machine.L230A,
+                            Material,
+                            new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
+                            new List<Element>(2){new Point(StartX, StartZ), new Point(EndX, EndZ)}, 
+                            0, 
+                            0, 
+                            0);
+                    }
+                    else
+                    {
+                        CurrentSequence = new RoughTurningSequence(
+                            Machine.L230A,
+                            Material,
+                            new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
+                            new List<Element>(2){new Point(StartX, StartZ), new Point(EndX, EndZ)}, 
+                            ToolRadius() is 0.8 ? ToolRadius() * 2.5 : ToolRadius() * 2, 
+                            0, 
+                            0);
+                    }
                     if (CurrentSequence.MachineTime.FullTime > 0)
                         result += $"Время резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString(2)} сек. Время перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString(2)} сек. Общее: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек.";
                     break;

@@ -8,7 +8,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning.Base
 {
     public class TurningSequence : Sequence
     {
-        public TurningSequence(Machine machine, Material material, Tool tool, List<Element> contour, double stepOver, double roughStockAllow, double profStockAllow)
+        public TurningSequence(Machine machine, Material material, TurningTool tool, List<Element> contour, double stepOver, double roughStockAllow, double profStockAllow)
         {
             Machine = machine;
             Material = material;
@@ -21,7 +21,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning.Base
 
         public Machine Machine { get; set; }
         public Material Material { get; set; }
-        public Tool Tool { get; set; }
+        public TurningTool Tool { get; set; }
         public List<Element> Contour { get; set; }
         public double StepOver { get; set; }
         public double RoughStockAllow { get; set; }
