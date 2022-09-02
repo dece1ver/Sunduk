@@ -37,7 +37,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             false, 
             false);
         public override MachineType MachineType => MachineType.Turning;
-        public override string Name => ProfStockAllow > 0 ? $"Торцовка черновая" : $"Торцовка";
+        public override string Name => ProfStockAllow > 0 ? "Торцовка черновая" : "Торцовка";
         public override OperationTime MachineTime => this.OperationTime(Material);
 
         public RoughFacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter,

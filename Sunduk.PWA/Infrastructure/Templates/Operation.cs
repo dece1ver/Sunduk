@@ -252,7 +252,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// </summary>
         public static double GroovingFeedRough()
         {
-            return 0.1;
+            return 0.08;
         }
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// </summary>
         public static double GroovingFeedFinish()
         {
-            return 0.07;
+            return 0.05;
         }
 
         public static double DrillFeed(Machine machine, Material material, DrillingTool drillingTool)

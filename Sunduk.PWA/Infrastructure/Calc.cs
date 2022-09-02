@@ -398,6 +398,71 @@ namespace Sunduk.PWA.Infrastructure
             return new OperationTime(cuttingTime, rapidTime);
         }
 
+        /// <summary>
+        /// Время обработки наружной канавки
+        /// </summary>
+        public static OperationTime OperationTime(this TurningExternalGroovingSequence turningExternalGroovingSequence, Material material)
+            {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            var startX = turningExternalGroovingSequence.ExternalDiameter;
+            var endX = turningExternalGroovingSequence.InternalDiameter;
+            var fullLengthX = (startX - endX) / 2;
+            var stepsX = (int)Math.Round(fullLengthX / turningExternalGroovingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            var width = turningExternalGroovingSequence.Width;
+            if (width < turningExternalGroovingSequence.Tool.Width) width = turningExternalGroovingSequence.Tool.Width;
+            var stepsZ = (int)Math.Round(width * 2 / turningExternalGroovingSequence.Tool.Width, MidpointRounding.ToPositiveInfinity);
+            var roughSpeed = Operation.GroovingSpeedRough(material);
+            var roughFeed = Operation.GroovingFeedRough();
+            var finishSpeed = Operation.GroovingSpeedFinish(material);
+            var finishFeed = Operation.GroovingFeedFinish();
+            var roughSpins = (roughSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
+            var finishSpins = (finishSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
+            if (roughSpins > 3000) roughSpins = 3000;
+            if (finishSpins > 3000) finishSpins = 3000;
+            cuttingTime += stepsZ * (stepsX * (turningExternalGroovingSequence.StepOver + Operation.Escaping()).AxialTurningTime(roughSpins, roughFeed));
+            cuttingTime += 2 * (fullLengthX + Operation.Escaping()).AxialTurningTime(finishSpins, finishFeed);
+
+            rapidTime += stepsZ * (stepsX * AxialRapidTime(turningExternalGroovingSequence.StepOver + Operation.Escaping()));
+            rapidTime += 3 * AxialRapidTime(fullLengthX + Operation.Escaping());
+            rapidTime += AxialRapidTime(fullLengthX);
+
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        /// <summary>
+        /// Время обработки внутренней канавки
+        /// </summary>
+        public static OperationTime OperationTime(this TurningInternalGroovingSequence turningInternalGroovingSequence, Material material)
+        {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            var startX = turningInternalGroovingSequence.ExternalDiameter;
+            var endX = turningInternalGroovingSequence.InternalDiameter;
+            var fullLengthX = (startX - endX) / 2;
+            var stepsX = (int)Math.Round(fullLengthX / turningInternalGroovingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            var width = turningInternalGroovingSequence.Width;
+            if (width < turningInternalGroovingSequence.Tool.Width) width = turningInternalGroovingSequence.Tool.Width;
+            var stepsZ = (int)Math.Round(width / turningInternalGroovingSequence.Tool.Width, MidpointRounding.ToPositiveInfinity);
+            var roughSpeed = Operation.GroovingSpeedRough(material);
+            var roughFeed = Operation.GroovingFeedRough();
+            var finishSpeed = Operation.GroovingSpeedFinish(material);
+            var finishFeed = Operation.GroovingFeedFinish();
+            var roughSpins = (roughSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
+            var finishSpins = (finishSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
+            if (roughSpins > 3000) roughSpins = 3000;
+            if (finishSpins > 3000) finishSpins = 3000;
+            cuttingTime += stepsZ * (stepsX * (turningInternalGroovingSequence.StepOver + Operation.Escaping()).AxialTurningTime(roughSpins, roughFeed));
+            cuttingTime += 2 * (fullLengthX + Operation.Escaping()).AxialTurningTime(finishSpins, finishFeed);
+
+            rapidTime += stepsZ * (stepsX * AxialRapidTime(turningInternalGroovingSequence.StepOver + Operation.Escaping()));
+            rapidTime += 3 * AxialRapidTime(fullLengthX + Operation.Escaping());
+            rapidTime += 2 * AxialRapidTime(Math.Abs(turningInternalGroovingSequence.CuttingPoint) + Operation.Escaping());
+            rapidTime += AxialRapidTime(fullLengthX);
+
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
         
         /// <summary>
         /// Время обработки при нарезании резьбы метчиком

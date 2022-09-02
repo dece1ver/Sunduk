@@ -13,7 +13,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
         public bool Optional { get; set; }
         public string Comment { get; set; }
         public override string Operation => Templates.Operation.Stop(Optional, Comment);
-        public override string Name => Optional ? "Остановка" : "Опциональная остановка";
+        public override string Name => Optional ? "Опциональная остановка" : "Остановка";
         public override OperationTime MachineTime => this.OperationTime();
     }
 }
