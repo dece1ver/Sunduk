@@ -468,7 +468,7 @@
             and not TailstockOnSequence 
             and not TailstockOffSequence 
             and not StopSequence
-            ? $"{CurrentSequence.Name}\nВремя резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString(2)} сек. Время перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString(2)} сек. Общее: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек." 
+            ? $"{CurrentSequence.Name}\nВремя резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString(2)} сек.\nВремя перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString(2)} сек.\nОбщее: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек." 
             : $"{CurrentSequence.Name}\nВремя: { CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек";
     }
 
