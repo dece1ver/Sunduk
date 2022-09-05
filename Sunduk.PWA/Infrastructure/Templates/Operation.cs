@@ -4,11 +4,12 @@ using Sunduk.PWA.Infrastructure.Sequences.Turning;
 using Sunduk.PWA.Infrastructure.Tools;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 using Sunduk.PWA.Infrastructure.Tools.Milling;
-using Sunduk.PWA.Infrastructure.Tools.Turning;
+using Sunduk.PWA.Infrastructure.Tools.Turning.Base;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Sunduk.PWA.Infrastructure.Tools.Turning;
 using static Sunduk.PWA.Infrastructure.Util;
 
 namespace Sunduk.PWA.Infrastructure.Templates
@@ -180,6 +181,31 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
+        /// <summary>
+        /// Скорость резания на накатке
+        /// </summary>
+        public static int BurnishingSpeed(TurningBurnishingTool tool)
+        {
+            return tool.Type switch
+            {
+                TurningBurnishingTool.Types.Diamond => 80,
+                TurningBurnishingTool.Types.Roller => 120,
+                _ => 0,
+            };
+        }
+
+        /// <summary>
+        /// Подача на накатке
+        /// </summary>
+        public static double BurnishingFeed(TurningBurnishingTool tool)
+        {
+            return tool.Type switch
+            {
+                TurningBurnishingTool.Types.Diamond => 0.03,
+                TurningBurnishingTool.Types.Roller => 0.2,
+                _ => 0,
+            };
+        }
 
         /// <summary>
         /// Скорость резания при сверлении
@@ -363,27 +389,59 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Упор
         /// </summary>
+        public static string BurnishingOperation(Machine machine, TurningBurnishingTool tool, double diameter, double startZ, double endZ)
+        {
+            if (tool is null || diameter is 0) return string.Empty;
+            var exit = tool is TurningExternalBurnishingTool
+                ? $"U1. {CoolantOff(machine)}\n"
+                : $"U-1. {CoolantOff(machine)}\nG0 Z{startZ.NC()}\n";
+            return machine switch
+            {
+                Machine.GS1500 =>
+                    TurningReferentPoint +
+                    tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
+                    $"{CoolantOn(machine)}\n" +
+                    $"G0 X{diameter.NC()} Z{startZ.NC()} S{BurnishingSpeed(tool)} {Direction(tool)}\n" +
+                    $"G1 Z{endZ.NC()} F{BurnishingFeed(tool).NC()}\n" +
+                    exit +
+                    TurningReferentPoint,
+
+                Machine.L230A =>
+                    tool.Description(ToolDescriptionOption.L230) + "\n" +
+                    $"{CoolantOn(machine)}\n" +
+                    $"G0 X{diameter.NC()} Z{startZ.NC()} S{BurnishingSpeed(tool)} {Direction(tool)}\n" +
+                    $"G1 Z{endZ.NC()} F{BurnishingFeed(tool).NC()}\n" +
+                    exit +
+                    TurningReferentPoint,
+
+                _ => string.Empty,
+            };
+        }
+
+        /// <summary>
+        /// Упор
+        /// </summary>
         public static string Limiter(Machine machine, Tool tool, double externalDiameter)
         {
             if (tool is null || externalDiameter == 0) return string.Empty;
             return machine switch
             {
                 Machine.GS1500 =>
-                TurningReferentPoint +
-                $"T{tool.Position.ToolNumber()} G54 ({tool.Name})\n" +
-                $"G0 X{externalDiameter.NC(0)} Z0.5\n" +
-                SpindleUnclamp(machine) + "\n" +
-                AbsStop + "\n" +
-                "W1.\n" +
-                TurningReferentPoint,
+                    TurningReferentPoint +
+                    $"T{tool.Position.ToolNumber()} G54 ({tool.Name})\n" +
+                    $"G0 X{externalDiameter.NC(0)} Z0.5\n" +
+                    SpindleUnclamp(machine) + "\n" +
+                    AbsStop + "\n" +
+                    "W1.\n" +
+                    TurningReferentPoint,
 
                 Machine.L230A =>
-                $"T{tool.Position.ToolNumber()} ({tool.Name})\n" +
-                $"G0 X{externalDiameter.NC(0)} Z0.5\n" +
-                SpindleUnclamp(machine) + "\n" +
-                AbsStop + "\n" +
-                "W1.\n" +
-                TurningReferentPoint,
+                    $"T{tool.Position.ToolNumber()} ({tool.Name})\n" +
+                    $"G0 X{externalDiameter.NC(0)} Z0.5\n" +
+                    SpindleUnclamp(machine) + "\n" +
+                    AbsStop + "\n" +
+                    "W1.\n" +
+                    TurningReferentPoint,
 
                 _ => string.Empty,
             };

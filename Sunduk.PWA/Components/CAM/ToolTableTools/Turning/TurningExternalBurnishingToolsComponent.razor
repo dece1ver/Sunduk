@@ -1,0 +1,68 @@
+﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<MudTable Items="TurningExternalBurnishingTools" ReadOnly="ReadOnly" Hover="true" CanCancelEdit="false" Elevation="0">
+    <HeaderContent>
+        <MudTh>Позиция</MudTh>
+        <MudTh>Тип</MudTh>
+        <MudTh/>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Позиция">T@(context.Position.ToolNumber())</MudTd>
+        @if (context.Type == TurningBurnishingTool.Types.Diamond)
+        {
+            <MudTd DataLabel="Тип">Алмаз</MudTd>
+        }
+        @if (context.Type == TurningBurnishingTool.Types.Roller)
+        {
+            <MudTd DataLabel="Тип">Ролик</MudTd>
+        }
+        <MudTd>
+                <MudIconButton Class="ma-n3" Variant="Variant.Text" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="(() => RemoveTurningBurnishingTool(context))" />
+        </MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="Позиция">
+            <MudTextField @bind-Value="@context.Position" Adornment="Adornment.Start" AdornmentText="T" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+        </MudTd>
+        <MudTd DataLabel="Тип">
+            <MudSelect T="TurningBurnishingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                <MudSelectItem Value="@TurningBurnishingTool.Types.Diamond">Алмаз</MudSelectItem>
+                <MudSelectItem Value="@TurningBurnishingTool.Types.Roller">Ролик</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+    </RowEditingTemplate>
+</MudTable>
+    <AddToolButton OnClick="AddTurningBurnishingTool" />
+@code {
+    [Parameter]
+    public List<Tool> Tools { get; set; }
+
+    [Parameter] 
+    public EventCallback<List<Tool>> ToolsChanged { get; set; }
+
+    public List<TurningExternalBurnishingTool> TurningExternalBurnishingTools
+    {
+        get => Tools.OfType<TurningExternalBurnishingTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is TurningExternalBurnishingTool);
+            Tools.AddRange(value);
+        }
+    }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    private async Task AddTurningBurnishingTool()
+    {
+        Tools.Add(new TurningExternalBurnishingTool(0101, TurningBurnishingTool.Types.Diamond));
+        await LocalStorage.SetItemAsync(nameof(TurningExternalBurnishingTools), TurningExternalBurnishingTools);
+        await ToolsChanged.InvokeAsync(Tools);
+    }
+    private async Task RemoveTurningBurnishingTool(TurningBurnishingTool tool)
+    {
+        Tools.Remove(tool);
+        await LocalStorage.SetItemAsync(nameof(TurningExternalBurnishingTools), TurningExternalBurnishingTools);
+        await ToolsChanged.InvokeAsync(Tools);
+    }
+}

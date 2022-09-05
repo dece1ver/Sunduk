@@ -411,7 +411,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
             if ((profStockAllow > 0 || !doFinish) && !useCycles)
             {
-                if (tool.Width == width && outerCornerBlunt > 0)
+                if (Math.Abs(tool.Width - width) < 0.001 && outerCornerBlunt > 0)
                 {
                     cutting +=
                         $"G0 Z{(startPoint + clearance).NC()}\n" +
@@ -421,7 +421,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         roughBluntLower +
                         $"Z{(endPoint + profStockAllow).NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n";
                 }
-                else if (tool.Width == width - profStockAllow * 2 && outerCornerBlunt <= 0)
+                else if (Math.Abs(tool.Width - (width - profStockAllow * 2)) < 0.001 && outerCornerBlunt <= 0)
                 {
                     //cutting += $"G0 X{(externalDiameter + clearance).NC()}\n";
                 }
@@ -444,7 +444,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             }
             if (doFinish)
             {
-                if (tool.Width == width && outerCornerBlunt > 0)
+                if (Math.Abs(tool.Width - width) < 0.001 && outerCornerBlunt > 0)
                 {
                     cutting +=
                         $"G0 Z{(startPoint + clearance).NC()}\n" +
@@ -454,14 +454,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         bluntLower +
                         $"Z{endPoint.NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n";
                 }
-                else if (tool.Width == width && outerCornerBlunt <= 0)
+                else if (Math.Abs(tool.Width - width) < 0.001 && outerCornerBlunt <= 0)
                 {
                     //cutting += $"G0 X{(externalDiameter + clearance).NC()}\n";
                 }
                 else
                 {
                     if (!useCycles ||
-                        (useCycles && (profStockAllow > 0 || outerCornerBlunt > 0)))
+                        profStockAllow > 0 || outerCornerBlunt > 0) // (useCycles && (profStockAllow > 0 || outerCornerBlunt > 0))) 
                     {
                         cutting +=
                         $"{(!useCycles ? $"G0 Z{(startPoint + clearance).NC()}\n" : string.Empty)}" +

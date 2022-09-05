@@ -425,7 +425,7 @@ namespace Sunduk.PWA.Infrastructure
 
             rapidTime += stepsZ * (stepsX * AxialRapidTime(turningExternalGroovingSequence.StepOver + Operation.Escaping()));
             rapidTime += 3 * AxialRapidTime(fullLengthX + Operation.Escaping());
-            rapidTime += AxialRapidTime(fullLengthX);
+            rapidTime += AxialRapidTime(fullLengthX); // ???
 
             return new OperationTime(cuttingTime, rapidTime);
         }
@@ -458,8 +458,61 @@ namespace Sunduk.PWA.Infrastructure
             rapidTime += stepsZ * (stepsX * AxialRapidTime(turningInternalGroovingSequence.StepOver + Operation.Escaping()));
             rapidTime += 3 * AxialRapidTime(fullLengthX + Operation.Escaping());
             rapidTime += 2 * AxialRapidTime(Math.Abs(turningInternalGroovingSequence.CuttingPoint) + Operation.Escaping());
-            rapidTime += AxialRapidTime(fullLengthX);
+            rapidTime += AxialRapidTime(fullLengthX); // ???
 
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        /// <summary>
+        /// Время обработки наружной канавки
+        /// </summary>
+        public static OperationTime OperationTime(this TurningFaceGroovingSequence turningFaceGroovingSequence, Material material)
+            {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            var startX = turningFaceGroovingSequence.ExternalDiameter;
+            var endX = turningFaceGroovingSequence.InternalDiameter;
+            var width = (turningFaceGroovingSequence.ExternalDiameter - turningFaceGroovingSequence.InternalDiameter) / 2;
+            var length = Math.Abs(turningFaceGroovingSequence.CuttingPoint) + Math.Abs(turningFaceGroovingSequence.Width); // надо переделать, вместо ширины сделать конечный Z или что-то такое
+            var stepsZ = (int)Math.Round(width / turningFaceGroovingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            if (width < turningFaceGroovingSequence.Tool.Width) width = turningFaceGroovingSequence.Tool.Width;
+            var stepsX = (int)Math.Round(width * 2 / turningFaceGroovingSequence.Tool.Width, MidpointRounding.ToPositiveInfinity);
+            var roughSpeed = Operation.GroovingSpeedRough(material);
+            var roughFeed = Operation.GroovingFeedRough();
+            var finishSpeed = Operation.GroovingSpeedFinish(material);
+            var finishFeed = Operation.GroovingFeedFinish();
+            var roughSpins = (roughSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
+            var finishSpins = (finishSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
+            if (roughSpins > 3000) roughSpins = 3000;
+            if (finishSpins > 3000) finishSpins = 3000;
+            cuttingTime += stepsX * (stepsZ * (turningFaceGroovingSequence.StepOver + Operation.Escaping()).AxialTurningTime(roughSpins, roughFeed));
+            cuttingTime += 2 * (length + Operation.Escaping()).AxialTurningTime(finishSpins, finishFeed);
+
+            rapidTime += stepsX * (stepsZ * AxialRapidTime(turningFaceGroovingSequence.StepOver + Operation.Escaping()));
+            rapidTime += 3 * AxialRapidTime(length + Operation.Escaping());
+            rapidTime += AxialRapidTime(length); // ???
+
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        /// <summary>
+        /// Время обработки при накатывании
+        /// </summary>
+        public static OperationTime OperationTime(this TurningBurnishingSequence turningBurnishingSequence)
+        {
+            
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            var fullLength = (Math.Abs(turningBurnishingSequence.StartZ) + Math.Abs(turningBurnishingSequence.EndZ));
+            var additionalRapidMove = turningBurnishingSequence.Tool is TurningExternalBurnishingTool ? 1 : 1 + fullLength;
+            var feed = Operation.BurnishingFeed(turningBurnishingSequence.Tool);
+            var speed = Operation.BurnishingSpeed(turningBurnishingSequence.Tool);
+            var spins = (speed * 1000) / (Math.PI * turningBurnishingSequence.Diameter);
+            if (spins > 1000) spins = 1000;
+            cuttingTime += (fullLength + 1).AxialTurningTime(spins, feed);
+            cuttingTime += Operation.Escaping().AxialTurningTime(spins, feed);
+            rapidTime += fullLength.AxialRapidTime();
+            rapidTime += additionalRapidMove.AxialRapidTime();
             return new OperationTime(cuttingTime, rapidTime);
         }
 

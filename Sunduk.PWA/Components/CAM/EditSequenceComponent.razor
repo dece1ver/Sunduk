@@ -425,7 +425,25 @@
                 <MudTextField Label="Конец" @bind-Value="ThreadEnd" Immediate="true" Variant="Variant.Filled" Margin="Margin.Dense" Converter="Util.DoubleConverter" />
             </MudItem>
             break;
-
+        case TurningBurnishingSequence turningBurnishingSequence:
+            <MudItem xs="6" md="3">
+                <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool" Margin="Margin.Dense" Variant="Variant.Filled">
+                    @foreach (var tool in Tools.Where(x => x is TurningBurnishingTool))
+                    {
+                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <MudTextField Label="Диаметр" @bind-Value="ExternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <MudTextField Label="Начало" @bind-Value="StartPoint" Immediate="true" Variant="Variant.Filled" Margin="Margin.Dense" Converter="Util.DoubleConverter" />
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <MudTextField Label="Конец" @bind-Value="EndPoint" Immediate="true" Variant="Variant.Filled" Margin="Margin.Dense" Converter="Util.DoubleConverter" />
+            </MudItem>
+            break;
         case TurningGroovingSequence turningGroovingSequence:
             <MudItem xs="12">
             @if (turningGroovingSequence is TurningExternalGroovingSequence)
@@ -767,6 +785,7 @@
     private double InternalDiameter { get; set; }
 
     public double StartPoint { get; set; }
+    public double EndPoint { get; set; }
 
     private double StepOver { get; set; }
 

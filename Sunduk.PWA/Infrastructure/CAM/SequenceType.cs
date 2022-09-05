@@ -9,6 +9,7 @@
         Drilling,
         Tapping,
         Threading,
-        Grooving
+        Grooving,
+        Burnishing
     }
 }

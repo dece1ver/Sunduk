@@ -313,6 +313,24 @@ namespace Sunduk.PWA.Infrastructure
                     ToolDescriptionOption.ToolTable => threadingInternalTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
+                TurningExternalBurnishingTool turningExternalBurnishingTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{turningExternalBurnishingTool.Position.ToolNumber()} ({turningExternalBurnishingTool.Name})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{turningExternalBurnishingTool.Position.ToolNumber()}({turningExternalBurnishingTool.Name})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{turningExternalBurnishingTool.Position.ToolNumber()} G54 M58 ({turningExternalBurnishingTool.Name})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{turningExternalBurnishingTool.Position.ToolNumber()} G55 M58 ({turningExternalBurnishingTool.Name})".Replace(',', '.'),
+                    ToolDescriptionOption.ToolTable => turningExternalBurnishingTool.Description().Split('(')[1].TrimEnd(')'),
+                    _ => string.Empty,
+                },
+                TurningInternalBurnishingTool turningInternalBurnishingTool => option switch
+                {
+                    ToolDescriptionOption.General => $"T{turningInternalBurnishingTool.Position.ToolNumber()} ({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{turningInternalBurnishingTool.Position.ToolNumber()}({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{turningInternalBurnishingTool.Position.ToolNumber()} G54 M58 ({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{turningInternalBurnishingTool.Position.ToolNumber()} G55 M58 ({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
+                    ToolDescriptionOption.ToolTable => turningInternalBurnishingTool.Description().Split('(')[1].TrimEnd(')'),
+                    _ => string.Empty,
+                },
                 TurningDrillingTool turningDrillingTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{turningDrillingTool.Position.ToolNumber()} ({turningDrillingTool.Name} D{turningDrillingTool.Diameter})".Replace(',', '.'),

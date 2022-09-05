@@ -78,6 +78,15 @@
                 <ThreadingInternalToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
             </MudTabPanel>
 
+            // TurningExternalBurnishing
+            <MudTabPanel Text="Накатки наружные" Style="font-size: x-small">
+                <TurningExternalBurnishingToolsComponent @bind-Tools="Tools" ReadOnly="false" />
+            </MudTabPanel>
+
+            // TurningInternalBurnishing
+            <MudTabPanel Text="Накатки внутренние" Style="font-size: x-small">
+                <TurningInternalBurnishingToolsComponent @bind-Tools="Tools" ReadOnly="false" />
+            </MudTabPanel>
 
             // TurningDrilling
             <MudTabPanel Text="Сверла" Style="font-size: x-small">

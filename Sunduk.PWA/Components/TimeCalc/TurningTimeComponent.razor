@@ -1,17 +1,16 @@
 ﻿@using _Imports = MudBlazor._Imports
 @using Sunduk.PWA.Infrastructure.Time
-@using Sunduk.PWA.Infrastructure.Sequences.Turning.Base
-@using System.Reflection.Metadata.Ecma335
+
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
-        <MudItem xs="12" sm="6" md="@(SequenceType is SequenceType.Facing ? 3 : 4)">
+        <MudItem xs="12" sm="6" md="@(SequenceType is SequenceType.Facing or SequenceType.Burnishing ? 3 : 4)">
             <MudSelect @bind-Value="Material" Label="Материал детали" T="Material" Variant="Variant.Filled" Margin="Margin.Dense">
                 <MudSelectItem Value="@Material.Steel">Черная сталь</MudSelectItem>
                 <MudSelectItem Value="@Material.Stainless">Нержавеющая сталь</MudSelectItem>
                 <MudSelectItem Value="@Material.Brass">Бронза</MudSelectItem>
             </MudSelect>
         </MudItem>
-        <MudItem xs="12" sm="6" md="@(SequenceType is SequenceType.Facing ? 3 : 4)">
+        <MudItem xs="12" sm="6" md="@(SequenceType is SequenceType.Facing or SequenceType.Burnishing ? 3 : 4)">
             <MudSelect Label="Тип" T="SequenceType" Variant="Variant.Filled" Margin="Margin.Dense" Value="SequenceType" ValueChanged="OnSequenceTypeChanged">
                 <MudSelectItem Value="@SequenceType.General">Общие</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.Facing">Обработка торца</MudSelectItem>
@@ -19,6 +18,7 @@
                 <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.Threading">Обработка резьбы</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.Burnishing">Накатка</MudSelectItem>
             </MudSelect>
         </MudItem>
         @switch (SequenceType)
@@ -37,10 +37,10 @@
 
             case SequenceType.Facing:
 
-                <MudItem xs="12" sm="6" md="3" lg="2">
+                <MudItem xs="12" sm="6" md="3" lg="3">
                     <MudTextField Label="Диаметр заготовки" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
-                <MudItem xs="12" sm="6" md="3" lg="2"> 
+                <MudItem xs="12" sm="6" md="3" lg="3"> 
                     <MudTextField Label="Проходы" @bind-Value="Steps" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.IntConverterFromOne" />
                 </MudItem>
                 break;
@@ -53,13 +53,13 @@
                         <MudSelectItem Value="@(TurningTypes.Gentle)">Нежное ковыряние</MudSelectItem>
                     </MudSelect>
                 </MudItem>
-                <MudItem xs="12" sm="6" md="6" lg="4">
+                <MudItem xs="12" sm="6" md="4" lg="4">
                     <MudTextField Label="Верхний диаметр" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
-                <MudItem xs="12" sm="6" md="6" lg="4">
+                <MudItem xs="12" sm="6" md="4" lg="4">
                     <MudTextField Label="Нижний диаметр" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
-                <MudItem xs="12" sm="6" md="6" lg="4">
+                <MudItem xs="12" sm="6" md="4" lg="4">
                     <MudTextField Label="Глубина" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 break;
@@ -169,6 +169,14 @@
                         </MudItem>
                         break;
                 }
+                break;
+            case SequenceType.Burnishing:
+                <MudItem xs="12" sm="6" md="3" lg="3">
+                    <MudTextField Label="Диаметр" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
+                <MudItem xs="12" sm="6" md="3" lg="3">
+                    <MudTextField Label="Глубина" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
                 break;
         }
         <MudItem Class="mt-4" xs="12">
@@ -400,6 +408,10 @@
                         false => new ThreadCuttingSequence(Machine.L230A, new ThreadingTool(1, Pitch, ThreadStandard.Profile().GetDouble()), ThreadStandard, CuttingType.External, StartX, Pitch, StartZ, EndZ, PlaneLength, CurrentThreadTemplate)
                     };
                     break;
+                case SequenceType.Burnishing:
+                    if (EndX is 0 || EndZ is 0) return string.Empty;
+                    CurrentSequence = new TurningBurnishingSequence(Machine.L230A, new TurningBurnishingTool(0, TurningBurnishingTool.Types.Diamond), EndX, StartZ, EndZ); 
+                    break;
             }
             return ExampleString();
         }
@@ -450,7 +462,7 @@
             }
             case ThreadStandard.NPT:
             {
-                Thread.GetNptValues(CurrentThreadTemplate, out var externalDiameter, out var internalDiameter, out var pitch, out var planeLength, out var threadLength);
+                Thread.GetNptValues(CurrentThreadTemplate, out var externalDiameter, out _, out var pitch, out var planeLength, out var threadLength);
                 StartX = externalDiameter.GetDouble();
                 Pitch = pitch.GetDouble();
                 PlaneLength = planeLength;
