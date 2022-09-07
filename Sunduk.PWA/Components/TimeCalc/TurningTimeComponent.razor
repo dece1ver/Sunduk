@@ -1,4 +1,5 @@
-﻿@using _Imports = MudBlazor._Imports
+﻿@inject IDialogService DialogService
+@using _Imports = MudBlazor._Imports
 @using Sunduk.PWA.Infrastructure.Time
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
@@ -14,7 +15,8 @@
             <MudSelect Label="Тип" T="SequenceType" Variant="Variant.Filled" Margin="Margin.Dense" Value="SequenceType" ValueChanged="OnSequenceTypeChanged">
                 <MudSelectItem Value="@SequenceType.General">Общие</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.Facing">Обработка торца</MudSelectItem>
-                <MudSelectItem Value="@SequenceType.ExternalTurning">Точение</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.RoughTurning">Точение черновое</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.FinishTurning">Точение чистовое</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.Threading">Обработка резьбы</MudSelectItem>
@@ -45,19 +47,22 @@
                 </MudItem>
                 break;
 
-            case SequenceType.ExternalTurning:
+            case SequenceType.RoughTurning or SequenceType.FinishTurning:
                 <MudItem xs="12" sm="6" md="4">
                     <MudSelect Label="Тип обработки" T="TurningTypes" @bind-Value="TurningType" Variant="Variant.Filled" Margin="Margin.Dense">
-                        <MudSelectItem Value="@(TurningTypes.Rough)">Обдирка</MudSelectItem>
+                        @if (SequenceType is SequenceType.RoughTurning)
+                        {
+                            <MudSelectItem Value="@(TurningTypes.Rough)">Обдирка</MudSelectItem>
+                        }
                         <MudSelectItem Value="@(TurningTypes.Medium)">Ковыряние</MudSelectItem>
                         <MudSelectItem Value="@(TurningTypes.Gentle)">Нежное ковыряние</MudSelectItem>
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6" md="4" lg="4">
-                    <MudTextField Label="Верхний диаметр" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                    <MudTextField Label="Начальный диаметр" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 <MudItem xs="12" sm="6" md="4" lg="4">
-                    <MudTextField Label="Нижний диаметр" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                    <MudTextField Label="Конечный диаметр" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 <MudItem xs="12" sm="6" md="4" lg="4">
                     <MudTextField Label="Глубина" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
@@ -221,6 +226,10 @@
                         <MudItem Class="my-2">
                             <MudText Style="margin-top: 7px; margin-left: 10px;" Typo="Typo.body2">@($"Суммарное время с учетом смены инструмента: {(FullOperationTime.FullTime / 60).ToPrettyString(2)} мин. ({FullOperationTime.FullTime.ToPrettyString(2)} сек.)")</MudText>
                         </MudItem>
+                        <MudItem Class="d-flex justify-end flex-grow-1 gap-4">
+                            <MudIconButton Style="@($"margin-top: 3px; margin-left: 4px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true"
+                                       Icon="@Icons.Material.Filled.ClearAll" OnClick="ClearSequences" />
+                            </MudItem>
                     </MudGrid>
                 </MudPaper>
             </MudField>
@@ -327,32 +336,33 @@
                         new TurningExternalTool(0, TurningExternalTool.Types.Face, 80, 0.8),
                         StartX, 0, Steps, 0, 1, (0,0));
                     break;
-                case SequenceType.ExternalTurning:
-                    if (StartX <= 0 || EndX <= 0 || StartX < EndX || EndZ is 0) return string.Empty;
-                    if (Math.Abs(StartX - EndX) < 0.001)
-                    {
-                        CurrentSequence = new FinishTurningSequence(
-                            Machine.L230A,
-                            Material,
-                            new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
-                            new List<Element>(2){new Point(StartX, StartZ), new Point(EndX, EndZ)}, 
-                            0, 
-                            0, 
-                            0);
-                    }
-                    else
-                    {
-                        CurrentSequence = new RoughTurningSequence(
-                            Machine.L230A,
-                            Material,
-                            new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
-                            new List<Element>(2){new Point(StartX, StartZ), new Point(EndX, EndZ)}, 
-                            ToolRadius() is 0.8 ? ToolRadius() * 2.5 : ToolRadius() * 2, 
-                            0, 
-                            0);
-                    }
-                    
+                case SequenceType.RoughTurning:
+                    if (StartX <= 0 || EndX <= 0 || EndZ is 0) return string.Empty;
+                    CurrentSequence = new RoughTurningSequence(
+                        Machine.L230A,
+                        Material,
+                        StartX > EndX 
+                            ? new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()) 
+                            : new TurningInternalTool(0, 20, 80, ToolRadius()),
+                        new List<Element>(2){new Point(StartX, StartZ), new Point(EndX, EndZ)}, 
+                        ToolRadius() is 0.8 ? ToolRadius() * 2.5 : ToolRadius() * 2, 
+                        0, 
+                        0);
+
                     break;
+                case SequenceType.FinishTurning:
+                        if (StartX <= 0 || EndX <= 0 || EndZ is 0) return string.Empty;
+                    CurrentSequence = new FinishTurningSequence(
+                        Machine.L230A,
+                        Material,
+                        StartX > EndX 
+                            ? new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()) 
+                            : new TurningInternalTool(0, 20, 80, ToolRadius()),
+                        new List<Element>(2){new Point(StartX, StartZ), new Point(EndX, EndZ)}, 
+                        0, 
+                        0, 
+                        0);
+                        break;
                 case SequenceType.Grooving:
                     switch (GroovingSequence)
                     {
@@ -492,9 +502,11 @@
                 break;
             case SequenceType.Facing:
                 break;
-            case SequenceType.ExternalTurning:
+            case SequenceType.RoughTurning:
+                TurningType = TurningTypes.Rough;
                 break;
-            case SequenceType.InternalTurning:
+            case SequenceType.FinishTurning:
+                TurningType = TurningTypes.Medium;
                 break;
             case SequenceType.Drilling:
                 break;
@@ -507,6 +519,26 @@
                 break;
         }
         SequenceType = value;
+    }
+
+    private async Task<bool> OpenConfirmDialog(string message, string okMessage)
+    {
+        message ??= string.Empty;
+        var parameters = new DialogParameters
+        {
+            { nameof(message), message },
+            { nameof(okMessage), okMessage }
+        };
+        var options = new DialogOptions() { FullScreen = false, CloseButton = false };
+        var dialog = DialogService.Show<ConfirmDialog>("Подтверждение", parameters, options);
+        var result = await dialog.Result;
+        return !result.Cancelled;
+    }
+
+    private async Task ClearSequences()
+    {
+        bool resultDialog = await OpenConfirmDialog($"Очистить список обработки?", "Очистить");
+        if (resultDialog) Sequences.Clear();
     }
 
 }

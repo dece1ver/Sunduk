@@ -4,6 +4,8 @@
     {
         General,
         Facing,
+        RoughTurning,
+        FinishTurning,
         ExternalTurning,
         InternalTurning,
         Drilling,

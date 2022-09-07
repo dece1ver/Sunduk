@@ -591,10 +591,14 @@
         Mode = Mode != Mode.AddSequence ? Mode.AddSequence : Mode.General;
     }
 
-    private async Task<bool> OpenConfirmDialog(string message)
+    private async Task<bool> OpenConfirmDialog(string message, string okMessage)
     {
         message ??= string.Empty;
-        var parameters = new DialogParameters { { nameof(message), message } };
+        var parameters = new DialogParameters
+        {
+            { nameof(message), message },
+            { nameof(okMessage), okMessage }
+        };
         var options = new DialogOptions() { FullScreen = false, CloseButton = false };
         var dialog = DialogService.Show<ConfirmDialog>("Подтверждение", parameters, options);
         var result = await dialog.Result;
@@ -628,7 +632,7 @@
 
     private async Task DownloadProgram()
     {
-        bool resultDialog = await OpenConfirmDialog($"Скачать файл \"{NcDetailNumber}.nc\" ?");
+        bool resultDialog = await OpenConfirmDialog($"Скачать файл \"{NcDetailNumber}.nc\" ?", "Скачать");
         if (resultDialog) await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, System.Text.Encoding.UTF8, "text/plain");
     }
 

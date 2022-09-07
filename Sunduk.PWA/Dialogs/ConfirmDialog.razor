@@ -1,17 +1,18 @@
 ﻿<MudDialog>
     <DialogContent>
-        <MudText>@message</MudText>
+        <MudText>@Message</MudText>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Отмена</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Submit">Скачать</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Submit">@OkMessage</MudButton>
     </DialogActions>
 </MudDialog>
 @code 
 {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-    [Parameter] public string message { get; set; }
+    [Parameter] public string Message { get; set; }
+    [Parameter] public string OkMessage { get; set; }
 
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();

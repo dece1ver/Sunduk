@@ -338,7 +338,9 @@ namespace Sunduk.PWA.Infrastructure
             var startZ = Math.Abs(roughTurningSequence.Contour[0].Z ?? 0);
             var endZ = Math.Abs(roughTurningSequence.Contour[1].Z ?? 0);
             var fullLength = startZ + endZ;
-            var steps = (int)Math.Round((startX - endX) / 2 / roughTurningSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            var steps = startX > endX 
+                ? (int)Math.Round((startX - endX) / 2 / roughTurningSequence.StepOver, MidpointRounding.ToPositiveInfinity) 
+                : (int)Math.Round((endX - startX) / 2 / roughTurningSequence.StepOver, MidpointRounding.ToPositiveInfinity);
             var speed = Operation.CuttingSpeedRough(material);
             var feed = Operation.FeedRough(roughTurningSequence.Tool.Radius);
             var spins = (speed * 1000) / (Math.PI * ((startX + endX) / 2));
@@ -362,12 +364,14 @@ namespace Sunduk.PWA.Infrastructure
             var endX = Math.Abs(finishTurningSequence.Contour[1].X ?? 0);
             var startZ = Math.Abs(finishTurningSequence.Contour[0].Z ?? 0);
             var endZ = Math.Abs(finishTurningSequence.Contour[1].Z ?? 0);
+            var fullHeight = Math.Abs(startX - endX) / 2;
             var fullLength = startZ + endZ;
             var speed = Operation.CuttingSpeedFinish(material);
             var feed = Operation.FeedFinish(finishTurningSequence.Tool.Radius);
             var spins = (speed * 1000) / (Math.PI * endX);
             if (spins > 3000) spins = 3000;
             cuttingTime += AxialTurningTime(fullLength + Operation.Escaping(), spins, feed);
+            cuttingTime += AxialTurningTime(fullHeight + Operation.Escaping(), spins, feed);
 
             rapidTime += AxialRapidTime(fullLength);
             rapidTime += fullLength.AxialRapidTime();
