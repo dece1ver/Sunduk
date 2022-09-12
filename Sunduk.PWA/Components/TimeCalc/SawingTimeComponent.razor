@@ -4,15 +4,15 @@
     }
 </style>
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid>
+    <MudGrid Spacing="1">
         <MudItem xs="6">
-            <MudSelect @bind-Value="WorkpieceForm" Label="Форма заготовки" T="Form" Variant="Variant.Outlined">
+            <MudSelect @bind-Value="WorkpieceForm" Label="Форма заготовки" T="Form" Variant="Variant.Filled" Margin="Margin.Dense">
                 <MudSelectItem Value="@(Form.Circle)">Круглая</MudSelectItem>
-                <MudSelectItem Value="@(Form.Rectangle)">Прямоугольная</MudSelectItem>
+                @*<MudSelectItem Value="@(Form.Rectangle)">Прямоугольная</MudSelectItem>*@
             </MudSelect>
         </MudItem>
         <MudItem xs="6">
-            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Material" Variant="Variant.Outlined">
+            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Material" Variant="Variant.Filled" Margin="Margin.Dense">
                 <MudSelectItem Value="@(Material.Steel)">Черная сталь</MudSelectItem>
                 <MudSelectItem Value="@(Material.Stainless)">Нержавеющая сталь</MudSelectItem>
             </MudSelect>
@@ -178,22 +178,22 @@
     public TimeValue TimeModifier { get; set; } = TimeValue.Minute;
 
     public string _WorkpieceExternalDiameter { get; set; } = string.Empty;
-    public double WorkpieceExternalDiameter { get => Util.GetDouble(_WorkpieceExternalDiameter); }
+    public double WorkpieceExternalDiameter => Util.GetDouble(_WorkpieceExternalDiameter);
 
     public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
-    public double WorkpieceInternalDiameter { get => Util.GetDouble(_WorkpieceInternalDiameter); }
+    public double WorkpieceInternalDiameter => Util.GetDouble(_WorkpieceInternalDiameter);
 
     public string _WorkpieceWidth { get; set; } = string.Empty;
-    public double WorkpieceWidth { get => Util.GetDouble(_WorkpieceWidth); }
+    public double WorkpieceWidth => Util.GetDouble(_WorkpieceWidth);
 
     public string _WorkpieceHeight { get; set; } = string.Empty;
-    public double WorkpieceHeight { get => Util.GetDouble(_WorkpieceHeight); }
+    public double WorkpieceHeight => Util.GetDouble(_WorkpieceHeight);
 
     public string _WorkpieceLength { get; set; } = string.Empty;
-    public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
+    public double WorkpieceLength => Util.GetDouble(_WorkpieceLength);
 
     public string _PartsCount { get; set; } = string.Empty;
-    public double PartsCount { get => Util.GetDouble(_PartsCount, 1); }
+    public double PartsCount => Util.GetDouble(_PartsCount, 1);
 
     #region Заготовка
     public bool ValidWorkpiece

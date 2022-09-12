@@ -1,6 +1,6 @@
 ﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
-using Sunduk.PWA.Util;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
@@ -25,6 +25,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             InnerBluntType,
             true);
         public override string Name => $"Канавка внутренняя {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}";
+        public override OperationTime MachineTime => this.OperationTime(Material);
 
         public TurningInternalGroovingSequence(
             Machine machine,

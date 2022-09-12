@@ -1,0 +1,83 @@
+﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<MudTable Items="MillingBoreTools" ReadOnly="ReadOnly" Hover="true" CanCancelEdit="false" Elevation="0">
+    <HeaderContent>
+        <MudTh>Позиция</MudTh>
+        <MudTh>Диаметр</MudTh>
+        <MudTh>Рабочая глубина</MudTh>
+        <MudTh>Радиус при вершине</MudTh>
+        <MudTh>Исполнение</MudTh>
+        <MudTh/>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Позиция">T@(context.Position)</MudTd>
+        <MudTd DataLabel="Диаметр">Ø@(context.Diameter.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs))</MudTd>
+        <MudTd DataLabel="Рабочая длина">L@(context.CuttingLength > 0 ? context.CuttingLength.ToPrettyString() : "-")</MudTd>
+        <MudTd DataLabel="Радиус при вершине">R@(context.Radius > 0 ? context.Radius.ToPrettyString() : "-")</MudTd>
+        <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Right ? "Правое" : "Левое")</MudTd>
+        <MudTd>
+            <MudIconButton Class="ma-n3" Variant="Variant.Text" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="(() => RemoveMillingTool(context))" />
+        </MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="Позиция">
+            <MudTextField @bind-Value="@context.Position" Adornment="Adornment.Start" AdornmentText="T" Variant="Variant.Outlined" Margin="Margin.Dense" Required />
+        </MudTd>
+        <MudTd DataLabel="Диаметр">
+            <MudTextField @bind-Value="@context.Diameter" Adornment="Adornment.Start" AdornmentText="Ø" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+        </MudTd>
+        <MudTd DataLabel="Рабочая глубина">
+            <MudTextField @bind-Value="@context.CuttingLength" Adornment="Adornment.Start" AdornmentText="L" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+        </MudTd>
+        <MudTd DataLabel="Радиус при вершине">
+            <MudTextField @bind-Value="@context.Radius" Adornment="Adornment.Start" AdornmentText="R" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+        </MudTd>
+        <MudTd DataLabel="Исполнение">
+            <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                <MudSelectItem Value="@Tool.ToolHand.Right">Правое</MudSelectItem>
+                <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+    </RowEditingTemplate>
+</MudTable>
+<AddToolButton OnClick="AddMillingBoreTool" />
+
+@code {
+
+    [Parameter]
+    public List<Tool> Tools { get; set; }
+
+    [Parameter] 
+    public EventCallback<List<Tool>> ToolsChanged { get; set; }
+
+    #region Список расточек
+        public List<MillingBoreTool> MillingBoreTools
+    {
+        get => Tools.OfType<MillingBoreTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is MillingBoreTool);
+            Tools.AddRange(value);
+        }
+    }
+    #endregion
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+
+
+    private async Task AddMillingBoreTool()
+    {
+        Tools.Add(new MillingBoreTool(1, 20));
+        _ = LocalStorage.SetItemAsync(nameof(MillingBoreTools), MillingBoreTools);
+        await ToolsChanged.InvokeAsync(Tools);
+    }
+    private async Task RemoveMillingTool(MillingBoreTool tool)
+    {
+        Tools.Remove(tool);
+        var tempList = MillingBoreTools;
+        _ =  LocalStorage.SetItemAsync(nameof(MillingBoreTools), MillingBoreTools);
+        await ToolsChanged.InvokeAsync(Tools);
+    }
+}

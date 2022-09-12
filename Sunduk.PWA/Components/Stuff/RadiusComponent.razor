@@ -29,75 +29,74 @@
                     </MudItem>
                 </MudGrid>
             </MudField>
-            
         </MudItem>
 
         <MudHidden Breakpoint="Breakpoint.Xs">
             <MudItem xs="12" sm="6" >
-            <MudCard Elevation="0" Outlined="true" Class="mt-1">
-                <MudCardContent>
-                    @if (CurrentImage == Images.ExternalRadius)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/radius/ext_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.InternalRadius)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/radius/int_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.ExternalRadiusSize)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/radius/ext_part_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.ExternalPartDiameter)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/radius/ext_part_diam_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.ExternalToolRadius)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/radius/ext_tool_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.InternalRadiusSize)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/radius/int_part_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.InternalPartDiameter)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/radius/int_part_diam_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                    @if (CurrentImage == Images.InternalToolRadius)
-                    {
-                        <center>
-                            <img src="/img/stuffimages/radius/int_tool_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
-                        </center>
-                    }
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        <div>
-            <img src="/img/stuffimages/radius/ext_radius_n.svg" asp-append-version="true" width="0" height="0" />
-            <img src="/img/stuffimages/radius/int_radius_n.svg" asp-append-version="true" width="0" height="0" />
-            <img src="/img/stuffimages/radius/ext_part_radius_n.svg" asp-append-version="true" width="0" height="0" />
-            <img src="/img/stuffimages/radius/ext_part_diam_n.svg" asp-append-version="true" width="0" height="0" />
-            <img src="/img/stuffimages/radius/ext_tool_radius_n.svg" asp-append-version="true" width="0" height="0"/>
-            <img src="/img/stuffimages/radius/ext_tool_radius_n.svg" asp-append-version="true" width="0" height="0"/>
-            <img src="/img/stuffimages/radius/int_part_radius_n.svg" asp-append-version="true" width="0" height="0"/>
-            <img src="/img/stuffimages/radius/int_part_diam_n.svg" asp-append-version="true" width="0" height="0"/>
-            <img src="/img/stuffimages/radius/int_tool_radius_n.svg" asp-append-version="true" width="0" height="0"/>
-        </div>
+                <MudCard Elevation="0" Outlined="true" Class="mt-1">
+                    <MudCardContent>
+                        @if (CurrentImage == Images.ExternalRadius)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/radius/ext_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.InternalRadius)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/radius/int_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.ExternalRadiusSize)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/radius/ext_part_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.ExternalPartDiameter)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/radius/ext_part_diam_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.ExternalToolRadius)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/radius/ext_tool_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.InternalRadiusSize)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/radius/int_part_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.InternalPartDiameter)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/radius/int_part_diam_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                        @if (CurrentImage == Images.InternalToolRadius)
+                        {
+                            <center>
+                                <img src="/img/stuffimages/radius/int_tool_radius_n.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                            </center>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <div>
+                <img src="/img/stuffimages/radius/ext_radius_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/radius/int_radius_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/radius/ext_part_radius_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/radius/ext_part_diam_n.svg" asp-append-version="true" width="0" height="0" />
+                <img src="/img/stuffimages/radius/ext_tool_radius_n.svg" asp-append-version="true" width="0" height="0"/>
+                <img src="/img/stuffimages/radius/ext_tool_radius_n.svg" asp-append-version="true" width="0" height="0"/>
+                <img src="/img/stuffimages/radius/int_part_radius_n.svg" asp-append-version="true" width="0" height="0"/>
+                <img src="/img/stuffimages/radius/int_part_diam_n.svg" asp-append-version="true" width="0" height="0"/>
+                <img src="/img/stuffimages/radius/int_tool_radius_n.svg" asp-append-version="true" width="0" height="0"/>
+            </div>
         </MudHidden>
         <MudItem xs="12">
             <MudField Label="Результат" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n1">
@@ -200,13 +199,13 @@
     public Radius RadiusType { get; set; } = Radius.External;
 
     public string _RadiusDiameter { get; set; } = string.Empty;
-    public double RadiusDiameter { get => Util.GetDouble(_RadiusDiameter); }
+    public double RadiusDiameter => Util.GetDouble(_RadiusDiameter);
 
     public string _RadiusSize { get; set; } = string.Empty;
-    public double RadiusSize { get => Util.GetDouble(_RadiusSize); }
+    public double RadiusSize => Util.GetDouble(_RadiusSize);
 
     public string _InsertRadius { get; set; } = string.Empty;
-    public double InsertRadius { get => Util.GetDouble(_InsertRadius); }
+    public double InsertRadius => Util.GetDouble(_InsertRadius);
 
     public double RadiusStartDiameter
     {
@@ -220,9 +219,9 @@
         }
     }
 
-    public double RadiusDepth { get => RadiusSize + InsertRadius; }
+    public double RadiusDepth => RadiusSize + InsertRadius;
 
-    public int ExampleLines { get => RadiusExample.Count(f => f == '\n') + 1; }
+    public int ExampleLines => RadiusExample.Count(f => f == '\n') + 1;
 
 
     //private void SetInternalType()

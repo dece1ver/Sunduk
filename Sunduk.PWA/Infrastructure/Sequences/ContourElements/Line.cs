@@ -2,25 +2,21 @@
 
 namespace Sunduk.PWA.Infrastructure.Sequences.ContourElements
 {
-    public class Line : Element
+    public sealed class Line : Element
     {
-        public Line(double? x, double? z, double angle = 0, double startBlunt = 0, Blunt startBluntType = Blunt.Radius, double endBlunt = 0, Blunt endBluntType = Blunt.Radius)
+        public Line(double? x, double? z, double angle = 0, double blunt = 0, Blunt bluntType = Infrastructure.Blunt.Radius)
         {
             X = x;
             Z = z;
             Angle = angle;
-            StartBlunt = startBlunt;
-            StartBluntType = startBluntType;
-            EndBlunt = endBlunt;
-            EndBluntType = endBluntType;
+            Blunt = blunt;
+            BluntType = bluntType;
         }
 
         public override double? X { get; set; }
         public override double? Z { get; set; }
         public double Angle { get; set; }
-        public double StartBlunt { get; set; }
-        public Blunt StartBluntType { get; set; }
-        public double EndBlunt { get; set; }
-        public Blunt EndBluntType { get; set; }
+        public double Blunt { get; set; }
+        public Blunt BluntType { get; set; }
     }
 }

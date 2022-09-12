@@ -372,25 +372,25 @@
                     </MudSelect>
                 </MudItem>
             }
-            <MudItem xs="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapeziodal ? 6 : 4)">
+            <MudItem xs="6" md="(ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 6 : 4)">
                 <MudSelect @bind-Value="ThreadType" Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense">
                     <MudSelectItem Value="CuttingType.External">Наружная</MudSelectItem>
                     <MudSelectItem Value="CuttingType.Internal">Внутренняя</MudSelectItem>
                 </MudSelect>
             </MudItem>
-            <MudItem xs="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapeziodal ? 6 : 4)">
-                <MudSelect @bind-Value="ThreadStandart" Label="Тип" T="ThreadStandart" Variant="Variant.Filled" Margin="Margin.Dense">
-                    <MudSelectItem Value="@(ThreadStandart.Metric)">Метрическая 60° (М)</MudSelectItem>
-                    <MudSelectItem Value="@(ThreadStandart.BSPP)">Трубная цилиндрическая 55° (Tr)</MudSelectItem>
-                    <MudSelectItem Value="@(ThreadStandart.Trapeziodal)">Трапецеидальная 30° (G)</MudSelectItem>
-                    <MudSelectItem Value="@(ThreadStandart.NPT)">Коническая 60° (K)</MudSelectItem>
+            <MudItem xs="6" md="(ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 6 : 4)">
+                <MudSelect @bind-Value="ThreadStandard" Label="Тип" T="ThreadStandard" Variant="Variant.Filled" Margin="Margin.Dense">
+                    <MudSelectItem Value="@(ThreadStandard.Metric)">Метрическая 60° (М)</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.BSPP)">Трубная цилиндрическая 55° (Tr)</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">Трапецеидальная 30° (G)</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.NPT)">Коническая 60° (K)</MudSelectItem>
                 </MudSelect>
             </MudItem>
-            @if (ThreadStandart == ThreadStandart.BSPP)
+            @if (ThreadStandard == ThreadStandard.BSPP)
                 {
                 <MudItem xs="6" sm="6" md="4">
                     <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
-                        @foreach (string item in Thread.bsppTemplates)
+                        @foreach (string item in Thread.BsppTemplates)
                         {
                             <MudSelectItem Value="@(item)">
                                 <MudText>@item</MudText>
@@ -399,11 +399,11 @@
                     </MudSelect>
                 </MudItem>
                 }
-                @if (ThreadStandart == ThreadStandart.NPT)
+                @if (ThreadStandard == ThreadStandard.NPT)
                 {
                 <MudItem xs="6" sm="6" md="4">
                     <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
-                        @foreach (string item in Thread.nptTemplates)
+                        @foreach (string item in Thread.NptTemplates)
                         {
                             <MudSelectItem Value="@(item)">
                                 <MudText>@item</MudText>
@@ -425,7 +425,25 @@
                 <MudTextField Label="Конец" @bind-Value="ThreadEnd" Immediate="true" Variant="Variant.Filled" Margin="Margin.Dense" Converter="Util.DoubleConverter" />
             </MudItem>
             break;
-
+        case TurningBurnishingSequence turningBurnishingSequence:
+            <MudItem xs="6" md="3">
+                <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool" Margin="Margin.Dense" Variant="Variant.Filled">
+                    @foreach (var tool in Tools.Where(x => x is TurningBurnishingTool))
+                    {
+                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <MudTextField Label="Диаметр" @bind-Value="ExternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <MudTextField Label="Начало" @bind-Value="StartPoint" Immediate="true" Variant="Variant.Filled" Margin="Margin.Dense" Converter="Util.DoubleConverter" />
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <MudTextField Label="Конец" @bind-Value="EndPoint" Immediate="true" Variant="Variant.Filled" Margin="Margin.Dense" Converter="Util.DoubleConverter" />
+            </MudItem>
+            break;
         case TurningGroovingSequence turningGroovingSequence:
             <MudItem xs="12">
             @if (turningGroovingSequence is TurningExternalGroovingSequence)
@@ -655,12 +673,12 @@
                 break;
             case ThreadCuttingSequence threadCuttingSequence:
                 Tool = threadCuttingSequence.Tool;
-                ThreadStandart = threadCuttingSequence.ThreadStandart;
+                ThreadStandard = threadCuttingSequence.ThreadStandard;
                 ThreadDiameter = threadCuttingSequence.ThreadDiameter;
                 ThreadPitch = threadCuttingSequence.ThreadPitch;
                 ThreadStart = threadCuttingSequence.StartZ;
                 ThreadEnd = threadCuttingSequence.EndZ;
-                ThreadNPTPlane = threadCuttingSequence.ThreadNPTPlane;
+                ThreadNPTPlane = threadCuttingSequence.ThreadNptPlane;
                 break;
             case TurningExternalGroovingSequence turningExternalGroovingSequence:
                 Tool = turningExternalGroovingSequence.Tool;
@@ -749,6 +767,7 @@
     [Parameter] public List<Tool> Tools { get; set; }
     [Parameter] public List<Sequence> Program { get; set; }
     [Parameter] public Sequence Sequence { get; set; }
+    [Parameter] public CoordinateSystem CoordinateSystem { get; set; }
 
     public Sequence CurrentSequence { get; set; }
     private string CurrentThreadTemplate { get; set; }
@@ -766,6 +785,7 @@
     private double InternalDiameter { get; set; }
 
     public double StartPoint { get; set; }
+    public double EndPoint { get; set; }
 
     private double StepOver { get; set; }
 
@@ -836,7 +856,7 @@
     public List<Hole> Holes { get; set; }
 
     public CuttingType ThreadType { get; set; }
-    public ThreadStandart ThreadStandart { get; set; }
+    public ThreadStandard ThreadStandard { get; set; }
     public double ThreadDiameter { get; set; }
     public double ThreadPitch { get; set; }
     public double ThreadStart { get; set; }
@@ -861,56 +881,66 @@
                 case MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence:
                     CurrentSequence = new MillingHighSpeedDrillingSequence(
                         millingHighSpeedDrillingSequence.Machine,
+                        millingHighSpeedDrillingSequence.CoordinateSystem,
                         millingHighSpeedDrillingSequence.Material,
                         Tool as MillingDrillingTool,
                         DrillStart,
                         DrillEnd,
                         millingHighSpeedDrillingSequence.Holes,
-                        millingHighSpeedDrillingSequence.Polar);
+                        millingHighSpeedDrillingSequence.Polar, 
+                        millingHighSpeedDrillingSequence.SafePlane);
                     return CurrentSequence.Operation;
 
                 case MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence:
                     CurrentSequence = new MillingPeckDeepDrillingSequence (
                         millingPeckDeepDrillingSequence.Machine,
+                        millingPeckDeepDrillingSequence.CoordinateSystem,
                         millingPeckDeepDrillingSequence.Material,
                         Tool as MillingDrillingTool,
                         StepOver,
                         DrillStart,
                         DrillEnd,
                         millingPeckDeepDrillingSequence.Holes,
-                        millingPeckDeepDrillingSequence.Polar);
+                        millingPeckDeepDrillingSequence.Polar, 
+                        millingPeckDeepDrillingSequence.SafePlane);
                     return CurrentSequence.Operation;
 
                 case MillingPeckDrillingSequence millingPeckDrillingSequence:
                     CurrentSequence = new MillingPeckDrillingSequence(
                         millingPeckDrillingSequence.Machine,
+                        millingPeckDrillingSequence.CoordinateSystem,
                         millingPeckDrillingSequence.Material,
                         Tool as MillingDrillingTool,
                         StepOver,
                         DrillStart,
                         DrillEnd,
                         millingPeckDrillingSequence.Holes,
-                        millingPeckDrillingSequence.Polar);
+                        millingPeckDrillingSequence.Polar, 
+                        millingPeckDrillingSequence.SafePlane);
                     return CurrentSequence.Operation;
 
                 case MillingTappingSequence millingTappingSequence:
                     CurrentSequence = new MillingTappingSequence(
                         millingTappingSequence.Machine,
+                        millingTappingSequence.CoordinateSystem,
                         Tool as MillingTappingTool,
                         TappingCutSpeed,
                         DrillStart,
                         DrillEnd,
                         millingTappingSequence.Holes,
-                        millingTappingSequence.Polar);
+                        millingTappingSequence.Polar, 
+                        millingTappingSequence.SafePlane);
                     return CurrentSequence.Operation;
 
                 case MillingCustomSequence millingCustomSequence:
                     CurrentSequence = new MillingCustomSequence(
                         millingCustomSequence.Machine,
+                        millingCustomSequence.CoordinateSystem,
                         Tool,
                         CustomOperation,
                         Coolant,
-                        millingCustomSequence.Polar);
+                        millingCustomSequence.Polar, 
+                        millingCustomSequence.SafePlane);
                     return CurrentSequence.Operation;
 
                 // токарные
@@ -991,7 +1021,7 @@
                     CurrentSequence = new ThreadCuttingSequence(
                         threadCuttingSequence.Machine,
                         Tool as ThreadingTool,
-                        ThreadStandart,
+                        ThreadStandard,
                         ThreadType,
                         ThreadDiameter,
                         ThreadPitch,
@@ -1128,16 +1158,16 @@
     {
         CurrentThreadTemplate = value;
 
-        if (ThreadStandart == ThreadStandart.BSPP)
+        if (ThreadStandard == ThreadStandard.BSPP)
         {
-            Thread.GetBSPPValues(CurrentThreadTemplate, out string diameter, out string pitch);
+            Thread.GetBsppValues(CurrentThreadTemplate, out string diameter, out string pitch);
             ThreadDiameter = diameter.GetDouble();
             ThreadPitch = pitch.GetDouble();
             ThreadNPTPlane = 0;
         }
-        else if (ThreadStandart == ThreadStandart.NPT)
+        else if (ThreadStandard == ThreadStandard.NPT)
         {
-            Thread.GetNPTValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
+            Thread.GetNptValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
             ThreadDiameter = externalDiameter.GetDouble();
             ThreadPitch = pitch.GetDouble();
             ThreadEnd = (-threadLength); // наверно тоже строку стоит возвращать

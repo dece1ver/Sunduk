@@ -11,10 +11,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 
         public override string Operation 
         {
-            get
-            {
-                return Templates.FacingOperation.FinishFacingCycle(Tool, RoughSequence);
-            }
+            get => Templates.FacingOperation.FinishFacingCycle(Tool, RoughSequence);
             set { }
         }
 

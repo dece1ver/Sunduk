@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Sunduk.PWA.Util.Util;
+using static Sunduk.PWA.Infrastructure.Util;
 
 namespace Sunduk.PWA.Infrastructure.Templates
 {
@@ -82,7 +82,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"G0 X{(externalDiameter + 2).NC(0)} Z{zPoint.NC()} S{GroovingSpeedRough(material)} {Direction(tool)}\n" +
@@ -90,7 +90,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 cutting +
                 $"G0 X{(externalDiameter + 2).NC(0)}\n" +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
@@ -100,7 +100,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 cutting +
                 $"G0 X{(externalDiameter + 2).NC(0)}\n" +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 _ => string.Empty,
             };
@@ -278,7 +278,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 (external
@@ -290,7 +290,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G0 X{(externalDiameter + clearance * 2).NC(0)}\n" +
                 (external ? string.Empty : "Z2.\n") +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
@@ -304,7 +304,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G0 X{(externalDiameter + clearance * 2).NC(0)}\n" +
                 (external ? string.Empty : "Z2.\n") + 
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 _ => string.Empty,
             };
@@ -411,7 +411,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
             if ((profStockAllow > 0 || !doFinish) && !useCycles)
             {
-                if (tool.Width == width && outerCornerBlunt > 0)
+                if (Math.Abs(tool.Width - width) < 0.001 && outerCornerBlunt > 0)
                 {
                     cutting +=
                         $"G0 Z{(startPoint + clearance).NC()}\n" +
@@ -421,7 +421,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         roughBluntLower +
                         $"Z{(endPoint + profStockAllow).NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n";
                 }
-                else if (tool.Width == width - profStockAllow * 2 && outerCornerBlunt <= 0)
+                else if (Math.Abs(tool.Width - (width - profStockAllow * 2)) < 0.001 && outerCornerBlunt <= 0)
                 {
                     //cutting += $"G0 X{(externalDiameter + clearance).NC()}\n";
                 }
@@ -444,7 +444,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             }
             if (doFinish)
             {
-                if (tool.Width == width && outerCornerBlunt > 0)
+                if (Math.Abs(tool.Width - width) < 0.001 && outerCornerBlunt > 0)
                 {
                     cutting +=
                         $"G0 Z{(startPoint + clearance).NC()}\n" +
@@ -454,14 +454,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         bluntLower +
                         $"Z{endPoint.NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n";
                 }
-                else if (tool.Width == width && outerCornerBlunt <= 0)
+                else if (Math.Abs(tool.Width - width) < 0.001 && outerCornerBlunt <= 0)
                 {
                     //cutting += $"G0 X{(externalDiameter + clearance).NC()}\n";
                 }
                 else
                 {
                     if (!useCycles ||
-                        (useCycles && (profStockAllow > 0 || outerCornerBlunt > 0)))
+                        profStockAllow > 0 || outerCornerBlunt > 0) // (useCycles && (profStockAllow > 0 || outerCornerBlunt > 0))) 
                     {
                         cutting +=
                         $"{(!useCycles ? $"G0 Z{(startPoint + clearance).NC()}\n" : string.Empty)}" +
@@ -479,7 +479,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 $"{CoolantOn(machine)}\n" +
                 $"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{GroovingSpeedRough(material)} {Direction(tool)}\n" +
@@ -487,7 +487,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 cutting +
                 $"G0 Z{(startPoint + clearance * 2).NC(0)}\n" +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
@@ -497,7 +497,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 cutting +
                 $"G0 Z{(startPoint + clearance * 2).NC(0)}\n" +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 _ => string.Empty,
             };

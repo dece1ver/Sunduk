@@ -303,7 +303,7 @@
     private Calculation _CalculationType = Calculation.Simplified;
     public Calculation CalculationType
     {
-        get { return _CalculationType; }
+        get => _CalculationType;
         set
         {
             _CalculationType = value;
@@ -326,37 +326,37 @@
         InternalEndDiameter,
         InternalToolRadius,
     };
-    //public enum ImageType { Diameter, ToolRaduis, ChamferAngle, ChamferSize };
+    //public enum ImageType { Diameter, ToolRadius, ChamferAngle, ChamferSize };
     public Images CurrentImage { get; set; } = Images.ExternalChamfer;
 
     private string _chamferEndDiameter;
     public string _ChamferEndDiameter
     {
-        get { return _chamferEndDiameter; }
+        get => _chamferEndDiameter;
         set
         {
             _chamferEndDiameter = value;
             CalculateAll();
         }
     }
-    public double ChamferEndDiameter { get => Util.GetDouble(_ChamferEndDiameter); }
+    public double ChamferEndDiameter => Util.GetDouble(_ChamferEndDiameter);
 
     private string _chamferStartDiameter;
     public string _ChamferStartDiameter
     {
-        get { return _chamferStartDiameter; }
+        get => _chamferStartDiameter;
         set
         {
             _chamferStartDiameter = value;
             CalculateChamferSize();
         }
     }
-    public double ChamferStartDiameter { get => Util.GetDouble(_ChamferStartDiameter); }
+    public double ChamferStartDiameter => Util.GetDouble(_ChamferStartDiameter);
 
     private string _angle;
     public string _Angle
     {
-        get { return _angle; }
+        get => _angle;
         set
         {
             _angle = value;
@@ -365,31 +365,31 @@
             CalculateAll();
         }
     }
-    public double Angle { get => Util.GetDouble(_Angle); }
+    public double Angle => Util.GetDouble(_Angle);
 
     private string _chamferSize;
     public string _ChamferSize
     {
-        get { return _chamferSize; }
+        get => _chamferSize;
         set
         {
             _chamferSize = value;
             CalculateStartDiam();
         }
     }
-    public double ChamferSize { get => Util.GetDouble(_ChamferSize); }
+    public double ChamferSize => Util.GetDouble(_ChamferSize);
 
     private string _chamferInsertRadius;
     public string _ChamferInsertRadius
     {
-        get { return _chamferInsertRadius; }
+        get => _chamferInsertRadius;
         set
         {
             _chamferInsertRadius = value;
             CalculateAll();
         }
     }
-    public double ChamferInsertRadius { get => Util.GetDouble(_ChamferInsertRadius); }
+    public double ChamferInsertRadius => Util.GetDouble(_ChamferInsertRadius);
 
     public double ChamferResult
     {
@@ -412,7 +412,8 @@
 
     public bool RoundCorners { get; set; } = false;
     public string _RoundCorner { get; set; } = "0.3";
-    public double RoundCorner { get => Util.GetDouble(_RoundCorner); }
+    public double RoundCorner => Util.GetDouble(_RoundCorner);
+
     public double XRadiusShift
     {
         get
@@ -439,7 +440,7 @@
         set { }
     }
 
-    public int ExampleLines { get => ChamferExample.Count(f => f == '\n') + 1; }
+    public int ExampleLines => ChamferExample.Count(f => f == '\n') + 1;
 
     private double ChamferStartDiamWithShift
     {
@@ -456,15 +457,9 @@
         }
     }
 
-    private double ChamferSizeWithShift
-    {
-        get
-        {
-            return Math.Abs(ChamferSize + ZRadiusShift);
-        }
-    }
+    private double ChamferSizeWithShift => Math.Abs(ChamferSize + ZRadiusShift);
 
-    public double CornerFullRadius { get => ChamferInsertRadius + RoundCorner;}
+    public double CornerFullRadius => ChamferInsertRadius + RoundCorner;
 
     //public void SetImage(ImageType image)
     //{

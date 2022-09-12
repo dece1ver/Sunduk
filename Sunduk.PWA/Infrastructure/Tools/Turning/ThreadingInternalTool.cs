@@ -11,9 +11,9 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
     {
         public double Diameter { get; set; }
 
-        public override MachineType MachineType { get => MachineType.Turning; }
+        public override MachineType MachineType => MachineType.Turning;
 
-        public ThreadingInternalTool(int position, double diameter, double pitch, double angle, ToolHand hand = ToolHand.Rigth)
+        public ThreadingInternalTool(int position, double diameter, double pitch, double angle, ToolHand hand = ToolHand.Right)
             : base(position, pitch, angle, hand)
         {
             Diameter = diameter;

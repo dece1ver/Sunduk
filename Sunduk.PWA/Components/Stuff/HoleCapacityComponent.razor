@@ -82,12 +82,10 @@
     public Radius RadiusType { get; set; } = Radius.External;
 
     public string _HoleDiameter { get; set; } = string.Empty;
-    public double HoleDiameter { get => Util.GetDouble(_HoleDiameter); }
+    public double HoleDiameter => Util.GetDouble(_HoleDiameter);
 
     public string _ShankDiameter { get; set; } = string.Empty;
-    public double ShankDiameter { get => Util.GetDouble(_ShankDiameter); }
-
-
+    public double ShankDiameter => Util.GetDouble(_ShankDiameter);
 
 
     private string _toolSize;
@@ -104,7 +102,7 @@
             }
         }
     }
-    public double ToolSize { get => Util.GetDouble(_ToolSize); }
+    public double ToolSize => Util.GetDouble(_ToolSize);
 
     private string _minimalDiameter;
     public string _MinimalDiameter
@@ -119,7 +117,7 @@
             }
         }
     }
-    public double MinimalDiameter { get => Util.GetDouble(_MinimalDiameter); }
+    public double MinimalDiameter => Util.GetDouble(_MinimalDiameter);
 
     void FocusToolSize()
     {

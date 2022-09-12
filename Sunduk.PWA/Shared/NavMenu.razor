@@ -1,21 +1,11 @@
 ﻿
 <MudNavMenu>
     <MudNavLink Href="/calculator" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Calculate">Калькулятор режимов</MudNavLink>
-    @if (ExperimantalMode)
-    {
-        <MudNavLink Href="/sunducam" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.FeaturedPlayList">SunduCAM</MudNavLink>
-    }
     <MudNavLink Href="/stuff" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.RoundedCorner">Всякая хрень</MudNavLink>
     <MudNavLink Href="/converters" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Transform">Конвертеры</MudNavLink>
     <MudNavLink Href="/knowledge/about" Match="NavLinkMatch.Prefix" Icon="@Icons.Filled.MenuBook">База знаний</MudNavLink>
-    @if (ExperimantalMode)
-    {
-
-    }
-    @if (ExperimantalMode)
-    {
-        <MudNavLink Href="/timecalc" Match="NavLinkMatch.Prefix" Icon="@Icons.Filled.Timer">Расчеты времени</MudNavLink>
-    }
+    <MudNavLink Href="/timecalc" Match="NavLinkMatch.Prefix" Icon="@Icons.Filled.Timer">Расчеты времени</MudNavLink>
+    <MudNavLink Href="/sunducam" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.FeaturedPlayList">SunduCAM</MudNavLink>
 </MudNavMenu>
 
 @code {

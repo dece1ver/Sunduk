@@ -1,0 +1,178 @@
+﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<MudTable Items="MillingTappingTools" ReadOnly="ReadOnly" Hover="true" CanCancelEdit="false" Elevation="0">
+    <HeaderContent>
+        <MudTh>Позиция</MudTh>
+        <MudTh>Стандарт</MudTh>
+        <MudTh>Диаметр</MudTh>
+        <MudTh>Шаг</MudTh>
+        <MudTh>Тип</MudTh>
+        <MudTh>Исполнение</MudTh>
+        <MudTh/>
+    </HeaderContent>
+    <RowTemplate> 
+        <MudTd DataLabel="Позиция">T@(context.Position)</MudTd>
+        @switch (@context.ThreadStandard)
+        {
+            case ThreadStandard.Metric:
+                <MudTd DataLabel="Стандарт">Метрическая 60° (М)</MudTd>
+                break;
+            case ThreadStandard.BSPP:
+                <MudTd DataLabel="Стандарт">Трубная цилиндрическая 55° (G)</MudTd>
+                break;
+            case ThreadStandard.Trapezoidal:
+                <MudTd DataLabel="Стандарт">Трапецеидальная 30° (Tr)</MudTd>
+                break;
+            case ThreadStandard.NPT:
+                <MudTd DataLabel="Стандарт">Коническая 60° (K)</MudTd>
+                break;
+        }
+        @switch (context.ThreadStandard)
+        {
+            case ThreadStandard.Metric:
+                <MudTd DataLabel="Диаметр">@("M" + context.Diameter.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs))</MudTd>
+                break;
+            case ThreadStandard.BSPP:
+                <MudTd DataLabel="Диаметр">@(Thread.SimpleThreadTemplate(context.StandardTemplate))</MudTd>
+                break;
+            case ThreadStandard.Trapezoidal:
+                <MudTd DataLabel="Диаметр">@("Tr" + context.Diameter.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs))</MudTd>
+                break;
+            case ThreadStandard.NPT:
+                <MudTd DataLabel="Диаметр">@(Thread.SimpleThreadTemplate(context.StandardTemplate))</MudTd>
+                break;
+        }
+        <MudTd DataLabel="Шаг">@(context.Pitch.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs))мм</MudTd>
+        
+        
+        @if (context.Type == TappingTool.Types.Cutting)
+        {
+            <MudTd DataLabel="Тип">Нарезной</MudTd>
+        }
+        @if (context.Type == TappingTool.Types.Forming)
+        {
+            <MudTd DataLabel="Тип">Раскатник</MudTd>
+        }
+        <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Right ? "Правое" : "Левое")</MudTd>
+        <MudTd>
+            <MudIconButton Class="ma-n3" Variant="Variant.Text" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="(() => RemoveMillingTappingTool(context))" />
+        </MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="Позиция">
+            <MudTextField @bind-Value="@context.Position" Adornment="Adornment.Start" AdornmentText="T" Variant="Variant.Outlined" Margin="Margin.Dense" Required />
+        </MudTd>
+        <MudTd DataLabel="Стандарт">
+            <MudSelect T="ThreadStandard" ValueChanged="s => OnThreadStandardChanged(s, context)" Margin="Margin.Dense" Variant="Variant.Outlined" Required>
+                    <MudSelectItem Value="@(ThreadStandard.Metric)">@(ThreadStandard.Metric.Description())</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.BSPP)">@(ThreadStandard.BSPP.Description())</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">@(ThreadStandard.Trapezoidal.Description())</MudSelectItem>
+                    <MudSelectItem Value="@(ThreadStandard.NPT)">@(ThreadStandard.NPT.Description())</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+        <MudTd DataLabel="Диаметр">
+            @switch (context.ThreadStandard)
+            {
+                case ThreadStandard.Metric:
+                    <MudTextField @bind-Value="@context.Diameter" Adornment="Adornment.Start" AdornmentText="Ø" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                    break;
+                case ThreadStandard.BSPP:
+                    <MudSelect Value="context.StandardTemplate" T="string" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" 
+                               ValueChanged="s => OnThreadBsppTemplateChanged(s, context)" Required>
+                        @foreach (var template in Thread.BsppTemplates)
+                        {
+                            <MudSelectItem Value="template"/>
+                        }
+                    </MudSelect>
+                    break;
+                case ThreadStandard.Trapezoidal:
+                    <MudTextField @bind-Value="@context.Diameter" Adornment="Adornment.Start" AdornmentText="Ø" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+                    break;
+                case ThreadStandard.NPT:
+                    <MudSelect Value="context.StandardTemplate" T="string" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" 
+                               ValueChanged="s => OnThreadNptTemplateChanged(s, context)" Required>
+                        @foreach (var template in Thread.NptTemplates)
+                        {
+                            <MudSelectItem Value="template"/>
+                        }
+                    </MudSelect>
+                    break;
+            }
+        </MudTd>
+        <MudTd DataLabel="Шаг">
+            <MudTextField @bind-Value="@context.Pitch" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" 
+                          ReadOnly="@(context.ThreadStandard is ThreadStandard.BSPP or ThreadStandard.NPT)" Required />
+        </MudTd>
+        <MudTd DataLabel="Тип">
+            <MudSelect T="TappingTool.Types" @bind-Value="@context.Type" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                <MudSelectItem Value="@TappingTool.Types.Cutting">Нарезной</MudSelectItem>
+                <MudSelectItem Value="@TappingTool.Types.Forming">Раскатник</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+        <MudTd DataLabel="Исполнение">
+            <MudSelect T="Tool.ToolHand" @bind-Value="@context.Hand" Variant="Variant.Outlined" Margin="Margin.Dense" Required>
+                <MudSelectItem Value="@Tool.ToolHand.Right">Правое</MudSelectItem>
+                <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+    </RowEditingTemplate>
+</MudTable>
+<AddToolButton OnClick="AddMillingTappingTool" />
+
+@code {
+    /// <summary>
+    /// TODO сделать шаблоны и обозначения под разные стандарты резьб
+    /// </summary>
+    [Parameter]
+    public List<Tool> Tools { get; set; }
+
+    [Parameter] 
+    public EventCallback<List<Tool>> ToolsChanged { get; set; }
+
+    public List<MillingTappingTool> MillingTappingTools
+    {
+        get => Tools.OfType<MillingTappingTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is MillingTappingTool);
+            Tools.AddRange(value);
+        }
+    }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    private async Task AddMillingTappingTool()
+    {
+        Tools.Add(new MillingTappingTool(1, TappingTool.Types.Cutting, 8, 1.25, ThreadStandard.Metric));
+        await LocalStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
+        await ToolsChanged.InvokeAsync(Tools);
+    }
+    private async Task RemoveMillingTappingTool(MillingTappingTool tool)
+    {
+        Tools.Remove(tool);
+        await LocalStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
+        await ToolsChanged.InvokeAsync(Tools);
+    }
+    
+    private void OnThreadStandardChanged(ThreadStandard value, MillingTappingTool tool)
+    {
+        if (tool.ThreadStandard == value) return;
+        tool.ThreadStandard = value;
+        tool.StandardTemplate = string.Empty;
+    }
+    
+    private void OnThreadBsppTemplateChanged(string value, MillingTappingTool tool)
+    {
+        Thread.GetBsppValues(value, out _, out var pitch);
+        tool.Pitch = pitch.GetDouble();
+        tool.StandardTemplate = value;
+    }
+
+    private void OnThreadNptTemplateChanged(string value, MillingTappingTool tool)
+    {
+        Thread.GetNptValues(value, out _, out _, out var pitch, out _, out _);
+        tool.Pitch = pitch.GetDouble();
+        tool.StandardTemplate = value;
+    }
+}

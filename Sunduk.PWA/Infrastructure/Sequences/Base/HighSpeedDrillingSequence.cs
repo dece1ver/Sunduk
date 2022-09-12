@@ -1,4 +1,6 @@
-﻿using Sunduk.PWA.Infrastructure.Tools.Base;
+﻿using Sunduk.PWA.Infrastructure.Time;
+using Sunduk.PWA.Infrastructure.Tools.Base;
+using System;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Base
 {
@@ -9,7 +11,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
         public DrillingTool Tool { get; set; }
         public double StartZ { get; set; }
         public double EndZ { get; set; }
-        public override string Name => $"Высокоскоростное сверление";
+        public override string Name => $"Высокоскоростное сверление Ø{Tool.Diameter.NC(option: Util.NcDecimalPointOption.Without)} L-{Math.Abs(EndZ).NC(option: Util.NcDecimalPointOption.Without)} ({Tool.Type.Description()})";
+        public override OperationTime MachineTime => this.OperationTime(Material);
         public HighSpeedDrillingSequence(Machine machine, Material material, DrillingTool tool, double startZ, double endZ)
         {
             Machine = machine;

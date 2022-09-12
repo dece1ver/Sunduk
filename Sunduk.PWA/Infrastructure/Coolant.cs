@@ -4,6 +4,7 @@
     { 
         General, 
         Through, 
+        Full, 
         Blow 
     }
 }

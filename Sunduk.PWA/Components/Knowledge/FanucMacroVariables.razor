@@ -1,0 +1,263 @@
+﻿@using MudBlazor.Services
+<style>
+    table, th, td {
+        border: 1px solid gray;
+        border-collapse: collapse;
+    }
+</style>
+
+<MudContainer>
+    <MudGrid>
+        <MudItem xs="12">
+            <MudField Variant=Variant.Filled Label="Группы переменных" DisableUnderLine=true>
+                <table>
+                    <tbody>
+                    <tr>
+                        <td class="monotext14">#0</td>
+                        <td class="text14">null</td>
+                        <td class="text12">Нельзя переопределить, можно сравнивать.</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1-#33</td>
+                        <td class="text14">Локальные</td>
+                        <td class="text12">Своя область видимости для каждой подпрограммы, доступно 5 уровней вложения. Обнуление при завершении программы.</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#100-#199</td>
+                        <td class="text14" rowspan="2">Общие</td>
+                        <td class="text12">Обнуление при завершении программы.</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#500-#999</td>
+                        <td class="text12">Значение сохраняется до перезаписи.</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1000+</td>
+                        <td class="text14" colspan="2">Системные</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </MudField>
+        </MudItem>
+        <MudItem xs="12">
+            <MudField Variant=Variant.Filled Label="Функции" DisableUnderLine=true>
+                <table>
+                    <thead>
+                    <tr>
+                        <th class="monotext14">Пример</th>
+                        <th class="monotext14">Описание</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="monotext14">#1=1</td>
+                        <td class="text14">Присвоение</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=#1+#2</td>
+                        <td class="text14">Сложение</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=#1-#2</td>
+                        <td class="text14">Вычитание</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=#1*#2</td>
+                        <td class="text14">Умножение</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=#1/#2</td>
+                        <td class="text14">Деление</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=SIN[#2]</td>
+                        <td class="text14">Синус</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=ASIN[#2]</td>
+                        <td class="text14">Арксинус</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=COS[#2]</td>
+                        <td class="text14">Косинус</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=ACOS[#2]</td>
+                        <td class="text14">Арккосинус</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=TAN[#2]</td>
+                        <td class="text14">Тангенс</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=ATAN[#2]</td>
+                        <td class="text14">Арктангенс</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=SQRT[#2]</td>
+                        <td class="text14">Квадратный корень</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=ABS[#2]</td>
+                        <td class="text14">Абсолютное значение (модуль)</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=ROUND[#2]</td>
+                        <td class="text14">Округление</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=FIX[#2]</td>
+                        <td class="text14">Округление в меньшую сторону</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=FUP[#2]</td>
+                        <td class="text14">Округление в большую сторону</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=LN[#2]</td>
+                        <td class="text14">Логарифм</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1=EXP[#2]</td>
+                        <td class="text14">Экспонента</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">[#1EQ1]AND[#2EQ1]</td>
+                        <td class="text14">Логическое "И"</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">[#1EQ1]OR[#1EQ1]</td>
+                        <td class="text14">Логическое "ИЛИ"</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">[#1EQ1]XOR[#1EQ1]</td>
+                        <td class="text14">Исключающее "ИЛИ"</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </MudField>
+        </MudItem>
+        <MudItem xs="12">
+            <MudField Variant=Variant.Filled Label="Операторы" DisableUnderLine=true>
+                <table>
+                    <thead>
+                    <tr>
+                        <th class="monotext14">Пример</th>
+                        <th class="monotext14">Описание</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="monotext14">GOTO (n)</td>
+                        <td class="text14">Переход на кадр</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Операторы сравнения</th>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1&nbspEQ&nbsp1</td>
+                        <td class="text14">Равно</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1&nbspNE&nbsp1</td>
+                        <td class="text14">Не равно</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1&nbspGT&nbsp1</td>
+                        <td class="text14">Больше</td>
+                    </tr>
+                    <tr>
+
+                        <td class="monotext14">#1&nbspLT&nbsp1</td>
+                        <td class="text14">Меньше</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1&nbspGE&nbsp1</td>
+                        <td class="text14">Больше или равно</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">#1&nbspLE&nbsp1</td>
+                        <td class="text14">Меньше или равно</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Условные операторы</th>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">IF[#1&nbspEQ&nbsp1]&nbspGOTO&nbsp(n)</td>
+                        <td class="text14">Если условие выполнено, то переход на кадр.</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">IF[#1&nbspEQ&nbsp1]&nbspTHEN&nbsp#2=1</td>
+                        <td class="text14">Если условие выполнено, выполняется функция.</td>
+                    </tr>
+                    <tr>
+                        <td class="monotext14">WHILE[#1&nbspEQ&nbsp1]&nbspDO&nbsp1<br/>...<br/>END&nbsp1</td>
+                        <td class="text14">Пока выполняется условие, выполняется все между DO и END</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </MudField>
+        </MudItem>
+        <MudItem xs="12">
+            <MudField Variant=Variant.Filled Label="Аргументы" DisableUnderLine=true>
+                <table>
+                    <thead>
+                    <tr>
+                        @foreach (var h in headings)
+                        {
+                            <th class="monotext14">@h</th>
+                        }
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var row in rows)
+                    {
+                        <tr>
+                            @foreach (var x in row.Split())
+                            {
+                                <td class="monotext14">@x</td>
+                            }
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </MudField>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    [Inject] IBreakpointService BreakpointListener { get; set; }
+
+    private Breakpoint breakpoint;
+
+    string[] headings = { "Аргумент", "Номер"};
+    string[] rows = {
+        "A #1",
+        "B #2",
+        "C #3",
+        "D #7",
+        "E #8",
+        "F #9",
+        "G #10",
+        "H #11",
+        "I #4",
+        "J #5",
+        "K #6",
+        "L #12",
+        "M #13",
+        "N #14",
+        "O #15",
+        "P #16",
+        "Q #17",
+        "R #18",
+        "S #19",
+        "T #20",
+        "U #21",
+        "V #22",
+        "W #23",
+        "X #24",
+        "Y #25",
+        "Z #26",
+    };
+}

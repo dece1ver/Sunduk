@@ -1,78 +1,40 @@
 ﻿@page "/sunducam"
 @inject IDialogService DialogService
-@inject Blazored.LocalStorage.ILocalStorageService localStorage
-@using MudBlazor.Services
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-2">
     <MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="fas fa-crutch">Раздел в разработке</MudAlert>
-    <MudGrid Spacing=1>
-        <MudItem xs="12">
-            <MudExpansionPanel HideIcon="true">
-                <TitleContent>
-                    <div class="d-flex">
-                        <MudButtonGroup Variant="Variant.Outlined" OverrideStyles=false>
-                            <MudIconButton Icon="@Icons.Material.TwoTone.Save" Title="Скачать программу" Variant=Variant.Outlined
-                                           OnClick="DownloadProgram" />
-                            <MudIconButton Icon="@Icons.Material.TwoTone.TableView" Title="Инструмент" OnClick="OpenToolDialog" Variant=Variant.Outlined
-                                           Color="(Mode == Mode.ToolTable ? Color.Primary : Color.Default)" Class="ml-1" />
-                            <MudHidden Breakpoint=Breakpoint.Xs>
-                                <MudButton OnClick="OpenSequencelDialog" EndIcon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)" Variant=Variant.Outlined
-                                           Color="(Mode == Mode.AddSequence ? Color.Primary : Color.Default)" Class="ml-1">Добавить переход</MudButton>
-                            </MudHidden>
-                            <MudHidden Breakpoint=Breakpoint.Xs Invert=true>
-                                <MudIconButton OnClick="OpenSequencelDialog" Icon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)" Variant=Variant.Outlined
-                                               Color="(Mode == Mode.AddSequence ? Color.Primary : Color.Default)" Class="ml-1">Добавить переход</MudIconButton>
-                            </MudHidden>
-                        </MudButtonGroup>
-                        <MudIcon Icon="@Icons.Material.TwoTone.Settings" Class="d-flex ml-auto mt-1" />
-                    </div>
-                </TitleContent>
-                <ChildContent>
-                    <MudGrid Spacing="1">
-                        <MudItem xs="12" sm="7" md="8">
-                            <MudSelect @bind-Value="Machine" Label="Станок" T="Machine" Variant="Variant.Filled" Dense="true">
-                                <MudSelectItem Value="@(Machine.L230A)">Hyundai L230A</MudSelectItem>
-                                <MudSelectItem Value="@(Machine.GS1500)">Goodway GS-1500</MudSelectItem>
-                                <MudSelectItem Value="@(Machine.A110)">Victor A110</MudSelectItem>
-                            </MudSelect>
-                        </MudItem>
-                        <MudItem xs="12" sm="5" md="4">
-                            @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
-                            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал детали" T="Material" Variant="Variant.Filled" Dense="true">
-                                <MudSelectItem Value="@Material.Steel">Черная сталь</MudSelectItem>
-                                <MudSelectItem Value="@Material.Stainless">Нержавеющая сталь</MudSelectItem>
-                                <MudSelectItem Value="@Material.Brass">Бронза</MudSelectItem>
-                            </MudSelect>
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="6">
-                            <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="6">
-                            <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                        </MudItem>
-                        @if (MachineType == MachineType.Turning)
-                        {
-                            <MudItem xs="12" sm="4">
-                                <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                            </MudItem>
-                            <MudItem xs="12" sm="4">
-                                <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                            </MudItem>
-                            <MudItem xs="12" sm="4">
-                                <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                            </MudItem>
-                        }
-                        <MudItem xs="12" sm="4">
-                            <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
-                        </MudItem>
-                        <MudItem xs="12" sm="4">
-                            <MudTextField @bind-Value="DrawningVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Margin="Margin.Dense" />
-                        </MudItem>
-                        <MudItem xs="12" sm="4">
-                            <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                        </MudItem>
-                    </MudGrid>
-                </ChildContent>
-            </MudExpansionPanel>
+    <MudGrid Spacing="1">
+        <MudItem xs="12" Class="@(Mode is not Mode.General ? "mb-n3" : "mb-0")">
+            <MudPaper Outlined="true" Class="pa-4 rounded-0">
+                <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false">
+                    <MudIconButton Icon="@Icons.Material.TwoTone.SaveAs" Title="Скачать программу" Variant="Variant.Outlined"
+                                    OnClick="DownloadProgram" />
+                    <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                        <MudButton EndIcon="@Icons.Material.TwoTone.Settings" OnClick="OpenSetupMode" Variant="Variant.Outlined"
+                                    Color="(Mode == Mode.Setup ? Color.Primary : Color.Default)" Class="ml-1">Наладка</MudButton>
+                    </MudHidden>
+                    <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true">
+                        <MudIconButton Icon="@Icons.Material.TwoTone.Settings" Title="Наладка" OnClick="OpenSetupMode" Variant="Variant.Outlined"
+                                        Color="(Mode == Mode.Setup ? Color.Primary : Color.Default)" Class="ml-1" />
+                    </MudHidden>
+                    <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                        <MudButton EndIcon="@Icons.Material.TwoTone.TableView" OnClick="OpenToolDialog" Variant="Variant.Outlined"
+                                    Color="(Mode == Mode.ToolTable ? Color.Primary : Color.Default)" Class="ml-1">Инструмент</MudButton>
+                    </MudHidden>
+                    <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true">
+                        <MudIconButton Icon="@Icons.Material.TwoTone.TableView" Title="Инструмент" OnClick="OpenToolDialog" Variant="Variant.Outlined"
+                                    Color="(Mode == Mode.ToolTable ? Color.Primary : Color.Default)" Class="ml-1" />
+                    </MudHidden>
+                    <MudHidden Breakpoint="Breakpoint.Xs">
+                        <MudButton OnClick="OpenSequenceDialog" EndIcon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)" Variant="Variant.Outlined"
+                                    Color="(Mode == Mode.AddSequence ? Color.Primary : Color.Default)" Class="ml-1">Добавить переход</MudButton>
+                    </MudHidden>
+                    <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+                        <MudIconButton OnClick="OpenSequenceDialog" Icon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)" Variant="Variant.Outlined"
+                                        Color="(Mode == Mode.AddSequence ? Color.Primary : Color.Default)" Class="ml-1">Добавить переход</MudIconButton>
+                    </MudHidden>
+                </MudButtonGroup>
+            </MudPaper>
         </MudItem>
         @switch (Mode)
         {
@@ -161,6 +123,91 @@
                     </MudField>*@
                 </MudItem>
                 break;
+            case Mode.Setup:
+                <MudItem xs=12 Class="mt-0">
+                    <MudPaper Class="pa-4 rounded-0" Elevation="0" Outlined="false">
+                        <MudGrid Spacing="1">
+                        <MudItem xs="Machine != Machine.GS1500 ? 8 : 12" sm="Machine != Machine.GS1500 ? 4 : 7" md="Machine != Machine.GS1500 ? 6 : 8">
+                            <MudSelect Value="Machine" Label="Станок" T="Machine" Variant="Variant.Filled" Dense="true" ValueChanged="OnMachineChanged">
+                                <MudSelectItem Value="@(Machine.L230A)">Hyundai L230A</MudSelectItem>
+                                <MudSelectItem Value="@(Machine.GS1500)">Goodway GS-1500</MudSelectItem>
+                                <MudSelectItem Value="@(Machine.A110)">Victor A110</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        @if (Machine != Machine.GS1500)
+                        {
+                            <MudHidden Breakpoint="Breakpoint.MdAndDown">
+                                <MudItem xs="4" sm="3" md="2">
+                                    <MudSelect @bind-Value="CoordinateSystem" Label="Система координат" T="CoordinateSystem" Variant="Variant.Filled" Dense="true">
+                                        <MudSelectItem Value="@CoordinateSystem.G54"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G55"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G56"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G57"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G58"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G59"/>
+                                    </MudSelect>
+                                </MudItem>
+                            </MudHidden>
+
+                            <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
+                                <MudItem xs="4" sm="3" md="2">
+                                    <MudSelect @bind-Value="CoordinateSystem" Label="СК" T="CoordinateSystem" Variant="Variant.Filled" Dense="true">
+                                        <MudSelectItem Value="@CoordinateSystem.G54"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G55"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G56"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G57"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G58"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G59"/>
+                                    </MudSelect>
+                                </MudItem>
+                            </MudHidden>
+                        }
+                        <MudItem xs="12" sm="5" md="4">
+                            @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
+                            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал детали" T="Material" Variant="Variant.Filled" Dense="true">
+                                <MudSelectItem Value="@Material.Steel">Черная сталь</MudSelectItem>
+                                <MudSelectItem Value="@Material.Stainless">Нержавеющая сталь</MudSelectItem>
+                                <MudSelectItem Value="@Material.Brass">Бронза</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="6">
+                            <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="6">
+                            <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        @if (MachineType == MachineType.Turning)
+                        {
+                            <MudItem xs="6" sm="4">
+                                <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="6" sm="4">
+                                <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="12" sm="4">
+                                <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
+                        }
+                        else
+                        {
+                            <MudItem xs="6" sm="3">
+                                <MudTextField @bind-Value="_SafePlane" Label="Плоскость безопасности" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
+                        }
+                        <MudItem xs="6" sm="Machine is Machine.A110 ? 3 : 4">
+                            <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="6" sm="Machine is Machine.A110 ? 3 : 4">
+                            <MudTextField @bind-Value="DrawingVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="Machine is Machine.A110 ? 3 : 4">
+                            <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                    </MudGrid>
+                    </MudPaper>
+                    
+                </MudItem>
+                break;
             case Mode.ToolTable:
                 <MudItem xs=12>
                     <ToolTableComponent Tools="Tools"
@@ -172,6 +219,7 @@
                     <MudPaper Class="pa-4 rounded-0" Elevation="0" Outlined="false">
                         <AddSequenceComponent Tools="Tools"
                                               Machine="Machine"
+                                              CoordinateSystem="CoordinateSystem"
                                               MachineType="MachineType"
                                               Program="Program"
                                               @bind-Mode="Mode"
@@ -180,7 +228,9 @@
                                               WorkpieceInternalDiameter="WorkpieceInternalDiameter"
                                               WorkpieceCurrentInternalDiameter="WorkpieceCurrentInternalDiameter"
                                               WorkpieceLength="WorkpieceLength"
-                                              CyclesCount="CyclesCount" />
+                                              CyclesCount="CyclesCount"
+                                              SafePlane="SafePlane"
+                                              />
                     </MudPaper>
                 </MudItem>
                 break;
@@ -197,8 +247,6 @@
 {
     [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
-    [Inject] IBreakpointService BreakpointListener { get; set; }
-
 
     public Mode Mode { get; set; } = Mode.General;
 
@@ -208,53 +256,57 @@
     public object SelectedSequenceIndex = 0;
     public Sequence CurrentSelectedSequence { get; set; }
 
-    public int CyclesCount
-    {
-        get
-        {
-            return Program.Where(x =>
-            x is RoughFacingSequence ||
-            x is FacingSequence ||
-            x is RoughFacingCycleSequence)
-                .Count() + 1;
-        }
-        set { }
-    }
+    public int CyclesCount => Program
+        .Count(x => x is RoughFacingSequence or FacingSequence or RoughFacingCycleSequence) + 1;
+
+    public CoordinateSystem CoordinateSystem { get; set; } = CoordinateSystem.G54;
+
+    public string _SafePlane { get; set; } = "300";
+    public double SafePlane => _SafePlane.GetDouble();
 
     public List<Tool> Tools { get; set; } = new();
 
     #region Фрезерный инструмент
-    public List<MillingTool> MillingTools { get; set; }
-    public List<MillingDrillingTool> MillingDrillingTools { get; set; }
-    public List<MillingTappingTool> MillingTappingTools { get; set; }
+    
+    public List<MillingBoreTool> MillingBoreTools => Tools.OfType<MillingBoreTool>().ToList();
+    public List<MillingChamferTool> MillingChamferTools => Tools.OfType<MillingChamferTool>().ToList();
+    public List<MillingDrillingTool> MillingDrillingTools => Tools.OfType<MillingDrillingTool>().ToList();
+    public List<MillingSpecialTool> MillingSpecialTools => Tools.OfType<MillingSpecialTool>().ToList();
+    public List<MillingTappingTool> MillingTappingTools => Tools.OfType<MillingTappingTool>().ToList();
+    public List<MillingThreadCuttingTool> MillingThreadCuttingTools => Tools.OfType<MillingThreadCuttingTool>().ToList();
+    public List<MillingTool> MillingTools => Tools.OfType<MillingTool>().ToList();
     #endregion
 
     #region Токарныый инструмент
-    public List<GroovingExternalTool> GroovingExternalTools { get; set; }
-    public List<GroovingFaceTool> GroovingFaceTools { get; set; }
-    public List<GroovingInternalTool> GroovingInternalTools { get; set; }
-    public List<SpecialTurningTool> SpecialTurningTools { get; set; }
-    public List<ThreadingExternalTool> ThreadingExternalTools { get; set; }
-    public List<ThreadingInternalTool> ThreadingInternalTools { get; set; }
-    public List<TurningDrillingTool> TurningDrillingTools { get; set; }
-    public List<TurningExternalTool> TurningExternalTools { get; set; }
-    public List<TurningInternalTool> TurningInternalTools { get; set; }
-    public List<TurningTappingTool> TurningTappingTools { get; set; }
+    public List<GroovingExternalTool> GroovingExternalTools => Tools.OfType<GroovingExternalTool>().ToList();
+    public List<GroovingFaceTool> GroovingFaceTools => Tools.OfType<GroovingFaceTool>().ToList();
+    public List<GroovingInternalTool> GroovingInternalTools => Tools.OfType<GroovingInternalTool>().ToList();
+    public List<TurningSpecialTool> TurningSpecialTools => Tools.OfType<TurningSpecialTool>().ToList();
+    public List<ThreadingExternalTool> ThreadingExternalTools => Tools.OfType<ThreadingExternalTool>().ToList();
+    public List<ThreadingInternalTool> ThreadingInternalTools => Tools.OfType<ThreadingInternalTool>().ToList();
+    public List<TurningExternalBurnishingTool> TurningExternalBurnishingTools => Tools.OfType<TurningExternalBurnishingTool>().ToList();
+    public List<TurningInternalBurnishingTool> TurningInternalBurnishingTools => Tools.OfType<TurningInternalBurnishingTool>().ToList();
+    public List<TurningDrillingTool> TurningDrillingTools => Tools.OfType<TurningDrillingTool>().ToList();
+    public List<TurningExternalTool> TurningExternalTools => Tools.OfType<TurningExternalTool>().ToList();
+    public List<TurningInternalTool> TurningInternalTools => Tools.OfType<TurningInternalTool>().ToList();
+    public List<TurningTappingTool> TurningTappingTools => Tools.OfType<TurningTappingTool>().ToList();
     #endregion
 
 
     public Material WorkpieceMaterial { get; set; }
+
     public Machine Machine { get; set; }
-    public MachineType MachineType { get => Machine.GetMachineType(); }
+
+    public MachineType MachineType => Machine.GetMachineType();
 
     public string _WorkpieceExternalDiameter { get; set; } = "50";
-    public double WorkpieceExternalDiameter { get => Util.GetDouble(_WorkpieceExternalDiameter); }
+    public double WorkpieceExternalDiameter => _WorkpieceExternalDiameter.GetDouble();
 
     public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
-    public double WorkpieceInternalDiameter { get => Util.GetDouble(_WorkpieceInternalDiameter); }
+    public double WorkpieceInternalDiameter => _WorkpieceInternalDiameter.GetDouble();
 
     public double WorkpieceCurrentExternalDiameter { get; set; }
-    public double WorkpieceCurrentInternalDiameter { get => GetCurrentInternalDiameter(Program.Count); }
+    public double WorkpieceCurrentInternalDiameter => GetCurrentInternalDiameter(Program.Count);
 
     private double GetCurrentInternalDiameter(int index)
     {
@@ -281,40 +333,31 @@
 
     public string DetailNumber { get; set; }
 
-    public string NcDetailNumber { get => $"{(!string.IsNullOrEmpty(DetailNumber) ? DetailNumber.Translate() : "AR000-00-000")}.{ OperationNumber.ToString("D1").Replace(",", ".")}S"; }
+    public string NcDetailNumber => $"{(!string.IsNullOrEmpty(DetailNumber) ? DetailNumber.Translate() : "AR000-00-000")}{(OperationNumber > 0 ? $".{ OperationNumber.ToString("D1").Replace(",", ".")}S" : string.Empty)}";
 
     public string DetailName { get; set; }
-    public string NcDetailName { get => !string.IsNullOrEmpty(DetailName) ? $"{DetailName.Translate()}" : "DETAIL"; }
+    public string NcDetailName => !string.IsNullOrEmpty(DetailName) ? $"{DetailName.Translate()}" : "DETAIL";
 
     public string Author { get; set; }
-    public string NcAuthor { get => !string.IsNullOrEmpty(Author) ? $"{Author.Translate()}" : "AUTHOR"; }
+    public string NcAuthor => !string.IsNullOrEmpty(Author) ? $"{Author.Translate()}" : "AUTHOR";
 
-    public int OperationNumber { get; set; } = 1;
+    public int OperationNumber { get; set; } = 0;
 
-    public double DrawningVersion { get; set; }
+    public string DrawingVersion { get; set; }
+    public string NcDrawingVersion => !string.IsNullOrEmpty(DrawingVersion) ? DrawingVersion.Translate() : "0.0";
 
     public int? SpindleLimit { get; set; }
 
     public string _WorkpieceLength { get; set; } = "50";
-    public double WorkpieceLength { get => Util.GetDouble(_WorkpieceLength); }
+    public double WorkpieceLength => _WorkpieceLength.GetDouble();
 
 
-    //public Sequence Header => new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion) };
-    //public string Header => Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawningVersion);
+    //public Sequence Header => new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawingVersion) };
+    //public string Header => Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawingVersion);
     //public Sequence SafetyString => new Sequence { Name = "Строка безопасности", Operation = Operation.SafetyString(Machine, 3000) };
     //public string SafetyString => Operation.SafetyString(Machine, 3000);
 
-    public bool ValidWorkpiece
-    {
-        get
-        {
-            if (WorkpieceExternalDiameter > 0 && WorkpieceInternalDiameter < WorkpieceExternalDiameter && WorkpieceLength > 0)
-            {
-                return true;
-            }
-            return false;
-        }
-    }
+    public bool ValidWorkpiece => WorkpieceExternalDiameter > 0 && WorkpieceInternalDiameter < WorkpieceExternalDiameter && WorkpieceLength > 0;
 
     public List<Sequence> Program { get; set; }
 
@@ -330,172 +373,221 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // MillingDrilling
-        MillingDrillingTools = await localStorage.GetItemAsync<List<MillingDrillingTool>>(nameof(MillingDrillingTools)) ?? new();
-        if (MillingDrillingTools is null || MillingDrillingTools.Count == 0)
+        Machine = await LocalStorage.GetItemAsync<Machine>(nameof(Machine));
+        OnMachineChanged(Machine);
+
+        // MillingBore
+        var millingBoreTools = await LocalStorage.GetItemAsync<List<MillingBoreTool>>(nameof(MillingBoreTools)) ?? new List<MillingBoreTool>();
+        if (millingBoreTools.Count is 0)
         {
-            MillingDrillingTools.Add(new MillingDrillingTool(1, MillingDrillingTool.Types.Solid, 6, 140));
-            MillingDrillingTools.Add(new MillingDrillingTool(2, MillingDrillingTool.Types.Insert, 25, 180));
-            await localStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+            millingBoreTools.Add(new MillingBoreTool(05, 16, 50, 0.2));
         }
-        Tools.AddRange(MillingDrillingTools);
+        Tools.AddRange(millingBoreTools);
+
+        // MillingChamfer
+        var millingChamferTools = await LocalStorage.GetItemAsync<List<MillingChamferTool>>(nameof(MillingChamferTools)) ?? new List<MillingChamferTool>();
+        if (millingChamferTools.Count == 0)
+        {
+            millingChamferTools.Add(new MillingChamferTool(05, 12, 45, 1));
+            millingChamferTools.Add(new MillingChamferTool(11, 16, 45, 1));
+            millingChamferTools.Add(new MillingChamferTool(16, 6, 45));
+        }
+        Tools.AddRange(millingChamferTools);
+
+        // MillingDrilling
+        var millingDrillingTools = await LocalStorage.GetItemAsync<List<MillingDrillingTool>>(nameof(MillingDrillingTools)) ?? new List<MillingDrillingTool>();
+        if (millingDrillingTools.Count == 0)
+        {
+            millingDrillingTools.Add(new MillingDrillingTool(13, DrillingTool.Types.Solid, 11.2, 140));
+        }
+        Tools.AddRange(millingDrillingTools);
+
+        // MillingSpecial
+        var millingSpecialTools = await LocalStorage.GetItemAsync<List<MillingSpecialTool>>(nameof(MillingSpecialTools)) ?? new List<MillingSpecialTool>();
+        if (millingSpecialTools.Count == 0)
+        {
+            millingSpecialTools.Add(new MillingSpecialTool(24, "BLUM"));
+        }
+        Tools.AddRange(millingSpecialTools);
 
         // MillingTapping
-        MillingTappingTools = await localStorage.GetItemAsync<List<MillingTappingTool>>(nameof(MillingTappingTools)) ?? new();
-        if (MillingTappingTools is null || MillingTappingTools.Count == 0)
+        var millingTappingTools = await LocalStorage.GetItemAsync<List<MillingTappingTool>>(nameof(MillingTappingTools)) ?? new List<MillingTappingTool>();
+        if (millingTappingTools.Count == 0)
         {
-            MillingTappingTools.Add(new MillingTappingTool(3, MillingTappingTool.Types.Cutting, 12, 1.75));
-            MillingTappingTools.Add(new MillingTappingTool(4, MillingTappingTool.Types.Forming, 10, 1.5));
-            await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
+            // на будущее, если надо по умолчанию что-то
         }
-        Tools.AddRange(MillingTappingTools);
+        Tools.AddRange(millingTappingTools);
+
+        // MillingThreadCutting
+        var millingThreadCuttingTools = await LocalStorage.GetItemAsync<List<MillingThreadCuttingTool>>(nameof(MillingThreadCuttingTools)) ?? new List<MillingThreadCuttingTool>();
+        if (millingThreadCuttingTools.Count == 0)
+        {
+            millingThreadCuttingTools.Add(new MillingThreadCuttingTool(14, 9.5, ThreadStandard.NPT, 1.411));
+        }
+        Tools.AddRange(millingThreadCuttingTools);
 
         // Milling
-        MillingTools = await localStorage.GetItemAsync<List<MillingTool>>(nameof(MillingTools)) ?? new();
-        if (MillingTools is null || MillingTools.Count == 0)
+        var millingTools = await LocalStorage.GetItemAsync<List<MillingTool>>(nameof(MillingTools)) ?? new List<MillingTool>();
+        if (millingTools.Count == 0)
         {
-            MillingTools.Add(new MillingTool(3, MillingTool.Types.Solid, 12));
-            MillingTools.Add(new MillingTool(4, MillingTool.Types.Insert, 32));
-            await localStorage.SetItemAsync(nameof(MillingTools), MillingTools);
+            millingTools.Add(new MillingTool(04, MillingTool.Types.Insert, 63, 5));
+            millingTools.Add(new MillingTool(12, MillingTool.Types.Insert, 32, 3));
+            millingTools.Add(new MillingTool(20, MillingTool.Types.Insert, 80, 6));
         }
-        Tools.AddRange(MillingTools);
+        Tools.AddRange(millingTools);
 
         // GroovingExternal
-        GroovingExternalTools = await localStorage.GetItemAsync<List<GroovingExternalTool>>(nameof(GroovingExternalTools)) ?? new();
-        if (GroovingExternalTools is null || GroovingExternalTools.Count == 0)
+        var groovingExternalTools = await LocalStorage.GetItemAsync<List<GroovingExternalTool>>(nameof(GroovingExternalTools)) ?? new List<GroovingExternalTool>();
+        if (groovingExternalTools.Count == 0)
         {
-            GroovingExternalTools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Grooving, 3, GroovingExternalTool.Point.Left));
-            GroovingExternalTools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Cutting, 3, GroovingExternalTool.Point.Right));
-            await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+            groovingExternalTools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Grooving, 1.5, TurningGroovingTool.Point.Left));
+            groovingExternalTools.Add(new GroovingExternalTool(1212, GroovingExternalTool.Types.Cutting, 3, TurningGroovingTool.Point.Right));
         }
-        Tools.AddRange(GroovingExternalTools);
+        Tools.AddRange(groovingExternalTools);
 
         // GroovingFace
-        GroovingFaceTools = await localStorage.GetItemAsync<List<GroovingFaceTool>>(nameof(GroovingFaceTools)) ?? new();
-        if (GroovingFaceTools is null || GroovingFaceTools.Count == 0)
+        var groovingFaceTools = await LocalStorage.GetItemAsync<List<GroovingFaceTool>>(nameof(GroovingFaceTools)) ?? new List<GroovingFaceTool>();
+        if (groovingFaceTools.Count == 0)
         {
-            GroovingFaceTools.Add(new GroovingFaceTool(1212, 4, GroovingFaceTool.Point.Bottom));
-            await localStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
+            groovingFaceTools.Add(new GroovingFaceTool(1212, 4, TurningGroovingTool.Point.Bottom));
         }
-        Tools.AddRange(GroovingFaceTools);
+        Tools.AddRange(groovingFaceTools);
 
         // GroovingInternal
-        GroovingInternalTools = await localStorage.GetItemAsync<List<GroovingInternalTool>>(nameof(GroovingInternalTools)) ?? new();
-        if (GroovingInternalTools is null || GroovingInternalTools.Count == 0)
+        var groovingInternalTools = await LocalStorage.GetItemAsync<List<GroovingInternalTool>>(nameof(GroovingInternalTools)) ?? new List<GroovingInternalTool>();
+        if (groovingInternalTools.Count == 0)
         {
-            GroovingInternalTools.Add(new GroovingInternalTool(1212, 20, 3, GroovingInternalTool.Point.Right));
-            GroovingInternalTools.Add(new GroovingInternalTool(1212, 40, 4, GroovingInternalTool.Point.Right));
-            await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
+            groovingInternalTools.Add(new GroovingInternalTool(1212, 20, 3, TurningGroovingTool.Point.Right));
+            groovingInternalTools.Add(new GroovingInternalTool(1212, 40, 4, TurningGroovingTool.Point.Right));
         }
-        Tools.AddRange(GroovingInternalTools);
+        Tools.AddRange(groovingInternalTools);
 
         // SpecialTurning
-        SpecialTurningTools = await localStorage.GetItemAsync<List<SpecialTurningTool>>(nameof(SpecialTurningTools)) ?? new();
-        if (SpecialTurningTools is null || SpecialTurningTools.Count == 0)
+        var turningSpecialTools = await LocalStorage.GetItemAsync<List<TurningSpecialTool>>(nameof(TurningSpecialTools)) ?? new List<TurningSpecialTool>();
+        if (turningSpecialTools.Count == 0)
         {
-            SpecialTurningTools.Add(new SpecialTurningTool(0101, "UPOR"));
-            await localStorage.SetItemAsync(nameof(SpecialTurningTools), SpecialTurningTools);
+            turningSpecialTools.Add(new TurningSpecialTool(0101, "UPOR"));
         }
-        Tools.AddRange(SpecialTurningTools);
+        Tools.AddRange(turningSpecialTools);
 
         // ThreadingExternal
-        ThreadingExternalTools = await localStorage.GetItemAsync<List<ThreadingExternalTool>>(nameof(ThreadingExternalTools)) ?? new();
-        if (ThreadingExternalTools is null || ThreadingExternalTools.Count == 0)
+        var threadingExternalTools = await LocalStorage.GetItemAsync<List<ThreadingExternalTool>>(nameof(ThreadingExternalTools)) ?? new List<ThreadingExternalTool>();
+        if (threadingExternalTools.Count == 0)
         {
-            ThreadingExternalTools.Add(new ThreadingExternalTool(1111, 1.5, 1));
-            await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
+            threadingExternalTools.Add(new ThreadingExternalTool(1111, 1.5, 1));
         }
-        Tools.AddRange(ThreadingExternalTools);
+        Tools.AddRange(threadingExternalTools);
 
         // ThreadingInternal
-        ThreadingInternalTools = await localStorage.GetItemAsync<List<ThreadingInternalTool>>(nameof(ThreadingInternalTools)) ?? new();
-        if (ThreadingInternalTools is null || ThreadingInternalTools.Count == 0)
+        var threadingInternalTools = await LocalStorage.GetItemAsync<List<ThreadingInternalTool>>(nameof(ThreadingInternalTools)) ?? new List<ThreadingInternalTool>();
+        if (threadingInternalTools.Count == 0)
         {
-            ThreadingInternalTools.Add(new ThreadingInternalTool(1111, 16, 1.5, 1));
-            await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
+            threadingInternalTools.Add(new ThreadingInternalTool(1111, 16, 1.5, 1));
         }
-        Tools.AddRange(ThreadingInternalTools);
+        Tools.AddRange(threadingInternalTools);
 
-        // TurningDrilling
-        TurningDrillingTools = await localStorage.GetItemAsync<List<TurningDrillingTool>>(nameof(TurningDrillingTools)) ?? new();
-        if (TurningDrillingTools is null || TurningDrillingTools.Count == 0)
+
+        Tools.AddRange(await LocalStorage.GetItemAsync<List<TurningExternalBurnishingTool>>(nameof(TurningExternalBurnishingTools)) ?? new List<TurningExternalBurnishingTool>());
+        Tools.AddRange(await LocalStorage.GetItemAsync<List<TurningInternalBurnishingTool>>(nameof(TurningInternalBurnishingTools)) ?? new List<TurningInternalBurnishingTool>());
+
+    // TurningDrilling
+        var turningDrillingTools = await LocalStorage.GetItemAsync<List<TurningDrillingTool>>(nameof(TurningDrillingTools)) ?? new List<TurningDrillingTool>();
+        if (turningDrillingTools.Count == 0)
         {
-            TurningDrillingTools.Add(new TurningDrillingTool(0505, TurningDrillingTool.Types.Rapid, 5, 120));
-            TurningDrillingTools.Add(new TurningDrillingTool(0707, TurningDrillingTool.Types.Solid, 10, 140));
-            TurningDrillingTools.Add(new TurningDrillingTool(0606, TurningDrillingTool.Types.Insert, 25, 180));
-            await localStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);
+            turningDrillingTools.Add(new TurningDrillingTool(0505, DrillingTool.Types.Rapid, 5, 120));
+            turningDrillingTools.Add(new TurningDrillingTool(0707, DrillingTool.Types.Solid, 10, 140));
+            turningDrillingTools.Add(new TurningDrillingTool(0606, DrillingTool.Types.Insert, 25, 180));
         }
-        Tools.AddRange(TurningDrillingTools);
+        Tools.AddRange(turningDrillingTools);
 
         // TurningExternal
-        TurningExternalTools = await localStorage.GetItemAsync<List<TurningExternalTool>>(nameof(TurningExternalTools)) ?? new();
-        if (TurningExternalTools is null || TurningExternalTools.Count == 0)
+        var turningExternalTools = await LocalStorage.GetItemAsync<List<TurningExternalTool>>(nameof(TurningExternalTools)) ?? new List<TurningExternalTool>();
+        if (turningExternalTools.Count == 0)
         {
-            TurningExternalTools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Bar, 55, 0.8));
-            TurningExternalTools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Face, 100, 0.8));
-            TurningExternalTools.Add(new TurningExternalTool(0303, TurningExternalTool.Types.Bar, 35, 0.4));
-            await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+            turningExternalTools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Bar, 55, 0.8));
+            turningExternalTools.Add(new TurningExternalTool(0202, TurningExternalTool.Types.Face, 100, 0.8));
+            turningExternalTools.Add(new TurningExternalTool(0303, TurningExternalTool.Types.Bar, 35, 0.4));
         }
-        Tools.AddRange(TurningExternalTools);
+        Tools.AddRange(turningExternalTools);
 
         // TurningInternal
-        TurningInternalTools = await localStorage.GetItemAsync<List<TurningInternalTool>>(nameof(TurningInternalTools)) ?? new();
-        if (TurningInternalTools is null || TurningInternalTools.Count == 0)
+        var turningInternalTools = await LocalStorage.GetItemAsync<List<TurningInternalTool>>(nameof(TurningInternalTools)) ?? new List<TurningInternalTool>();
+        if (turningInternalTools.Count == 0)
         {
-            TurningInternalTools.Add(new TurningInternalTool(0202, 25, 55, 0.8));
-            TurningInternalTools.Add(new TurningInternalTool(0202, 32, 80, 0.8));
-            TurningInternalTools.Add(new TurningInternalTool(0303, 10, 55, 0.4));
-            await localStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
+            turningInternalTools.Add(new TurningInternalTool(0202, 25, 55, 0.8));
+            turningInternalTools.Add(new TurningInternalTool(0202, 32, 80, 0.8));
+            turningInternalTools.Add(new TurningInternalTool(0303, 10, 55, 0.4));
         }
-        Tools.AddRange(TurningInternalTools);
+        Tools.AddRange(turningInternalTools);
 
         // TurningTapping
-        TurningTappingTools = await localStorage.GetItemAsync<List<TurningTappingTool>>(nameof(TurningTappingTools)) ?? new();
-        if (TurningTappingTools is null || TurningTappingTools.Count == 0)
+        var turningTappingTools = await LocalStorage.GetItemAsync<List<TurningTappingTool>>(nameof(TurningTappingTools)) ?? new List<TurningTappingTool>();
+        if (turningTappingTools.Count == 0)
         {
-            TurningTappingTools.Add(new TurningTappingTool(0909, TurningTappingTool.Types.Cutting, 12, 1.75));
-            TurningTappingTools.Add(new TurningTappingTool(0808, TurningTappingTool.Types.Forming, 10, 1.5));
-            await localStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
+            turningTappingTools.Add(new TurningTappingTool(0909, TappingTool.Types.Cutting, 12, 1.75, ThreadStandard.Metric));
+            turningTappingTools.Add(new TurningTappingTool(0808, TappingTool.Types.Forming, 10, 1.5, ThreadStandard.Metric));
         }
-        Tools.AddRange(TurningTappingTools);
+        Tools.AddRange(turningTappingTools);
 
 
-        Program = new();
-        Program.Add(new HeaderSequence(Machine, DetailNumber, DetailName, Author, DrawningVersion, string.Empty) { Name = $"Шапка" });
-        Program.Add(new SafetyStringSequence(Machine, 3000) { Name = $"Строка безопасности" });
-        CyclesCount = 1;
+        Program = new List<Sequence>
+        {
+            new HeaderSequence(Machine, DetailNumber, DetailName, Author, DrawingVersion, string.Empty) { Name = $"Шапка" },
+            new SafetyStringSequence(Machine, 3000, CoordinateSystem) { Name = $"Строка безопасности" }
+        };
+    }
+
+    private async Task SaveMachine()
+    {
+        await LocalStorage.SetItemAsync(nameof(Machine), Machine);
     }
 
     private async Task SaveTools()
     {
-
-        await localStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
-        await localStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
-        await localStorage.SetItemAsync(nameof(MillingTools), MillingTools);
-        await localStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
-        await localStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
-        await localStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
-        await localStorage.SetItemAsync(nameof(SpecialTurningTools), SpecialTurningTools);
-        await localStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
-        await localStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
-        await localStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);
-        await localStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
-        await localStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
-        await localStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
-
+        await LocalStorage.SetItemAsync(nameof(MillingChamferTools), MillingChamferTools);
+        await LocalStorage.SetItemAsync(nameof(MillingBoreTools), MillingBoreTools);
+        await LocalStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingSpecialTools), MillingSpecialTools);
+        await LocalStorage.SetItemAsync(nameof(MillingTappingTools), MillingTappingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingThreadCuttingTools), MillingThreadCuttingTools);
+        await LocalStorage.SetItemAsync(nameof(MillingTools), MillingTools);
+        await LocalStorage.SetItemAsync(nameof(GroovingExternalTools), GroovingExternalTools);
+        await LocalStorage.SetItemAsync(nameof(GroovingFaceTools), GroovingFaceTools);
+        await LocalStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
+        await LocalStorage.SetItemAsync(nameof(TurningSpecialTools), TurningSpecialTools);
+        await LocalStorage.SetItemAsync(nameof(ThreadingExternalTools), ThreadingExternalTools);
+        await LocalStorage.SetItemAsync(nameof(ThreadingInternalTools), ThreadingInternalTools);
+        await LocalStorage.SetItemAsync(nameof(TurningExternalBurnishingTools), TurningExternalBurnishingTools);
+        await LocalStorage.SetItemAsync(nameof(TurningInternalBurnishingTools), TurningInternalBurnishingTools);
+        await LocalStorage.SetItemAsync(nameof(TurningDrillingTools), TurningDrillingTools);
+        await LocalStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+        await LocalStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
+        await LocalStorage.SetItemAsync(nameof(TurningTappingTools), TurningTappingTools);
     }
 
     private async Task OpenToolDialog()
     {
         await Task.Run(SaveTools);
-        if (Mode != Mode.ToolTable)
+        Mode = Mode != Mode.ToolTable ? Mode.ToolTable : Mode.General;
+    }
+
+    private async Task OpenSetupMode()
+    {
+        await Task.Run(SaveTools);
+        Mode = Mode != Mode.Setup ? Mode.Setup : Mode.General;
+    }
+
+    private void OnMachineChanged(Machine machine)
+    {
+        CoordinateSystem = machine switch
         {
-            Mode = Mode.ToolTable;
-        }
-        else
-        {
-            Mode = Mode.General;
-        }
+            Machine.L230A => CoordinateSystem.G55,
+            Machine.GS1500 => CoordinateSystem.G54,
+            Machine.A110 => CoordinateSystem.G57,
+            _ => throw new ArgumentOutOfRangeException(nameof(machine), machine, null)
+            };
+        Machine = machine;
+        _ = SaveMachine();
     }
 
     private async Task OpenEditSequenceDialog(Sequence sequence)
@@ -509,43 +601,28 @@
         //var result = await dialog.Result;
         CurrentSelectedSequence = sequence;
         await Task.Run(SaveTools);
-        if (Mode != Mode.EditSequence)
-        {
-            Mode = Mode.EditSequence;
-        }
-        else
-        {
-            Mode = Mode.General;
-        }
+        Mode = Mode != Mode.EditSequence ? Mode.EditSequence : Mode.General;
     }
 
 
-    private async Task OpenSequencelDialog()
+    private async Task OpenSequenceDialog()
     {
         await Task.Run(SaveTools);
-        if (Mode != Mode.AddSequence)
-        {
-            Mode = Mode.AddSequence;
-        }
-        else
-        {
-            Mode = Mode.General;
-        }
+        Mode = Mode != Mode.AddSequence ? Mode.AddSequence : Mode.General;
     }
 
-    private async Task<bool> OpenConfirmDialog(string message)
+    private async Task<bool> OpenConfirmDialog(string message, string okMessage)
     {
-        if (message is null) message = string.Empty;
-        var parameters = new DialogParameters();
-        parameters.Add(nameof(message), message);
+        message ??= string.Empty;
+        var parameters = new DialogParameters
+        {
+            { nameof(message), message },
+            { nameof(okMessage), okMessage }
+        };
         var options = new DialogOptions() { FullScreen = false, CloseButton = false };
         var dialog = DialogService.Show<ConfirmDialog>("Подтверждение", parameters, options);
         var result = await dialog.Result;
-        if (!result.Cancelled)
-        {
-            return true;
-        }
-        return false;
+        return !result.Cancelled;
     }
 
     private void RemoveSequence(Sequence seq)
@@ -575,7 +652,7 @@
 
     private async Task DownloadProgram()
     {
-        bool resultDialog = await OpenConfirmDialog($"Скачать файл \"{NcDetailNumber}.nc\" ?");
+        bool resultDialog = await OpenConfirmDialog($"Скачать файл \"{NcDetailNumber}.nc\" ?", "Скачать");
         if (resultDialog) await BlazorDownloadFileService.DownloadFileFromText(NcDetailNumber + ".nc", ProgramText, System.Text.Encoding.UTF8, "text/plain");
     }
 
@@ -591,113 +668,128 @@
             {
                 switch (Program[i])
                 {
-                    case HeaderSequence headerSequence:
-                        HeaderSequence newHeaderSequence = Program[i] as HeaderSequence;
+                    case HeaderSequence:
+                        var newHeaderSequence = Program[i] as HeaderSequence;
                         newHeaderSequence.Machine = Machine;
                         newHeaderSequence.DetailNumber = NcDetailNumber;
                         newHeaderSequence.DetailName = NcDetailName;
                         newHeaderSequence.Author = NcAuthor;
-                        newHeaderSequence.DrawVersion = DrawningVersion;
+                        newHeaderSequence.DrawVersion = NcDrawingVersion;
                         newHeaderSequence.ToolTable = Util.GetToolTable(Machine, Program);
                         Program[i] = newHeaderSequence;
                         break;
-                    case SafetyStringSequence safetyStringSequence:
-                        SafetyStringSequence newSafetyStringSequence = Program[i] as SafetyStringSequence;
+                    case SafetyStringSequence:
+                        var newSafetyStringSequence = Program[i] as SafetyStringSequence;
                         newSafetyStringSequence.Machine = Machine;
                         newSafetyStringSequence.SpeedLimit = SpindleLimit;
+                        newSafetyStringSequence.CoordinateSystem = CoordinateSystem;
                         Program[i] = newSafetyStringSequence;
                         break;
-                    case LimiterSequence limiterSequence:
-                        LimiterSequence newlimiterSequence = Program[i] as LimiterSequence;
-                        newlimiterSequence.Machine = Machine;
-                        Program[i] = newlimiterSequence;
+                    case LimiterSequence:
+                        var newLimiterSequence = Program[i] as LimiterSequence;
+                        newLimiterSequence.Machine = Machine;
+                        Program[i] = newLimiterSequence;
                         break;
-                    case FacingSequence facingSequence:
-                        FacingSequence newFacingSequence = Program[i] as FacingSequence;
+                    case FacingSequence:
+                        var newFacingSequence = Program[i] as FacingSequence;
                         newFacingSequence.Machine = Machine;
                         newFacingSequence.Material = WorkpieceMaterial;
                         newFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
                         newFacingSequence.InternalDiameter = GetCurrentInternalDiameter(i);
                         Program[i] = newFacingSequence;
                         break;
-                    case RoughFacingSequence roughFacingSequence:
-                        RoughFacingSequence newRoughFacingSequence = Program[i] as RoughFacingSequence;
+                    case RoughFacingSequence:
+                        var newRoughFacingSequence = Program[i] as RoughFacingSequence;
                         newRoughFacingSequence.Machine = Machine;
                         newRoughFacingSequence.Material = WorkpieceMaterial;
                         newRoughFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
                         newRoughFacingSequence.InternalDiameter = GetCurrentInternalDiameter(i);
                         Program[i] = newRoughFacingSequence;
                         break;
-                    case RoughFacingCycleSequence roughFacingCycleSequence:
-                        RoughFacingCycleSequence newRoughFacingCycleSequence = Program[i] as RoughFacingCycleSequence;
+                    case RoughFacingCycleSequence:
+                        var newRoughFacingCycleSequence = Program[i] as RoughFacingCycleSequence;
                         newRoughFacingCycleSequence.Machine = Machine;
                         newRoughFacingCycleSequence.Material = WorkpieceMaterial;
                         newRoughFacingCycleSequence.ExternalDiameter = WorkpieceExternalDiameter;
                         newRoughFacingCycleSequence.InternalDiameter = GetCurrentInternalDiameter(i);
                         Program[i] = newRoughFacingCycleSequence;
                         break;
-                    case FinishFacingSequence finishFacingSequence:
-                        FinishFacingSequence newFinishFacingSequence = Program[i] as FinishFacingSequence;
+                    case FinishFacingSequence:
+                        var newFinishFacingSequence = Program[i] as FinishFacingSequence;
                         newFinishFacingSequence.Machine = Machine;
                         newFinishFacingSequence.Material = WorkpieceMaterial;
                         newFinishFacingSequence.ExternalDiameter = WorkpieceExternalDiameter;
                         newFinishFacingSequence.InternalDiameter = GetCurrentInternalDiameter(i);
                         Program[i] = newFinishFacingSequence;
                         break;
-                    case FinishFacingCycleSequence finishFacingCycleSequence:
+                    case FinishFacingCycleSequence:
                         break;
-                    case TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence:
-                        TurningHighSpeedDrillingSequence newTurningHighSpeedDrillingSequence = Program[i] as TurningHighSpeedDrillingSequence;
+                    case TurningHighSpeedDrillingSequence:
+                        var newTurningHighSpeedDrillingSequence = Program[i] as TurningHighSpeedDrillingSequence;
                         newTurningHighSpeedDrillingSequence.Machine = Machine;
                         newTurningHighSpeedDrillingSequence.Material = WorkpieceMaterial;
                         break;
-                    case MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence:
-                        MillingHighSpeedDrillingSequence newMillingHighSpeedDrillingSequencee = Program[i] as MillingHighSpeedDrillingSequence;
-                        newMillingHighSpeedDrillingSequencee.Machine = Machine;
-                        newMillingHighSpeedDrillingSequencee.Material = WorkpieceMaterial;
+                    case MillingHighSpeedDrillingSequence:
+                        var newMillingHighSpeedDrillingSequence = Program[i] as MillingHighSpeedDrillingSequence;
+                        newMillingHighSpeedDrillingSequence.Machine = Machine;
+                        newMillingHighSpeedDrillingSequence.CoordinateSystem = CoordinateSystem;
+                        newMillingHighSpeedDrillingSequence.Material = WorkpieceMaterial;
+                        newMillingHighSpeedDrillingSequence.SafePlane = SafePlane;
                         break;
-                    case TurningPeckDrillingSequence turningPeckDrillingSequence:
-                        TurningPeckDrillingSequence newTurningPeckDrillingSequence = Program[i] as TurningPeckDrillingSequence;
+                    case TurningPeckDrillingSequence:
+                        var newTurningPeckDrillingSequence = Program[i] as TurningPeckDrillingSequence;
                         newTurningPeckDrillingSequence.Machine = Machine;
                         newTurningPeckDrillingSequence.Material = WorkpieceMaterial;
                         break;
-                    case MillingPeckDrillingSequence millingPeckDrillingSequence:
-                        MillingPeckDrillingSequence newMillingPeckDrillingSequence = Program[i] as MillingPeckDrillingSequence;
+                    case MillingPeckDrillingSequence:
+                        var newMillingPeckDrillingSequence = Program[i] as MillingPeckDrillingSequence;
                         newMillingPeckDrillingSequence.Machine = Machine;
+                        newMillingPeckDrillingSequence.CoordinateSystem = CoordinateSystem;
                         newMillingPeckDrillingSequence.Material = WorkpieceMaterial;
+                        newMillingPeckDrillingSequence.SafePlane = SafePlane;
                         break;
-                    case TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence:
-                        TurningPeckDeepDrillingSequence newTurningPeckDeepDrillingSequence = Program[i] as TurningPeckDeepDrillingSequence;
+                    case TurningPeckDeepDrillingSequence:
+                        var newTurningPeckDeepDrillingSequence = Program[i] as TurningPeckDeepDrillingSequence;
                         newTurningPeckDeepDrillingSequence.Machine = Machine;
                         newTurningPeckDeepDrillingSequence.Material = WorkpieceMaterial;
                         break;
-                    case MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence:
-                        MillingPeckDeepDrillingSequence newMillingPeckDeepDrillingSequence = Program[i] as MillingPeckDeepDrillingSequence;
+                    case MillingPeckDeepDrillingSequence:
+                        var newMillingPeckDeepDrillingSequence = Program[i] as MillingPeckDeepDrillingSequence;
                         newMillingPeckDeepDrillingSequence.Machine = Machine;
+                        newMillingPeckDeepDrillingSequence.CoordinateSystem = CoordinateSystem;
                         newMillingPeckDeepDrillingSequence.Material = WorkpieceMaterial;
+                        newMillingPeckDeepDrillingSequence.SafePlane = SafePlane;
                         break;
-                    case TurningTappingSequence TurningTappingSequence:
-                        TurningTappingSequence newTurningTappingSequence = Program[i] as TurningTappingSequence;
+                    case TurningTappingSequence:
+                        var newTurningTappingSequence = Program[i] as TurningTappingSequence;
                         newTurningTappingSequence.Machine = Machine;
                         break;
-                    case MillingTappingSequence MillingTappingSequence:
-                        MillingTappingSequence newMillingTappingSequence = Program[i] as MillingTappingSequence;
+                    case MillingTappingSequence:
+                        var newMillingTappingSequence = Program[i] as MillingTappingSequence;
                         newMillingTappingSequence.Machine = Machine;
+                        newMillingTappingSequence.CoordinateSystem = CoordinateSystem;
+                        newMillingTappingSequence.SafePlane = SafePlane;
                         break;
-                    case ThreadCuttingSequence threadCuttingSequence:
-                        ThreadCuttingSequence newThreadCuttingSequence = Program[i] as ThreadCuttingSequence;
+                    case ThreadCuttingSequence:
+                        var newThreadCuttingSequence = Program[i] as ThreadCuttingSequence;
                         newThreadCuttingSequence.Machine = Machine;
                         break;
-                    case CustomSequence toolCallSequence:
-                        CustomSequence newCustomSequence = Program[i] as CustomSequence;
-                        newCustomSequence.Machine = Machine;
+                    case TurningCustomSequence:
+                        var newTurningCustomSequence = Program[i] as TurningCustomSequence;
+                        newTurningCustomSequence.Machine = Machine;
                         break;
-                    case TurningGroovingSequence turningGroovingSequence:
-                        TurningGroovingSequence newTurningGroovingSequence = Program[i] as TurningGroovingSequence;
+                    case MillingCustomSequence:
+                        var newMillingCustomSequence = Program[i] as MillingCustomSequence;
+                        newMillingCustomSequence.Machine = Machine;
+                        newMillingCustomSequence.CoordinateSystem = CoordinateSystem;
+                        newMillingCustomSequence.SafePlane = SafePlane;
+                        break;
+                    case TurningGroovingSequence:
+                        var newTurningGroovingSequence = Program[i] as TurningGroovingSequence;
                         newTurningGroovingSequence.Machine = Machine;
                         break;
-                    case TurningCutOffSequence turningCutOffSequence:
-                        TurningCutOffSequence newTurningCutOffSequence = Program[i] as TurningCutOffSequence;
+                    case TurningCutOffSequence:
+                        var newTurningCutOffSequence = Program[i] as TurningCutOffSequence;
                         newTurningCutOffSequence.Machine = Machine;
                         break;
                     default:
@@ -705,11 +797,38 @@
                 }
             }
 
-            foreach (var sequence in Program)
+            for (int i = 0; i < Program.Count; i++)
             {
+                var sequence = Program[i];
                 if (Program.IndexOf(sequence) == Program.Count - 1)
                 {
-                    result.Add(sequence.Operation.Replace("/", string.Empty).Replace("M1", string.Empty));
+                    result.Add(sequence.Operation.Replace("/G91 G30 Z0\n/G90 G53 X-800 Y0\nM1", "G91 G30 Z0\nG90 G53 X-800 Y0"));
+                }
+                else if (Program.Count > Program.IndexOf(sequence) + 1 && Program.IndexOf(sequence) > 1)
+                {
+                    string first = sequence.Operation.Split('\n', 2)[0], other = sequence.Operation.Split('\n', 2)[1];
+                    var nextSequence = Program[i + 1];
+                    switch (nextSequence)
+                    {
+                        case MillingCustomSequence millingCustomSequence:
+                            result.Add($"{first}\nT{millingCustomSequence.Tool.Position}\n{other}");
+                            break;
+                        case MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence:
+                            result.Add($"{first}\nT{millingHighSpeedDrillingSequence.Tool.Position}\n{other}");
+                            break;
+                        case MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence:
+                            result.Add($"{first}\nT{millingPeckDeepDrillingSequence.Tool.Position}\n{other}");
+                            break;
+                        case MillingPeckDrillingSequence millingPeckDrillingSequence:
+                            result.Add($"{first}\nT{millingPeckDrillingSequence.Tool.Position}\n{other}");
+                            break;
+                        case MillingTappingSequence millingTappingSequence:
+                            result.Add($"{first}\nT{millingTappingSequence.Tool.Position}\n{other}");
+                            break;
+                        default:
+                            result.Add(sequence.Operation);
+                            break;
+                    }
                 }
                 else
                 {
@@ -726,6 +845,5 @@
 
 
     // создание переходов
-
 
 }

@@ -1,12 +1,11 @@
 ﻿using Sunduk.PWA.Infrastructure.Sequences;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 using Sunduk.PWA.Infrastructure.Tools.Milling;
-using Sunduk.PWA.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Sunduk.PWA.Util.Util;
+using static Sunduk.PWA.Infrastructure.Util;
 
 namespace Sunduk.PWA.Infrastructure.Templates
 {
@@ -20,20 +19,20 @@ namespace Sunduk.PWA.Infrastructure.Templates
             if (tool is null || startZ <= endZ) return string.Empty;
             string approach = startZ > 0
                 ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()} S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\n"
-                : $"G0 X-{tool.Diameter.NC()} Z{SAFE_APPROACH_DISTANCE.NC()} S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\n Z{startZ.NC()}\n";
+                : $"G0 X-{tool.Diameter.NC()} Z{SafeApproachDistance.NC()} S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\n Z{startZ.NC()}\n";
             string exit = startZ > 0
                 ? $"G0 Z{startZ.NC()}\n"
-                : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
+                : $"G0 Z{SafeApproachDistance.NC()}\n";
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 approach +
                 $"G1 Z{(endZ - tool.PointLength()).NC()} F{DrillFeed(machine, material, tool).NC(2)}\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
@@ -42,27 +41,26 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G1 Z{(endZ - tool.PointLength()).NC()} F{DrillFeed(machine, material, tool).NC(2)}\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 _ => string.Empty
             };
         }
 
-        public static string MillingHighSpeedDrilling(Machine machine, Material material, MillingDrillingTool tool, double startZ, double endZ, List<Hole> holes, bool polar = false)
+        public static string MillingHighSpeedDrilling(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
-            var spindleSpeed = DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100);
-            var feed = DrillFeed(machine, material, tool).ToFeedPerMin(spindleSpeed, 1, 100);
+            int spindleSpeed = DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100);
+            int feed = DrillFeed(machine, material, tool).ToFeedPerMin(spindleSpeed, 1, 100);
             string result = machine switch
             {
 
                 Machine.A110 =>
-                tool.Description(ToolDescriptionOption.General) + "\n" +
-                $"T00\n" +
-                $"{(polar ? "G16 " : string.Empty)}" +
-                $"G57 G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
-                $"G81 Z{(endZ - tool.PointLength()).NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} F{feed}\n",
+                tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
+                $"{coordinateSystem} {(polar ? "G16 " : string.Empty)}G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
+                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
+                $"G81 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} Z{(endZ - tool.PointLength()).NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} F{feed}\n",
                 _ => string.Empty
             };
 
@@ -73,10 +71,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 result += machine switch
                 {
                     Machine.A110 =>
-                    $"G80\n" +
+                    "G80\n" +
                     $"{CoolantOff(machine)}\n" +
-                    $"{(polar ? "G15" : string.Empty)}" +
-                    MILLING_REFERENT_POINT,
+                    $"{(polar ? "G15\n" : string.Empty)}" +
+                    SpindleStop + "\n" +
+                    MillingReferentPoint,
                     _ => string.Empty
                 };
             }
@@ -94,21 +93,21 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 depth <= 0) return string.Empty;
             string approach = startZ > 0
                 ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()}S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\n"
-                : $"G0 X-{tool.Diameter.NC()} Z{SAFE_APPROACH_DISTANCE.NC()}S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\nZ{startZ.NC()}\n";
+                : $"G0 X-{tool.Diameter.NC()} Z{SafeApproachDistance.NC()}S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\nZ{startZ.NC()}\n";
             string exit = startZ > 0
                 ? $"G0 Z{startZ.NC()}\n"
-                : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
+                : $"G0 Z{SafeApproachDistance.NC()}\n";
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 approach +
                 "G74 R0.1\n" +
                 $"G74 Z{(endZ - tool.PointLength()).NC()} Q{depth.Microns()} F{DrillFeed(machine, material, tool).NC(2)}\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
@@ -118,27 +117,26 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G74 Z{(endZ - tool.PointLength()).NC()} Q{depth.Microns()} F{DrillFeed(machine, material, tool).NC(2)}\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 _ => string.Empty
             };
         }
 
-        public static string MillingPeckDrilling(Machine machine, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes, bool polar = false)
+        public static string MillingPeckDrilling(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
-            var spindleSpeed = DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100);
-            var feed = DrillFeed(machine, material, tool).ToFeedPerMin(spindleSpeed, 1, 100);
+            int spindleSpeed = DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100);
+            int feed = DrillFeed(machine, material, tool).ToFeedPerMin(spindleSpeed, 1, 100);
             string result = machine switch
             {
 
                 Machine.A110 =>
-                tool.Description(ToolDescriptionOption.General) + "\n" +
-                $"T00\n" +
-                $"{(polar ? "G16 " : string.Empty)}" +
-                $"G57 G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
-                $"G82 Z{(endZ - tool.PointLength()).NC(option: NcDecimalPointOption.Without)} Q{depth.Microns()} R{startZ.NC(option: NcDecimalPointOption.Without)} F{feed}\n",
+                tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
+                $"{coordinateSystem} {(polar ? "G16 " : string.Empty)}G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
+                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
+                $"G82 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} Z{(endZ - tool.PointLength()).NC(option: NcDecimalPointOption.Without)} Q{depth.Microns()} R{startZ.NC(option: NcDecimalPointOption.Without)} F{feed}\n",
                 _ => string.Empty
             };
 
@@ -149,10 +147,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 result += machine switch
                 {
                     Machine.A110 =>
-                    $"G80\n" +
+                    "G80\n" +
                     $"{CoolantOff(machine)}\n" +
-                    $"{(polar ? "G15" : string.Empty)}" +
-                    MILLING_REFERENT_POINT,
+                    $"{(polar ? "G15\n" : string.Empty)}" +
+                    SpindleStop + "\n" +
+                    MillingReferentPoint,
                     _ => string.Empty
                 };
             }
@@ -169,21 +168,21 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 depth <= 0) return string.Empty;
             string approach = startZ > 0
                 ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()} S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\n"
-                : $"G0 X-{tool.Diameter.NC()} Z{SAFE_APPROACH_DISTANCE.NC()} S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\nZ{startZ.NC()}\n";
+                : $"G0 X-{tool.Diameter.NC()} Z{SafeApproachDistance.NC()} S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\nZ{startZ.NC()}\n";
             string exit = startZ > 0
                 ? $"G0 Z{startZ.NC()}\n"
-                : $"G0 Z{SAFE_APPROACH_DISTANCE.NC()}\n";
+                : $"G0 Z{SafeApproachDistance.NC()}\n";
             return machine switch
             {
                 Machine.GS1500 =>
-                TURNING_REFERENT_POINT +
+                TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                 approach +
                 $"G83 Z{(endZ - tool.PointLength()).NC()} Q{depth.Microns()} F{DrillFeed(machine, material, tool).NC(2)}\n" +
                 "G80\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
 
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
@@ -193,26 +192,25 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 "G80\n" +
                 exit +
                 $"{CoolantOff(machine)}\n" +
-                TURNING_REFERENT_POINT,
+                TurningReferentPoint,
                 _ => string.Empty
             };
         }
 
-        public static string MillingPeckDeepDrilling(Machine machine, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes, bool polar = false)
+        public static string MillingPeckDeepDrilling(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
-            var spindleSpeed = DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100);
-            var feed = DrillFeed(machine, material, tool).ToFeedPerMin(spindleSpeed, 1, 100);
+            int spindleSpeed = DrillCuttingSpeed(material, tool).ToSpindleSpeed(tool.Diameter, 100);
+            int feed = DrillFeed(machine, material, tool).ToFeedPerMin(spindleSpeed, 1, 100);
             string result = machine switch
             {
 
                 Machine.A110 =>
-                tool.Description(ToolDescriptionOption.General) + "\n" +
-                $"T00\n" +
-                $"{(polar ? "G16 " : string.Empty)}" +
-                $"G57 G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{startZ.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
-                $"G83 Z{(endZ - tool.PointLength()).NC(option: NcDecimalPointOption.Without)} Q{depth.Microns()} R{startZ.NC(option: NcDecimalPointOption.Without)} F{feed}\n",
+                tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
+                $"{coordinateSystem} {(polar ? "G16 " : string.Empty)}G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
+                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
+                $"G83 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} Z{(endZ - tool.PointLength()).NC(option: NcDecimalPointOption.Without)} Q{depth.Microns()} R{startZ.NC(option: NcDecimalPointOption.Without)} F{feed}\n",
                 _ => string.Empty
             };
 
@@ -223,10 +221,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 result += machine switch
                 {
                     Machine.A110 =>
-                    $"G80\n" +
+                    "G80\n" +
                     $"{CoolantOff(machine)}\n" +
-                    $"{(polar ? "G15" : string.Empty)}" +
-                    MILLING_REFERENT_POINT,
+                    $"{(polar ? "G15\n" : string.Empty)}" +
+                    SpindleStop + "\n" +
+                    MillingReferentPoint,
                     _ => string.Empty
                 };
             }

@@ -4,11 +4,14 @@
     {
         General,
         Facing,
+        RoughTurning,
+        FinishTurning,
         ExternalTurning,
         InternalTurning,
         Drilling,
         Tapping,
         Threading,
-        Grooving
+        Grooving,
+        Burnishing
     }
 }

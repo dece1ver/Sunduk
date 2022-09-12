@@ -10,7 +10,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Base
         public enum Types { Insert, Solid, Tip, Center, Rapid }
 
         private Types _Type;
-        public virtual Types Type
+        public Types Type
         {
             get => _Type; set
             {
@@ -39,9 +39,8 @@ namespace Sunduk.PWA.Infrastructure.Tools.Base
         }
         public double Diameter { get; set; }
         public double Angle { get; set; }
-        public override string Name
-        {
-            get => Type switch
+        public override string Name =>
+            Type switch
             {
                 Types.Insert => "SV KORP",
                 Types.Solid => "SV TV",
@@ -50,9 +49,8 @@ namespace Sunduk.PWA.Infrastructure.Tools.Base
                 Types.Rapid => "SV HSS",
                 _ => string.Empty,
             };
-        }
 
-        public DrillingTool(int position, Types type, double diameter, double angle, ToolHand hand = ToolHand.Rigth)
+        public DrillingTool(int position, Types type, double diameter, double angle, ToolHand hand = ToolHand.Right)
         {
             Position = position;
             Type = type;

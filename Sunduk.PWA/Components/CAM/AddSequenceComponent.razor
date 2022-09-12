@@ -1,5 +1,4 @@
-﻿@using Sunduk.PWA.Infrastructure.Tools.Turning.Base
-<MudGrid Spacing=1>
+﻿<MudGrid Spacing=1>
     <MudItem xs="12" md="4">
         <MudSelect Label="Тип" T="SequenceType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnSequenceChanged">
             <MudSelectItem Value="@SequenceType.General">Общие</MudSelectItem>
@@ -8,6 +7,7 @@
                 <MudSelectItem Value="@SequenceType.Facing">Обработка торца</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.ExternalTurning">Наружное точение</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.Burnishing">Накатка</MudSelectItem>
             }
             <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
             <MudSelectItem Value="@SequenceType.Threading">Нарезание резьбы</MudSelectItem>
@@ -16,7 +16,7 @@
 
     @switch (Type)
     {
-        #region Общие
+        // Общие
         case SequenceType.General:
             <MudItem xs="12" md="4">
                 <MudSelect Label="Переход" T="GeneralSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="GeneralSequence">
@@ -51,6 +51,7 @@
                     <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="Coolant">
                         <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
                         <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
+                        <MudSelectItem Value="@(Coolant.Full)">Вся подача СОЖ</MudSelectItem>
                         <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
                     </MudSelect>
                 </MudItem>
@@ -68,9 +69,9 @@
                 </MudItem>
             }
             break;
-        #endregion
 
-        #region Обработка торца
+
+        // Обработка торца
         case SequenceType.Facing:
             <MudItem xs="12" md="4">
                 <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTurningSequenceChanged">
@@ -200,9 +201,9 @@
             }
 
             break;
-        #endregion
+        
 
-        #region Токарные
+        //Токарные
         case SequenceType.ExternalTurning:
             <MudItem xs="12" md="4">
                 <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="TurningSequence">
@@ -222,9 +223,9 @@
                 <ContourComponent></ContourComponent>
             </MudItem>
             break;
-        #endregion
+        
 
-        #region Сверлильные
+        //Сверлильные
         case SequenceType.Drilling:
             <MudItem xs="12" md="4">
                 <MudSelect Label="Переход" T="DrillingSequences" @bind-Value="DrillingSequence" Variant="Variant.Filled" Margin="Margin.Dense">
@@ -286,16 +287,17 @@
             }
             @if (MachineType == MachineType.Milling)
             {
-                <MudItem xs="6">
+                <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
                     <MudNumericField Label="Количество отверстий" T="int" Min="1" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.HolesConverter" ValueChanged="OnHolesCountChanged" />
                 </MudItem>
-                <MudItem xs="6">
+                <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
                     <MudSelect Label="Расположение" T="HolesSetterType" @bind-Value="HolesSetter" Variant="Variant.Filled" Margin="Margin.Dense">
                         <MudSelectItem Value="@(HolesSetterType.Manual)">Вручную</MudSelectItem>
                         <MudSelectItem Value="@(HolesSetterType.Cylinder)">На цилиндре</MudSelectItem>
+                        <MudSelectItem Value="@(HolesSetterType.EvenlyCylinder)">Равномерно на цилиндре</MudSelectItem>
                     </MudSelect>
                 </MudItem>
-                @if (HolesSetter == HolesSetterType.Cylinder)
+                @if (HolesSetter == HolesSetterType.EvenlyCylinder)
                 {
                     <MudItem xs="6">
                         <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
@@ -303,6 +305,24 @@
                     <MudItem xs="6">
                         <MudTextField Label="Начальный угол" @bind-Value="StartAngle" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="°" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
+                }
+                @if (HolesSetter == HolesSetterType.Cylinder)
+                {
+                    <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+                        <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                    @foreach (var hole in Holes)
+                    {
+                        <MudItem xs="6" sm="4" md="3" lg="2">
+                            <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                <MudGrid>
+                                    <MudItem xs=12>
+                                        <MudTextField Label="Угол" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                                    </MudItem>
+                                </MudGrid>
+                            </MudField>
+                        </MudItem>
+                    }
                 }
                 @if (HolesSetter == HolesSetterType.Manual)
                 {
@@ -325,9 +345,9 @@
                 }
             }
             break;
-        #endregion
+        
 
-        #region Резьбонарезные
+        //Резьбонарезные
         case SequenceType.Threading:
             <MudItem xs="12" sm="6" md="4">
                 <MudSelect Label="Переход" T="ThreadingSequences" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnThreadingSequenceChanged">
@@ -362,25 +382,25 @@
                         </MudSelect>
                     </MudItem>
                 }
-                <MudItem xs="6" sm="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapeziodal ? 6 : 4)">
-                    <MudSelect Label="Стандарт" T="ThreadStandart" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="ThreadStandart">
-                        <MudSelectItem Value="@(ThreadStandart.Metric)">Метрическая 60° (М)</MudSelectItem>
-                        <MudSelectItem Value="@(ThreadStandart.BSPP)">Трубная цилиндрическая 55° (Tr)</MudSelectItem>
-                        <MudSelectItem Value="@(ThreadStandart.Trapeziodal)">Трапецеидальная 30° (G)</MudSelectItem>
-                        <MudSelectItem Value="@(ThreadStandart.NPT)">Коническая 60° (K)</MudSelectItem>
+                <MudItem xs="6" sm="6" md="(ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 6 : 4)">
+                    <MudSelect Label="Стандарт" T="ThreadStandard" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="ThreadStandard">
+                        <MudSelectItem Value="@(ThreadStandard.Metric)">Метрическая 60° (М)</MudSelectItem>
+                        <MudSelectItem Value="@(ThreadStandard.BSPP)">Трубная цилиндрическая 55° (G)</MudSelectItem>
+                        <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">Трапецеидальная 30° (Tr)</MudSelectItem>
+                        <MudSelectItem Value="@(ThreadStandard.NPT)">Коническая 60° (K)</MudSelectItem>
                     </MudSelect>
                 </MudItem>
-                <MudItem xs="6" sm="6" md="(ThreadStandart is ThreadStandart.Metric or ThreadStandart.Trapeziodal ? 6 : 4)">
+                <MudItem xs="6" sm="6" md="(ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 6 : 4)">
                     <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnThreadCuttingTypeChanged">
                         <MudSelectItem Value="@(CuttingType.External)">Наружная</MudSelectItem>
                         <MudSelectItem Value="@(CuttingType.Internal)">Внутренняя</MudSelectItem>
                     </MudSelect>
                 </MudItem>
-                @if (ThreadStandart == ThreadStandart.BSPP)
+                @if (ThreadStandard == ThreadStandard.BSPP)
                 {
                 <MudItem xs="6" sm="6" md="4">
                     <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
-                        @foreach (string item in Thread.bsppTemplates)
+                        @foreach (string item in Thread.BsppTemplates)
                         {
                             <MudSelectItem Value="@(item)">
                                 <MudText>@item</MudText>
@@ -389,11 +409,11 @@
                     </MudSelect>
                 </MudItem>
                 }
-                @if (ThreadStandart == ThreadStandart.NPT)
+                @if (ThreadStandard == ThreadStandard.NPT)
                 {
                 <MudItem xs="6" sm="6" md="4">
                     <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
-                        @foreach (string item in Thread.nptTemplates)
+                        @foreach (string item in Thread.NptTemplates)
                         {
                             <MudSelectItem Value="@(item)">
                                 <MudText>@item</MudText>
@@ -446,16 +466,34 @@
                 </MudItem>
                 @if (MachineType == MachineType.Milling)
                 {
-                    <MudItem xs="6">
+                    <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
                         <MudNumericField Label="Количество отверстий" T="int" Min="1" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.HolesConverter" ValueChanged="OnHolesCountChanged" />
                     </MudItem>
-                    <MudItem xs="6">
+                    <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
                         <MudSelect Label="Расположение" T="HolesSetterType" @bind-Value="HolesSetter" Variant="Variant.Filled" Margin="Margin.Dense">
                             <MudSelectItem Value="@(HolesSetterType.Manual)">Вручную</MudSelectItem>
                             <MudSelectItem Value="@(HolesSetterType.Cylinder)">На цилиндре</MudSelectItem>
                         </MudSelect>
                     </MudItem>
                     @if (HolesSetter == HolesSetterType.Cylinder)
+                    {
+                        <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+                            <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                        </MudItem>
+                        @foreach (var hole in Holes)
+                        {
+                            <MudItem xs="6" sm="4" md="3" lg="2">
+                                <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                    <MudGrid>
+                                        <MudItem xs=12>
+                                            <MudTextField Label="Угол" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                                        </MudItem>
+                                    </MudGrid>
+                                </MudField>
+                            </MudItem>
+                        }
+                    }
+                    @if (HolesSetter == HolesSetterType.EvenlyCylinder)
                     {
                         <MudItem xs="6">
                             <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
@@ -486,11 +524,11 @@
                 }
             }
             break;
-        #endregion
+        
 
-        #region Канавочные
+        //Канавочные
         case SequenceType.Grooving:
-            <MudItem xs="4">
+            <MudItem xs="12" md="4">
                 <MudSelect Label="Переход" T="TurningGroovingSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="GroovingSequence">
                     <MudSelectItem Value="@(TurningGroovingSequences.Cutting)">Отрезка</MudSelectItem>
                     <MudSelectItem Value="@(TurningGroovingSequences.RoughGrooving)">Канавка черновая</MudSelectItem>
@@ -499,7 +537,7 @@
             </MudItem>
             @if (GroovingSequence is TurningGroovingSequences.Grooving or TurningGroovingSequences.RoughGrooving && GrooveType is CuttingType.Radial)
             {
-                <MudItem xs="4">
+                <MudItem xs="12" md="4">
                     <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                         @foreach (var tool in Tools.Where(x => x is GroovingExternalTool || x is GroovingInternalTool))
                         {
@@ -510,7 +548,7 @@
             }
             else if (GroovingSequence is TurningGroovingSequences.Cutting && GrooveType is CuttingType.Radial)
             {
-                <MudItem xs="4">
+                <MudItem xs="12" md="4">
                     <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                         @foreach (var tool in Tools.Where(x => x is GroovingExternalTool))
                         {
@@ -521,7 +559,7 @@
             }
             @if (GrooveType is CuttingType.Face)
             {
-                <MudItem xs="4">
+                <MudItem xs="12" md="4">
                     <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                         @foreach (var tool in Tools.Where(x => x is GroovingFaceTool))
                         {
@@ -532,52 +570,52 @@
             }
             @if (GroovingSequence is TurningGroovingSequences.Grooving or TurningGroovingSequences.RoughGrooving)
             {
-                <MudItem xs="4">
+                <MudItem xs="12" md="4">
                     <MudSelect Label="Тип" T="CuttingType" Value="GrooveType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnGrooveCuttingTypeChanged">
                         <MudSelectItem Value="@(CuttingType.Radial)">Радиальная</MudSelectItem>
                         <MudSelectItem Value="@(CuttingType.Face)">Торцевая</MudSelectItem>
                     </MudSelect>
                 </MudItem>
-                <MudItem xs="4">
+                <MudItem xs="12" md="4">
                     <MudTextField Label="Начальный диаметр" @bind-Value="_GroovingExternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                 </MudItem>
-                <MudItem xs="4">
+                <MudItem xs="12" md="4">
                     <MudTextField Label="Конечный диаметр" @bind-Value="_GroovingInternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                 </MudItem>
                 @if(GrooveType is CuttingType.Face)
                 {
-                    <MudItem xs="3">
+                    <MudItem xs="12" md="3">
                         <MudTextField Label="Начальная точка" @bind-Value="_GroovingStartPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                     </MudItem>
                 }
                 else
                 {
-                    <MudItem xs="3">
+                    <MudItem xs="12" md="3">
                         <MudTextField Label="Ширина" @bind-Value="_GroovingWidth" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                     </MudItem>
                 }
-                <MudItem xs="3">
+                <MudItem xs="12" md="3">
                     <MudTextField Label="Конечная точка" @bind-Value="_GroovingCuttingPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                 </MudItem>
-                <MudItem xs="3">
+                <MudItem xs="12" md="3">
                     <MudTextField Label="Шаг" @bind-Value="_GroovingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                 </MudItem>
-                <MudItem xs="3">
+                <MudItem xs="12" md="3">
                     <MudTextField Label="Припуск" @bind-Value="_GroovingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                 </MudItem>
-                <MudItem xs="3">
+                <MudItem xs="12" md="3">
                     <MudTextField Label="Притупление" @bind-Value="_OuterGroovingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                 </MudItem>
-                <MudItem xs="3">
+                <MudItem xs="12" md="3">
                     <MudSelect Label="Тип притупления" T="Blunt" Variant="Variant.Filled" @bind-Value="OuterGroovingBluntType" Margin="Margin.Dense">
                         <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
                         <MudSelectItem Value="@(Blunt.SimpleChamfer)">Фаска</MudSelectItem>
                     </MudSelect>
                 </MudItem>
-                <MudItem xs="3">
+                <MudItem xs="12" md="3">
                     <MudTextField Label="Галтель" @bind-Value="_InnerGroovingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                 </MudItem>
-                <MudItem xs="3">
+                <MudItem xs="12" md="3">
                     <MudSelect Label="Тип галтели" T="Blunt" Variant="Variant.Filled" @bind-Value="InnerGroovingBluntType" Margin="Margin.Dense">
                         <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
                         <MudSelectItem Value="@(Blunt.SimpleChamfer)">Фаска</MudSelectItem>
@@ -587,22 +625,22 @@
             }
             @if (GroovingSequence == TurningGroovingSequences.Cutting)
             {
-                <MudItem xs="4">
+                <MudItem xs="12" md="4">
                     <MudTextField Label="Начальный диаметр" @bind-Value="_CuttingExternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                 </MudItem>
-                <MudItem xs="4">
+                <MudItem xs="12" md="4">
                     <MudTextField Label="Конечный диаметр" @bind-Value="_CuttingInternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                 </MudItem>
-                <MudItem xs="4">
+                <MudItem xs="12" md="4">
                     <MudTextField Label="Конечная точка" @bind-Value="_CuttingPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                 </MudItem>
-                <MudItem xs="4">
+                <MudItem xs="12" md="4">
                     <MudTextField Label="Шаг" @bind-Value="_CuttingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                 </MudItem>
-                <MudItem xs="4">
-                    <MudTextField Label="@BluntLabel(CuttingBluntType)" @bind-Value="_CuttingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _caclCuttingChamferDiameter = true)" />
+                <MudItem xs="12" md="4">
+                    <MudTextField Label="@BluntLabel(CuttingBluntType)" @bind-Value="_CuttingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _calcCuttingChamferDiameter = true)" />
                 </MudItem>
-                <MudItem xs="4">
+                <MudItem xs="12" md="4">
                     <MudSelect Label="Тип" T="Blunt" Variant="Variant.Filled" @bind-Value="CuttingBluntType" Margin="Margin.Dense">
                         <MudSelectItem Value="@(Blunt.SimpleChamfer)">Простая фаска</MudSelectItem>
                         <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
@@ -615,7 +653,7 @@
                         <MudTextField Label="Угол фаски" @bind-Value="_CuttingCustomChamferAngle" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="°" Immediate="true" />
                     </MudItem>
                     <MudItem xs="12" md="4">
-                        <MudTextField Label="Конечный диаметр фаски" @bind-Value="_CuttingCustomChamferDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _caclCuttingChamferDiameter = false)" />
+                        <MudTextField Label="Конечный диаметр фаски" @bind-Value="_CuttingCustomChamferDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _calcCuttingChamferDiameter = false)" />
                     </MudItem>
                     <MudItem xs="12" md="4">
                         <MudTextField Label="Скругление на фаске" @bind-Value="_CuttingCustomChamferBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
@@ -624,8 +662,27 @@
                 }
             }
             break;
-        #endregion
-
+        
+        // накатка
+        case SequenceType.Burnishing:
+            <MudItem xs="12" md="4">
+                <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                    @foreach (var tool in Tools.Where(x => x is TurningBurnishingTool))
+                    {
+                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudTextField Label="Диаметр" @bind-Value="_BurnishingDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField Label="Начальная точка" @bind-Value="_BurnishingStart" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField Label="Конечная точка" @bind-Value="_BurnishingEnd" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+            </MudItem>
+            break;
         default:
             break;
     }
@@ -659,6 +716,9 @@
     public Machine Machine { get; set; }
 
     [Parameter]
+    public CoordinateSystem CoordinateSystem { get; set; }
+
+    [Parameter]
     public MachineType MachineType { get; set; }
 
     [Parameter]
@@ -677,11 +737,14 @@
     public int CyclesCount { get; set; }
 
     [Parameter]
+    public double SafePlane { get; set; }
+
+    [Parameter]
     public EventCallback<Mode> ModeChanged { get; set; }
 
     public Sequence CurrentSequence { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task  OnInitializedAsync()
     {
         if (Holes.Count == 0) Holes.Add(new Hole());
         HolesCount = 1;
@@ -699,7 +762,7 @@
         InnerGroovingBluntType = Blunt.Radius;
     }
 
-    #region Всякие OnChanged
+    //Всякие OnChanged
 
     private void OnSequenceChanged(SequenceType value)
     {
@@ -747,41 +810,53 @@
     private void OnGrooveCuttingTypeChanged(CuttingType value)
     {
         GrooveType = value;
-        if (GrooveType is CuttingType.Radial && !(Tool is GroovingExternalTool || Tool is GroovingInternalTool)) Tool = null;
-        if (GrooveType is CuttingType.Face && !(Tool is GroovingFaceTool)) Tool = null;
+        switch (GrooveType)
+        {
+            case CuttingType.Radial when Tool is not (GroovingExternalTool or GroovingInternalTool):
+            case CuttingType.Face when Tool is not GroovingFaceTool:
+                Tool = null;
+                break;
+        }
     }
 
     private void OnTemplateChanged(string value)
     {
         CurrentThreadTemplate = value;
-        if (ThreadStandart == ThreadStandart.Metric)
+        switch (ThreadStandard)
         {
-            Thread.GetMetricValues(CurrentThreadTemplate, out string diameter, out string pitch);
-            _ThreadDiameter = diameter;
-            _ThreadPitch = pitch;
-            ThreadNPTPlane = 0;
-        }
-        else if (ThreadStandart == ThreadStandart.BSPP)
-        {
-            Thread.GetBSPPValues(CurrentThreadTemplate, out string diameter, out string pitch);
-            _ThreadDiameter = diameter;
-            _ThreadPitch = pitch;
-            ThreadNPTPlane = 0;
-        }
-        else if (ThreadStandart == ThreadStandart.Trapeziodal)
-        {
-            Thread.GetTrapezoidalValues(CurrentThreadTemplate, out string diameter, out string pitch);
-            _ThreadDiameter = diameter;
-            _ThreadPitch = pitch;
-            ThreadNPTPlane = 0;
-        }
-        else if (ThreadStandart == ThreadStandart.NPT)
-        {
-            Thread.GetNPTValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
-            _ThreadDiameter = externalDiameter;
-            _ThreadPitch = pitch;
-            _ThreadEnd = (-threadLength).ToPrettyString(); // наверно тоже строку стоит возвращать
-            ThreadNPTPlane = planeLength;
+            case ThreadStandard.Metric:
+            {
+                Thread.GetMetricValues(CurrentThreadTemplate, out string diameter, out string pitch);
+                _ThreadDiameter = diameter;
+                _ThreadPitch = pitch;
+                ThreadNPTPlane = 0;
+                break;
+            }
+            case ThreadStandard.BSPP:
+            {
+                Thread.GetBsppValues(CurrentThreadTemplate, out string diameter, out string pitch);
+                _ThreadDiameter = diameter;
+                _ThreadPitch = pitch;
+                ThreadNPTPlane = 0;
+                break;
+            }
+            case ThreadStandard.Trapezoidal:
+            {
+                Thread.GetTrapezoidalValues(CurrentThreadTemplate, out string diameter, out string pitch);
+                _ThreadDiameter = diameter;
+                _ThreadPitch = pitch;
+                ThreadNPTPlane = 0;
+                break;
+            }
+            case ThreadStandard.NPT:
+            {
+                Thread.GetNptValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
+                _ThreadDiameter = externalDiameter;
+                _ThreadPitch = pitch;
+                _ThreadEnd = (-threadLength).ToPrettyString(); // наверно тоже строку стоит возвращать
+                ThreadNPTPlane = planeLength;
+                break;
+            }
         }
     }
 
@@ -798,10 +873,10 @@
             Holes.Remove(Holes[^1]);
         }
     }
-    #endregion
+    
 
 
-    #region Типы переходов
+    //Типы переходов
     private SequenceType Type { get; set; }
 
     private GeneralSequences GeneralSequence { get; set; }
@@ -813,7 +888,7 @@
     private ThreadingSequences ThreadingSequence { get; set; }
 
     private TurningGroovingSequences GroovingSequence { get; set; }
-    #endregion
+    
 
     private Tool Tool { get; set; }
     private string CustomOperation { get; set; } = string.Empty;
@@ -825,50 +900,51 @@
 
     private string CurrentThreadTemplate { get; set; }
 
-    #region Точение резьбы
-    private ThreadStandart ThreadStandart { get; set; }
+    //Точение резьбы
+    private ThreadStandard ThreadStandard { get; set; }
     private CuttingType ThreadType { get; set; }
 
     private string _ThreadDiameter { get; set; }
-    private double ThreadDiameter { get => Util.GetDouble(_ThreadDiameter, numberOption: Util.GetNumberOption.Any); }
+    private double ThreadDiameter => _ThreadDiameter.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     private string _ThreadPitch { get; set; }
-    private double ThreadPitch { get => Util.GetDouble(_ThreadPitch, numberOption: Util.GetNumberOption.Any); }
+    private double ThreadPitch => _ThreadPitch.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     private string _ThreadStart { get; set; }
-    private double ThreadStart { get => Util.GetDouble(_ThreadStart, numberOption: Util.GetNumberOption.Any); }
+    private double ThreadStart => _ThreadStart.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     private string _ThreadEnd { get; set; } = "-";
-    private double ThreadEnd { get => Util.GetDouble(_ThreadEnd, numberOption: Util.GetNumberOption.Any) - Math.Round(ThreadPitch, 1); }
+    private double ThreadEnd => _ThreadEnd.GetDouble(numberOption: Util.GetNumberOption.Any) - Math.Round(ThreadPitch, 1);
 
     private double ThreadNPTPlane { get; set; }
-    #endregion
+    
 
-    #region Резьбонарезание
+    //Резьбонарезание
     private string _TapCutSpeed { get; set; }
-    private double TapCutSpeed { get => Util.GetDouble(_TapCutSpeed, numberOption: Util.GetNumberOption.Any); }
+    private double TapCutSpeed => _TapCutSpeed.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     private string _TapStart { get; set; }
-    private double TapStart { get => Util.GetDouble(_TapStart, numberOption: Util.GetNumberOption.Any); }
+    private double TapStart => _TapStart.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     private string _TapEnd { get; set; } = "-";
-    private double TapEnd { get => Util.GetDouble(_TapEnd, numberOption: Util.GetNumberOption.Any); }
-    #endregion
+    private double TapEnd => _TapEnd.GetDouble(numberOption: Util.GetNumberOption.Any);
 
-    #region Торцовка
+    
+
+    //Торцовка
     bool _caclFacingChamferDiameter = true;
-    int _MediumBluntFieldSize { get => TurningSequence == TurningSequences.FinishFacing ? 4 : 6; }
+    int _MediumBluntFieldSize => TurningSequence == TurningSequences.FinishFacing ? 4 : 6;
 
-    private double FacingExternalDiameter { get => WorkpieceExternalDiameter; }
+    private double FacingExternalDiameter => WorkpieceExternalDiameter;
 
     private string _FacingStepOver { get; set; } = "1";
-    private double FacingStepOver { get => Util.GetDouble(_FacingStepOver); }
+    private double FacingStepOver => _FacingStepOver.GetDouble();
 
     private string _FacingRoughStockAllow { get; set; } = "2";
-    private double FacingRoughStockAllow { get => Util.GetDouble(_FacingRoughStockAllow); }
+    private double FacingRoughStockAllow => _FacingRoughStockAllow.GetDouble();
 
     private string _FacingProfStockAllow { get; set; } = "0.2";
-    private double FacingProfStockAllow { get => Util.GetDouble(_FacingProfStockAllow); }
+    private double FacingProfStockAllow => _FacingProfStockAllow.GetDouble();
 
     private string _facingCornerBlunt;
     private string _FacingCornerBlunt
@@ -883,7 +959,7 @@
             }
         }
     }
-    private double FacingCornerBlunt { get => Util.GetDouble(_FacingCornerBlunt); }
+    private double FacingCornerBlunt => _FacingCornerBlunt.GetDouble();
 
     private Blunt FacingBluntType { get; set; }
 
@@ -904,42 +980,40 @@
             }
         }
     }
-    private double FacingCustomChamferAngle { get => Util.GetDouble(_FacingCustomChamferAngle); }
+    private double FacingCustomChamferAngle => _FacingCustomChamferAngle.GetDouble();
 
     private string _FacingCustomChamferBlunt { get; set; }
-    private double FacingCustomChamferBlunt { get => Util.GetDouble(_FacingCustomChamferBlunt); }
+    private double FacingCustomChamferBlunt => _FacingCustomChamferBlunt.GetDouble();
 
-    private string _facingCustumChamferDiameter;
+    private string _facingCustomChamferDiameter;
     private string _FacingCustomChamferDiameter
     {
-        get => _facingCustumChamferDiameter;
+        get => _facingCustomChamferDiameter;
         set
         {
-            _facingCustumChamferDiameter = value;
-            if (!_caclFacingChamferDiameter)
-            {
-                var result = ((FacingExternalDiameter - FacingCustomChamferDiameter) / 2 * Math.Tan((90 - FacingCustomChamferAngle).Radians())).ToPrettyString();
-                _FacingCornerBlunt = result;
-            }
+            _facingCustomChamferDiameter = value;
+            if (_caclFacingChamferDiameter) return;
+            string result = ((FacingExternalDiameter - FacingCustomChamferDiameter) / 2 * Math.Tan((90 - FacingCustomChamferAngle).Radians())).ToPrettyString();
+            _FacingCornerBlunt = result;
         }
     }
-    private double FacingCustomChamferDiameter { get => Util.GetDouble(_FacingCustomChamferDiameter); }
+    private double FacingCustomChamferDiameter => _FacingCustomChamferDiameter.GetDouble();
 
-    #endregion
+    
 
-    #region Сверловка
+    //Сверловка
 
     private string _DrillStart { get; set; } = "2";
-    private double DrillStart { get => Util.GetDouble(_DrillStart, numberOption: Util.GetNumberOption.Any); }
+    private double DrillStart => _DrillStart.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     private string _DrillEnd { get; set; } = "-";
-    private double DrillEnd { get => Util.GetDouble(_DrillEnd, numberOption: Util.GetNumberOption.Any); }
+    private double DrillEnd => _DrillEnd.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     private string _PeckingDepth { get; set; } = "0.25";
-    private double PeckingDepth { get => Util.GetDouble(_PeckingDepth); }
+    private double PeckingDepth => _PeckingDepth.GetDouble();
 
     private string _PeckingDeepDepth { get; set; } = "2";
-    private double PeckingDeepDepth { get => Util.GetDouble(_PeckingDeepDepth); }
+    private double PeckingDeepDepth => _PeckingDeepDepth.GetDouble();
 
     private List<Hole> Holes { get; set; } = new();
     private int HolesCount { get; set; } = 1;
@@ -947,25 +1021,25 @@
     private double HolesRadius { get; set; }
     private double StartAngle { get; set; } = 0;
 
-    private enum HolesSetterType { Manual, Cylinder}
+    private enum HolesSetterType { Manual, Cylinder, EvenlyCylinder}
     private HolesSetterType HolesSetter { get; set; }
 
-    #endregion
+    
 
-    #region Отрезка
+    //Отрезка
 
-    private bool _caclCuttingChamferDiameter = true;
+    private bool _calcCuttingChamferDiameter = true;
     private string _CuttingExternalDiameter { get; set; }
-    private double CuttingExternalDiameter { get => Util.GetDouble(_CuttingExternalDiameter); }
+    private double CuttingExternalDiameter => _CuttingExternalDiameter.GetDouble();
 
     private string _CuttingInternalDiameter { get; set; }
-    private double CuttingInternalDiameter { get => Util.GetDouble(_CuttingInternalDiameter); }
+    private double CuttingInternalDiameter => _CuttingInternalDiameter.GetDouble();
 
     private string _CuttingStepOver { get; set; }
-    private double CuttingStepOver { get => Util.GetDouble(_CuttingStepOver); }
+    private double CuttingStepOver => _CuttingStepOver.GetDouble();
 
     private string _CuttingPoint { get; set; } = "-";
-    private double CuttingPoint { get => Util.GetDouble(_CuttingPoint, numberOption: Util.GetNumberOption.Any); }
+    private double CuttingPoint => _CuttingPoint.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     private string _cuttingCornerBlunt;
     private string _CuttingCornerBlunt
@@ -974,13 +1048,13 @@
         set
         {
             _cuttingCornerBlunt = value;
-            if (_caclCuttingChamferDiameter)
+            if (_calcCuttingChamferDiameter)
             {
                 _CuttingCustomChamferDiameter = (CuttingExternalDiameter - 2 * CuttingCornerBlunt * Math.Tan(CuttingCustomChamferAngle.Radians())).ToPrettyString();
             }
         }
     }
-    private double CuttingCornerBlunt { get => Util.GetDouble(_CuttingCornerBlunt); }
+    private double CuttingCornerBlunt => _CuttingCornerBlunt.GetDouble();
 
     private Blunt CuttingBluntType { get; set; } = Blunt.SimpleChamfer;
 
@@ -991,7 +1065,7 @@
         set
         {
             _cuttingCustomChamferAngle = value;
-            if (_caclCuttingChamferDiameter)
+            if (_calcCuttingChamferDiameter)
             {
                 _CuttingCustomChamferDiameter = (CuttingExternalDiameter - 2 * CuttingCornerBlunt * Math.Tan(CuttingCustomChamferAngle.Radians())).ToPrettyString();
             }
@@ -1001,57 +1075,55 @@
             }
         }
     }
-    private double CuttingCustomChamferAngle { get => Util.GetDouble(_CuttingCustomChamferAngle); }
+    private double CuttingCustomChamferAngle => _CuttingCustomChamferAngle.GetDouble();
 
     private string _CuttingCustomChamferBlunt { get; set; }
-    private double CuttingCustomChamferBlunt { get => Util.GetDouble(_CuttingCustomChamferBlunt); }
+    private double CuttingCustomChamferBlunt => _CuttingCustomChamferBlunt.GetDouble();
 
-    private string _cuttingCustumChamferDiameter;
+    private string _cuttingCustomChamferDiameter;
     private string _CuttingCustomChamferDiameter {
-        get => _cuttingCustumChamferDiameter;
+        get => _cuttingCustomChamferDiameter;
         set
         {
-            _cuttingCustumChamferDiameter = value;
-            if (!_caclCuttingChamferDiameter)
+            _cuttingCustomChamferDiameter = value;
+            if (!_calcCuttingChamferDiameter)
             {
                 _CuttingCornerBlunt = ((CuttingExternalDiameter - CuttingCustomChamferDiameter) / 2 * Math.Tan((90 - CuttingCustomChamferAngle).Radians())).ToPrettyString();
             }
         }
     }
-    private double CuttingCustomChamferDiameter { get => Util.GetDouble(_CuttingCustomChamferDiameter); }
+    private double CuttingCustomChamferDiameter => _CuttingCustomChamferDiameter.GetDouble();
 
+    
 
-
-    #endregion
-
-    #region Канавки
+    //Канавки
 
     private string _GroovingExternalDiameter { get; set; }
-    private double GroovingExternalDiameter { get => Util.GetDouble(_GroovingExternalDiameter); }
+    private double GroovingExternalDiameter => _GroovingExternalDiameter.GetDouble();
 
     private string _GroovingInternalDiameter { get; set; }
-    private double GroovingInternalDiameter { get => Util.GetDouble(_GroovingInternalDiameter); }
+    private double GroovingInternalDiameter => _GroovingInternalDiameter.GetDouble();
 
     private string _GroovingStepOver { get; set; }
-    private double GroovingStepOver { get => Util.GetDouble(_GroovingStepOver); }
+    private double GroovingStepOver => _GroovingStepOver.GetDouble();
 
     private string _GroovingWidth { get; set; }
-    private double GroovingWidth { get => Util.GetDouble(_GroovingWidth); }
+    private double GroovingWidth => _GroovingWidth.GetDouble();
 
     private string _GroovingStartPoint { get; set; }
-    private double GroovingStartPoint { get => Util.GetDouble(_GroovingStartPoint); }
+    private double GroovingStartPoint => _GroovingStartPoint.GetDouble();
 
     private string _GroovingCuttingPoint { get; set; } = "-";
-    private double GroovingCuttingPoint { get => Util.GetDouble(_GroovingCuttingPoint, numberOption: Util.GetNumberOption.Any); }
+    private double GroovingCuttingPoint => _GroovingCuttingPoint.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     private string _GroovingProfStockAllow { get; set; }
-    private double GroovingProfStockAllow { get => Util.GetDouble(_GroovingProfStockAllow); }
+    private double GroovingProfStockAllow => _GroovingProfStockAllow.GetDouble();
 
     private string _OuterGroovingCornerBlunt { get; set; }
-    private double OuterGroovingCornerBlunt { get => Util.GetDouble(_OuterGroovingCornerBlunt); }
+    private double OuterGroovingCornerBlunt => _OuterGroovingCornerBlunt.GetDouble();
 
     private string _InnerGroovingCornerBlunt { get; set; }
-    private double InnerGroovingCornerBlunt { get => Util.GetDouble(_InnerGroovingCornerBlunt); }
+    private double InnerGroovingCornerBlunt => _InnerGroovingCornerBlunt.GetDouble();
 
     private Blunt OuterGroovingBluntType { get; set; }
     private Blunt InnerGroovingBluntType { get; set; }
@@ -1062,12 +1134,23 @@
 
     private bool ExternalGrooving => GroovingExternalDiameter > GroovingInternalDiameter;
 
-    #endregion
+
+    // накатка
+    private CuttingType BurnishingType { get; set; }
+
+    private string _BurnishingDiameter { get; set; }
+    private double BurnishingDiameter => _BurnishingDiameter.GetDouble();
+
+    private string _BurnishingStart { get; set; }
+    private double BurnishingStart => _BurnishingStart.GetDouble(numberOption: Util.GetNumberOption.Any);
+
+    private string _BurnishingEnd { get; set; }
+    private double BurnishingEnd => _BurnishingEnd.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     /// <summary>
     /// Тут сразу формируется переход, текст которого выводится в пример. Уже созданный тут переход сабмитится при нажатии на кнопку.
     /// </summary>
-    #region Пример
+    //Пример
     public string ExampleText
     {
         get
@@ -1085,7 +1168,7 @@
                         CurrentSequence = new TurningCustomSequence(Machine, Tool, CustomOperation);
                         return CurrentSequence.Operation;
                     case MachineType.Milling:
-                        CurrentSequence = new MillingCustomSequence(Machine, Tool, CustomOperation, Coolant, ToolCallPolar);
+                        CurrentSequence = new MillingCustomSequence(Machine, CoordinateSystem, Tool, CustomOperation, Coolant, ToolCallPolar, SafePlane);
                         return CurrentSequence.Operation;
                 }
             }
@@ -1180,12 +1263,15 @@
                     case MachineType.Milling:
                         CurrentSequence = new MillingHighSpeedDrillingSequence(
                             Machine,
+                            CoordinateSystem,
                             WorkpieceMaterial,
                             Tool as MillingDrillingTool,
                             DrillStart,
                             DrillEnd,
-                            HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
-                            HolesSetter == HolesSetterType.Cylinder ? true : false);
+                            HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ? 
+                                PolarHoles(HolesCount, HolesRadius, StartAngle, HolesSetter is HolesSetterType.EvenlyCylinder) : Holes,
+                            HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder,
+                            SafePlane);
                         return CurrentSequence.Operation;
                 }
             }
@@ -1206,13 +1292,16 @@
                     case MachineType.Milling:
                         CurrentSequence = new MillingPeckDrillingSequence(
                             Machine,
+                            CoordinateSystem,
                             WorkpieceMaterial,
                             Tool as MillingDrillingTool,
                             PeckingDepth,
                             DrillStart,
                             DrillEnd,
-                            HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
-                            HolesSetter == HolesSetterType.Cylinder ? true : false);
+                            HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ? 
+                                PolarHoles(HolesCount, HolesRadius, StartAngle, HolesSetter is HolesSetterType.EvenlyCylinder) : Holes,
+                            HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder, 
+                            SafePlane);
                         return CurrentSequence.Operation;
                 }
             }
@@ -1233,13 +1322,16 @@
                     case MachineType.Milling:
                         CurrentSequence = new MillingPeckDrillingSequence(
                             Machine,
+                            CoordinateSystem,
                             WorkpieceMaterial,
                             Tool as MillingDrillingTool,
                             PeckingDeepDepth,
                             DrillStart,
                             DrillEnd,
-                            HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
-                            HolesSetter == HolesSetterType.Cylinder ? true : false);
+                            HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ? 
+                                PolarHoles(HolesCount, HolesRadius, StartAngle, HolesSetter is HolesSetterType.EvenlyCylinder) : Holes,
+                            HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder, 
+                            SafePlane);
                         return CurrentSequence.Operation;
                 }
             }
@@ -1249,7 +1341,7 @@
                 CurrentSequence = new ThreadCuttingSequence(
                     Machine,
                     Tool as ThreadingExternalTool,
-                    ThreadStandart,
+                    ThreadStandard,
                     ThreadType,
                     ThreadDiameter,
                     ThreadPitch,
@@ -1263,7 +1355,7 @@
                 CurrentSequence = new ThreadCuttingSequence(
                     Machine,
                     Tool as ThreadingInternalTool,
-                    ThreadStandart,
+                    ThreadStandard,
                     ThreadType,
                     ThreadDiameter,
                     ThreadPitch,
@@ -1283,12 +1375,15 @@
                     case MachineType.Milling:
                         CurrentSequence = new MillingTappingSequence(
                         Machine,
+                        CoordinateSystem,
                         Tool as MillingTappingTool,
                         TapCutSpeed,
                         TapStart,
                         TapEnd,
-                        HolesSetter == HolesSetterType.Cylinder ? PolarHoles(HolesCount, HolesRadius, StartAngle) : Holes,
-                        HolesSetter == HolesSetterType.Cylinder ? true : false);
+                        HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ? 
+                            PolarHoles(HolesCount, HolesRadius, StartAngle, HolesSetter is HolesSetterType.EvenlyCylinder) : Holes,
+                        HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder, 
+                        SafePlane);
                         return CurrentSequence.Operation;
 
                 }
@@ -1347,12 +1442,12 @@
                         InnerGroovingBluntType);
                     return CurrentSequence.Operation;
                 }
-                else if (Tool is GroovingFaceTool)
+                else if (Tool is GroovingFaceTool groovingFaceTool)
                 {
                     CurrentSequence = new TurningFaceGroovingSequence(
                         Machine,
                         WorkpieceMaterial,
-                        Tool as GroovingFaceTool,
+                        groovingFaceTool,
                         GroovingCuttingPoint,
                         GroovingExternalDiameter,
                         GroovingInternalDiameter,
@@ -1368,12 +1463,12 @@
             }
             if (Type == SequenceType.Grooving && GroovingSequence == TurningGroovingSequences.RoughGrooving)
             {
-                if (Tool is GroovingExternalTool)
+                if (Tool is GroovingExternalTool groovingExternalTool)
                 {
                     CurrentSequence = new TurningExternalRoughGroovingSequence(
                         Machine,
                         WorkpieceMaterial,
-                        Tool as GroovingExternalTool,
+                        groovingExternalTool,
                         GroovingCuttingPoint,
                         GroovingExternalDiameter,
                         GroovingInternalDiameter,
@@ -1386,12 +1481,12 @@
                         InnerGroovingBluntType);
                     return CurrentSequence.Operation;
                 }
-                else if (Tool is GroovingInternalTool)
+                else if (Tool is GroovingInternalTool groovingInternalTool)
                 {
                     CurrentSequence = new TurningInternalGroovingSequence(
                         Machine,
                         WorkpieceMaterial,
-                        Tool as GroovingInternalTool,
+                        groovingInternalTool,
                         GroovingCuttingPoint,
                         GroovingExternalDiameter,
                         GroovingInternalDiameter,
@@ -1404,12 +1499,12 @@
                         InnerGroovingBluntType);
                     return CurrentSequence.Operation;
                 }
-                else if (Tool is GroovingFaceTool)
+                else if (Tool is GroovingFaceTool groovingFaceTool)
                 {
                     CurrentSequence = new TurningFaceRoughGroovingSequence(
                         Machine,
                         WorkpieceMaterial,
-                        Tool as GroovingFaceTool,
+                        groovingFaceTool,
                         GroovingCuttingPoint,
                         GroovingExternalDiameter,
                         GroovingInternalDiameter,
@@ -1424,12 +1519,22 @@
                 }
 
             }
+            if (Type == SequenceType.Burnishing)
+            {
+                CurrentSequence = new TurningBurnishingSequence(
+                    Machine,
+                    Tool as TurningBurnishingTool, 
+                    BurnishingDiameter,
+                    BurnishingStart,
+                    BurnishingEnd);
+                return CurrentSequence.Operation;
+            }
             return string.Empty;
         }
     }
-    #endregion
+    
 
-    // добавлеие перехода
+    // добавление перехода
     async Task Submit()
     {
         Program.Add(CurrentSequence);
@@ -1437,15 +1542,15 @@
         await ModeChanged.InvokeAsync(Mode);
     }
 
-    private List<Hole> PolarHoles(int holesCount, double radius, double startAngle)
+    private List<Hole> PolarHoles(int holesCount, double radius, double startAngle, bool evenly)
     {
         List<Hole> result = new();
-        double angleStep = 360 / holesCount;
+        double angleStep = 360.0 / holesCount;
         while (startAngle >= 360) startAngle -= 360;
         while (startAngle <= -360) startAngle += 360;
         for (int i = 0; i < holesCount; i++)
         {
-            result.Add(new Hole(radius, angleStep * i + startAngle));
+            result.Add(evenly ? new Hole(radius, angleStep * i + startAngle) : new Hole(radius, Holes[i].Y));
         }
         return result;
     }

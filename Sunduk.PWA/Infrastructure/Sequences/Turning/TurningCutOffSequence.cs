@@ -1,4 +1,5 @@
 ﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
@@ -19,6 +20,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 
         public override MachineType MachineType => MachineType.Turning;
         public override string Operation => Templates.GroovingOperation.CutOffSequence(Machine, Material, Tool, CuttingPoint, ExternalDiameter, InternalDiameter, CornerBlunt, StepOver, BluntType, BluntCustomAngle, BluntCustomRadius);
+        public override OperationTime MachineTime => this.OperationTime(Material);
         public override string Name => $"Отрезка";
 
         public TurningCutOffSequence(

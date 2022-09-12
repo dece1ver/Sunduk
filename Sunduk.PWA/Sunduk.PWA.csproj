@@ -5,14 +5,15 @@
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <AssemblyName>Sunduk</AssemblyName>
     <ApplicationIcon>wwwroot\favicon.ico</ApplicationIcon>
-    <AssemblyVersion>1.0.3.11</AssemblyVersion>
-    <FileVersion>1.0.3.11</FileVersion>
+    <AssemblyVersion>1.0.4.2</AssemblyVersion>
+    <FileVersion>1.0.4.2</FileVersion>
     <Authors>dece1ver</Authors>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <NeutralLanguage />
     <NoWin32Manifest>true</NoWin32Manifest>
 	<PublishTrimmed>false</PublishTrimmed>
 	<UserSecretsId>d8e95f7a-203c-4a38-b42e-fa8e200063e5</UserSecretsId>
+	<Description>Sunduk</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,10 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlazorDownloadFile" Version="2.3.1" />
-    <PackageReference Include="Blazored.LocalStorage" Version="4.1.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.13" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.13" PrivateAssets="all" />
+    <PackageReference Include="BlazorDownloadFile" Version="2.4.0.2" />
+    <PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.17" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.17" PrivateAssets="all" />
     <PackageReference Include="MudBlazor" Version="5.2.4" />
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
   </ItemGroup>

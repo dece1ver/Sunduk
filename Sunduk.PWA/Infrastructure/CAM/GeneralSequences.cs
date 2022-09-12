@@ -3,6 +3,9 @@
     public enum GeneralSequences
     {
         Limiter,
-        CustomOperation
+        CustomOperation,
+        TailStockOn,
+        TailStockOff,
+        Stop,
     }
 }

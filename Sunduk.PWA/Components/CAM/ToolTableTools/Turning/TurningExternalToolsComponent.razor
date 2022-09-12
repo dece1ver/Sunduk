@@ -1,0 +1,79 @@
+﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<MudTable Items="TurningExternalTools" ReadOnly="ReadOnly" Hover="true" CanCancelEdit="false" Elevation="0">
+    <HeaderContent>
+        <MudTh>Позиция</MudTh>
+        <MudTh>Описание</MudTh>
+        <MudTh>Угол при вершине</MudTh>
+        <MudTh>Радиус при вершине</MudTh>
+        <MudTh>Исполнение</MudTh>
+        <MudTh/>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Позиция">T@(context.Position.ToolNumber())</MudTd>
+        <MudTd DataLabel="Тип">@(context.Type == TurningExternalTool.Types.Bar ? "Проходной" : "Подрезной")</MudTd>
+        <MudTd DataLabel="Угол при вершине">@context.Angle.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs)°</MudTd>
+        <MudTd DataLabel="Радиус при вершине">R@(context.Radius > 0 ? context.Radius.ToPrettyString() : "-")</MudTd>
+        <MudTd DataLabel="Исполнение">@(context.Hand == Tool.ToolHand.Right ? "Правое" : "Левое")</MudTd>
+        <MudTd>
+            <MudIconButton Class="ma-n3" Variant="Variant.Text" Icon="@Icons.Material.Outlined.RemoveCircleOutline" OnClick="(() => RemoveTurningExternalTool(context))" />
+        </MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="Позиция">
+            <MudTextField @bind-Value="@context.Position" Adornment="Adornment.Start" AdornmentText="T" Variant="Variant.Outlined" Margin="Margin.Dense" Format="D4" Required />
+        </MudTd>
+        <MudTd DataLabel="Тип">
+            <MudSelect T="TurningExternalTool.Types" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="@context.Type" Required>
+                <MudSelectItem Value="@TurningExternalTool.Types.Bar">Проходной</MudSelectItem>
+                <MudSelectItem Value="@TurningExternalTool.Types.Face">Подрезной</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+        <MudTd DataLabel="Угол при вершине">
+            <MudTextField @bind-Value="@context.Angle" Adornment="Adornment.End" AdornmentText="°" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+        </MudTd>
+        <MudTd DataLabel="Радиус при вершине">
+            <MudTextField @bind-Value="@context.Radius" Adornment="Adornment.Start" AdornmentText="R" Variant="Variant.Outlined" Margin="Margin.Dense" Converter="Util.DoubleConverter" Required />
+        </MudTd>
+        <MudTd DataLabel="Исполнение">
+            <MudSelect T="Tool.ToolHand" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="@context.Hand" Required>
+                <MudSelectItem Value="@Tool.ToolHand.Right">Правое</MudSelectItem>
+                <MudSelectItem Value="@Tool.ToolHand.Left">Левое</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+    </RowEditingTemplate>
+</MudTable>
+<AddToolButton OnClick="AddTurningExternalTool" />
+@code {
+    [Parameter]
+    public List<Tool> Tools { get; set; }
+
+    [Parameter] 
+    public EventCallback<List<Tool>> ToolsChanged { get; set; }
+
+    public List<TurningExternalTool> TurningExternalTools
+    {
+        get => Tools.OfType<TurningExternalTool>().ToList();
+        set
+        {
+            Tools.RemoveAll(x => x is TurningExternalTool);
+            Tools.AddRange(value);
+        }
+    }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    private async Task AddTurningExternalTool()
+    {
+        Tools.Add(new TurningExternalTool(0101, TurningExternalTool.Types.Bar, 80, 0.8));
+        await LocalStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+        await ToolsChanged.InvokeAsync(Tools);
+    }
+    private async Task RemoveTurningExternalTool(TurningExternalTool tool)
+    {
+        Tools.Remove(tool);
+        await LocalStorage.SetItemAsync(nameof(TurningExternalTools), TurningExternalTools);
+        await ToolsChanged.InvokeAsync(Tools);
+    }
+}

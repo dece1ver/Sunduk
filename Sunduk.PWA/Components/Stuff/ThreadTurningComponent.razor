@@ -10,11 +10,11 @@
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="6">
-            <MudSelect Label="Стандарт" T="ThreadStandart" Value="ThreadStandart" Variant="Variant.Filled" ValueChanged="OnStandartChanged">
-                <MudSelectItem Value="@(ThreadStandart.Metric)">60° Метрическая</MudSelectItem>
-                <MudSelectItem Value="@(ThreadStandart.BSPP)">55° Трубная цилиндрическая</MudSelectItem>
-                <MudSelectItem Value="@(ThreadStandart.Trapeziodal)">30° Трапецеидальная</MudSelectItem>
-                <MudSelectItem Value="@(ThreadStandart.NPT)">60° Коническая</MudSelectItem>
+            <MudSelect Label="Стандарт" T="ThreadStandard" Value="ThreadStandard" Variant="Variant.Filled" ValueChanged="OnStandartChanged">
+                <MudSelectItem Value="@(ThreadStandard.Metric)">@(ThreadStandard.Metric.Description())</MudSelectItem>
+                <MudSelectItem Value="@(ThreadStandard.BSPP)">@(ThreadStandard.BSPP.Description())</MudSelectItem>
+                <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">@(ThreadStandard.Trapezoidal.Description())</MudSelectItem>
+                <MudSelectItem Value="@(ThreadStandard.NPT)">@(ThreadStandard.NPT.Description())</MudSelectItem>
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="6">
@@ -125,12 +125,12 @@
             <MudExpansionPanel Text="Пример программы для Fanuc">
                 <MudItem xs="12">
                     <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace; font-size: small;" Margin="Margin.Dense" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z{StartPointZ.NC()} S{SpindleSpeed.Round(100)} M3 G97\n" +
-                                $"G76 P0201{Thread.Profile(ThreadStandart)} Q{Passes[^2].Microns()} R{Passes[^1].NC()}\n" +
+                                $"G76 P0201{Thread.Profile(ThreadStandard)} Q{Passes[^2].Microns()} R{Passes[^1].NC()}\n" +
                                 $"G76 X{EndDiameter} Z{EndPointZ.NC()} P{(int)(Passes.Sum().Microns())} Q{Passes[0].Microns()}{ThreadShift} F{ThreadPitch.NC()}")">
                     </MudTextField>
                 </MudItem>
             </MudExpansionPanel>
-        @if(ThreadStandart == ThreadStandart.NPT)
+        @if(ThreadStandard == ThreadStandard.NPT)
         {
             <MudExpansionPanel Text="Пример проточки под резьбу">
                 <MudItem xs="12">
@@ -151,53 +151,41 @@
     {
         get
         {
-            if (ThreadStandart == ThreadStandart.Metric)
+            return ThreadStandard switch
             {
-                return Thread.metricTemplates;
-            }
-            else if (ThreadStandart == ThreadStandart.BSPP)
-            {
-                return Thread.bsppTemplates;
-            }
-            else if (ThreadStandart == ThreadStandart.Trapeziodal)
-            {
-                return Thread.trapezoidalTemplates;
-            }
-            else if (ThreadStandart == ThreadStandart.NPT)
-            {
-                return Thread.nptTemplates;
-            }
-            else
-            {
-                return new HashSet<string> { };
-            }
+                ThreadStandard.Metric => Thread.MetricTemplates,
+                ThreadStandard.BSPP => Thread.BsppTemplates,
+                ThreadStandard.Trapezoidal => Thread.TrapezoidalTemplates,
+                ThreadStandard.NPT => Thread.NptTemplates,
+                _ => new HashSet<string> { }
+                };
         }
     }
     public string CurrentThreadTemplate { get; set; }
 
-    public ThreadStandart ThreadStandart { get; set; } = ThreadStandart.Metric;
+    public ThreadStandard ThreadStandard { get; set; } = ThreadStandard.Metric;
     public CuttingType ThreadType { get; set; } = CuttingType.External;
 
 
     public string ThreadDiameterString { get; set; }
-    public double ThreadDiameter { get => Util.GetDouble(ThreadDiameterString); }
+    public double ThreadDiameter => Util.GetDouble(ThreadDiameterString);
 
     public string ThreadPitchString { get; set; }
-    public double ThreadPitch { get => Util.GetDouble(ThreadPitchString); }
+    public double ThreadPitch => Util.GetDouble(ThreadPitchString);
 
     public double PlaneLength { get; set; } = 0;
     public string ThreadShift
     {
         get
         {
-            if (ThreadStandart == ThreadStandart.NPT)
+            if (ThreadStandard == ThreadStandard.NPT)
             {
                 switch (ThreadType)
                 {
                     case CuttingType.External:
-                        return $" R-{Thread.IntNPTThreadShift(EndPointZ, StartPointZ).NC(2)}";
+                        return $" R-{Thread.IntNptThreadShift(EndPointZ, StartPointZ).NC(2)}";
                     case CuttingType.Internal:
-                        return $" R{Thread.IntNPTThreadShift(EndPointZ, StartPointZ).NC(2)}";
+                        return $" R{Thread.IntNptThreadShift(EndPointZ, StartPointZ).NC(2)}";
                     default:
                         return string.Empty;
                 }
@@ -208,37 +196,37 @@
 
     public string TurningExample { get
         {
-            switch (ThreadStandart)
+            switch (ThreadStandard)
             {
-                case ThreadStandart.Metric:
+                case ThreadStandard.Metric:
                     switch (ThreadType)
                     {
                         case CuttingType.External:
-                            return $"G0 X{(ThreadDiameter - 2 * Thread.ThreadChamfer(ThreadStandart, ThreadPitch, ThreadType) - InsertRadius).NC()} Z1. S180 M3\n" + 
+                            return $"G0 X{(ThreadDiameter - 2 * Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) - InsertRadius).NC()} Z1. S180 M3\n" + 
                                    $"G1 Z0. F0.1\n" +
-                                   $"X{ThreadDiameter.NC()} C{(Thread.ThreadChamfer(ThreadStandart, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
+                                   $"X{ThreadDiameter.NC()} C{(Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()}";
                         case CuttingType.Internal:
-                            return $"G0 X{(ThreadDiameter - ThreadPitch + 2 * Thread.ThreadChamfer(ThreadStandart, ThreadPitch, ThreadType) + InsertRadius).NC()} Z1. S180 M3\n" +
+                            return $"G0 X{(ThreadDiameter - ThreadPitch + 2 * Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius).NC()} Z1. S180 M3\n" +
                                    $"G1 Z0. F0.1\n" +
-                                   $"X{(ThreadDiameter - ThreadPitch).NC()} C{(Thread.ThreadChamfer(ThreadStandart, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
+                                   $"X{(ThreadDiameter - ThreadPitch).NC()} C{(Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()}";
                         default:
                             return string.Empty;
 
                     }
-                case ThreadStandart.NPT:
+                case ThreadStandard.NPT:
                     switch (ThreadType)
                     {
                         case CuttingType.External:
-                            return $"G0 X{(ThreadDiameter - 2 * (PlaneLength * Math.Tan(1.79.Radians())) - 2 * Thread.ThreadChamfer(ThreadStandart, ThreadPitch, ThreadType) - InsertRadius).NC()} Z1. S180 M3\n" +
+                            return $"G0 X{(ThreadDiameter - 2 * (PlaneLength * Math.Tan(1.79.Radians())) - 2 * Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) - InsertRadius).NC()} Z1. S180 M3\n" +
                                    $"G1 Z0. F0.1\n" +
-                                   $"X{(ThreadDiameter - 2 * (PlaneLength * Math.Tan(1.79.Radians()))).NC()} C{(Thread.ThreadChamfer(ThreadStandart, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
+                                   $"X{(ThreadDiameter - 2 * (PlaneLength * Math.Tan(1.79.Radians()))).NC()} C{(Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()} A-1.79";
                         case CuttingType.Internal:
-                            return $"G0 X{(ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandart, ThreadType, ThreadPitch) + 2 * Thread.ThreadChamfer(ThreadStandart, ThreadPitch, ThreadType) + InsertRadius).NC()} Z1. S180 M3\n" +
+                            return $"G0 X{(ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch) + 2 * Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius).NC()} Z1. S180 M3\n" +
                                    $"G1 Z0. F0.1\n" +
-                                   $"X{(ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandart, ThreadType, ThreadPitch)).NC()} C{(Thread.ThreadChamfer(ThreadStandart, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
+                                   $"X{(ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)).NC()} C{(Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()} A1.79";
                         default:
                             return string.Empty;
@@ -252,15 +240,15 @@
     //{
     //    get
     //    {
-    //        if (ThreadStandart == ThreadStandart.Metric)
+    //        if (ThreadStandard == ThreadStandard.Metric)
     //        {
     //            return "мм";
     //        }
-    //        else if (ThreadStandart == ThreadStandart.BSPP)
+    //        else if (ThreadStandard == ThreadStandard.BSPP)
     //        {
     //            return "TPI";
     //        }
-    //        else if (ThreadStandart == ThreadStandart.Trapeziodal)
+    //        else if (ThreadStandard == ThreadStandard.Trapezoidal)
     //        {
     //            return "мм";
     //        }
@@ -272,11 +260,11 @@
     //}
 
 
-    public double[] Passes { get => Thread.Passes(ThreadStandart, ThreadType, ThreadPitch); }
-    public double[] TotalPasses { get => Thread.TotalPasses(ThreadStandart, ThreadType, ThreadPitch); }
+    public double[] Passes => Thread.Passes(ThreadStandard, ThreadType, ThreadPitch);
+    public double[] TotalPasses => Thread.TotalPasses(ThreadStandard, ThreadType, ThreadPitch);
 
 
-    public int SpindleSpeed { get => ((int)(120000 / (Math.PI * ThreadDiameter))); }
+    public int SpindleSpeed => ((int)(120000 / (Math.PI * ThreadDiameter)));
 
     public double? ThreadAngle
     {
@@ -299,7 +287,7 @@
         {
             if (Thread.Valid(ThreadDiameter, ThreadPitch))
             {
-                return Thread.ApproachDiameter(ThreadStandart, ThreadType, ThreadDiameter, ThreadPitch, EndPointZ, StartPointZ, PlaneLength).NC(1);
+                return Thread.ApproachDiameter(ThreadStandard, ThreadType, ThreadDiameter, ThreadPitch, EndPointZ, StartPointZ, PlaneLength).NC(1);
             }
             return string.Empty;
         }
@@ -311,7 +299,7 @@
         {
             if (Thread.Valid(ThreadDiameter, ThreadPitch))
             {
-                return Thread.EndDiameter(ThreadStandart, ThreadType, ThreadDiameter, ThreadPitch, EndPointZ, StartPointZ, PlaneLength).NC(2);
+                return Thread.EndDiameter(ThreadStandard, ThreadType, ThreadDiameter, ThreadPitch, EndPointZ, StartPointZ, PlaneLength).NC(2);
             }
             return string.Empty;
         }
@@ -322,11 +310,11 @@
 
     public double InsertRadius { get; set; } = 0.4;
 
-    private void OnStandartChanged(ThreadStandart value)
+    private void OnStandartChanged(ThreadStandard value)
     {
-        if (ThreadStandart != value)
+        if (ThreadStandard != value)
         {
-            ThreadStandart = value;
+            ThreadStandard = value;
             ThreadPitchString = string.Empty;
             ThreadDiameterString = string.Empty;
             CurrentThreadTemplate = null;
@@ -336,23 +324,23 @@
     private void OnTemplateChanged(string value)
     {
         CurrentThreadTemplate = value;
-        if (ThreadStandart == ThreadStandart.Metric)
+        if (ThreadStandard == ThreadStandard.Metric)
         {
             Thread.GetMetricValues(CurrentThreadTemplate, out string diameter, out string pitch);
             ThreadDiameterString = diameter;
             ThreadPitchString = pitch;
             PlaneLength = 0;
-            EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandart, ThreadPitch, ThreadType), 1);
+            EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
         }
-        else if (ThreadStandart == ThreadStandart.BSPP)
+        else if (ThreadStandard == ThreadStandard.BSPP)
         {
-            Thread.GetBSPPValues(CurrentThreadTemplate, out string diameter, out string pitch);
+            Thread.GetBsppValues(CurrentThreadTemplate, out string diameter, out string pitch);
             ThreadDiameterString = diameter;
             ThreadPitchString = pitch;
             PlaneLength = 0;
-            EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandart, ThreadPitch, ThreadType), 1);
+            EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
         }
-        else if (ThreadStandart == ThreadStandart.Trapeziodal)
+        else if (ThreadStandard == ThreadStandard.Trapezoidal)
         {
             Thread.GetTrapezoidalValues(CurrentThreadTemplate, out string diameter, out string pitch);
             ThreadDiameterString = diameter;
@@ -360,13 +348,13 @@
             PlaneLength = 0;
             EndPointZ = -30;
         }
-        else if (ThreadStandart == ThreadStandart.NPT)
+        else if (ThreadStandard == ThreadStandard.NPT)
         {
-            Thread.GetNPTValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
+            Thread.GetNptValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
             ThreadDiameterString = externalDiameter;
             ThreadPitchString = pitch;
             PlaneLength = planeLength;
-            EndPointZ = -threadLength - Math.Round(Thread.ThreadRunout(ThreadStandart, ThreadPitch, ThreadType), 1);
+            EndPointZ = -threadLength - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
         }
     }
 }
