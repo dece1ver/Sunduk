@@ -2,7 +2,7 @@
 @inject IDialogService DialogService
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-2">
-    @*<MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="fas fa-crutch">Раздел в разработке</MudAlert>*@
+    <MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="fas fa-crutch">Раздел в разработке</MudAlert>
     <MudGrid Spacing="1">
         <MudItem xs="12" Class="@(Mode is not Mode.General ? "mb-n3" : "mb-0")">
             <MudPaper Outlined="true" Class="pa-4 rounded-0">
@@ -184,7 +184,7 @@
                             <MudItem xs="6" sm="4">
                                 <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                             </MudItem>
-                            <MudItem xs="Machine is Machine.L230A ? 12 : 6" sm="4">
+                            <MudItem xs="12" sm="4">
                                 <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                             </MudItem>
                         }
@@ -200,7 +200,7 @@
                         <MudItem xs="6" sm="Machine is Machine.A110 ? 3 : 4">
                             <MudTextField @bind-Value="DrawingVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
-                        <MudItem xs="Machine is Machine.GS1500 or Machine.A110 ? 6 : 12" sm="Machine is Machine.A110 ? 3 : 4">
+                        <MudItem xs="12" sm="Machine is Machine.A110 ? 3 : 4">
                             <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
                     </MudGrid>

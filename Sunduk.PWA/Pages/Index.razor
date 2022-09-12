@@ -2,35 +2,26 @@
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
 
     <MudGrid Spacing="1" Class="d-flex pa-1" Justify="Justify.FlexStart">
-        <MudItem xs="6" md="@(ExperimantalMode ? 4 : 6)" lg="@(ExperimantalMode ? 4 : 3)" xl="@(ExperimantalMode ? 2 : 3)">
+        <MudItem xs="6" md="4" lg="4" xl="2">
             <SectionButton Label="Калькулятор режимов" Link="/calculator" Icon="@Icons.Material.Filled.Calculate" />
         </MudItem>
-
-        @if (ExperimantalMode)
-        {
-            <MudItem xs="6" md="@(ExperimantalMode ? 4 : 6)" lg="@(ExperimantalMode ? 4 : 3)" xl="@(ExperimantalMode ? 2 : 3)">
-            <SectionButton Label="SunduCAM" Link="/sunducam" Icon="@Icons.Material.Outlined.FeaturedPlayList" />
-        </MudItem>
-        }
-
-        <MudItem xs="6" md="@(ExperimantalMode ? 4 : 6)" lg="@(ExperimantalMode ? 4 : 3)" xl="@(ExperimantalMode ? 2 : 3)">
+        <MudItem xs="6" md="4" lg="4" xl="2">
             <SectionButton Label="Всякая хрень" Link="/stuff" Icon="@Icons.Material.Filled.RoundedCorner" />
         </MudItem>
 
-        <MudItem xs="6" md="@(ExperimantalMode ? 4 : 6)" lg="@(ExperimantalMode ? 4 : 3)" xl="@(ExperimantalMode ? 2 : 3)">
+        <MudItem xs="6" md="4" lg="4" xl="2">
             <SectionButton Label="Конвертеры" Link="/converters" Icon="@Icons.Material.Filled.Transform" />
         </MudItem>
 
-        <MudItem xs="6" md="@(ExperimantalMode ? 4 : 6)" lg="@(ExperimantalMode ? 4 : 3)" xl="@(ExperimantalMode ? 2 : 3)">
+        <MudItem xs="6" md="4" lg="4" xl="2">
             <SectionButton Label="База знаний" Link="/knowledge/about" Icon="@Icons.Material.Filled.MenuBook" />
         </MudItem>
-
-        @if (ExperimantalMode)
-        {
-            <MudItem xs="6" md="@(ExperimantalMode ? 4 : 6)" lg="@(ExperimantalMode ? 4 : 3)" xl="@(ExperimantalMode ? 2 : 3)">
+        <MudItem xs="6" md="4" lg="4" xl="2">
             <SectionButton Label="Расчеты времени" Link="/timecalc" Icon="@Icons.Material.Filled.Timer" />
         </MudItem>
-        }
+        <MudItem xs="6" md="4" lg="4" xl="2">
+            <SectionButton Label="SunduCAM" Link="/sunducam" Icon="@Icons.Material.Outlined.FeaturedPlayList" />
+        </MudItem>
         
     </MudGrid>
 </MudContainer>

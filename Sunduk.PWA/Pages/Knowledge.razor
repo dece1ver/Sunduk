@@ -1,52 +1,50 @@
 ﻿@page "/knowledge/{article}"
-@using Sunduk.PWA.Components.Knowledge;
-
 
 <MudContainer MaxWidth=MaxWidth.False Class="mt-0">
-    <MudGrid Spacing=1>
+    <MudGrid Spacing=1 Class="ml-n6">
         <MudItem xs=12 sm=4 lg=3 >
-                <MudList Dense=true Clickable="true" @bind-SelectedItem="selectedItem" @bind-SelectedValue="Article" Class="mt-n2">
-                    <MudListItem Dense=true DisableGutters=true Icon="@Icons.Material.Filled.Info" Value="@("about")" Href="/knowledge/about">
-                        <MudText Class="mx-n4" Typo=Typo.body2>О разделе</MudText>
-                    </MudListItem>
+            <MudList  Dense=true Clickable="true" @bind-SelectedItem="selectedItem" @bind-SelectedValue="Article" Class="mt-n2">
+                <MudListItem Dense=true DisableGutters=true Icon="@Icons.Material.Filled.Info" Value="@("about")" Href="/knowledge/about">
+                    <MudText Class="mx-n4" Typo=Typo.body2>О разделе</MudText>
+                </MudListItem>
 
-                    <MudListItem Dense=true DisableGutters=true Icon="@Icons.Material.Filled.Folder" Expanded="true">
-                        <ChildContent>
-                            <MudText Class="mx-n4" Typo=Typo.body2>Справочник</MudText>
-                        </ChildContent>
-                        <NestedList>
-                            <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("center-length")" Href="/knowledge/center-length">
-                                <MudText Class="mx-n4" Typo=Typo.body2>Глубина центровки</MudText>
-                            </MudListItem>
-                            <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("fanuc-macro")" Href="/knowledge/fanuc-macro">
-                                <MudText Class="mx-n4" Typo=Typo.body2>Fanuc макро</MudText>
-                            </MudListItem>
-                            <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("vectors")" Href="/knowledge/vectors">
-                                <MudText Class="mx-n4" Typo=Typo.body2>Вектора</MudText>
-                            </MudListItem>
-                        </NestedList>
-                    </MudListItem>
+                <MudListItem Dense=true DisableGutters=true Icon="@Icons.Material.Filled.Folder" Expanded="true">
+                    <ChildContent>
+                        <MudText Class="mx-n4" Typo=Typo.body2>Справочник</MudText>
+                    </ChildContent>
+                    <NestedList>
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("center-length")" Href="/knowledge/center-length">
+                            <MudText Class="mx-n4" Typo=Typo.body2>Глубина центровки</MudText>
+                        </MudListItem>
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("fanuc-macro")" Href="/knowledge/fanuc-macro">
+                            <MudText Class="mx-n4" Typo=Typo.body2>Fanuc макро</MudText>
+                        </MudListItem>
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("vectors")" Href="/knowledge/vectors">
+                            <MudText Class="mx-n4" Typo=Typo.body2>Вектора</MudText>
+                        </MudListItem>
+                    </NestedList>
+                </MudListItem>
 
-                    <MudListItem Dense=true DisableGutters=true Icon="@Icons.Material.Filled.Folder">
-                        <ChildContent>
-                            <MudText Class="mx-n4" Typo=Typo.body2>Программирование Fanuc</MudText>
-                        </ChildContent>
-                        <NestedList>
-                            <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("custom-victor-cycles")" Href="/knowledge/custom-victor-cycles">
-                                <MudText Class="mx-n4" Typo=Typo.body2>Циклы Victor</MudText>
-                            </MudListItem>
-                            <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("fanuc-general-programming")" Href="/knowledge/fanuc-general-programming">
-                                <MudText Class="mx-n4" Typo=Typo.body2>Общая информация</MudText>
-                            </MudListItem>
-                            <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("programming-g00")" Href="/knowledge/programming-g00">
-                                <MudText Class="mx-n4" Typo=Typo.body2>G00</MudText>
-                            </MudListItem>
-                            <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("programming-g01")" Href="/knowledge/programming-g01">
-                                <MudText Class="mx-n4" Typo=Typo.body2>G01</MudText>
-                            </MudListItem>
-                        </NestedList>
-                    </MudListItem>
-                </MudList>
+                <MudListItem Dense=true DisableGutters=true Icon="@Icons.Material.Filled.Folder">
+                    <ChildContent>
+                        <MudText Class="mx-n4" Typo=Typo.body2>Программирование Fanuc</MudText>
+                    </ChildContent>
+                    <NestedList>
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("custom-victor-cycles")" Href="/knowledge/custom-victor-cycles">
+                            <MudText Class="mx-n4" Typo=Typo.body2>Циклы Victor</MudText>
+                        </MudListItem>
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("fanuc-general-programming")" Href="/knowledge/fanuc-general-programming">
+                            <MudText Class="mx-n4" Typo=Typo.body2>Общая информация</MudText>
+                        </MudListItem>
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("programming-g00")" Href="/knowledge/programming-g00">
+                            <MudText Class="mx-n4" Typo=Typo.body2>G00</MudText>
+                        </MudListItem>
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("programming-g01")" Href="/knowledge/programming-g01">
+                            <MudText Class="mx-n4" Typo=Typo.body2>G01</MudText>
+                        </MudListItem>
+                    </NestedList>
+                </MudListItem>
+            </MudList>
         </MudItem>
         <MudItem xs=12 sm=8 lg=9 Class="mr-n4">
             @switch (Article?.ToString())

@@ -15,9 +15,9 @@
     <MudAppBar Dense="true" Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudLink Typo="Typo.h5" Href="" Underline="Underline.None" Style="font-family: 'Saira Stencil One';">SUNDUK</MudLink>
-        <MudToggleIconButton @bind-Toggled="@ExperimentalMode"
+      @*<MudToggleIconButton @bind-Toggled="@ExperimentalMode"
                      Icon="fas fa-crutch" Color="@Color.Default" Title="Off"
-                     ToggledIcon="fas fa-crutch" ToggledColor="@Color.Primary" ToggledTitle="On"/>
+                     ToggledIcon="fas fa-crutch" ToggledColor="@Color.Primary" ToggledTitle="On"/>*@
         <MudSpacer />
         @if (DebugMode)
         {
@@ -51,6 +51,9 @@
 
 @code
 {
+    public static bool DebugMode { get; set; } = false;
+    public bool ExperimentalMode { get; set; } = DebugMode;
+
     [Inject] IBreakpointService BreakpointListener { get; set; }
 
     private Guid _subscriptionId;
@@ -82,10 +85,6 @@
     public Breakpoint Breakpoint { get; set; }
 
     string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-
-
-    public static bool DebugMode { get; set; } = true;
-    public bool ExperimentalMode { get; set; } = DebugMode ? DebugMode : !DebugMode;
 
     bool _drawerOpen = true;
 

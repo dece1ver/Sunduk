@@ -4,15 +4,15 @@
     }
 </style>
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid>
+    <MudGrid Spacing="1">
         <MudItem xs="6">
-            <MudSelect @bind-Value="WorkpieceForm" Label="Форма заготовки" T="Form" Variant="Variant.Outlined">
+            <MudSelect @bind-Value="WorkpieceForm" Label="Форма заготовки" T="Form" Variant="Variant.Filled" Margin="Margin.Dense">
                 <MudSelectItem Value="@(Form.Circle)">Круглая</MudSelectItem>
-                <MudSelectItem Value="@(Form.Rectangle)">Прямоугольная</MudSelectItem>
+                @*<MudSelectItem Value="@(Form.Rectangle)">Прямоугольная</MudSelectItem>*@
             </MudSelect>
         </MudItem>
         <MudItem xs="6">
-            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Material" Variant="Variant.Outlined">
+            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал" T="Material" Variant="Variant.Filled" Margin="Margin.Dense">
                 <MudSelectItem Value="@(Material.Steel)">Черная сталь</MudSelectItem>
                 <MudSelectItem Value="@(Material.Stainless)">Нержавеющая сталь</MudSelectItem>
             </MudSelect>
