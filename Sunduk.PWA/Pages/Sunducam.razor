@@ -1,111 +1,40 @@
 ﻿@page "/sunducam"
 @inject IDialogService DialogService
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="fas fa-crutch">Раздел в разработке</MudAlert>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-2">
+    @*<MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="fas fa-crutch">Раздел в разработке</MudAlert>*@
     <MudGrid Spacing="1">
-        <MudItem xs="12">
-            <MudExpansionPanel HideIcon="true">
-                <TitleContent>
-                    <div class="d-flex">
-                        <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false">
-                            <MudIconButton Icon="@Icons.Material.TwoTone.Save" Title="Скачать программу" Variant="Variant.Outlined"
-                                           OnClick="DownloadProgram" />
-                            <MudIconButton Icon="@Icons.Material.TwoTone.TableView" Title="Инструмент" OnClick="OpenToolDialog" Variant="Variant.Outlined"
-                                           Color="(Mode == Mode.ToolTable ? Color.Primary : Color.Default)" Class="ml-1" />
-                            <MudHidden Breakpoint="Breakpoint.Xs">
-                                <MudButton OnClick="OpenSequenceDialog" EndIcon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)" Variant="Variant.Outlined"
-                                           Color="(Mode == Mode.AddSequence ? Color.Primary : Color.Default)" Class="ml-1">Добавить переход</MudButton>
-                            </MudHidden>
-                            <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
-                                <MudIconButton OnClick="OpenSequenceDialog" Icon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)" Variant="Variant.Outlined"
-                                               Color="(Mode == Mode.AddSequence ? Color.Primary : Color.Default)" Class="ml-1">Добавить переход</MudIconButton>
-                            </MudHidden>
-                        </MudButtonGroup>
-                        <MudIcon Icon="@Icons.Material.TwoTone.Settings" Class="d-flex ml-auto mt-1" />
-                    </div>
-                </TitleContent>
-                <ChildContent>
-                    <MudGrid Spacing="1">
-                        <MudItem xs="Machine != Machine.GS1500 ? 8 : 12" sm="Machine != Machine.GS1500 ? 4 : 7" md="Machine != Machine.GS1500 ? 6 : 8">
-                            <MudSelect Value="Machine" Label="Станок" T="Machine" Variant="Variant.Filled" Dense="true" ValueChanged="OnMachineChanged">
-                                <MudSelectItem Value="@(Machine.L230A)">Hyundai L230A</MudSelectItem>
-                                <MudSelectItem Value="@(Machine.GS1500)">Goodway GS-1500</MudSelectItem>
-                                <MudSelectItem Value="@(Machine.A110)">Victor A110</MudSelectItem>
-                            </MudSelect>
-                        </MudItem>
-                        @if (Machine != Machine.GS1500)
-                        {
-                            <MudHidden Breakpoint="Breakpoint.MdAndDown">
-                                <MudItem xs="4" sm="3" md="2">
-                                    <MudSelect @bind-Value="CoordinateSystem" Label="Система координат" T="CoordinateSystem" Variant="Variant.Filled" Dense="true">
-                                        <MudSelectItem Value="@CoordinateSystem.G54"/>
-                                        <MudSelectItem Value="@CoordinateSystem.G55"/>
-                                        <MudSelectItem Value="@CoordinateSystem.G56"/>
-                                        <MudSelectItem Value="@CoordinateSystem.G57"/>
-                                        <MudSelectItem Value="@CoordinateSystem.G58"/>
-                                        <MudSelectItem Value="@CoordinateSystem.G59"/>
-                                    </MudSelect>
-                                </MudItem>
-                            </MudHidden>
-
-                            <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
-                                <MudItem xs="4" sm="3" md="2">
-                                    <MudSelect @bind-Value="CoordinateSystem" Label="СК" T="CoordinateSystem" Variant="Variant.Filled" Dense="true">
-                                        <MudSelectItem Value="@CoordinateSystem.G54"/>
-                                        <MudSelectItem Value="@CoordinateSystem.G55"/>
-                                        <MudSelectItem Value="@CoordinateSystem.G56"/>
-                                        <MudSelectItem Value="@CoordinateSystem.G57"/>
-                                        <MudSelectItem Value="@CoordinateSystem.G58"/>
-                                        <MudSelectItem Value="@CoordinateSystem.G59"/>
-                                    </MudSelect>
-                                </MudItem>
-                            </MudHidden>
-                        }
-                        <MudItem xs="12" sm="5" md="4">
-                            @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
-                            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал детали" T="Material" Variant="Variant.Filled" Dense="true">
-                                <MudSelectItem Value="@Material.Steel">Черная сталь</MudSelectItem>
-                                <MudSelectItem Value="@Material.Stainless">Нержавеющая сталь</MudSelectItem>
-                                <MudSelectItem Value="@Material.Brass">Бронза</MudSelectItem>
-                            </MudSelect>
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="6">
-                            <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="6">
-                            <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                        </MudItem>
-                        @if (MachineType == MachineType.Turning)
-                        {
-                            <MudItem xs="6" sm="4">
-                                <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                            </MudItem>
-                            <MudItem xs="6" sm="4">
-                                <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                            </MudItem>
-                            <MudItem xs="Machine is Machine.L230A ? 12 : 6" sm="4">
-                                <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                            </MudItem>
-                        }
-                        else
-                        {
-                            <MudItem xs="6" sm="3">
-                                <MudTextField @bind-Value="_SafePlane" Label="Плоскость безопасности" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                            </MudItem>
-                        }
-                        <MudItem xs="6" sm="3">
-                            <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
-                        </MudItem>
-                        <MudItem xs="12" sm="Machine is Machine.A110 ? 3 : 4">
-                            <MudTextField @bind-Value="DrawingVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                        </MudItem>
-                        <MudItem xs="12" sm="Machine is Machine.A110 ? 3 : 4">
-                            <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
-                        </MudItem>
-                    </MudGrid>
-                </ChildContent>
-            </MudExpansionPanel>
+        <MudItem xs="12" Class="@(Mode is not Mode.General ? "mb-n3" : "mb-0")">
+            <MudPaper Outlined="true" Class="pa-4 rounded-0">
+                <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false">
+                    <MudIconButton Icon="@Icons.Material.TwoTone.SaveAs" Title="Скачать программу" Variant="Variant.Outlined"
+                                    OnClick="DownloadProgram" />
+                    <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                        <MudButton EndIcon="@Icons.Material.TwoTone.Settings" OnClick="OpenSetupMode" Variant="Variant.Outlined"
+                                    Color="(Mode == Mode.Setup ? Color.Primary : Color.Default)" Class="ml-1">Наладка</MudButton>
+                    </MudHidden>
+                    <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true">
+                        <MudIconButton Icon="@Icons.Material.TwoTone.Settings" Title="Наладка" OnClick="OpenSetupMode" Variant="Variant.Outlined"
+                                        Color="(Mode == Mode.Setup ? Color.Primary : Color.Default)" Class="ml-1" />
+                    </MudHidden>
+                    <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                        <MudButton EndIcon="@Icons.Material.TwoTone.TableView" OnClick="OpenToolDialog" Variant="Variant.Outlined"
+                                    Color="(Mode == Mode.ToolTable ? Color.Primary : Color.Default)" Class="ml-1">Инструмент</MudButton>
+                    </MudHidden>
+                    <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true">
+                        <MudIconButton Icon="@Icons.Material.TwoTone.TableView" Title="Инструмент" OnClick="OpenToolDialog" Variant="Variant.Outlined"
+                                    Color="(Mode == Mode.ToolTable ? Color.Primary : Color.Default)" Class="ml-1" />
+                    </MudHidden>
+                    <MudHidden Breakpoint="Breakpoint.Xs">
+                        <MudButton OnClick="OpenSequenceDialog" EndIcon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)" Variant="Variant.Outlined"
+                                    Color="(Mode == Mode.AddSequence ? Color.Primary : Color.Default)" Class="ml-1">Добавить переход</MudButton>
+                    </MudHidden>
+                    <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+                        <MudIconButton OnClick="OpenSequenceDialog" Icon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)" Variant="Variant.Outlined"
+                                        Color="(Mode == Mode.AddSequence ? Color.Primary : Color.Default)" Class="ml-1">Добавить переход</MudIconButton>
+                    </MudHidden>
+                </MudButtonGroup>
+            </MudPaper>
         </MudItem>
         @switch (Mode)
         {
@@ -192,6 +121,91 @@
                                 </MudText>
                             }
                     </MudField>*@
+                </MudItem>
+                break;
+            case Mode.Setup:
+                <MudItem xs=12 Class="mt-0">
+                    <MudPaper Class="pa-4 rounded-0" Elevation="0" Outlined="false">
+                        <MudGrid Spacing="1">
+                        <MudItem xs="Machine != Machine.GS1500 ? 8 : 12" sm="Machine != Machine.GS1500 ? 4 : 7" md="Machine != Machine.GS1500 ? 6 : 8">
+                            <MudSelect Value="Machine" Label="Станок" T="Machine" Variant="Variant.Filled" Dense="true" ValueChanged="OnMachineChanged">
+                                <MudSelectItem Value="@(Machine.L230A)">Hyundai L230A</MudSelectItem>
+                                <MudSelectItem Value="@(Machine.GS1500)">Goodway GS-1500</MudSelectItem>
+                                <MudSelectItem Value="@(Machine.A110)">Victor A110</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        @if (Machine != Machine.GS1500)
+                        {
+                            <MudHidden Breakpoint="Breakpoint.MdAndDown">
+                                <MudItem xs="4" sm="3" md="2">
+                                    <MudSelect @bind-Value="CoordinateSystem" Label="Система координат" T="CoordinateSystem" Variant="Variant.Filled" Dense="true">
+                                        <MudSelectItem Value="@CoordinateSystem.G54"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G55"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G56"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G57"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G58"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G59"/>
+                                    </MudSelect>
+                                </MudItem>
+                            </MudHidden>
+
+                            <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
+                                <MudItem xs="4" sm="3" md="2">
+                                    <MudSelect @bind-Value="CoordinateSystem" Label="СК" T="CoordinateSystem" Variant="Variant.Filled" Dense="true">
+                                        <MudSelectItem Value="@CoordinateSystem.G54"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G55"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G56"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G57"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G58"/>
+                                        <MudSelectItem Value="@CoordinateSystem.G59"/>
+                                    </MudSelect>
+                                </MudItem>
+                            </MudHidden>
+                        }
+                        <MudItem xs="12" sm="5" md="4">
+                            @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
+                            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал детали" T="Material" Variant="Variant.Filled" Dense="true">
+                                <MudSelectItem Value="@Material.Steel">Черная сталь</MudSelectItem>
+                                <MudSelectItem Value="@Material.Stainless">Нержавеющая сталь</MudSelectItem>
+                                <MudSelectItem Value="@Material.Brass">Бронза</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="6">
+                            <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="6">
+                            <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        @if (MachineType == MachineType.Turning)
+                        {
+                            <MudItem xs="6" sm="4">
+                                <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="6" sm="4">
+                                <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="Machine is Machine.L230A ? 12 : 6" sm="4">
+                                <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
+                        }
+                        else
+                        {
+                            <MudItem xs="6" sm="3">
+                                <MudTextField @bind-Value="_SafePlane" Label="Плоскость безопасности" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
+                        }
+                        <MudItem xs="6" sm="Machine is Machine.A110 ? 3 : 4">
+                            <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="6" sm="Machine is Machine.A110 ? 3 : 4">
+                            <MudTextField @bind-Value="DrawingVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="Machine is Machine.GS1500 or Machine.A110 ? 6 : 12" sm="Machine is Machine.A110 ? 3 : 4">
+                            <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                        </MudItem>
+                    </MudGrid>
+                    </MudPaper>
+                    
                 </MudItem>
                 break;
             case Mode.ToolTable:
@@ -555,6 +569,12 @@
     {
         await Task.Run(SaveTools);
         Mode = Mode != Mode.ToolTable ? Mode.ToolTable : Mode.General;
+    }
+
+    private async Task OpenSetupMode()
+    {
+        await Task.Run(SaveTools);
+        Mode = Mode != Mode.Setup ? Mode.Setup : Mode.General;
     }
 
     private void OnMachineChanged(Machine machine)
