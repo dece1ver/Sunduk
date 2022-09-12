@@ -326,7 +326,7 @@
                         GeneralSequences.TailStockOn => new TailstockOnSequence(Machine.L230A),
                         GeneralSequences.TailStockOff => new TailstockOffSequence(Machine.L230A),
                         _ => CurrentSequence
-                        };
+                    };
                     break;
                 case SequenceType.Facing:
                     if (StartX <= 0 || Steps <= 0) return string.Empty;
@@ -338,12 +338,16 @@
                     break;
                 case SequenceType.RoughTurning:
                     if (StartX <= 0 || EndX <= 0 || EndZ is 0) return string.Empty;
+                    double roughDifference = StartX - EndX;
+                    var roughTurningTool = Math.Abs(roughDifference) switch {
+                        > 0.001 when roughDifference > 0 => new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
+                        > 0.001 when roughDifference < 0 => new TurningInternalTool(0, 20, 80, ToolRadius()),
+                        _ => new TurningTool() { Position = 0, Angle = 80, Radius = ToolRadius() },
+                    };
                     CurrentSequence = new RoughTurningSequence(
                         Machine.L230A,
                         Material,
-                        StartX > EndX 
-                            ? new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()) 
-                            : new TurningInternalTool(0, 20, 80, ToolRadius()),
+                        roughTurningTool,
                         new List<Element>(2){new Point(StartX, StartZ), new Point(EndX, EndZ)}, 
                         ToolRadius() is 0.8 ? ToolRadius() * 2.5 : ToolRadius() * 2, 
                         0, 
@@ -352,12 +356,17 @@
                     break;
                 case SequenceType.FinishTurning:
                         if (StartX <= 0 || EndX <= 0 || EndZ is 0) return string.Empty;
+                        double finishDifference = StartX - EndX;
+                        var finishTurningTool = Math.Abs(finishDifference) switch
+                        {
+                            > 0.001 when finishDifference > 0 => new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
+                            > 0.001 when finishDifference < 0 => new TurningInternalTool(0, 20, 80, ToolRadius()),
+                            _ => new TurningTool() { Position = 0, Angle = 80, Radius = ToolRadius() },
+                        };
                     CurrentSequence = new FinishTurningSequence(
                         Machine.L230A,
                         Material,
-                        StartX > EndX 
-                            ? new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()) 
-                            : new TurningInternalTool(0, 20, 80, ToolRadius()),
+                        finishTurningTool,
                         new List<Element>(2){new Point(StartX, StartZ), new Point(EndX, EndZ)}, 
                         0, 
                         0, 

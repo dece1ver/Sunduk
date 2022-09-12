@@ -23,7 +23,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
                 {
                     TurningExternalTool => $"Наружное черновое точение с Ø{this.Contour.FirstOrDefault().X} по Ø{this.Contour.LastOrDefault().X} на глубину {this.Contour.LastOrDefault().Z} мм",
                     TurningInternalTool => $"Внутреннее черновое точение с Ø{this.Contour.FirstOrDefault().X} по Ø{this.Contour.LastOrDefault().X} на глубину {this.Contour.LastOrDefault().Z} мм",
-                    _ => "Черновое точение",
+                    _ => $"Черновое точение Ø{this.Contour.LastOrDefault().X} на глубину {this.Contour.LastOrDefault().Z} мм",
                 };
                 return name;
             }

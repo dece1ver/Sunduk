@@ -338,9 +338,17 @@ namespace Sunduk.PWA.Infrastructure
             var startZ = Math.Abs(roughTurningSequence.Contour[0].Z ?? 0);
             var endZ = Math.Abs(roughTurningSequence.Contour[1].Z ?? 0);
             var fullLength = startZ + endZ;
-            var steps = startX > endX 
+            int steps;
+            if (Math.Abs(startX - endX) < 0.001)
+            {
+                steps = 1;
+            }
+            else
+            {
+                steps = startX > endX 
                 ? (int)Math.Round((startX - endX) / 2 / roughTurningSequence.StepOver, MidpointRounding.ToPositiveInfinity) 
                 : (int)Math.Round((endX - startX) / 2 / roughTurningSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            }
             var speed = Operation.CuttingSpeedRough(material);
             var feed = Operation.FeedRough(roughTurningSequence.Tool.Radius);
             var spins = (speed * 1000) / (Math.PI * ((startX + endX) / 2));
@@ -415,7 +423,7 @@ namespace Sunduk.PWA.Infrastructure
             var stepsX = (int)Math.Round(fullLengthX / turningExternalGroovingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
             var width = turningExternalGroovingSequence.Width;
             if (width < turningExternalGroovingSequence.Tool.Width) width = turningExternalGroovingSequence.Tool.Width;
-            var stepsZ = (int)Math.Round(width * 2 / turningExternalGroovingSequence.Tool.Width, MidpointRounding.ToPositiveInfinity);
+            var stepsZ = (int)Math.Round(width / (turningExternalGroovingSequence.Tool.Width * 2 ), MidpointRounding.ToPositiveInfinity);
             var roughSpeed = Operation.GroovingSpeedRough(material);
             var roughFeed = Operation.GroovingFeedRough();
             var finishSpeed = Operation.GroovingSpeedFinish(material);
