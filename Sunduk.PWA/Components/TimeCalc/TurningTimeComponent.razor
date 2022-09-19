@@ -85,15 +85,24 @@
                         </MudSelect>
                     </MudItem>
                 }
-                <MudItem xs="12" sm="4" md="3" lg="3">
+                <MudItem xs="12" 
+                    sm="@(GroovingSequence is TurningGroovingSequences.Grooving ? 4 : 4)" 
+                    md="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 6)" 
+                    lg="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 6)">
                     <MudTextField Label="@($"{(CuttingType is CuttingType.Radial ? "Начальный диаметр" : "Верхний диаметр")}")" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
-                <MudItem xs="12" sm="4" md="3" lg="3">
+                <MudItem xs="12" 
+                    sm="@(GroovingSequence is TurningGroovingSequences.Grooving ? 4 : 4)" 
+                    md="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 6)" 
+                    lg="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 6)">
                     <MudTextField Label="@($"{(CuttingType is CuttingType.Radial ? "Конечный диаметр" : "Нижний диаметр")}")" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
-                <MudItem xs="12" sm="4" md="2" lg="2">
-                    <MudTextField Label="@($"{(CuttingType is CuttingType.Radial ? "Ширина" : "Глубина")}")" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
-                </MudItem>
+                @if (GroovingSequence is TurningGroovingSequences.Grooving)
+                {
+                    <MudItem xs="12" sm="4" md="2" lg="2">
+                        <MudTextField Label="@($"{(CuttingType is CuttingType.Radial ? "Ширина" : "Глубина")}")" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                    </MudItem>
+                }
                 break;
 
             case SequenceType.Drilling:
@@ -221,7 +230,7 @@
                         </MudGrid>
                     </MudPaper>
                 }
-                <MudPaper Outlined="true" Class="ma-1">
+                <MudPaper Outlined="true" Class="mt-4 mx-1">
                     <MudGrid Justify="Justify.FlexStart" Spacing="1">
                         <MudItem Class="my-2">
                             <MudText Style="margin-top: 7px; margin-left: 10px;" Typo="Typo.body2">@($"Суммарное время с учетом смены инструмента: {(FullOperationTime.FullTime / 60).ToPrettyString(2)} мин. ({FullOperationTime.FullTime.ToPrettyString(2)} сек.)")</MudText>
@@ -355,14 +364,14 @@
 
                     break;
                 case SequenceType.FinishTurning:
-                        if (StartX <= 0 || EndX <= 0 || EndZ is 0) return string.Empty;
-                        double finishDifference = StartX - EndX;
-                        var finishTurningTool = Math.Abs(finishDifference) switch
-                        {
-                            > 0.001 when finishDifference > 0 => new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
-                            > 0.001 when finishDifference < 0 => new TurningInternalTool(0, 20, 80, ToolRadius()),
-                            _ => new TurningTool() { Position = 0, Angle = 80, Radius = ToolRadius() },
-                        };
+                    if (StartX <= 0 || EndX <= 0 || EndZ is 0) return string.Empty;
+                    double finishDifference = StartX - EndX;
+                    var finishTurningTool = Math.Abs(finishDifference) switch
+                    {
+                        > 0.001 when finishDifference > 0 => new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
+                        > 0.001 when finishDifference < 0 => new TurningInternalTool(0, 20, 80, ToolRadius()),
+                        _ => new TurningTool() { Position = 0, Angle = 80, Radius = ToolRadius() },
+                    };
                     CurrentSequence = new FinishTurningSequence(
                         Machine.L230A,
                         Material,
@@ -371,7 +380,7 @@
                         0, 
                         0, 
                         0);
-                        break;
+                    break;
                 case SequenceType.Grooving:
                     switch (GroovingSequence)
                     {
@@ -453,41 +462,41 @@
         switch (ThreadStandard)
         {
             case ThreadStandard.Metric:
-            {
-                Thread.GetMetricValues(CurrentThreadTemplate, out var diameter, out var pitch);
-                StartX = diameter.GetDouble();
-                Pitch = pitch.GetDouble();
-                PlaneLength = 0;
-                EndZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, Pitch, CuttingType.External), 1);
-                break;
-            }
+                {
+                    Thread.GetMetricValues(CurrentThreadTemplate, out var diameter, out var pitch);
+                    StartX = diameter.GetDouble();
+                    Pitch = pitch.GetDouble();
+                    PlaneLength = 0;
+                    EndZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, Pitch, CuttingType.External), 1);
+                    break;
+                }
             case ThreadStandard.BSPP:
-            {
-                Thread.GetBsppValues(CurrentThreadTemplate, out var diameter, out var pitch);
-                StartX = diameter.GetDouble();
-                Pitch = pitch.GetDouble();
-                PlaneLength = 0;
-                EndZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, Pitch, CuttingType.External), 1);
-                break;
-            }
+                {
+                    Thread.GetBsppValues(CurrentThreadTemplate, out var diameter, out var pitch);
+                    StartX = diameter.GetDouble();
+                    Pitch = pitch.GetDouble();
+                    PlaneLength = 0;
+                    EndZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, Pitch, CuttingType.External), 1);
+                    break;
+                }
             case ThreadStandard.Trapezoidal:
-            {
-                Thread.GetTrapezoidalValues(CurrentThreadTemplate, out var diameter, out var pitch);
-                StartX = diameter.GetDouble();
-                Pitch = pitch.GetDouble();
-                PlaneLength = 0;
-                EndZ = -30;
-                break;
-            }
+                {
+                    Thread.GetTrapezoidalValues(CurrentThreadTemplate, out var diameter, out var pitch);
+                    StartX = diameter.GetDouble();
+                    Pitch = pitch.GetDouble();
+                    PlaneLength = 0;
+                    EndZ = -30;
+                    break;
+                }
             case ThreadStandard.NPT:
-            {
-                Thread.GetNptValues(CurrentThreadTemplate, out var externalDiameter, out _, out var pitch, out var planeLength, out var threadLength);
-                StartX = externalDiameter.GetDouble();
-                Pitch = pitch.GetDouble();
-                PlaneLength = planeLength;
-                EndZ = -threadLength - Math.Round(Thread.ThreadRunout(ThreadStandard, Pitch, CuttingType.External), 1);
-                break;
-            }
+                {
+                    Thread.GetNptValues(CurrentThreadTemplate, out var externalDiameter, out _, out var pitch, out var planeLength, out var threadLength);
+                    StartX = externalDiameter.GetDouble();
+                    Pitch = pitch.GetDouble();
+                    PlaneLength = planeLength;
+                    EndZ = -threadLength - Math.Round(Thread.ThreadRunout(ThreadStandard, Pitch, CuttingType.External), 1);
+                    break;
+                }
         }
     }
 
@@ -513,6 +522,11 @@
                 break;
             case SequenceType.RoughTurning:
                 TurningType = TurningTypes.Rough;
+                if(SequenceType is SequenceType.Drilling) // черновое после сверления -> расточка
+                {
+                    StartX = EndX;
+                    EndX = 0;
+                }
                 break;
             case SequenceType.FinishTurning:
                 TurningType = TurningTypes.Medium;
