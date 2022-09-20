@@ -236,7 +236,7 @@
         {
             switch (ThreadStandard)
             {
-                case ThreadStandard.Metric or ThreadStandard.BSPP or ThreadStandard.Trapezoidal:
+                case ThreadStandard.Metric or ThreadStandard.Trapezoidal:
                     switch (ThreadType)
                     {
                         case CuttingType.External:
@@ -248,9 +248,9 @@
                                    $"X{ThreadDiameter.NC()} A-45. R{(InsertRadius + BluntSize).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()}";
                             } else {
-                                return $"G0 X{(ThreadDiameter - 2 * Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) - InsertRadius).NC()} Z1. S180 M3\n" +
+                                return $"G0 X{(ThreadDiameter - 2 * ThreadChamfer - InsertRadius).NC()} Z1. S180 M3\n" +
                                    $"G1 Z0. F0.1\n" +
-                                   $"X{ThreadDiameter.NC()} C{(Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
+                                   $"X{ThreadDiameter.NC()} C{(ThreadChamfer + InsertRadius / 2).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()}";
                             }
                         case CuttingType.Internal:
@@ -262,9 +262,49 @@
                                    $"X{(ThreadDiameter - ThreadPitch).NC()} A45. R{(InsertRadius + BluntSize).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()}";
                             } else {
-                                return $"G0 X{(ThreadDiameter - ThreadPitch + 2 * Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius).NC()} Z1. S180 M3\n" +
+                                return $"G0 X{(ThreadDiameter - ThreadPitch + 2 * ThreadChamfer + InsertRadius).NC()} Z1. S180 M3\n" +
                                    $"G1 Z0. F0.1\n" +
-                                   $"X{(ThreadDiameter - ThreadPitch).NC()} C{(Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
+                                   $"X{(ThreadDiameter - ThreadPitch).NC()} C{(ThreadChamfer + InsertRadius / 2).NC()}\n" +
+                                   $"G1 Z{EndPointZ.NC()}";
+                            }
+                        default:
+                            return string.Empty;
+                    }
+                case ThreadStandard.BSPP:
+                    switch (ThreadType)
+                    {
+                        case CuttingType.External:
+                            if (Blunted)
+                            {
+                                var threadExtChamferStartX = ThreadDiameter - 2 * ThreadChamfer - InsertRadius;
+                                return $"G0 X{(threadExtChamferStartX - 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
+                                   $"G1 Z0. F0.1\n" +
+                                   $"X{threadExtChamferStartX.NC()} R{(InsertRadius + BluntSize).NC()}\n" +
+                                   $"X{ThreadDiameter.NC()} A-45. R{(InsertRadius + BluntSize).NC()}\n" +
+                                   $"G1 Z{EndPointZ.NC()}";
+                            }
+                            else
+                            {
+                                return $"G0 X{(ThreadDiameter - 2 * ThreadChamfer - InsertRadius).NC()} Z1. S180 M3\n" +
+                                   $"G1 Z0. F0.1\n" +
+                                   $"X{ThreadDiameter.NC()} C{(ThreadChamfer + InsertRadius / 2).NC()}\n" +
+                                   $"G1 Z{EndPointZ.NC()}";
+                            }
+                        case CuttingType.Internal:
+                            var threadIntChamferStartX = ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch) + 2 * ThreadChamfer + InsertRadius;
+                            if (Blunted)
+                            {
+                                return $"G0 X{(threadIntChamferStartX + 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
+                                   $"G1 Z0. F0.1\n" +
+                                   $"X{threadIntChamferStartX.NC()} R{(InsertRadius + BluntSize).NC()}\n" +
+                                   $"X{(ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)).NC()} A45. R{(InsertRadius + BluntSize).NC()}\n" +
+                                   $"G1 Z{EndPointZ.NC()}";
+                            }
+                            else
+                            {
+                                return $"G0 X{(threadIntChamferStartX).NC()} Z1. S180 M3\n" +
+                                   $"G1 Z0. F0.1\n" +
+                                   $"X{(ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)).NC()} C{(ThreadChamfer + InsertRadius / 2).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()}";
                             }
                         default:
