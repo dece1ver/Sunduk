@@ -130,15 +130,34 @@
                     </MudTextField>
                 </MudItem>
             </MudExpansionPanel>
-        @if(ThreadStandard == ThreadStandard.NPT)
-        {
-            <MudExpansionPanel Text="Пример проточки под резьбу">
+        <MudExpansionPanel Text="Пример проточки под резьбу">
+            <MudGrid>
                 <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace; font-size: small;" Margin="Margin.Dense" ReadOnly="true" Lines="4" Value="@(TurningExample)">
-                    </MudTextField>
+                    <MudField Label="Параметры" Variant="Variant.Outlined" InnerPadding="false">
+                        <MudGrid Spacing="1">
+                            <MudItem xs="Blunted ? 6 : 12" sm="Blunted ? 3 : 4">
+                                <MudSwitch Class="mb-1 mt-3" @bind-Checked="Blunted" Color="Color.Primary">Скруглить</MudSwitch>
+                            </MudItem>
+                                @if (Blunted)
+                                {
+                                <MudItem xs="Blunted ? 6 : 6" sm="Blunted ? 3 : 4">
+                                        <MudTextField Class="mb-n2 mt-0" T="double" @bind-Value="BluntSize" Label="Скругление" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true"/>
+                                    </MudItem>
+                                }
+                            <MudItem xs="Blunted ? 6 : 6" sm="Blunted ? 3 : 4">
+                                    <MudTextField T="double" @bind-Value="ThreadChamfer" Label="Фаска" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
+                            </MudItem>
+                            <MudItem xs="Blunted ? 6 : 6" sm="Blunted ? 3 : 4">
+                                    <MudTextField T="double" @bind-Value="InsertRadius" Label="Радиус пластины" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudField>
                 </MudItem>
-            </MudExpansionPanel>
-        }
+                <MudItem xs="12">
+                    <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace; font-size: small;" Margin="Margin.Dense" ReadOnly="true" Lines="4" Value="@(TurningExample)"/>
+                </MudItem>
+            </MudGrid>
+        </MudExpansionPanel>
     }
 
 </MudContainer>
@@ -146,7 +165,6 @@
 
 @code
 {
-
     public ICollection<string> ThreadTemplates
     {
         get
@@ -158,7 +176,7 @@
                 ThreadStandard.Trapezoidal => Thread.TrapezoidalTemplates,
                 ThreadStandard.NPT => Thread.NptTemplates,
                 _ => new HashSet<string> { }
-                };
+            };
         }
     }
     public string CurrentThreadTemplate { get; set; }
@@ -166,12 +184,16 @@
     public ThreadStandard ThreadStandard { get; set; } = ThreadStandard.Metric;
     public CuttingType ThreadType { get; set; } = CuttingType.External;
 
+    public double ThreadChamfer { get; set; }
 
     public string ThreadDiameterString { get; set; }
     public double ThreadDiameter => Util.GetDouble(ThreadDiameterString);
 
     public string ThreadPitchString { get; set; }
     public double ThreadPitch => Util.GetDouble(ThreadPitchString);
+
+    public bool Blunted { get; set; } = false;
+    public double BluntSize { get; set; } = 0.3;
 
     public double PlaneLength { get; set; } = 0;
     public string ThreadShift
@@ -198,36 +220,69 @@
         {
             switch (ThreadStandard)
             {
-                case ThreadStandard.Metric:
+                case ThreadStandard.Metric or ThreadStandard.BSPP or ThreadStandard.Trapezoidal:
                     switch (ThreadType)
                     {
                         case CuttingType.External:
-                            return $"G0 X{(ThreadDiameter - 2 * Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) - InsertRadius).NC()} Z1. S180 M3\n" + 
+                            if (Blunted) {
+                                var threadExtChamferStartX = ThreadDiameter - 2 * ThreadChamfer - InsertRadius;
+                                return $"G0 X{(threadExtChamferStartX - 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
+                                   $"G1 Z0. F0.1\n" +
+                                   $"X{threadExtChamferStartX.NC()} R{(InsertRadius + BluntSize).NC()}\n" +
+                                   $"X{ThreadDiameter.NC()} A-45. R{(InsertRadius + BluntSize).NC()}\n" +
+                                   $"G1 Z{EndPointZ.NC()}";
+                            } else {
+                                return $"G0 X{(ThreadDiameter - 2 * Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) - InsertRadius).NC()} Z1. S180 M3\n" +
                                    $"G1 Z0. F0.1\n" +
                                    $"X{ThreadDiameter.NC()} C{(Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()}";
+                            }
                         case CuttingType.Internal:
-                            return $"G0 X{(ThreadDiameter - ThreadPitch + 2 * Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius).NC()} Z1. S180 M3\n" +
+                            var threadIntChamferStartX = ThreadDiameter - ThreadPitch + 2 * ThreadChamfer + InsertRadius;
+                            if (Blunted) {
+                                return $"G0 X{(threadIntChamferStartX + 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
+                                   $"G1 Z0. F0.1\n" +
+                                   $"X{threadIntChamferStartX.NC()} R{(InsertRadius + BluntSize).NC()}\n" +
+                                   $"X{(ThreadDiameter - ThreadPitch).NC()} A45. R{(InsertRadius + BluntSize).NC()}\n" +
+                                   $"G1 Z{EndPointZ.NC()}";
+                            } else {
+                                return $"G0 X{(ThreadDiameter - ThreadPitch + 2 * Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius).NC()} Z1. S180 M3\n" +
                                    $"G1 Z0. F0.1\n" +
                                    $"X{(ThreadDiameter - ThreadPitch).NC()} C{(Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()}";
+                            }
                         default:
                             return string.Empty;
-
                     }
                 case ThreadStandard.NPT:
                     switch (ThreadType)
                     {
                         case CuttingType.External:
-                            return $"G0 X{(ThreadDiameter - 2 * (PlaneLength * Math.Tan(1.79.Radians())) - 2 * Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) - InsertRadius).NC()} Z1. S180 M3\n" +
+                            if (Blunted) {
+                                return $"G0 X{CalculatedNptChamferStartXWithShift.NC()} Z1. S180 M3\n" +
                                    $"G1 Z0. F0.1\n" +
-                                   $"X{(ThreadDiameter - 2 * (PlaneLength * Math.Tan(1.79.Radians()))).NC()} C{(Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
+                                   $"X{CalculatedNptChamferStartX.NC()} R{(InsertRadius + BluntSize).NC()}\n" +
+                                   $"X{CalculatedNptChamferEndX.NC()} A-45. R{(InsertRadius + BluntSize).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()} A-1.79";
-                        case CuttingType.Internal:
-                            return $"G0 X{(ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch) + 2 * Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius).NC()} Z1. S180 M3\n" +
+                            } else {
+                                return $"G0 X{(CalculatedNptStart - 2 * ThreadChamfer - InsertRadius).NC()} Z1. S180 M3\n" +
                                    $"G1 Z0. F0.1\n" +
-                                   $"X{(ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)).NC()} C{(Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType) + InsertRadius / 2).NC()}\n" +
+                                   $"X{CalculatedNptStart.NC()} C{(ThreadChamfer + InsertRadius / 2).NC()}\n" +
+                                   $"G1 Z{EndPointZ.NC()} A-1.79";
+                            }
+                        case CuttingType.Internal:
+                            if (Blunted) {
+                                return $"G0 X{CalculatedNptChamferStartXWithShift.NC()} Z1. S180 M3\n" +
+                                   $"G1 Z0. F0.1\n" +
+                                   $"X{CalculatedNptChamferStartX.NC()} R{(InsertRadius + BluntSize).NC()}\n" +
+                                   $"X{CalculatedNptChamferEndX.NC()} A45. R{(InsertRadius + BluntSize).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()} A1.79";
+                            } else {
+                                return $"G0 X{(ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch) + 2 * ThreadChamfer + InsertRadius).NC()} Z1. S180 M3\n" +
+                                   $"G1 Z0. F0.1\n" +
+                                   $"X{CalculatedNptStart.NC()} C{(ThreadChamfer + InsertRadius / 2).NC()}\n" +
+                                   $"G1 Z{EndPointZ.NC()} A1.79";
+                            }
                         default:
                             return string.Empty;
                     }
@@ -236,35 +291,46 @@
             }
         } set { } }
 
-    //public string ThreadUnits
-    //{
-    //    get
-    //    {
-    //        if (ThreadStandard == ThreadStandard.Metric)
-    //        {
-    //            return "мм";
-    //        }
-    //        else if (ThreadStandard == ThreadStandard.BSPP)
-    //        {
-    //            return "TPI";
-    //        }
-    //        else if (ThreadStandard == ThreadStandard.Trapezoidal)
-    //        {
-    //            return "мм";
-    //        }
-    //        else
-    //        {
-    //            return string.Empty;
-    //        }
-    //    }
-    //}
-
-
     public double[] Passes => Thread.Passes(ThreadStandard, ThreadType, ThreadPitch);
     public double[] TotalPasses => Thread.TotalPasses(ThreadStandard, ThreadType, ThreadPitch);
 
+    public double CalculatedNptStart => ThreadType switch
+    {
+        CuttingType.External => (ThreadDiameter - 2 * (PlaneLength * Math.Tan(1.79.Radians()))),
+        CuttingType.Internal => (ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)),
+        _ => 0,
+    };
 
-    public int SpindleSpeed => ((int)(120000 / (Math.PI * ThreadDiameter)));
+    public double CalculatedNptChamferEndX => ThreadType switch
+    {
+        CuttingType.External => CalculatedNptStart + 2 * ThreadChamfer * Math.Tan(1.79.Radians()),
+        CuttingType.Internal => CalculatedNptStart - 2 * ThreadChamfer * Math.Tan(1.79.Radians()),
+        _ => 0,
+    };
+
+    public double CalculatedNptChamferStartX => ThreadType switch
+    {
+        CuttingType.External => CalculatedNptChamferEndX - 2 * ThreadChamfer - InsertRadius,
+        CuttingType.Internal => CalculatedNptChamferEndX + 2 * ThreadChamfer + InsertRadius,
+        _ => 0,
+    };
+
+    public double CalculatedNptChamferStartXWithShift => ThreadType switch
+    {
+        CuttingType.External => CalculatedNptChamferStartX - 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X,
+        CuttingType.Internal => CalculatedNptChamferStartX + 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X,
+        _ => 0,
+    };
+
+    public int SpindleSpeed 
+    { 
+        get 
+        {
+            var spins = ((int)(120000 / (Math.PI * ThreadDiameter)));
+            if (spins > 2000) spins = 2000; // ограничение 2000 оборотов
+            return spins;
+        }
+    }
 
     public double? ThreadAngle
     {
@@ -331,6 +397,7 @@
             ThreadPitchString = pitch;
             PlaneLength = 0;
             EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
+            ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
         }
         else if (ThreadStandard == ThreadStandard.BSPP)
         {
@@ -339,6 +406,7 @@
             ThreadPitchString = pitch;
             PlaneLength = 0;
             EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
+            ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
         }
         else if (ThreadStandard == ThreadStandard.Trapezoidal)
         {
@@ -347,6 +415,7 @@
             ThreadPitchString = pitch;
             PlaneLength = 0;
             EndPointZ = -30;
+            ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
         }
         else if (ThreadStandard == ThreadStandard.NPT)
         {
@@ -355,6 +424,7 @@
             ThreadPitchString = pitch;
             PlaneLength = planeLength;
             EndPointZ = -threadLength - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
+            ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
         }
     }
 }
