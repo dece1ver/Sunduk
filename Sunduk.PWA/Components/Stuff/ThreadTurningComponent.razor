@@ -136,20 +136,36 @@
                     <MudField Label="Параметры" Variant="Variant.Outlined" InnerPadding="false">
                         <MudGrid Spacing="1">
                             <MudItem xs="Blunted ? 6 : 12" sm="Blunted ? 3 : 4">
-                                <MudSwitch Class="mb-1 mt-3" @bind-Checked="Blunted" Color="Color.Primary">Скруглить</MudSwitch>
+                                <MudSwitch Class="mb-1 mt-3 ml-1" @bind-Checked="Blunted" Color="Color.Primary">Скруглить</MudSwitch>
                             </MudItem>
+                            <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
                                 @if (Blunted)
                                 {
-                                <MudItem xs="Blunted ? 6 : 6" sm="Blunted ? 3 : 4">
-                                        <MudTextField Class="mb-n2 mt-0" T="double" @bind-Value="BluntSize" Label="Скругление" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true"/>
+                                    <MudItem xs="6" sm="Blunted ? 3 : 4">
+                                        <MudTextField Class="mb-n2 mt-0" T="double" @bind-Value="BluntSize" Label="Скругление" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
                                     </MudItem>
                                 }
-                            <MudItem xs="Blunted ? 6 : 6" sm="Blunted ? 3 : 4">
+                                <MudItem Class="mb-2" xs="6" sm="Blunted ? 3 : 4">
                                     <MudTextField T="double" @bind-Value="ThreadChamfer" Label="Фаска" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
-                            </MudItem>
-                            <MudItem xs="Blunted ? 6 : 6" sm="Blunted ? 3 : 4">
+                                </MudItem>
+                                <MudItem Class="mb-2" xs="6" sm="Blunted ? 3 : 4">
                                     <MudTextField T="double" @bind-Value="InsertRadius" Label="Радиус пластины" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
-                            </MudItem>
+                                </MudItem>
+                            </MudHidden>
+                            <MudHidden Breakpoint="Breakpoint.Xs">
+                                @if (Blunted)
+                                {
+                                    <MudItem xs="6" sm="Blunted ? 3 : 4" Class="mb-2">
+                                        <MudTextField T="double" @bind-Value="BluntSize" Label="Скругление" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
+                                    </MudItem>
+                                }
+                                <MudItem Class="mb-2" xs="6" sm="Blunted ? 3 : 4">
+                                    <MudTextField T="double" @bind-Value="ThreadChamfer" Label="Фаска" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
+                                </MudItem>
+                                <MudItem Class="mb-2" xs="6" sm="Blunted ? 3 : 4">
+                                    <MudTextField T="double" @bind-Value="InsertRadius" Label="Радиус пластины" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
+                                </MudItem>
+                            </MudHidden>
                         </MudGrid>
                     </MudField>
                 </MudItem>
@@ -290,6 +306,8 @@
                     return string.Empty;
             }
         } set { } }
+
+    public int ExampleLines => TurningExample.Count(f => f == '\n') + 1;
 
     public double[] Passes => Thread.Passes(ThreadStandard, ThreadType, ThreadPitch);
     public double[] TotalPasses => Thread.TotalPasses(ThreadStandard, ThreadType, ThreadPitch);
