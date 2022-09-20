@@ -51,7 +51,7 @@
 
 @code
 {
-    public static bool DebugMode { get; set; } = true;
+    public static bool DebugMode { get; set; } = false;
     public bool ExperimentalMode { get; set; } = DebugMode;
 
     [Inject] IBreakpointService BreakpointListener { get; set; }
