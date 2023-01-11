@@ -4,14 +4,14 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
-        <MudItem xs="12" sm="6" md="@(SequenceType is SequenceType.Facing or SequenceType.Burnishing ? 3 : 4)">
+        <MudItem xs="12" sm="6" md="@(SequenceType is SequenceType.Burnishing ? 3 : 4)">
             <MudSelect @bind-Value="Material" Label="Материал детали" T="Material" Variant="Variant.Filled" Margin="Margin.Dense">
                 <MudSelectItem Value="@Material.Steel">Черная сталь</MudSelectItem>
                 <MudSelectItem Value="@Material.Stainless">Нержавеющая сталь</MudSelectItem>
                 <MudSelectItem Value="@Material.Brass">Бронза</MudSelectItem>
             </MudSelect>
         </MudItem>
-        <MudItem xs="12" sm="6" md="@(SequenceType is SequenceType.Facing or SequenceType.Burnishing ? 3 : 4)">
+        <MudItem xs="12" sm="6" md="@(SequenceType is SequenceType.Burnishing ? 3 : 4)">
             <MudSelect Label="Тип" T="SequenceType" Variant="Variant.Filled" Margin="Margin.Dense" Value="SequenceType" ValueChanged="OnSequenceTypeChanged">
                 <MudSelectItem Value="@SequenceType.General">Общие</MudSelectItem>
                 <MudSelectItem Value="@SequenceType.Facing">Обработка торца</MudSelectItem>
@@ -39,11 +39,14 @@
 
             case SequenceType.Facing:
 
-                <MudItem xs="12" sm="6" md="3" lg="3">
+                <MudItem xs="12" sm="4" md="4" lg="3"> 
+                    <MudTextField Label="Проходы" @bind-Value="Steps" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.IntConverterFromOne" />
+                </MudItem>
+                <MudItem xs="12" sm="4" md="6" lg="3">
                     <MudTextField Label="Диаметр заготовки" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
-                <MudItem xs="12" sm="6" md="3" lg="3"> 
-                    <MudTextField Label="Проходы" @bind-Value="Steps" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.IntConverterFromOne" />
+                <MudItem xs="12" sm="4" md="6" lg="3">
+                    <MudTextField Label="Диаметр отверстия" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 break;
 
@@ -52,10 +55,10 @@
                     <MudSelect Label="Тип обработки" T="TurningTypes" @bind-Value="TurningType" Variant="Variant.Filled" Margin="Margin.Dense">
                         @if (SequenceType is SequenceType.RoughTurning)
                         {
-                            <MudSelectItem Value="@(TurningTypes.Rough)">Обдирка</MudSelectItem>
+                            <MudSelectItem Value="@(TurningTypes.Rough)">Ap=2 F=0.22 (&GT;Ø12мм) [R0.8]</MudSelectItem>
                         }
-                        <MudSelectItem Value="@(TurningTypes.Medium)">Ковыряние</MudSelectItem>
-                        <MudSelectItem Value="@(TurningTypes.Gentle)">Нежное ковыряние</MudSelectItem>
+                        <MudSelectItem Value="@(TurningTypes.Medium)">Ap=0.8 F=0.15 (Ø6-12мм) [R0.4]</MudSelectItem>
+                        <MudSelectItem Value="@(TurningTypes.Gentle)">Ap=0.4 F=0.11 (&LT;Ø6мм) [R0.2]</MudSelectItem>
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6" md="4" lg="4">
@@ -343,7 +346,7 @@
                         Machine.L230A,
                         Material,
                         new TurningExternalTool(0, TurningExternalTool.Types.Face, 80, 0.8),
-                        StartX, 0, Steps, 0, 1, (0,0));
+                        StartX, EndX, Steps, 0, 1, (0,0));
                     break;
                 case SequenceType.RoughTurning:
                     if (StartX <= 0 || EndX <= 0 || EndZ is 0) return string.Empty;
@@ -522,7 +525,7 @@
                 break;
             case SequenceType.RoughTurning:
                 TurningType = TurningTypes.Rough;
-                if(SequenceType is SequenceType.Drilling) // черновое после сверления -> расточка
+                if(SequenceType is SequenceType.Drilling) // черновое после сверления -> верятно расточка
                 {
                     StartX = EndX;
                     EndX = 0;
