@@ -634,10 +634,16 @@
                 CornerBlunt = facingSequence.CornerBlunt;
                 CustomChamferAngle = facingSequence.BluntCustomAngle;
                 BluntType = facingSequence.BluntType;
+                SpeedRough = facingSequence.SpeedRough;
+                SpeedFinish = facingSequence.SpeedFinish;
+                FeedRough = facingSequence.FeedRough;
+                FeedFinish = facingSequence.FeedFinish;
                 break;
             case FinishFacingCycleSequence finishFacingCycleSequence:
                 Tool = finishFacingCycleSequence.Tool;
                 RepeatableRoughFacingSequence = finishFacingCycleSequence.RoughSequence;
+                SpeedFinish = finishFacingCycleSequence.SpeedFinish;
+                FeedFinish = finishFacingCycleSequence.FeedFinish;
                 break;
             case FinishFacingSequence finishFacingSequence:
                 Tool = finishFacingSequence.Tool;
@@ -646,6 +652,8 @@
                 CornerBlunt = finishFacingSequence.CornerBlunt;
                 CustomChamferAngle = finishFacingSequence.BluntCustomAngle;
                 BluntType = finishFacingSequence.BluntType;
+                SpeedFinish = finishFacingSequence.SpeedFinish;
+                FeedFinish = finishFacingSequence.FeedFinish;
                 break;
             case LimiterSequence limiterSequence:
                 Tool = limiterSequence.Tool;
@@ -660,6 +668,8 @@
                 CornerBlunt = roughFacingCycleSequence.CornerBlunt;
                 CustomChamferAngle = roughFacingCycleSequence.BluntCustomAngle;
                 BluntType = roughFacingCycleSequence.BluntType;
+                SpeedRough = roughFacingCycleSequence.SpeedRough;
+                FeedRough = roughFacingCycleSequence.FeedRough;
                 break;
             case RoughFacingSequence roughFacingSequence:
                 Tool = roughFacingSequence.Tool;
@@ -670,6 +680,8 @@
                 CornerBlunt = roughFacingSequence.CornerBlunt;
                 CustomChamferAngle = roughFacingSequence.BluntCustomAngle;
                 BluntType = roughFacingSequence.BluntType;
+                SpeedRough = roughFacingSequence.SpeedRough;
+                FeedRough = roughFacingSequence.FeedRough;
                 break;
             case ThreadCuttingSequence threadCuttingSequence:
                 Tool = threadCuttingSequence.Tool;
@@ -757,8 +769,6 @@
                 Tool = turningCustomSequence.Tool;
                 CustomOperation = turningCustomSequence.CustomOperation;
                 break;
-            default:
-                break;
         }
     }
 
@@ -780,6 +790,12 @@
 
     public Sequence RepeatableRoughFacingSequence { get; set; }
     bool _calcChamferDiameter = true;
+
+    public int SpeedRough { get; set; }
+    public int SpeedFinish { get; set; }
+
+    private double FeedRough { get; set; }
+    private double FeedFinish { get; set; }
 
     private double ExternalDiameter { get; set; }
     private double InternalDiameter { get; set; }
@@ -958,11 +974,15 @@
                         BluntType,
                         CustomChamferAngle,
                         CustomChamferBlunt,
-                        CornerBlunt);
+                        CornerBlunt, 
+                        SpeedRough, 
+                        SpeedFinish, 
+                        FeedRough, 
+                        FeedFinish);
                     return CurrentSequence.Operation;
 
                 case FinishFacingCycleSequence finishFacingCycleSequence:
-                    CurrentSequence = new FinishFacingCycleSequence(Tool as TurningExternalTool, RepeatableRoughFacingSequence);
+                    CurrentSequence = new FinishFacingCycleSequence(Tool as TurningExternalTool, RepeatableRoughFacingSequence, SpeedFinish, FeedFinish);
                     return CurrentSequence.Operation;
 
                 case FinishFacingSequence finishFacingSequence:
@@ -976,7 +996,9 @@
                         BluntType,
                         CustomChamferAngle,
                         CustomChamferBlunt,
-                        CornerBlunt);
+                        CornerBlunt, 
+                        SpeedFinish, 
+                        FeedFinish);
                     return CurrentSequence.Operation;
 
                 case LimiterSequence limiterSequence:
@@ -997,7 +1019,9 @@
                         BluntType,
                         CustomChamferAngle,
                         CustomChamferBlunt,
-                        CornerBlunt);
+                        CornerBlunt, 
+                        SpeedRough, 
+                        FeedRough);
                     return CurrentSequence.Operation;
 
                 case RoughFacingSequence roughFacingSequence:
@@ -1014,7 +1038,9 @@
                         BluntType,
                         CustomChamferAngle,
                         CustomChamferBlunt,
-                        CornerBlunt);
+                        CornerBlunt,
+                        SpeedRough,
+                        FeedRough);
                     return CurrentSequence.Operation;
 
                 case ThreadCuttingSequence threadCuttingSequence:

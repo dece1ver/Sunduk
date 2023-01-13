@@ -480,19 +480,19 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public static string MillingCustomOperation(Machine machine, CoordinateSystem coordinateSystem, Tool tool, string customOperation, Coolant coolant, bool polar, double safePlane)
         {
             if (tool is null) return string.Empty;
-            string direction = string.Empty;
+            var direction = string.Empty;
             if (coolant is not Coolant.General and not Coolant.Full)
             {
                 direction = Direction(tool);
             }
-            else if ((coolant is Coolant.General or Coolant.Full) && tool.Hand == Tool.ToolHand.Right)
-            {
-                direction = "M13";
-            }
-            else if ((coolant is Coolant.General or Coolant.Full) && tool.Hand == Tool.ToolHand.Left)
-            {
-                direction = "M14";
-            }
+            else
+                direction = coolant switch
+                {
+                    Coolant.General or Coolant.Full when tool.Hand == Tool.ToolHand.Right => "M13",
+                    Coolant.General or Coolant.Full when tool.Hand == Tool.ToolHand.Left => "M14",
+                    _ => direction
+                };
+
             return machine switch
             {
                 Machine.A110 =>

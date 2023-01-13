@@ -19,6 +19,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double BluntCustomAngle { get; set; }
         public double BluntCustomRadius { get; set; }
         public double CornerBlunt { get; set; }
+        public int SpeedRough { get; set; }
+        public int SpeedFinish { get; set; }
+        public double FeedRough { get; set; }
+        public double FeedFinish { get; set; }
         public override string Operation => Templates.FacingOperation.Facing(
             Machine, 
             Material, 
@@ -34,13 +38,35 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             BluntCustomRadius,
             CornerBlunt,
             true,
-            true);
+            true, 
+            SpeedRough, 
+            SpeedFinish, 
+            FeedRough, 
+            FeedFinish);
 
         public override MachineType MachineType => MachineType.Turning;
-        public override string Name => $"Торцовка";
+        public override string Name { get 
+            {
+                var name = ProfStockAllow > 0 ? $"Торцовка черновая с Ø{ExternalDiameter}" : $"Торцовка с Ø{ExternalDiameter}";
+                if (InternalDiameter > 0) name += $" до Ø{InternalDiameter}";
+                return name;
+            } 
+        }
 
-        public FacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter,
-            double roughStockAllow, double profStockAllow, double stepOver, (int, int) seqNumbers, Blunt bluntType, double bluntCustomAngle, double bluntCustomRadius, double cornerBlunt)
+        public FacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter,
+            double internalDiameter,
+            double roughStockAllow, 
+            double profStockAllow, 
+            double stepOver, 
+            (int, int) seqNumbers, 
+            Blunt bluntType, 
+            double bluntCustomAngle, 
+            double bluntCustomRadius, 
+            double cornerBlunt, 
+            int speedRough, 
+            int speedFinish, 
+            double feedRough, 
+            double feedFinish)
         {
             Machine = machine;
             Material = material;
@@ -55,6 +81,11 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             BluntCustomAngle = bluntCustomAngle;
             BluntCustomRadius = bluntCustomRadius;
             CornerBlunt = cornerBlunt;
+            SpeedRough = speedRough is 0 ? Templates.Operation.CuttingSpeedRough(Material) : speedRough;
+            SpeedFinish = speedFinish is 0 ? Templates.Operation.CuttingSpeedFinish(Material) : speedFinish;
+            FeedRough = feedRough is 0 ? Templates.Operation.FeedRough(Tool.Radius) : feedRough;
+            FeedFinish = feedFinish is 0 ? Templates.Operation.FeedFinish(Tool.Radius): feedFinish;
+
         }
     }
 }

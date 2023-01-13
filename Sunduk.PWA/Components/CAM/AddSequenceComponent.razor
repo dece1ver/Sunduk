@@ -176,7 +176,7 @@
             {
                 <MudItem xs="12" md="@(_MediumBluntFieldSize)">
                     <MudTextField Label="@BluntLabel(FacingBluntType)" @bind-Value="_FacingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"
-                                  @onfocusin="@(() => _caclFacingChamferDiameter = true)" />
+                                  @onfocusin="@(() => _calcFacingChamferDiameter = true)" />
                 </MudItem>
                 <MudItem xs="12" md="@(_MediumBluntFieldSize)">
                     <MudSelect Label="Тип" T="Blunt" Variant="Variant.Filled" @bind-Value="FacingBluntType" Margin="Margin.Dense">
@@ -192,7 +192,7 @@
                     </MudItem>
                     <MudItem xs="12" md="4">
                         <MudTextField Label="Конечный диаметр фаски" @bind-Value="_FacingCustomChamferDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true"
-                                      @onfocusin="@(() => _caclFacingChamferDiameter = false)" />
+                                      @onfocusin="@(() => _calcFacingChamferDiameter = false)" />
                     </MudItem>
                     <MudItem xs="12" md="4">
                         <MudTextField Label="Скругление на фаске" @bind-Value="_FacingCustomChamferBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
@@ -932,7 +932,7 @@
     
 
     //Торцовка
-    bool _caclFacingChamferDiameter = true;
+    bool _calcFacingChamferDiameter = true;
     int _MediumBluntFieldSize => TurningSequence == TurningSequences.FinishFacing ? 4 : 6;
 
     private double FacingExternalDiameter => WorkpieceExternalDiameter;
@@ -946,6 +946,15 @@
     private string _FacingProfStockAllow { get; set; } = "0.2";
     private double FacingProfStockAllow => _FacingProfStockAllow.GetDouble();
 
+    public int FacingSpeedRough { get; set; } = 0;
+    public int FacingSpeedFinish { get; set; } = 0;
+
+    private string _FacingFeedRough { get; set; } = "";
+    private double FacingFeedRough => _FacingFeedRough.GetDouble();
+
+    private string _FacingFeedFinish { get; set; } = "";
+    private double FacingFeedFinish => _FacingFeedFinish.GetDouble();
+
     private string _facingCornerBlunt;
     private string _FacingCornerBlunt
     {
@@ -953,7 +962,7 @@
         set
         {
             _facingCornerBlunt = value;
-            if (_caclFacingChamferDiameter)
+            if (_calcFacingChamferDiameter)
             {
                 _FacingCustomChamferDiameter = (FacingExternalDiameter - 2 * FacingCornerBlunt * Math.Tan(FacingCustomChamferAngle.Radians())).ToPrettyString();
             }
@@ -970,7 +979,7 @@
         set
         {
             _facingCustomChamferAngle = value;
-            if (_caclFacingChamferDiameter)
+            if (_calcFacingChamferDiameter)
             {
                 _FacingCustomChamferDiameter = (FacingExternalDiameter - 2 * FacingCornerBlunt * Math.Tan(FacingCustomChamferAngle.Radians())).ToPrettyString();
             }
@@ -992,7 +1001,7 @@
         set
         {
             _facingCustomChamferDiameter = value;
-            if (_caclFacingChamferDiameter) return;
+            if (_calcFacingChamferDiameter) return;
             string result = ((FacingExternalDiameter - FacingCustomChamferDiameter) / 2 * Math.Tan((90 - FacingCustomChamferAngle).Radians())).ToPrettyString();
             _FacingCornerBlunt = result;
         }
@@ -1188,7 +1197,11 @@
                     FacingBluntType,
                     FacingCustomChamferAngle,
                     FacingCustomChamferBlunt,
-                    FacingCornerBlunt);
+                    FacingCornerBlunt, 
+                    FacingSpeedRough, 
+                    FacingSpeedFinish, 
+                    FacingFeedRough, 
+                    FacingFeedFinish);
                 return CurrentSequence.Operation;
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.RoughFacing)
@@ -1206,7 +1219,9 @@
                     FacingBluntType,
                     FacingCustomChamferAngle,
                     FacingCustomChamferBlunt,
-                    FacingCornerBlunt);
+                    FacingCornerBlunt, 
+                    FacingSpeedRough, 
+                    FacingFeedRough);
                 return CurrentSequence.Operation;
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.RoughFacingCycle)
@@ -1224,12 +1239,14 @@
                     FacingBluntType,
                     FacingCustomChamferAngle,
                     FacingCustomChamferBlunt,
-                    FacingCornerBlunt);
+                    FacingCornerBlunt,
+                    FacingSpeedRough,
+                    FacingFeedRough);
                 return CurrentSequence.Operation;
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.FinishFacingCycle)
             {
-                CurrentSequence = new FinishFacingCycleSequence(Tool as TurningExternalTool, RepeatableRoughFacingSequence);
+                CurrentSequence = new FinishFacingCycleSequence(Tool as TurningExternalTool, RepeatableRoughFacingSequence, FacingSpeedFinish, FacingFeedFinish);
                 return CurrentSequence.Operation;
             }
             if (Type == SequenceType.Facing && TurningSequence == TurningSequences.FinishFacing)
@@ -1244,7 +1261,9 @@
                     FacingBluntType,
                     FacingCustomChamferAngle,
                     FacingCustomChamferBlunt,
-                    FacingCornerBlunt);
+                    FacingCornerBlunt, 
+                    FacingSpeedFinish, 
+                    FacingFeedFinish);
                 return CurrentSequence.Operation;
             }
 

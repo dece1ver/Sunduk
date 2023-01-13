@@ -19,6 +19,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double BluntCustomAngle { get; set; }
         public double BluntCustomRadius { get; set; }
         public double CornerBlunt { get; set; }
+        public int SpeedRough { get; set; }
+        public double FeedRough { get; set; }
         public override string Operation => Templates.FacingOperation.Facing(
             Machine, 
             Material, 
@@ -34,12 +36,29 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             BluntCustomRadius,
             CornerBlunt, 
             true, 
-            false);
+            false, 
+            SpeedRough, 
+            0, 
+            FeedRough, 
+            0);
         public override MachineType MachineType => MachineType.Turning;
         public override string Name => ProfStockAllow > 0 ? $"Торцовка черновая (под G70)" : $"Торцовка"; 
 
-        public RoughFacingCycleSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter,
-            double roughStockAllow, double profStockAllow, double stepOver, (int, int) seqNumbers, Blunt bluntType = default, double bluntCustomAngle = 0, double bluntCustomRadius = 0, double cornerBlunt = 0)
+        public RoughFacingCycleSequence(Machine machine, 
+            Material material,
+            TurningExternalTool tool, 
+            double externalDiameter, 
+            double internalDiameter,
+            double roughStockAllow, 
+            double profStockAllow, 
+            double stepOver, 
+            (int, int) seqNumbers, 
+            Blunt bluntType, 
+            double bluntCustomAngle, 
+            double bluntCustomRadius, 
+            double cornerBlunt, 
+            int speedRough, 
+            double feedRough)
         {
             Machine = machine;
             Material = material;
@@ -54,6 +73,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             BluntCustomAngle = bluntCustomAngle;
             BluntCustomRadius = bluntCustomRadius;
             CornerBlunt = cornerBlunt;
+            SpeedRough = speedRough is 0 ? Templates.Operation.CuttingSpeedRough(Material) : speedRough;
+            FeedRough = feedRough is 0 ? Templates.Operation.FeedRough(Tool.Radius) : feedRough;
         }
     }
 }

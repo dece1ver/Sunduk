@@ -48,6 +48,12 @@
                 <MudItem xs="12" sm="4" md="6" lg="3">
                     <MudTextField Label="Диаметр отверстия" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
+                <MudItem xs="12" sm="6" md="6" lg="3">
+                    <MudTextField Label="Скорость резания" @bind-Value="Speed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" sm="6" md="6" lg="3">
+                    <MudTextField Label="Подача" @bind-Value="Feed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
                 break;
 
             case SequenceType.RoughTurning or SequenceType.FinishTurning:
@@ -277,6 +283,9 @@
     private bool RadialGroove { get; set; } = true;
     private TurningGroovingSequences GroovingSequence { get; set; }
 
+    public int Speed { get; set; }
+    public double Feed { get; set; }
+
     public double StartZ { get; set; } = 2;
     public double EndZ { get; set; }
     public double StartX { get; set; }
@@ -307,19 +316,12 @@
 
     private string TimeInfo(Sequence sequence)
     {
-        string result = string.Empty;
-        switch (sequence.MachineTime.CuttingTime, sequence.MachineTime.RapidTime)
+        var result = (sequence.MachineTime.CuttingTime, sequence.MachineTime.RapidTime) switch
         {
-            case (> 0, > 0):
-                result = $"[ {sequence.MachineTime.CuttingTime.ToPrettyString(2)} + {sequence.MachineTime.RapidTime.ToPrettyString(2)} = {sequence.MachineTime.FullTime.ToPrettyString(2)} ]";
-                break;
-            case (0, > 0):
-                result = $"[ {sequence.MachineTime.RapidTime.ToPrettyString()} ]";
-                break;
-            default:
-                result = string.Empty;
-                break;
-        }
+            (> 0, > 0) => $"[ {sequence.MachineTime.CuttingTime.ToPrettyString(2)} + {sequence.MachineTime.RapidTime.ToPrettyString(2)} = {sequence.MachineTime.FullTime.ToPrettyString(2)} ]",
+            (0, > 0) => $"[ {sequence.MachineTime.RapidTime.ToPrettyString()} ]",
+            _ => string.Empty
+            };
         return result;
     }
 
@@ -327,7 +329,7 @@
     {
         get
         {
-            string result = string.Empty;
+            var result = string.Empty;
             switch (SequenceType)
             {
                 case SequenceType.General:
@@ -346,11 +348,22 @@
                         Machine.L230A,
                         Material,
                         new TurningExternalTool(0, TurningExternalTool.Types.Face, 80, 0.8),
-                        StartX, EndX, Steps, 0, 1, (0,0));
+                        StartX, 
+                        EndX, 
+                        Steps, 
+                        0, 
+                        1, 
+                        (0,0), 
+                        Blunt.SimpleChamfer, 
+                        0, 
+                        0, 
+                        0, 
+                        Speed, 
+                        Feed);
                     break;
                 case SequenceType.RoughTurning:
                     if (StartX <= 0 || EndX <= 0 || EndZ is 0) return string.Empty;
-                    double roughDifference = StartX - EndX;
+                    var roughDifference = StartX - EndX;
                     var roughTurningTool = Math.Abs(roughDifference) switch {
                         > 0.001 when roughDifference > 0 => new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
                         > 0.001 when roughDifference < 0 => new TurningInternalTool(0, 20, 80, ToolRadius()),
@@ -450,18 +463,17 @@
 
     private void OnStandartChanged(ThreadStandard value)
     {
-        if (ThreadStandard != value)
-        {
-            ThreadStandard = value;
-            Pitch = 0;
-            StartX = 0;
-            CurrentThreadTemplate = null;
-        }
+        if (ThreadStandard == value) return;
+        ThreadStandard = value;
+        Pitch = 0;
+        StartX = 0;
+        CurrentThreadTemplate = null;
     }
 
     private void OnTemplateChanged(string value)
     {
         CurrentThreadTemplate = value;
+        SetDefaultCutting();
         switch (ThreadStandard)
         {
             case ThreadStandard.Metric:
@@ -517,11 +529,14 @@
 
     private void OnSequenceTypeChanged(SequenceType value)
     {
+        
         switch (value)
         {
+            
             case SequenceType.General:
                 break;
             case SequenceType.Facing:
+                SetDefaultCutting();
                 break;
             case SequenceType.RoughTurning:
                 TurningType = TurningTypes.Rough;
@@ -563,8 +578,40 @@
 
     private async Task ClearSequences()
     {
-        bool resultDialog = await OpenConfirmDialog($"Очистить список обработки?", "Очистить");
+        var resultDialog = await OpenConfirmDialog($"Очистить список обработки?", "Очистить");
         if (resultDialog) Sequences.Clear();
+    }
+
+    private void SetDefaultCutting()
+    {
+        switch (SequenceType)
+        {
+            case SequenceType.General:
+                break;
+            case SequenceType.Facing or SequenceType.RoughTurning:
+                Speed = Operation.CuttingSpeedRough(Material);
+                Feed = Operation.FeedRough(ToolRadius());
+                break;
+            case SequenceType.FinishTurning:
+                Speed = Operation.CuttingSpeedFinish(Material);
+                Feed = Operation.FeedFinish(ToolRadius());
+                break;
+            case SequenceType.Drilling:
+                var tool = new DrillingTool(0, DrillingToolType, EndX, 180);
+                Speed = Operation.DrillCuttingSpeed(Material, tool);
+                Feed = Operation.DrillFeed(Machine.L230A, Material, tool);
+                break;
+            case SequenceType.Tapping:
+                break;
+            case SequenceType.Threading:
+                break;
+            case SequenceType.Grooving:
+                break;
+            case SequenceType.Burnishing:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
 }
