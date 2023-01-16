@@ -593,6 +593,7 @@
                 DrillEnd = millingHighSpeedDrillingSequence.EndZ;
                 Holes = millingHighSpeedDrillingSequence.Holes;
                 Polar = millingHighSpeedDrillingSequence.Polar;
+                SpeedFinish = millingHighSpeedDrillingSequence.Speed;
                 break;
             case MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence:
                 Tool = millingPeckDeepDrillingSequence.Tool;
@@ -601,6 +602,7 @@
                 DrillDepth = millingPeckDeepDrillingSequence.Depth;
                 Holes = millingPeckDeepDrillingSequence.Holes;
                 Polar = millingPeckDeepDrillingSequence.Polar;
+                SpeedFinish = millingPeckDeepDrillingSequence.Speed;
                 break;
             case MillingPeckDrillingSequence millingPeckDrillingSequence:
                 Tool = millingPeckDrillingSequence.Tool;
@@ -609,6 +611,7 @@
                 DrillDepth = millingPeckDrillingSequence.Depth;
                 Holes = millingPeckDrillingSequence.Holes;
                 Polar = millingPeckDrillingSequence.Polar;
+                SpeedFinish = millingPeckDrillingSequence.Speed;
                 break;
             case MillingTappingSequence millingTappingSequence:
                 Tool = millingTappingSequence.Tool;
@@ -691,7 +694,8 @@
                 ThreadPitch = threadCuttingSequence.ThreadPitch;
                 ThreadStart = threadCuttingSequence.StartZ;
                 ThreadEnd = threadCuttingSequence.EndZ;
-                ThreadNPTPlane = threadCuttingSequence.ThreadNptPlane;
+                ThreadNptPlane = threadCuttingSequence.ThreadNptPlane;
+                SpeedFinish = threadCuttingSequence.Speed;
                 break;
             case TurningExternalGroovingSequence turningExternalGroovingSequence:
                 Tool = turningExternalGroovingSequence.Tool;
@@ -705,6 +709,10 @@
                 InnerBlunt = turningExternalGroovingSequence.InnerCornerBlunt;
                 BluntType = turningExternalGroovingSequence.OuterBluntType;
                 InnerBluntType = turningExternalGroovingSequence.InnerBluntType;
+                SpeedRough = turningExternalGroovingSequence.SpeedRough;
+                SpeedFinish = turningExternalGroovingSequence.SpeedFinish;
+                FeedRough = turningExternalGroovingSequence.FeedRough;
+                FeedFinish = turningExternalGroovingSequence.FeedFinish;
                 break;
             case TurningFaceGroovingSequence turningFaceGroovingSequence:
                 Tool = turningFaceGroovingSequence.Tool;
@@ -718,6 +726,10 @@
                 InnerBlunt = turningFaceGroovingSequence.InnerCornerBlunt;
                 BluntType = turningFaceGroovingSequence.OuterBluntType;
                 InnerBluntType = turningFaceGroovingSequence.InnerBluntType;
+                SpeedRough = turningFaceGroovingSequence.SpeedRough;
+                SpeedFinish = turningFaceGroovingSequence.SpeedFinish;
+                FeedRough = turningFaceGroovingSequence.FeedRough;
+                FeedFinish = turningFaceGroovingSequence.FeedFinish;
                 break;
             case TurningInternalGroovingSequence turningInternalGroovingSequence:
                 Tool = turningInternalGroovingSequence.Tool;
@@ -731,6 +743,10 @@
                 InnerBlunt = turningInternalGroovingSequence.InnerCornerBlunt;
                 BluntType = turningInternalGroovingSequence.OuterBluntType;
                 InnerBluntType = turningInternalGroovingSequence.InnerBluntType;
+                SpeedRough = turningInternalGroovingSequence.SpeedRough;
+                SpeedFinish = turningInternalGroovingSequence.SpeedFinish;
+                FeedRough = turningInternalGroovingSequence.FeedRough;
+                FeedFinish = turningInternalGroovingSequence.FeedFinish;
                 break;
             case TurningCutOffSequence turningCutOffSequence:
                 Tool = turningCutOffSequence.Tool;
@@ -742,23 +758,31 @@
                 BluntType = turningCutOffSequence.BluntType;
                 CustomChamferAngle = turningCutOffSequence.BluntCustomAngle;
                 CustomChamferBlunt = turningCutOffSequence.BluntCustomRadius;
+                SpeedRough = turningCutOffSequence.SpeedRough;
+                FeedFinish = turningCutOffSequence.FeedRough;
                 break;
             case TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence:
                 Tool = turningHighSpeedDrillingSequence.Tool;
                 DrillStart = turningHighSpeedDrillingSequence.StartZ;
                 DrillEnd = turningHighSpeedDrillingSequence.EndZ;
+                SpeedFinish = turningHighSpeedDrillingSequence.Speed;
+                FeedFinish = turningHighSpeedDrillingSequence.Feed;
                 break;
             case TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence:
                 Tool = turningPeckDeepDrillingSequence.Tool;
                 DrillStart = turningPeckDeepDrillingSequence.StartZ;
                 DrillEnd = turningPeckDeepDrillingSequence.EndZ;
                 DrillDepth = turningPeckDeepDrillingSequence.Depth;
+                SpeedFinish = turningPeckDeepDrillingSequence.Speed;
+                FeedFinish = turningPeckDeepDrillingSequence.Feed;
                 break;
             case TurningPeckDrillingSequence turningPeckDrillingSequence:
                 Tool = turningPeckDrillingSequence.Tool;
                 DrillStart = turningPeckDrillingSequence.StartZ;
                 DrillEnd = turningPeckDrillingSequence.EndZ;
                 DrillDepth = turningPeckDrillingSequence.Depth;
+                SpeedFinish = turningPeckDrillingSequence.Speed;
+                FeedFinish = turningPeckDrillingSequence.Feed;
                 break;
             case TurningTappingSequence turningTappingSequence:
                 Tool = turningTappingSequence.Tool;
@@ -782,22 +806,20 @@
 
     public Sequence CurrentSequence { get; set; }
     private string CurrentThreadTemplate { get; set; }
-    private double ThreadNPTPlane { get; set; }
+    private double ThreadNptPlane { get; set; }
 
     public Tool Tool { get; set; }
+    public int SpeedRough { get; set; }
+    public int SpeedFinish { get; set; }
+    public double FeedRough { get; set; }
+    public double FeedFinish { get; set; }
     public string CustomOperation { get; set; }
     public Coolant Coolant { get; set; }
     public bool Polar { get; set; }
 
     public Sequence RepeatableRoughFacingSequence { get; set; }
     bool _calcChamferDiameter = true;
-
-    public int SpeedRough { get; set; }
-    public int SpeedFinish { get; set; }
-
-    private double FeedRough { get; set; }
-    private double FeedFinish { get; set; }
-
+    
     private double ExternalDiameter { get; set; }
     private double InternalDiameter { get; set; }
 
@@ -903,6 +925,8 @@
                         Tool as MillingDrillingTool,
                         DrillStart,
                         DrillEnd,
+                        SpeedFinish,
+                        FeedFinish,
                         millingHighSpeedDrillingSequence.Holes,
                         millingHighSpeedDrillingSequence.Polar, 
                         millingHighSpeedDrillingSequence.SafePlane);
@@ -917,6 +941,8 @@
                         StepOver,
                         DrillStart,
                         DrillEnd,
+                        SpeedFinish,
+                        FeedFinish,
                         millingPeckDeepDrillingSequence.Holes,
                         millingPeckDeepDrillingSequence.Polar, 
                         millingPeckDeepDrillingSequence.SafePlane);
@@ -931,6 +957,8 @@
                         StepOver,
                         DrillStart,
                         DrillEnd,
+                        SpeedFinish,
+                        FeedFinish,
                         millingPeckDrillingSequence.Holes,
                         millingPeckDrillingSequence.Polar, 
                         millingPeckDrillingSequence.SafePlane);
@@ -982,7 +1010,7 @@
                         FeedFinish);
                     return CurrentSequence.Operation;
 
-                case FinishFacingCycleSequence finishFacingCycleSequence:
+                case FinishFacingCycleSequence:
                     CurrentSequence = new FinishFacingCycleSequence(Tool as TurningExternalTool, RepeatableRoughFacingSequence, SpeedFinish, FeedFinish);
                     return CurrentSequence.Operation;
 
@@ -1054,7 +1082,8 @@
                         ThreadPitch,
                         ThreadStart,
                         ThreadEnd,
-                        ThreadNPTPlane);
+                        ThreadNptPlane,
+                        SpeedFinish);
                     return CurrentSequence.Operation;
 
                 case TurningCutOffSequence turningCutOffSequence:
@@ -1069,7 +1098,9 @@
                         StepOver,
                         BluntType,
                         CustomChamferAngle,
-                        CustomChamferBlunt);
+                        CustomChamferBlunt,
+                        SpeedFinish,
+                        FeedFinish);
                     return CurrentSequence.Operation;
 
                 case TurningExternalGroovingSequence turningExternalGroovingSequence:
@@ -1086,7 +1117,11 @@
                         OuterBlunt,
                         InnerBlunt,
                         BluntType,
-                        InnerBluntType);
+                        InnerBluntType,
+                        SpeedRough,
+                        SpeedFinish,
+                        FeedRough,
+                        FeedFinish);
                     return CurrentSequence.Operation;
 
                 case TurningFaceGroovingSequence turningFaceGroovingSequence:
@@ -1103,7 +1138,11 @@
                         OuterBlunt,
                         InnerBlunt,
                         BluntType,
-                        InnerBluntType);
+                        InnerBluntType,
+                        SpeedRough,
+                        SpeedFinish,
+                        FeedRough,
+                        FeedFinish);
                     return CurrentSequence.Operation;
 
                 case TurningInternalGroovingSequence turningInternalGroovingSequence:
@@ -1120,7 +1159,11 @@
                         OuterBlunt,
                         InnerBlunt,
                         BluntType,
-                        InnerBluntType);
+                        InnerBluntType,
+                        SpeedRough,
+                        SpeedFinish,
+                        FeedRough,
+                        FeedFinish);
                     return CurrentSequence.Operation;
 
                 case TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence:
@@ -1129,7 +1172,9 @@
                         turningHighSpeedDrillingSequence.Material,
                         Tool as TurningDrillingTool,
                         DrillStart,
-                        DrillEnd);
+                        DrillEnd, 
+                        SpeedFinish, 
+                        FeedFinish);
                     return CurrentSequence.Operation;
 
                 case TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence:
@@ -1139,7 +1184,9 @@
                         Tool as TurningDrillingTool,
                         StepOver,
                         DrillStart,
-                        DrillEnd);
+                        DrillEnd, 
+                        SpeedFinish, 
+                        FeedFinish);
                     return CurrentSequence.Operation;
 
                 case TurningPeckDrillingSequence turningPeckDrillingSequence:
@@ -1149,7 +1196,9 @@
                         Tool as TurningDrillingTool,
                         StepOver,
                         DrillStart,
-                        DrillEnd);
+                        DrillEnd, 
+                        SpeedFinish, 
+                        FeedFinish);
                     return CurrentSequence.Operation;
 
                 case TurningTappingSequence turningTappingSequence:
@@ -1185,20 +1234,25 @@
     {
         CurrentThreadTemplate = value;
 
-        if (ThreadStandard == ThreadStandard.BSPP)
+        switch (ThreadStandard)
         {
-            Thread.GetBsppValues(CurrentThreadTemplate, out string diameter, out string pitch);
-            ThreadDiameter = diameter.GetDouble();
-            ThreadPitch = pitch.GetDouble();
-            ThreadNPTPlane = 0;
-        }
-        else if (ThreadStandard == ThreadStandard.NPT)
-        {
-            Thread.GetNptValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
-            ThreadDiameter = externalDiameter.GetDouble();
-            ThreadPitch = pitch.GetDouble();
-            ThreadEnd = (-threadLength); // наверно тоже строку стоит возвращать
-            ThreadNPTPlane = planeLength;
+            case ThreadStandard.BSPP:
+            {
+                Thread.GetBsppValues(CurrentThreadTemplate, out string diameter, out string pitch);
+                ThreadDiameter = diameter.GetDouble();
+                ThreadPitch = pitch.GetDouble();
+                ThreadNptPlane = 0;
+                break;
+            }
+            case ThreadStandard.NPT:
+            {
+                Thread.GetNptValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
+                ThreadDiameter = externalDiameter.GetDouble();
+                ThreadPitch = pitch.GetDouble();
+                ThreadEnd = (-threadLength); // наверно тоже строку стоит возвращать
+                ThreadNptPlane = planeLength;
+                break;
+            }
         }
     }
 }

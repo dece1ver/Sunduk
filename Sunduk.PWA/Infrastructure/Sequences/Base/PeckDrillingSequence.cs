@@ -20,7 +20,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
         public int Speed { get; set; }
         public double Feed { get; set; }
         public override string Name => $"Прерывистое сверление Ø{Tool.Diameter.NC(option: Util.NcDecimalPointOption.Without)} L-{Math.Abs(EndZ).NC(option: Util.NcDecimalPointOption.Without)} ({Tool.Type.Description()})";
-        public override OperationTime MachineTime => this.OperationTime(Material);
+        public override OperationTime MachineTime => this.OperationTime();
         public PeckDrillingSequence(Machine machine, Material material, DrillingTool tool, double depth, double startZ, double endZ, int speed, double feed)
         {
             Machine = machine;

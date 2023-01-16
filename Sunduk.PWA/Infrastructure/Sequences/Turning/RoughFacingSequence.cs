@@ -50,7 +50,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
                 return name;
                 } 
             }
-        public override OperationTime MachineTime => this.OperationTime(Material);
+        public override OperationTime MachineTime => this.OperationTime();
 
         public RoughFacingSequence(
             Machine machine, 

@@ -30,7 +30,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             FeedRough, 
             FeedFinish);
     public override string Name => $"Канавка наружная {Width.NC(option: Util.NcDecimalPointOption.Without)}мм на Ø{ExternalDiameter.NC(option: Util.NcDecimalPointOption.Without)}";
-    public override OperationTime MachineTime => this.OperationTime(Material);
+    public override OperationTime MachineTime => this.OperationTime();
 
     public TurningExternalGroovingSequence(
             Machine machine,

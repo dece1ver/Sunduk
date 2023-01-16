@@ -13,7 +13,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class RoughTurningSequence : TurningSequence
     {
         public override string Operation => string.Empty;
-        public override OperationTime MachineTime => this.OperationTime(Material);
+        public override OperationTime MachineTime => this.OperationTime();
         public int SpeedRough { get; set; }
         public double FeedRough { get; set; }
         public override string Name

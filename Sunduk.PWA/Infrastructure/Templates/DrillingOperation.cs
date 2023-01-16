@@ -94,7 +94,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 depth <= 0) return string.Empty;
             var approach = startZ > 0
                 ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()}S{speed} {Direction(tool)}\n"
-                : $"G0 X-{tool.Diameter.NC()} Z{SafeApproachDistance.NC()}S{DrillCuttingSpeed(material, tool)} {Direction(tool)}\nZ{startZ.NC()}\n";
+                : $"G0 X-{tool.Diameter.NC()} Z{SafeApproachDistance.NC()}S{speed} {Direction(tool)}\nZ{startZ.NC()}\n";
             var exit = startZ > 0
                 ? $"G0 Z{startZ.NC()}\n"
                 : $"G0 Z{SafeApproachDistance.NC()}\n";

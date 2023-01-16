@@ -11,7 +11,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class FinishTurningSequence : TurningSequence
     {
         public override string Operation => string.Empty;
-        public override OperationTime MachineTime => this.OperationTime(Material);
+        public override OperationTime MachineTime => this.OperationTime();
         public int SpeedFinish { get; set; }
         public double FeedFinish { get; set; }
         public override string Name

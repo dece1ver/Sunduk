@@ -5,7 +5,7 @@
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="6" md="@(SequenceType is SequenceType.Burnishing ? 3 : 4)">
-            <MudSelect @bind-Value="Material" Label="Материал детали" T="Material" Variant="Variant.Filled" Margin="Margin.Dense">
+            <MudSelect Label="Материал детали" T="Material" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnMaterialChanged">
                 <MudSelectItem Value="@Material.Steel">Черная сталь</MudSelectItem>
                 <MudSelectItem Value="@Material.Stainless">Нержавеющая сталь</MudSelectItem>
                 <MudSelectItem Value="@Material.Brass">Бронза</MudSelectItem>
@@ -112,6 +112,12 @@
                         <MudTextField Label="@($"{(CuttingType is CuttingType.Radial ? "Ширина" : "Глубина")}")" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                 }
+                <MudItem xs="12" sm="6" md="6" lg="3">
+                    <MudTextField Label="Скорость резания" @bind-Value="Speed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.IntConverter" />
+                </MudItem>
+                <MudItem xs="12" sm="6" md="6" lg="3">
+                    <MudTextField Label="Подача" @bind-Value="Feed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
                 break;
 
             case SequenceType.Drilling:
@@ -145,6 +151,12 @@
                         </MudItem>
                         break;
                 }
+                <MudItem xs="12" sm="6" md="6" lg="3">
+                    <MudTextField Label="Скорость резания" @bind-Value="Speed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.IntConverter" />
+                </MudItem>
+                <MudItem xs="12" sm="6" md="6" lg="3">
+                    <MudTextField Label="Подача" @bind-Value="Feed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
                 break;
 
             case SequenceType.Threading:
@@ -155,7 +167,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6" md="6" lg="@(ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 3 : 6)">
-                    <MudSelect Label="Стандарт" T="ThreadStandard" Value="ThreadStandard" Variant="Variant.Filled" ValueChanged="OnStandartChanged" Margin="Margin.Dense">
+                    <MudSelect Label="Стандарт" T="ThreadStandard" Value="ThreadStandard" Variant="Variant.Filled" ValueChanged="OnStandardChanged" Margin="Margin.Dense">
                         <MudSelectItem Value="@(ThreadStandard.Metric)">@(ThreadStandard.Metric.Description())</MudSelectItem>
                         <MudSelectItem Value="@(ThreadStandard.BSPP)">@(ThreadStandard.BSPP.Description())</MudSelectItem>
                         <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">@(ThreadStandard.Trapezoidal.Description())</MudSelectItem>
@@ -192,6 +204,12 @@
                         </MudItem>
                         break;
                 }
+                <MudItem xs="12" sm="6" md="6" lg="3">
+                    <MudTextField Label="Скорость резания" @bind-Value="Speed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.IntConverter" />
+                </MudItem>
+                <MudItem xs="12" sm="6" md="6" lg="3">
+                    <MudTextField Label="Подача" @bind-Value="Feed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
                 break;
             case SequenceType.Burnishing:
                 <MudItem xs="12" sm="6" md="3" lg="3">
@@ -199,6 +217,12 @@
                 </MudItem>
                 <MudItem xs="12" sm="6" md="3" lg="3">
                     <MudTextField Label="Глубина" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
+                <MudItem xs="12" sm="6" md="6" lg="3">
+                    <MudTextField Label="Скорость резания" @bind-Value="Speed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.IntConverter" />
+                </MudItem>
+                <MudItem xs="12" sm="6" md="6" lg="3">
+                    <MudTextField Label="Подача" @bind-Value="Feed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 break;
         }
@@ -308,26 +332,71 @@
                         _speed = Operation.DrillCuttingSpeed(Material, new DrillingTool(0, DrillingToolType, EndX, 180));
                         break;
                     case SequenceType.Tapping:
+                        _speed = 5;
                         break;
                     case SequenceType.Threading:
+                        _speed = 120;
                         break;
                     case SequenceType.Grooving:
+                        _speed = Operation.GroovingSpeedRough(Material);
                         break;
                     case SequenceType.Burnishing:
+                        _speed = 5;
                         break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
                 }
             }
         }
     }
 
-    public double Feed { get; set; }
+    public double Feed
+    {
+        get => _feed;
+        set
+        {
+            if (value > 0)
+            {
+                _feed = value;
+            }
+            else
+            {
+                switch (SequenceType)
+                {
+                    case SequenceType.General:
+                        break;
+                    case SequenceType.Facing or SequenceType.RoughTurning:
+                        _feed = Operation.FeedRough(ToolRadius());
+                        break;
+                    case SequenceType.FinishTurning:
+                        _feed = Operation.FeedFinish(ToolRadius());
+                        break;
+                    case SequenceType.Drilling:
+                        _feed = Operation.DrillFeed(Machine.L230A, Material, new DrillingTool(0, DrillingToolType, EndX, 180));
+                        break;
+                    case SequenceType.Grooving:
+                        _feed = Operation.GroovingFeedRough();
+                        break;
+                    case SequenceType.Burnishing:
+                        _feed = 5;
+                        break;
+                }
+            }
+        }
+    }
 
     public double StartZ { get; set; } = 2;
     public double EndZ { get; set; }
     public double StartX { get; set; }
-    public double EndX { get; set; }
+
+    public double EndX
+    {
+        get => _endX;
+        set
+        {
+            _endX = value;
+            if (SequenceType is SequenceType.Drilling) SetDefaultCutting();
+        }
+    }
+
     public double StepOver { get; set; }
     public double Pitch { get; set; }
     public double PlaneLength { get; set; }
@@ -347,7 +416,17 @@
         }
     }
     public int Steps { get; set; } = 1;
-    public DrillingTool.Types DrillingToolType { get; set; }
+
+    public DrillingTool.Types DrillingToolType
+    {
+        get => _drillingToolType;
+        set
+        {
+            _drillingToolType = value;
+            if (SequenceType is SequenceType.Drilling) SetDefaultCutting();
+        }
+    }
+
     public ThreadStandard ThreadStandard { get; set; }
 
     public OperationTime FullOperationTime => Sequences.FullOperationTime();
@@ -414,7 +493,8 @@
                         new List<Element>(2){new Point(StartX, StartZ), new Point(EndX, EndZ)}, 
                         ToolRadius() is 0.8 ? ToolRadius() * 2.5 : ToolRadius() * 2, 
                         0, 
-                        0);
+                        0, 
+                        Speed, Feed);
 
                     break;
                 case SequenceType.FinishTurning:
@@ -433,7 +513,8 @@
                         new List<Element>(2){new Point(StartX, StartZ), new Point(EndX, EndZ)}, 
                         0, 
                         0, 
-                        0);
+                        0,
+                        Speed, Feed);
                     break;
                 case SequenceType.Grooving:
                     switch (GroovingSequence)
@@ -442,9 +523,9 @@
                             if (Math.Abs(StartX - EndX) < 0.001) break;
                             CurrentSequence = CuttingType switch
                             {
-                                CuttingType.Radial when StartX > EndX => new TurningExternalGroovingSequence(Machine.L230A, Material, new GroovingExternalTool(0, GroovingExternalTool.Types.Grooving, 3, TurningGroovingTool.Point.Right), 0, StartX, EndX, EndZ, 0.25, 0, 0, 0, Blunt.SimpleChamfer, Blunt.SimpleChamfer),
-                                CuttingType.Radial when StartX < EndX => new TurningInternalGroovingSequence(Machine.L230A, Material, new GroovingInternalTool(0, 0, 3, TurningGroovingTool.Point.Right), 0, EndX, StartX, EndZ, 0.25, 0, 0, 0, Blunt.SimpleChamfer, Blunt.SimpleChamfer),
-                                _ => new TurningFaceGroovingSequence(Machine.L230A, Material, new GroovingFaceTool(0, 3, TurningGroovingTool.Point.Right), -30, StartX, EndX, EndZ, 0.25, 0, 0, 0, Blunt.CustomChamfer, Blunt.CustomChamfer)
+                                CuttingType.Radial when StartX > EndX => new TurningExternalGroovingSequence(Machine.L230A, Material, new GroovingExternalTool(0, GroovingExternalTool.Types.Grooving, 3, TurningGroovingTool.Point.Right), 0, StartX, EndX, EndZ, 0.25, 0, 0, 0, Blunt.SimpleChamfer, Blunt.SimpleChamfer, Speed, Speed, Feed, Feed),
+                                CuttingType.Radial when StartX < EndX => new TurningInternalGroovingSequence(Machine.L230A, Material, new GroovingInternalTool(0, 0, 3, TurningGroovingTool.Point.Right), 0, EndX, StartX, EndZ, 0.25, 0, 0, 0, Blunt.SimpleChamfer, Blunt.SimpleChamfer, Speed, Speed, Feed, Feed),
+                                _ => new TurningFaceGroovingSequence(Machine.L230A, Material, new GroovingFaceTool(0, 3, TurningGroovingTool.Point.Right), -30, StartX, EndX, EndZ, 0.25, 0, 0, 0, Blunt.CustomChamfer, Blunt.CustomChamfer, Speed, Speed, Feed, Feed)
                             };
                             break;
 
@@ -454,14 +535,9 @@
                                 Machine.L230A,
                                 Material,
                                 new GroovingExternalTool(0, GroovingExternalTool.Types.Cutting, 1, TurningGroovingTool.Point.Right),
-                                0,
-                                StartX,
-                                EndX,
-                                0,
-                                0.25,
-                                Blunt.SimpleChamfer,
-                                0,
-                                0);
+                                0, StartX, EndX,
+                                0, 0.25, Blunt.SimpleChamfer,
+                                0, 0, Speed, Feed);
                             break;
                     }
                     break;
@@ -470,15 +546,15 @@
                     {
                         case DrillingSequences.HighSpeedDrilling:
                             if (EndZ is 0 || EndX is 0) break;
-                            CurrentSequence = new TurningHighSpeedDrillingSequence(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180), StartZ, EndZ);
+                            CurrentSequence = new TurningHighSpeedDrillingSequence(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180), StartZ, EndZ, Speed, Feed);
                             break;
                         case DrillingSequences.PeckingDeepDrilling:
                             if (EndZ is 0 || EndX is 0 || StepOver is 0) break;
-                            CurrentSequence = new TurningPeckDeepDrillingSequence(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180), StepOver, StartZ, EndZ);
+                            CurrentSequence = new TurningPeckDeepDrillingSequence(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180), StepOver, StartZ, EndZ, Speed, Feed);
                             break;
                         case DrillingSequences.PeckingDrilling:
                             if (EndZ is 0 || EndX is 0 || StepOver is 0) break;
-                            CurrentSequence = new TurningPeckDrillingSequence(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180), StepOver, StartZ, EndZ);
+                            CurrentSequence = new TurningPeckDrillingSequence(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180), StepOver, StartZ, EndZ, Speed, Feed);
                             break;
                     }
                     break;
@@ -487,19 +563,19 @@
                     CurrentSequence = Tapping switch
                     {
                         true => new TurningTappingSequence(Machine.L230A, new TurningTappingTool(0, TappingTool.Types.Cutting, StartX, Pitch, ThreadStandard, CurrentThreadTemplate), 5, StartZ, EndZ),
-                        false => new ThreadCuttingSequence(Machine.L230A, new ThreadingTool(1, Pitch, ThreadStandard.Profile().GetDouble()), ThreadStandard, CuttingType.External, StartX, Pitch, StartZ, EndZ, PlaneLength, CurrentThreadTemplate)
+                        false => new ThreadCuttingSequence(Machine.L230A, new ThreadingTool(1, Pitch, ThreadStandard.Profile().GetDouble()), ThreadStandard, CuttingType.External, StartX, Pitch, StartZ, EndZ, PlaneLength, Speed, CurrentThreadTemplate)
                     };
                     break;
                 case SequenceType.Burnishing:
                     if (EndX is 0 || EndZ is 0) return string.Empty;
-                    CurrentSequence = new TurningBurnishingSequence(Machine.L230A, new TurningBurnishingTool(0, TurningBurnishingTool.Types.Diamond), EndX, StartZ, EndZ); 
+                    CurrentSequence = new TurningBurnishingSequence(Machine.L230A, new TurningBurnishingTool(0, TurningBurnishingTool.Types.Diamond), EndX, StartZ, EndZ, Speed, Feed);
                     break;
             }
             return ExampleString();
         }
     }
 
-    private void OnStandartChanged(ThreadStandard value)
+    private void OnStandardChanged(ThreadStandard value)
     {
         if (ThreadStandard == value) return;
         ThreadStandard = value;
@@ -565,16 +641,22 @@
             : $"{CurrentSequence.Name}\nВремя: { CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек";
     }
 
+    private void OnMaterialChanged(Material value)
+    {
+        Material = value;
+        SetDefaultCutting();
+    }
+
     private void OnSequenceTypeChanged(SequenceType value)
     {
         SequenceType = value;
+        SetDefaultCutting();
         switch (value)
         {
             
             case SequenceType.General:
                 break;
             case SequenceType.Facing:
-                SetDefaultCutting();
                 break;
             case SequenceType.RoughTurning:
                 TurningType = TurningTypes.Rough;
@@ -639,17 +721,24 @@
                 Feed = Operation.DrillFeed(Machine.L230A, Material, tool);
                 break;
             case SequenceType.Tapping:
+                Speed = 5;
                 break;
             case SequenceType.Threading:
+                Speed = 120;
                 break;
             case SequenceType.Grooving:
+                Speed = Operation.GroovingSpeedRough(Material);
+                Feed = Operation.GroovingFeedRough();
                 break;
             case SequenceType.Burnishing:
+                Speed = 80;
+                Feed = 0.03;
                 break;
-            default:
-                throw new ArgumentOutOfRangeException();
         }
     }
 
     private int _speed;
+    private double _feed;
+    private double _endX;
+    private DrillingTool.Types _drillingToolType;
 }
