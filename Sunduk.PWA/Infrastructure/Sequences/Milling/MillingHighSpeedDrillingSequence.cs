@@ -19,11 +19,13 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Milling
             Tool as MillingDrillingTool, 
             StartZ, 
             EndZ, 
+            Speed, 
+            Feed, 
             Holes, 
             Polar, 
             SafePlane);
-        public MillingHighSpeedDrillingSequence(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane) 
-            : base(machine, material, tool, startZ, endZ)
+        public MillingHighSpeedDrillingSequence(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double startZ, double endZ, int speed, double feed, List<Hole> holes, bool polar, double safePlane) 
+            : base(machine, material, tool, startZ, endZ, speed, feed)
         {
             Holes = holes;
             Polar = polar;

@@ -49,7 +49,7 @@
                     <MudTextField Label="Диаметр отверстия" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 <MudItem xs="12" sm="6" md="6" lg="3">
-                    <MudTextField Label="Скорость резания" @bind-Value="Speed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                    <MudTextField Label="Скорость резания" @bind-Value="Speed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.IntConverter"/>
                 </MudItem>
                 <MudItem xs="12" sm="6" md="6" lg="3">
                     <MudTextField Label="Подача" @bind-Value="Feed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
@@ -283,7 +283,45 @@
     private bool RadialGroove { get; set; } = true;
     private TurningGroovingSequences GroovingSequence { get; set; }
 
-    public int Speed { get; set; }
+    public int Speed
+    {
+        get => _speed;
+        set
+        {
+            if (value > 0)
+            {
+                _speed = value;
+            }
+            else
+            {
+                switch (SequenceType)
+                {
+                    case SequenceType.General:
+                        break;
+                    case SequenceType.Facing or SequenceType.RoughTurning:
+                        _speed = Operation.CuttingSpeedRough(Material);
+                        break;
+                    case SequenceType.FinishTurning:
+                        _speed = Operation.CuttingSpeedFinish(Material);
+                        break;
+                    case SequenceType.Drilling:
+                        _speed = Operation.DrillCuttingSpeed(Material, new DrillingTool(0, DrillingToolType, EndX, 180));
+                        break;
+                    case SequenceType.Tapping:
+                        break;
+                    case SequenceType.Threading:
+                        break;
+                    case SequenceType.Grooving:
+                        break;
+                    case SequenceType.Burnishing:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+    }
+
     public double Feed { get; set; }
 
     public double StartZ { get; set; } = 2;
@@ -529,7 +567,7 @@
 
     private void OnSequenceTypeChanged(SequenceType value)
     {
-        
+        SequenceType = value;
         switch (value)
         {
             
@@ -540,7 +578,7 @@
                 break;
             case SequenceType.RoughTurning:
                 TurningType = TurningTypes.Rough;
-                if(SequenceType is SequenceType.Drilling) // черновое после сверления -> верятно расточка
+                if(SequenceType is SequenceType.Drilling) // черновое после сверления -> вероятно расточка
                 {
                     StartX = EndX;
                     EndX = 0;
@@ -559,7 +597,6 @@
                 CuttingType = CuttingType.Radial;
                 break;
         }
-        SequenceType = value;
     }
 
     private async Task<bool> OpenConfirmDialog(string message, string okMessage)
@@ -614,4 +651,5 @@
         }
     }
 
+    private int _speed;
 }

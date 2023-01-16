@@ -17,9 +17,11 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
         public double Depth { get; set; }
         public double StartZ { get; set; }
         public double EndZ { get; set; }
+        public int Speed { get; set; }
+        public double Feed { get; set; }
         public override string Name => $"Глубокое сверление Ø{Tool.Diameter.NC(option: Util.NcDecimalPointOption.Without)} L-{Math.Abs(EndZ).NC(option: Util.NcDecimalPointOption.Without)} ({Tool.Type.Description()})";
         public override OperationTime MachineTime => this.OperationTime(Material);
-        public PeckDeepDrillingSequence(Machine machine, Material material, DrillingTool tool, double depth, double startZ, double endZ)
+        public PeckDeepDrillingSequence(Machine machine, Material material, DrillingTool tool, double depth, double startZ, double endZ, int speed, double feed)
         {
             Machine = machine;
             Material = material;
@@ -27,6 +29,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
             Depth = depth;
             StartZ = startZ;
             EndZ = endZ;
+            Speed = speed;
+            Feed = feed;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     {
         public override MachineType MachineType => MachineType.Turning;
         public override string Operation => Templates.DrillingOperation.TurningPeckDrilling(Machine, Material, Tool, Depth, StartZ, EndZ);
-        public TurningPeckDrillingSequence(Machine machine, Material material, TurningDrillingTool tool, double depth, double startZ, double endZ) 
-            : base(machine, material, tool, depth, startZ, endZ) { }
+        public TurningPeckDrillingSequence(Machine machine, Material material, TurningDrillingTool tool, double depth, double startZ, double endZ, int speed, double feed) 
+            : base(machine, material, tool, depth, startZ, endZ, speed, feed) { }
     }
 }

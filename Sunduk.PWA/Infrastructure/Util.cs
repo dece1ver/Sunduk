@@ -504,7 +504,16 @@ namespace Sunduk.PWA.Infrastructure
 
 
         /// <summary>
-        /// Конвертер Double
+        /// Конвертер Int
+        /// </summary>
+        public static Converter<int> IntConverter = new()
+        {
+            SetFunc = value => value.ToString(),
+            GetFunc = text => text.GetInt(0, GetNumberOption.OnlyPositive),
+        };
+
+        /// <summary>
+        /// Конвертер Int с дефолтным значением 1
         /// </summary>
         public static Converter<int> IntConverterFromOne = new()
         {

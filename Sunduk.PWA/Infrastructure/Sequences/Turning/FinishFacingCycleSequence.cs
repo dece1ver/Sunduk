@@ -41,8 +41,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         {
             RoughSequence = roughSequence;
             Tool = tool;
-            SpeedFinish = speedFinish is 0 ? Templates.Operation.CuttingSpeedFinish(Material) : speedFinish;
-            FeedFinish = feedFinish is 0 ? Templates.Operation.FeedFinish(Tool.Radius): feedFinish;
+            SpeedFinish = speedFinish;
+            FeedFinish = feedFinish;
         }
     }
 }

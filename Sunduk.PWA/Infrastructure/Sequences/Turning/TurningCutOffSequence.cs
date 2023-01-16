@@ -17,9 +17,11 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public Blunt BluntType { get; set; }
         public double BluntCustomAngle { get; set; }
         public double BluntCustomRadius { get; set; }
+        public int SpeedRough { get; set; }
+        public double FeedRough { get; set; }
 
         public override MachineType MachineType => MachineType.Turning;
-        public override string Operation => Templates.GroovingOperation.CutOffSequence(Machine, Material, Tool, CuttingPoint, ExternalDiameter, InternalDiameter, CornerBlunt, StepOver, BluntType, BluntCustomAngle, BluntCustomRadius);
+        public override string Operation => Templates.GroovingOperation.CutOffSequence(Machine, Material, Tool, CuttingPoint, ExternalDiameter, InternalDiameter, CornerBlunt, StepOver, SpeedRough, FeedRough, BluntType, BluntCustomAngle, BluntCustomRadius);
         public override OperationTime MachineTime => this.OperationTime(Material);
         public override string Name => $"Отрезка";
 
@@ -34,7 +36,9 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double stepOver, 
             Blunt bluntType , 
             double bluntCustomAngle, 
-            double bluntCustomRadius)
+            double bluntCustomRadius,
+            int speedRough,
+            double feedRough)
         {
             Machine = machine;
             Material = material;
@@ -47,6 +51,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             BluntType = bluntType;
             BluntCustomAngle = bluntCustomAngle;
             BluntCustomRadius = bluntCustomRadius;
+            SpeedRough = speedRough;
+            FeedRough = feedRough;
         }
     }
 }

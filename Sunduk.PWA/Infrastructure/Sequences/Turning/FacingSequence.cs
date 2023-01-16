@@ -81,10 +81,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             BluntCustomAngle = bluntCustomAngle;
             BluntCustomRadius = bluntCustomRadius;
             CornerBlunt = cornerBlunt;
-            SpeedRough = speedRough is 0 ? Templates.Operation.CuttingSpeedRough(Material) : speedRough;
-            SpeedFinish = speedFinish is 0 ? Templates.Operation.CuttingSpeedFinish(Material) : speedFinish;
-            FeedRough = feedRough is 0 ? Templates.Operation.FeedRough(Tool.Radius) : feedRough;
-            FeedFinish = feedFinish is 0 ? Templates.Operation.FeedFinish(Tool.Radius): feedFinish;
+            SpeedRough = speedRough;
+            SpeedFinish = speedFinish;
+            FeedRough = feedRough;
+            FeedFinish = feedFinish;
 
         }
     }

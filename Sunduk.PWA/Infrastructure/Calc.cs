@@ -313,13 +313,13 @@ namespace Sunduk.PWA.Infrastructure
             var endX = roughFacingSequence.InternalDiameter;
             var startZ = roughFacingSequence.RoughStockAllow;
             var endZ = roughFacingSequence.ProfStockAllow;
+            var speedRough = roughFacingSequence.SpeedRough;
+            var feedRough = roughFacingSequence.FeedRough;
             var fullLength = startZ - endZ;
             var steps = (int)Math.Round(fullLength / roughFacingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
-            var speed = Operation.CuttingSpeedRough(material);
-            var feed = Operation.FeedRough(roughFacingSequence.Tool.Radius);
-            var spins = (speed * 1000) / (Math.PI * ((startX - endX) / 2));
+            var spins = (speedRough * 1000) / (Math.PI * ((startX - endX) / 2));
             if (spins > 3000) spins = 3000;
-            cuttingTime += steps * CrossTurningTime(startX, endX, spins, feed);
+            cuttingTime += steps * CrossTurningTime(startX, endX, spins, feedRough);
 
             rapidTime += steps * CrossRapidTime(startX, endX);
 
@@ -338,6 +338,8 @@ namespace Sunduk.PWA.Infrastructure
             var startZ = Math.Abs(roughTurningSequence.Contour[0].Z ?? 0);
             var endZ = Math.Abs(roughTurningSequence.Contour[1].Z ?? 0);
             var fullLength = startZ + endZ;
+            // var speedRough = roughTurningSequence.SpeedRough;
+            // var feedRough = roughTurningSequence.FeedRough;
             int steps;
             if (Math.Abs(startX - endX) < 0.001)
             {
@@ -456,10 +458,10 @@ namespace Sunduk.PWA.Infrastructure
             var width = turningInternalGroovingSequence.Width;
             if (width < turningInternalGroovingSequence.Tool.Width) width = turningInternalGroovingSequence.Tool.Width;
             var stepsZ = (int)Math.Round(width / turningInternalGroovingSequence.Tool.Width, MidpointRounding.ToPositiveInfinity);
-            var roughSpeed = Operation.GroovingSpeedRough(material);
-            var roughFeed = Operation.GroovingFeedRough();
-            var finishSpeed = Operation.GroovingSpeedFinish(material);
-            var finishFeed = Operation.GroovingFeedFinish();
+            var roughSpeed = turningInternalGroovingSequence.SpeedRough;
+            var roughFeed = turningInternalGroovingSequence.FeedRough;
+            var finishSpeed = turningInternalGroovingSequence.SpeedFinish;
+            var finishFeed = turningInternalGroovingSequence.FeedFinish;
             var roughSpins = (roughSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
             var finishSpins = (finishSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
             if (roughSpins > 3000) roughSpins = 3000;
@@ -489,10 +491,10 @@ namespace Sunduk.PWA.Infrastructure
             var stepsZ = (int)Math.Round(width / turningFaceGroovingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
             if (width < turningFaceGroovingSequence.Tool.Width) width = turningFaceGroovingSequence.Tool.Width;
             var stepsX = (int)Math.Round(width * 2 / turningFaceGroovingSequence.Tool.Width, MidpointRounding.ToPositiveInfinity);
-            var roughSpeed = Operation.GroovingSpeedRough(material);
-            var roughFeed = Operation.GroovingFeedRough();
-            var finishSpeed = Operation.GroovingSpeedFinish(material);
-            var finishFeed = Operation.GroovingFeedFinish();
+            var roughSpeed = turningFaceGroovingSequence.SpeedRough;
+            var roughFeed = turningFaceGroovingSequence.FeedRough;
+            var finishSpeed = turningFaceGroovingSequence.SpeedFinish;
+            var finishFeed = turningFaceGroovingSequence.FeedFinish;
             var roughSpins = (roughSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
             var finishSpins = (finishSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
             if (roughSpins > 3000) roughSpins = 3000;
@@ -517,8 +519,8 @@ namespace Sunduk.PWA.Infrastructure
             double rapidTime = 5;
             var fullLength = (Math.Abs(turningBurnishingSequence.StartZ) + Math.Abs(turningBurnishingSequence.EndZ));
             var additionalRapidMove = turningBurnishingSequence.Tool is TurningExternalBurnishingTool ? 1 : 1 + fullLength;
-            var feed = Operation.BurnishingFeed(turningBurnishingSequence.Tool);
-            var speed = Operation.BurnishingSpeed(turningBurnishingSequence.Tool);
+            var speed = turningBurnishingSequence.SpeedFinish;
+            var feed = turningBurnishingSequence.FeedFinish;
             var spins = (speed * 1000) / (Math.PI * turningBurnishingSequence.Diameter);
             if (spins > 1000) spins = 1000;
             cuttingTime += (fullLength + 1).AxialTurningTime(spins, feed);
