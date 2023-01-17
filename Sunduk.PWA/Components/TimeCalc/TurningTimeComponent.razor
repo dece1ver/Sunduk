@@ -58,14 +58,29 @@
 
             case SequenceType.RoughTurning or SequenceType.FinishTurning:
                 <MudItem xs="12" sm="6" md="4">
-                    <MudSelect Label="Тип обработки" T="TurningTypes" @bind-Value="TurningType" Variant="Variant.Filled" Margin="Margin.Dense">
-                        @if (SequenceType is SequenceType.RoughTurning)
-                        {
-                            <MudSelectItem Value="@(TurningTypes.Rough)">Ap=2 F=0.22 (&GT;Ø12мм) [R0.8]</MudSelectItem>
-                        }
-                        <MudSelectItem Value="@(TurningTypes.Medium)">Ap=0.8 F=0.15 (Ø6-12мм) [R0.4]</MudSelectItem>
-                        <MudSelectItem Value="@(TurningTypes.Gentle)">Ap=0.4 F=0.11 (&LT;Ø6мм) [R0.2]</MudSelectItem>
-                    </MudSelect>
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <MudTooltip>
+                                <ChildContent >
+                                    <MudSelect Label="Тип обработки" T="TurningTypes" @bind-Value="TurningType" Variant="Variant.Filled" Margin="Margin.Dense">
+                                        @if (SequenceType is SequenceType.RoughTurning)
+                                        {
+                                            <MudSelectItem Value="@(TurningTypes.Rough)">Грубая</MudSelectItem>
+
+                                        }
+                                        <MudSelectItem Value="@(TurningTypes.Medium)">Средняя</MudSelectItem>
+                                        <MudSelectItem Value="@(TurningTypes.Gentle)">Нежная</MudSelectItem>
+                                    </MudSelect>
+                                </ChildContent>
+                                <TooltipContent>
+                                    <p align="center" class="text14">Тип определяет съем материала за проход;<br/><br/></p>
+                                    <p align="left" class="text12">1. Грубая (Ap=2.0) - используется для черновой обработки деталей >Ø12мм, имеющих нормальную жесткость и вылет не более 3хØ;<br/><br/></p>
+                                    <p align="left" class="text12">2. Средняя (Ap=0.8) - используется для черновой обработки деталей Ø6-12мм, либо деталей большего размера, имеющих умеренные проблемы с жесткостью, такие как тонкостенность или большой вылет;<br/><br/></p>
+                                    <p align="left" class="text12">3. Нежная (Ap=0.4) - используется для черновой обработки деталей &lt;Ø6мм, либо деталей большего размера, имеющих значительные проблемы с жесткостью.<br/><br/></p>
+                                </TooltipContent>
+                            </MudTooltip>
+                        </MudItem>
+                    </MudGrid>
                 </MudItem>
                 <MudItem xs="12" sm="6" md="4" lg="4">
                     <MudTextField Label="Начальный диаметр" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
@@ -75,6 +90,12 @@
                 </MudItem>
                 <MudItem xs="12" sm="6" md="4" lg="4">
                     <MudTextField Label="Глубина" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                </MudItem>
+                <MudItem xs="12" sm="6" md="6" lg="3">
+                    <MudTextField Label="Скорость резания" @bind-Value="Speed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.IntConverter" />
+                </MudItem>
+                <MudItem xs="12" sm="6" md="6" lg="3">
+                    <MudTextField Label="Подача" @bind-Value="Feed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 break;
 
@@ -95,15 +116,15 @@
                     </MudItem>
                 }
                 <MudItem xs="12" 
-                    sm="@(GroovingSequence is TurningGroovingSequences.Grooving ? 4 : 4)" 
-                    md="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 6)" 
-                    lg="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 6)">
+                    sm="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 4)" 
+                    md="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 4)" 
+                    lg="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 4)">
                     <MudTextField Label="@($"{(CuttingType is CuttingType.Radial ? "Начальный диаметр" : "Верхний диаметр")}")" @bind-Value="StartX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 <MudItem xs="12" 
-                    sm="@(GroovingSequence is TurningGroovingSequences.Grooving ? 4 : 4)" 
-                    md="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 6)" 
-                    lg="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 6)">
+                    sm="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 4)" 
+                    md="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 4)" 
+                    lg="@(GroovingSequence is TurningGroovingSequences.Grooving ? 3 : 4)">
                     <MudTextField Label="@($"{(CuttingType is CuttingType.Radial ? "Конечный диаметр" : "Нижний диаметр")}")" @bind-Value="EndX" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 @if (GroovingSequence is TurningGroovingSequences.Grooving)
@@ -112,10 +133,10 @@
                         <MudTextField Label="@($"{(CuttingType is CuttingType.Radial ? "Ширина" : "Глубина")}")" @bind-Value="EndZ" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                     </MudItem>
                 }
-                <MudItem xs="12" sm="6" md="6" lg="3">
+                <MudItem xs="12" sm="6" md="4" lg="3">
                     <MudTextField Label="Скорость резания" @bind-Value="Speed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.IntConverter" />
                 </MudItem>
-                <MudItem xs="12" sm="6" md="6" lg="3">
+                <MudItem xs="12" sm="6" md="4" lg="3">
                     <MudTextField Label="Подача" @bind-Value="Feed" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                 </MudItem>
                 break;
@@ -741,4 +762,5 @@
     private double _feed;
     private double _endX;
     private DrillingTool.Types _drillingToolType;
+
 }

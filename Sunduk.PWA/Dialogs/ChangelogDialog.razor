@@ -18,10 +18,10 @@
                         @(info.Date is null ? info.Version : ($" {info.Date:dd.MM.yyyy}: {info.Version}"))
                     </MudText>
                     <MudText Typo="Typo.body2" Align="Align.Left">
-                        @for (int i = 0; i < info.Description.Length; i++)
+                        @foreach (var t in info.Description)
                         {
                             <p>
-                                • @info.Description[i]
+                                • @t
                             </p>
                         }
                     </MudText>
@@ -56,42 +56,51 @@ https://github.com/dece1ver/Sunduk
 
     protected override void OnInitialized()
     {
-        Info.Add(new ChangelogInfo(new Version(1,0), null, new string[]{ "Первая версия. Калькулятор режимов. Точение резьбы." }));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 1, 1), new DateTime(2021, 3, 24), new string[]{ "Добавил раздел \"Всякая хрень\", в нем добавил расчет фасок.", "Фиксы дизайна под смартфоны." }));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 1, 3), new DateTime(2021, 3, 29), new string[]{ "Убрал зависимость от локализации браузера.", "Небольшая оптимизация резьбы." }));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 1, 8), new DateTime(2021, 4, 1), new string[]{ "Добавил расчет конуса сверла.", "Диалог с QR-кодом." }));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 2, 2), new DateTime(2021, 4, 4), new string[]{ "Рефактор \"Всякой хрени\".", "Добавил скругления на фаске." }));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 2, 6), new DateTime(2021, 4, 6), new string[]{ "Добавил инструкции по \"установке\" на телефоны.", "Добавил скругления на фаске." }));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 2), new DateTime(2021, 5, 12), new string[]{ "Переписал резьбу: добавил расчеты съемов, проходов. Сделал не фиксированный шаг. " +
+        Info.Add(new ChangelogInfo(new Version(1,0), null, new[] {
+            "Первая версия. Калькулятор режимов. Точение резьбы."}));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 1, 1), new DateTime(2021, 3, 24), new[] {
+            "Добавил раздел \"Всякая хрень\", в нем добавил расчет фасок.", "Фиксы дизайна под смартфоны."}));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 1, 3), new DateTime(2021, 3, 29), new[] {
+            "Убрал зависимость от локализации браузера.", "Небольшая оптимизация резьбы."}));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 1, 8), new DateTime(2021, 4, 1), new[] {
+            "Добавил расчет конуса сверла.", "Диалог с QR-кодом."}));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 2, 2), new DateTime(2021, 4, 4), new[] {
+            "Рефактор \"Всякой хрени\".", "Добавил скругления на фаске."}));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 2, 6), new DateTime(2021, 4, 6), new[] {
+            "Добавил инструкции по \"установке\" на телефоны.", "Добавил скругления на фаске."}));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 2), new DateTime(2021, 5, 12), new[] { 
+            "Переписал резьбу: добавил расчеты съемов, проходов. Сделал не фиксированный шаг. ",
             "Метрическая по ГОСТ 24705-2004. Трубная цилиндрическая по ГОСТ 6357-81.", "Добавил диалог с ченджлогом." }));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 4), new DateTime(2021, 9, 29), new string[] { "Переехал на новый адрес sunduk.one", "Чуток косметики и фиксов." }));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 5), new DateTime(2021, 10, 12), new string[] {
+        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 4), new DateTime(2021, 9, 29), new[] {
+            "Переехал на новый адрес sunduk.one", "Чуток косметики и фиксов."}));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 5), new DateTime(2021, 10, 12), new[] {
             "Добавил трапецеидальную резьбу по ГОСТ 24737-81.",
             "Добавил коническую резьбу по ГОСТ 6111-52.",
             "Во всякую хрень добавил глубины центровых отверстий по ГОСТ 14034-74.",
-            "Изменил цветовую схему."
-        }));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 6), new DateTime(2021, 12, 14), new string[] {
+            "Изменил цветовую схему."}));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 6), new DateTime(2021, 12, 14), new[] {
             "Переписал фаску и радиус, добавил обратные варианты. На фаске добавил точный расчет."}));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 7), new DateTime(2022, 1, 15), new string[] {
+        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 7), new DateTime(2022, 1, 15), new[] {
             "Добавил обратную связь.", "Разблокировал возможность использования экспериментальных функций в релизной версии."}));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 8), new DateTime(2022, 2, 4), new string[] {
+        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 8), new DateTime(2022, 2, 4), new[] {
             "Добавил расчет сферы ниппеля.", "Добавил пересчет точки с декартовой СК в полярную и обратно.",
             "Перенес глубину центровки и векторы из всякой хрени в базу знаний."}));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 9), new DateTime(2022, 2, 12), new string[] {
+        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 9), new DateTime(2022, 2, 12), new[] {
             "Расчет диаметра на который может опуститься расточной."}));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 11), new DateTime(2022, 5, 19), new string[] {
-        "Примеры проточки под нарезание NPT резьбы во всякой хрени."}));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 12), new DateTime(2022, 8, 9), new string[] {
+        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 11), new DateTime(2022, 5, 19), new[] {
+            "Примеры проточки под нарезание NPT резьбы во всякой хрени."}));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 12), new DateTime(2022, 8, 9), new[] {
             "Добавил в базу знаний типы переменных и всякие операторы для макропрограммирования."}));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 13), new DateTime(2022, 8, 15), new string[] {
+        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 13), new DateTime(2022, 8, 15), new[] {
             "Расчет неполных дуг с касательной начальной точкой."}));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 14), new DateTime(2022, 8, 18), new string[] {
+        Info.Add(new ChangelogInfo(new Version(1, 0, 3, 14), new DateTime(2022, 8, 18), new[] {
             "Добавил в базу знаний описание пользовательских циклов на Victor."}));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 4), new DateTime(2022, 9, 06), new string[] {
+        Info.Add(new ChangelogInfo(new Version(1, 0, 4), new DateTime(2022, 9, 06), new[] {
             "Расчет времени токарной обработки."}));
-        Info.Add(new ChangelogInfo(new Version(1, 0, 4, 3), new DateTime(2022, 9, 06), new string[] {
+        Info.Add(new ChangelogInfo(new Version(1, 0, 4, 3), new DateTime(2022, 9, 06), new[] {
             "Улучшил примеры проточки под резьбу."}));
+        Info.Add(new ChangelogInfo(new Version(1, 0, 5, 0), new DateTime(2023, 1, 17), new[] {
+            "Возможность изменения режимов резания."}));
         Info.Reverse();
     }
 
