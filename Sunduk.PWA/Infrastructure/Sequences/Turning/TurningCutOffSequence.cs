@@ -21,7 +21,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double FeedRough { get; set; }
 
         public override MachineType MachineType => MachineType.Turning;
-        public override string Operation => Templates.GroovingOperation.CutOffSequence(Machine, Material, Tool, CuttingPoint, ExternalDiameter, InternalDiameter, CornerBlunt, StepOver, SpeedRough, FeedRough, BluntType, BluntCustomAngle, BluntCustomRadius);
+        public override string Operation => Templates.GroovingOperation.CutOffSequence(Machine, Tool, CuttingPoint, ExternalDiameter, InternalDiameter, CornerBlunt, StepOver, SpeedRough, FeedRough, BluntType, BluntCustomAngle, BluntCustomRadius);
         public override OperationTime MachineTime => this.OperationTime();
         public override string Name => $"Отрезка";
 

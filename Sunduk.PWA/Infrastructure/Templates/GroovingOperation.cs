@@ -13,11 +13,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
 {
     public class GroovingOperation : Operation
     {
-        public static string CutOffSequence(Machine machine, Material material, GroovingExternalTool tool, double cuttingPoint, 
+        public static string CutOffSequence(Machine machine, GroovingExternalTool tool, double cuttingPoint, 
             double externalDiameter, double internalDiameter, double cornerBlunt, double stepOver, int speedRough, double feedRough, Blunt bluntType, double bluntCustomAngle = 0, double bluntCustomRadius = 0)
         {
             if (tool is null) return string.Empty;
-            var zPoint = tool.ZeroPoint == GroovingExternalTool.Point.Right ? cuttingPoint : cuttingPoint - tool.Width;
+            var zPoint = tool.ZeroPoint == TurningGroovingTool.Point.Right ? cuttingPoint : cuttingPoint - tool.Width;
             var simpleChamferSize = cornerBlunt + tool.CornerRadius / 2;
             var (fullChamferSizeX, fullChamferSizeZ) = Calc.ChamferShifts(bluntCustomAngle, tool.CornerRadius);
             fullChamferSizeX += cornerBlunt;
@@ -151,7 +151,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
                 bluntRight = 
                 $"Z{(startPoint + outerBluntSize).NC()}\n" +
-                $"G1 X{externalDiameter.NC()} F{feedFinish.NC()}\n" +
+                $"G1 X{externalDiameter.NC()}{(feedFinish is 0 ? string.Empty : $" F{feedFinish.NC()}")}\n" +
                 $"Z{startPoint.NC()} {outerBluntLetter}{outerBluntSize.NC()}\n";
                 bluntLeft =
                 $"Z{(endPoint - outerBluntSize).NC()}\n" +
@@ -166,7 +166,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 {
                     roughBluntRight =
                     $"Z{(startPoint + outerBluntSize - profStockAllow).NC()}\n" +
-                    $"G1 X{(externalDiameter + bottomStockAllow).NC()} F{feedFinish.NC()}\n" +
+                    $"G1 X{(externalDiameter + bottomStockAllow).NC()}{(feedFinish is 0 ? string.Empty : $" F{feedFinish.NC()}")}\n" +
                     $"Z{(startPoint - profStockAllow).NC()} {outerBluntLetter}{outerBluntSize.NC()}\n";
                     roughBluntLeft =
                     $"Z{(endPoint - outerBluntSize + profStockAllow).NC()}\n" +
@@ -271,7 +271,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
                 case < 0.001 when outerCornerBlunt > 0:
                     cutting += 
-                        $"G0 X{(externalDiameter + clearance).NC()} S{speedFinish}\n" +
+                        $"G0 X{(externalDiameter + clearance).NC()}{(speedFinish == speedRough ? string.Empty : $" S{speedFinish}")}\n" +
                         bluntRight +
                         $"X{internalDiameter.NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n" +
                         $"G0 X{(externalDiameter + clearance).NC()}\n" +
@@ -286,13 +286,13 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     if (!useCycles || profStockAllow > 0 || outerCornerBlunt > 0)
                     {
                         cutting += 
-                            $"{(!useCycles ? $"G0 X{(externalDiameter + clearance).NC()} S{speedFinish}\n" : string.Empty)}" +
+                            $"{(!useCycles ? $"G0 X{(externalDiameter + clearance).NC()}{(speedFinish == speedRough ? string.Empty : $" S{speedFinish}")}\n" : string.Empty)}" +
                             bluntRight +
-                            $"X{internalDiameter.NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n" +
+                            $"{(bluntRight.Contains("G1") ? string.Empty : "G1 ")}X{internalDiameter.NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}{(feedFinish == feedRough ? string.Empty : $" F{feedFinish.NC()}")}\n" +
                             $"Z{centerPoint.NC()}\n" +
                             $"G0 X{(externalDiameter + clearance).NC()}\n" +
                             bluntLeft +
-                            $"X{internalDiameter.NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n" +
+                            $"{(bluntLeft.Contains("G1") ? string.Empty : "G1 ")}X{internalDiameter.NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n" +
                             $"Z{centerPoint.NC()}\n";
                     }
 

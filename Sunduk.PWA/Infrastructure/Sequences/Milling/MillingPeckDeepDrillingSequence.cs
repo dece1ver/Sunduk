@@ -14,8 +14,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Milling
         public override MachineType MachineType => MachineType.Milling;
         public override string Operation => Templates.DrillingOperation.MillingPeckDeepDrilling(
             Machine, 
-            CoordinateSystem, 
-            Material, 
+            CoordinateSystem,
             Tool as MillingDrillingTool, 
             Depth, 
             StartZ, 
