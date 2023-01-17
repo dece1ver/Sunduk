@@ -476,7 +476,7 @@ namespace Sunduk.PWA.Infrastructure
         }
 
         /// <summary>
-        /// Время обработки наружной канавки
+        /// Время обработки торцевой канавки
         /// </summary>
         public static OperationTime OperationTime(this TurningFaceGroovingSequence turningFaceGroovingSequence)
             {
@@ -486,7 +486,7 @@ namespace Sunduk.PWA.Infrastructure
             var endX = turningFaceGroovingSequence.InternalDiameter;
             var width = (turningFaceGroovingSequence.ExternalDiameter - turningFaceGroovingSequence.InternalDiameter) / 2;
             var length = Math.Abs(turningFaceGroovingSequence.CuttingPoint) + Math.Abs(turningFaceGroovingSequence.Width); // надо переделать, вместо ширины сделать конечный Z или что-то такое
-            var stepsZ = (int)Math.Round(width / turningFaceGroovingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            var stepsZ = (int)Math.Round(length / turningFaceGroovingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
             if (width < turningFaceGroovingSequence.Tool.Width) width = turningFaceGroovingSequence.Tool.Width;
             var stepsX = (int)Math.Round(width * 2 / turningFaceGroovingSequence.Tool.Width, MidpointRounding.ToPositiveInfinity);
             var roughSpeed = turningFaceGroovingSequence.SpeedRough;
@@ -555,8 +555,8 @@ namespace Sunduk.PWA.Infrastructure
             double rapidTime = 5;
             var fullLength = Math.Abs(threadCuttingSequence.EndZ) + Math.Abs(threadCuttingSequence.StartZ) + Thread.ThreadRunout(threadCuttingSequence.ThreadStandard, threadCuttingSequence.ThreadPitch, CuttingType.External);
             var feed = threadCuttingSequence.ThreadPitch;
-            var spins = 120.ToSpindleSpeed(threadCuttingSequence.ThreadDiameter);
-            if (spins > 1300) spins = 1300;
+            var spins = threadCuttingSequence.Speed.ToSpindleSpeed(threadCuttingSequence.ThreadDiameter);
+            if (spins > 2000) spins = 2000;
             var passes = Thread.PassesCount(threadCuttingSequence.ThreadStandard, threadCuttingSequence.ThreadPitch) + 3;
             cuttingTime += passes * fullLength.AxialTurningTime(spins, feed);
             rapidTime += passes * fullLength.AxialRapidTime();

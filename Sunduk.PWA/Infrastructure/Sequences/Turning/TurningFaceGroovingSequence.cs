@@ -30,7 +30,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             FeedRough, 
             FeedFinish);
         public override string Name => $"Канавка торцевая {Width.ToPrettyString()}мм на Ø{InternalDiameter.ToPrettyString()}-{ExternalDiameter.ToPrettyString()}";
-        public override OperationTime MachineTime => new(1, 1);
+        public override OperationTime MachineTime => this.OperationTime();
 
         public TurningFaceGroovingSequence(
             Machine machine,
