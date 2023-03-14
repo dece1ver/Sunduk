@@ -26,41 +26,34 @@ namespace Sunduk.PWA.Infrastructure.Templates
             var blunt = string.Empty;
             if (cornerBlunt > 0)
             {
-                switch (bluntType)
+                blunt = bluntType switch
                 {
-                    case Blunt.SimpleChamfer:
-                        blunt = $"G1 X{(externalDiameter - 2 * cornerBlunt - tool.CornerRadius - 1).NC(0)} F{feedRough.NC()}\n" +
+                    Blunt.SimpleChamfer =>
+                        $"G1 X{(externalDiameter - 2 * cornerBlunt - tool.CornerRadius - 1).NC(0)} F{feedRough.NC()}\n" +
+                        $"G0 X{(externalDiameter + 1).NC()}\n" + $"Z{(zPoint + simpleChamferSize).NC()}\n" +
+                        $"G1 X{externalDiameter.NC()} \n" + $"Z{zPoint.NC()} C{(simpleChamferSize).NC()}\n",
+                    Blunt.Radius =>
+                        $"G1 X{(externalDiameter - 2 * (cornerBlunt - tool.CornerRadius) - 1).NC(0)} F{feedRough.NC()}\n" +
+                        $"G0 X{(externalDiameter + 1).NC()}\n" + $"Z{(zPoint + fullChamferRadius).NC()}\n" +
+                        $"G1 X{externalDiameter.NC()}\n" + $"Z{zPoint.NC()} R{fullChamferRadius.NC()}\n",
+                    Blunt.CustomChamfer => bluntCustomRadius switch
+                    {
+                        > 0 when bluntCustomAngle is > 0 and < 90 =>
+                            $"G1 X{(externalDiameter - 2 * (fullChamferSizeX * Math.Tan(bluntCustomAngle.Radians()) + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X)).NC()} F{feedRough.NC()}\n" +
                             $"G0 X{(externalDiameter + 1).NC()}\n" +
-                            $"Z{(zPoint + simpleChamferSize).NC()}\n" +
-                            $"G1 X{externalDiameter.NC()} \n" +
-                            $"Z{zPoint.NC()} C{(simpleChamferSize).NC()}\n";
-                        break;
-                    case Blunt.Radius:
-                        blunt = $"G1 X{(externalDiameter - 2 * (cornerBlunt - tool.CornerRadius) - 1).NC(0)} F{feedRough.NC()}\n" +
-                            $"G0 X{(externalDiameter + 1).NC()}\n" +
-                            $"Z{(zPoint + fullChamferRadius).NC()}\n" +
+                            $"Z{(zPoint + fullChamferSizeZ + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" +
-                            $"Z{zPoint.NC()} R{fullChamferRadius.NC()}\n";
-                        break;
-                    case Blunt.CustomChamfer:
-                        blunt = bluntCustomRadius switch
-                        {
-                            > 0 when bluntCustomAngle is > 0 and < 90 =>
-                                $"G1 X{(externalDiameter - 2 * (fullChamferSizeX * Math.Tan(bluntCustomAngle.Radians()) + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X)).NC()} F{feedRough.NC()}\n" +
-                                $"G0 X{(externalDiameter + 1).NC()}\n" +
-                                $"Z{(zPoint + fullChamferSizeZ + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()}\n" +
-                                $"G1 X{externalDiameter.NC()}\n" +
-                                $"Z{(zPoint + fullChamferSizeZ).NC()} R{(fullChamferRadius).NC()}\n" +
-                                $"Z{zPoint.NC()} A{bluntCustomAngle.NC()} R{(fullChamferRadius).NC()}\n" +
-                                $"{(stepOver > 0 ? $"U-{(2 * Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X).NC()}\n" : string.Empty)}",
-                            <= 0 when bluntCustomAngle is > 0 and < 90 =>
-                                $"G1 X{(externalDiameter - 2 * (fullChamferSizeX * Math.Tan(bluntCustomAngle.Radians())) + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X).NC()} F{feedRough.NC()}\n" +
-                                $"G0 X{(externalDiameter + 1).NC()}\n" + $"Z{(zPoint + fullChamferSizeZ).NC()}\n" +
-                                $"G1 X{externalDiameter.NC()}\n" + $"Z{zPoint.NC()} A{bluntCustomAngle.NC()}\n",
-                            _ => string.Empty
-                        };
-                        break;
-                }
+                            $"Z{(zPoint + fullChamferSizeZ).NC()} R{(fullChamferRadius).NC()}\n" +
+                            $"Z{zPoint.NC()} A{bluntCustomAngle.NC()} R{(fullChamferRadius).NC()}\n" +
+                            $"{(stepOver > 0 ? $"U-{(2 * Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X).NC()}\n" : string.Empty)}",
+                        <= 0 when bluntCustomAngle is > 0 and < 90 =>
+                            $"G1 X{(externalDiameter - 2 * (fullChamferSizeX * Math.Tan(bluntCustomAngle.Radians())) + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X).NC()} F{feedRough.NC()}\n" +
+                            $"G0 X{(externalDiameter + 1).NC()}\n" + $"Z{(zPoint + fullChamferSizeZ).NC()}\n" +
+                            $"G1 X{externalDiameter.NC()}\n" + $"Z{zPoint.NC()} A{bluntCustomAngle.NC()}\n",
+                        _ => string.Empty
+                    },
+                    _ => blunt
+                };
             }
             var feed = string.IsNullOrEmpty(blunt) ? $" F{feedRough.NC()}" : string.Empty;
             var cutting = (stepOver == 0 || stepOver >= (externalDiameter - internalDiameter / 2))

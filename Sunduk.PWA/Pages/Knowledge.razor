@@ -1,47 +1,51 @@
 ﻿@page "/knowledge/{article}"
+@using System.Collections.Generic
+@using MudBlazor.Services
 
-<MudContainer MaxWidth=MaxWidth.False Class="mt-0">
-    <MudGrid Spacing=1 Class="ml-n6">
+<MudContainer MaxWidth=MaxWidth.False Class="mt-0 pl-0 pr-1">
+    <MudGrid Spacing=1 Class="mx-n1">
         <MudItem xs=12 sm=4 lg=3 >
-            <MudList  Dense=true Clickable="true" @bind-SelectedItem="selectedItem" @bind-SelectedValue="Article" Class="mt-n2">
-                <MudListItem Dense=true DisableGutters=true Icon="@Icons.Material.Filled.Info" Value="@("about")" Href="/knowledge/about">
+            <MudList Dense=true Clickable="true" @bind-SelectedItem="selectedItem" @bind-SelectedValue="Article" Class="mt-n2">
+                <MudListItem Dense=true DisableGutters=true Icon="@Icons.Material.Filled.Info" Value="About" Href="@($"/knowledge/{About}")">
                     <MudText Class="mx-n4" Typo=Typo.body2>О разделе</MudText>
                 </MudListItem>
-
-                <MudListItem Dense=true DisableGutters=true Icon="@Icons.Material.Filled.Folder" Expanded="true">
+                <MudListItem Dense=true DisableGutters=true Icon="@Icons.Material.Filled.Folder">
                     <ChildContent>
                         <MudText Class="mx-n4" Typo=Typo.body2>Справочник</MudText>
                     </ChildContent>
                     <NestedList>
-                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("center-length")" Href="/knowledge/center-length">
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="CenterLength" Href="@($"/knowledge/{CenterLength}")">
                             <MudText Class="mx-n4" Typo=Typo.body2>Глубина центровки</MudText>
                         </MudListItem>
-                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("fanuc-macro")" Href="/knowledge/fanuc-macro">
-                            <MudText Class="mx-n4" Typo=Typo.body2>Fanuc макро</MudText>
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="NptThread" Href="@($"/knowledge/{NptThread}")">
+                            <MudText Class="mx-n4" Typo=Typo.body2>Резьба NPT</MudText>
                         </MudListItem>
-                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("vectors")" Href="/knowledge/vectors">
-                            <MudText Class="mx-n4" Typo=Typo.body2>Вектора</MudText>
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="Vectors" Href="@($"/knowledge/{Vectors}")">
+                            <MudText Class="mx-n4" Typo=Typo.body2>Векторы</MudText>
                         </MudListItem>
                     </NestedList>
                 </MudListItem>
 
                 <MudListItem Dense=true DisableGutters=true Icon="@Icons.Material.Filled.Folder">
                     <ChildContent>
-                        <MudText Class="mx-n4" Typo=Typo.body2>Программирование Fanuc</MudText>
+                        <MudText Class="mx-n4" Typo=Typo.body2>Fanuc</MudText>
                     </ChildContent>
                     <NestedList>
-                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("custom-victor-cycles")" Href="/knowledge/custom-victor-cycles">
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="MacroB" Href="@($"/knowledge/{MacroB}")">
+                            <MudText Class="mx-n4" Typo=Typo.body2>Macro B</MudText>
+                        </MudListItem>
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="CustomVictorCycles" Href="@($"/knowledge/{CustomVictorCycles}")">
                             <MudText Class="mx-n4" Typo=Typo.body2>Циклы Victor</MudText>
                         </MudListItem>
-                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("fanuc-general-programming")" Href="/knowledge/fanuc-general-programming">
+                        @*<MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="FanucGeneralProgramming" Href="@($"/knowledge/{FanucGeneralProgramming}")">
                             <MudText Class="mx-n4" Typo=Typo.body2>Общая информация</MudText>
                         </MudListItem>
-                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("programming-g00")" Href="/knowledge/programming-g00">
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="FanucG00" Href="@($"/knowledge/{FanucG00}")">
                             <MudText Class="mx-n4" Typo=Typo.body2>G00</MudText>
                         </MudListItem>
-                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="@("programming-g01")" Href="/knowledge/programming-g01">
+                        <MudListItem Dense=true Icon="@Icons.Material.Filled.Info" Value="FanucG01" Href="@($"/knowledge/{FanucG01}")"">
                             <MudText Class="mx-n4" Typo=Typo.body2>G01</MudText>
-                        </MudListItem>
+                        </MudListItem>*@
                     </NestedList>
                 </MudListItem>
             </MudList>
@@ -49,14 +53,33 @@
         <MudItem xs=12 sm=8 lg=9 Class="mr-n4">
             @switch (Article?.ToString())
             {
-                case "about": <AboutKnowledgeComponent/> break;
-                case "center-length": <CenterLengthComponent/> break;
-                case "fanuc-macro": <FanucMacroVariables/> break;
-                case "vectors": <VectorComponent/> break;
-                case "custom-victor-cycles": <CustomVictorCycles/> break;
-                case "fanuc-general-programming": <GeneralPrograming/> break;
-                case "programming-g00": <ProgrammingG00/> break;
-                case "programming-g01": <ProgrammingG01/> break;
+                case About:
+                    <AboutKnowledgeComponent />
+                    break;
+                case CenterLength:
+                    <CenterLengthComponent />
+                    break;
+                case Vectors:
+                    <VectorComponent/>
+                    break;
+                case NptThread:
+                    <NptThreadComponent/>
+                    break;
+                case MacroB:
+                    <FanucMacroVariables />
+                    break;
+                case CustomVictorCycles:
+                    <CustomVictorCycles />
+                    break;
+                case FanucGeneralProgramming:
+                    <GeneralPrograming />
+                    break;
+                case FanucG00:
+                    <ProgrammingG00 />
+                    break;
+                case FanucG01:
+                    <ProgrammingG01 />
+                    break;
             }
         </MudItem>
     </MudGrid>
@@ -66,6 +89,46 @@
 @code 
 {
     [Parameter]
-    public object Article { get; set; } = "about";
+    public object Article { get; set; } = About;
     MudListItem selectedItem;
+
+    [Inject] IBreakpointService BreakpointListener { get; set; }
+
+    private Guid _subscriptionId;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var subscriptionResult = await BreakpointListener.Subscribe((breakpoint) =>
+            {
+                Breakpoint = breakpoint;
+                InvokeAsync(StateHasChanged);
+            }, new ResizeOptions
+                {
+                    ReportRate = 250,
+                    NotifyOnBreakpointOnly = true,
+                });
+
+            Breakpoint = subscriptionResult.Breakpoint;
+            _subscriptionId = subscriptionResult.SubscriptionId;
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async ValueTask DisposeAsync() => await BreakpointListener.Unsubscribe(_subscriptionId);
+
+    public Breakpoint Breakpoint { get; set; }
+    
+    const string About = "about";
+    const string CenterLength = "center-length";
+    const string NptThread = "npt-thread";
+    const string MacroB = "macro-b";
+    const string Vectors = "vectors";
+    const string CustomVictorCycles = "custom-victor-cycles";
+    const string FanucGeneralProgramming = "fanuc-general-programming";
+    const string FanucG00 = "fanuc-g00";
+    const string FanucG01 = "fanuc-g01";
 }

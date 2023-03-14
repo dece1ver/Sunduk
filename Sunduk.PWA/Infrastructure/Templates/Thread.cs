@@ -10,7 +10,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
     {
         public enum PassesOption { FullPasses, Infeed }
 
-        
+
 
         #region Шаблоны
         public static readonly HashSet<string> MetricTemplates = new()
@@ -191,35 +191,63 @@ namespace Sunduk.PWA.Infrastructure.Templates
             //"M300x8 (Стандартный)", "M300x6 (Мелкий)", "M300x4 (Мелкий)", "M300x3 (Мелкий)",
         };
 
+        public const string Bspp1d16 = "G1/16";
+        public const string Bspp1d8 = "G1/8";
+        public const string Bspp1d4 = "G1/4";
+        public const string Bspp3d8 = "G3/8";
+        public const string Bspp1d2 = "G1/2";
+        public const string Bspp5d8 = "G5/8";
+        public const string Bspp3d4 = "G3/4";
+        public const string Bspp7d8 = "G7/8";
+        public const string Bspp1 = "G1";
+        public const string Bspp1N1d8 = "G1⅛";
+        public const string Bspp1N1d4 = "G1¼";
+        public const string Bspp1N3d8 = "G1⅜";
+        public const string Bspp1N1d2 = "G1½";
+        public const string Bspp1N3d4 = "G1¾";
+        public const string Bspp2 = "G1¾";
+        public const string Bspp2N1d4 = "G2¼";
+        public const string Bspp2N1d2 = "G2½";
+        public const string Bspp2N3d4 = "G2¾";
+        public const string Bspp3N = "G3";
+        public const string Bspp3N1d4 = "G3¼";
+        public const string Bspp3N1d2 = "G3½";
+        public const string Bspp3N3d4 = "G3¾";
+        public const string Bspp4 = "G4";
+        public const string Bspp4N1d2 = "G4½";
+        public const string Bspp5 = "G5";
+        public const string Bspp5N1d2 = "G5½";
+        public const string Bspp6 = "G6";
+
         public static readonly HashSet<string> BsppTemplates = new()
         {
-            "G1/16",
-            "G1/8",
-            "G1/4",
-            "G3/8",
-            "G1/2",
-            "G5/8",
-            "G3/4",
-            "G7/8",
-            "G1",
-            "G1⅛",
-            "G1¼",
-            "G1⅜",
-            "G1½",
-            "G1¾",
-            "G2",
-            "G2¼",
-            "G2½",
-            "G2¾",
-            "G3",
-            "G3¼",
-            "G3½",
-            "G3¾",
-            "G4",
-            "G4½",
-            "G5",
-            "G5½",
-            "G6"
+            Bspp1d16,
+            Bspp1d8,
+            Bspp1d4,
+            Bspp3d8,
+            Bspp1d2,
+            Bspp5d8,
+            Bspp3d4,
+            Bspp7d8,
+            Bspp1,
+            Bspp1N1d8,
+            Bspp1N1d4,
+            Bspp1N3d8,
+            Bspp1N1d2,
+            Bspp1N3d4,
+            Bspp2,
+            Bspp2N1d4,
+            Bspp2N1d2,
+            Bspp2N3d4,
+            Bspp3N,
+            Bspp3N1d4,
+            Bspp3N1d2,
+            Bspp3N3d4,
+            Bspp4,
+            Bspp4N1d2,
+            Bspp5,
+            Bspp5N1d2,
+            Bspp6
         };
 
         public static readonly HashSet<string> TrapezoidalTemplates = new()
@@ -290,18 +318,29 @@ namespace Sunduk.PWA.Infrastructure.Templates
             //"Tr110x20 (Стандартный)", "Tr110x12 (Мелкий)", "Tr110x5 (Мелкий)", "Tr110x4 (Мелкий)",
         };
 
+        public const string Npt1d16 = "K1/16";
+        public const string Npt1d8 = "K1/8";
+        public const string Npt1d4 = "K1/4";
+        public const string Npt3d8 = "K3/8";
+        public const string Npt1d2 = "K1/2";
+        public const string Npt3d4 = "K3/4";
+        public const string Npt1 = "K1";
+        public const string Npt1N1d4 = "K1¼";
+        public const string Npt1N1d2 = "K1½";
+        public const string Npt2 = "K1½";
+
         public static readonly HashSet<string> NptTemplates = new()
         {
-            "K1/16",
-            "K1/8",
-            "K1/4",
-            "K3/8",
-            "K1/2",
-            "K3/4",
-            "K1",
-            "K1¼",
-            "K1½",
-            "K2"
+            Npt1d16,
+            Npt1d8,
+            Npt1d4,
+            Npt3d8,
+            Npt1d2,
+            Npt3d4,
+            Npt1,
+            Npt1N1d4,
+            Npt1N1d2,
+            Npt2
         };
 
         public static string SimpleThreadTemplate(string template)

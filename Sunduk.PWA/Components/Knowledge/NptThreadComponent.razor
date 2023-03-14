@@ -1,0 +1,78 @@
+﻿<style>
+    table, th, td {
+        border: 1px solid gray;
+        border-collapse: collapse;
+        text-align: center;
+        padding: 4px;
+        table-layout: fixed;
+        width: 100%;
+    }
+</style>
+
+<MudContainer MaxWidth=MaxWidth.False Class="mx-0 px-2">
+    <table>
+        <thead>
+        <td>K</td>
+        <td>TPI</td>
+        <td>P</td>
+        <td>L</td>
+        <td>l</td>
+        <td>D</td>
+        <td>d</td>
+        <td>H</td>
+        </thead>
+        <tbody>
+        @foreach (var thread in Thread.NptTemplates)
+        {
+            <tr>
+                <td>@thread</td>
+                <td>@((25.4 / GetNptPitch(thread).GetDouble()).ToString("N0"))</td>
+                <td>@GetNptPitch(thread)</td>
+                <td>@GetNptLength(thread)</td>
+                <td>@GetNptPlane(thread)</td>
+                <td>@GetNptDiam(thread)</td>
+                <td>@GetNptIntDiam(thread)</td>
+                <td>@Thread.ProfileHeight(ThreadStandard.NPT, CuttingType.External, GetNptPitch(thread).GetDouble()).ToPrettyString()</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</MudContainer>
+
+@code {
+
+    private string GetNptDiam(string template)
+    {
+        Thread.GetNptValues(template, out var diam, 
+            out _, out _, out _, out _);
+        return diam;
+    }
+
+    private string GetNptIntDiam(string template)
+    {
+        Thread.GetNptValues(template, out _,
+            out var diam, out _, out _, out _);
+        return diam;
+    }
+
+    private string GetNptPitch(string template)
+    {
+        Thread.GetNptValues(template, out _,
+            out _, out var pitch, out _, out _);
+        return pitch;
+    }
+
+    private string GetNptLength(string template)
+    {
+        Thread.GetNptValues(template, out _,
+            out _, out _, out _, out var length);
+        return length.ToPrettyString(2);
+    }
+
+    private string GetNptPlane(string template)
+    {
+        Thread.GetNptValues(template, out _,
+            out _, out _, out var length, out _);
+        return length.ToPrettyString(2);
+    }
+}
