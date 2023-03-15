@@ -1,0 +1,68 @@
+﻿<style>
+    table, th, td {
+        font-family: 'Roboto';
+        border: 1px solid gray;
+        border-collapse: collapse;
+        text-align: center;
+        padding: 2px;
+        table-layout: fixed;
+        width: 100%;
+        margin: 2px;
+    }
+</style>
+
+<table>
+    <thead>
+        <tr>
+            <td style="font-family: 'Roboto Mono', monospace;">G</td>
+            <td style="font-family: 'Roboto Mono', monospace;">TPI</td>
+            <td style="font-family: 'Roboto Mono', monospace;">P</td>
+            <td style="font-family: 'Roboto Mono', monospace;">D</td>
+            <td style="font-family: 'Roboto Mono', monospace;">d</td>
+            <td style="font-family: 'Roboto Mono', monospace;">H</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var thread in Thread.BsppTemplates)
+        {
+            <tr>
+                <td style="font-size: 16px">@thread</td>
+                <td>@((25.4 / GetBsppPitch(thread).GetDouble()).ToPrettyString(1))</td>
+                <td>@GetBsppPitch(thread)</td>
+                <td>@GetBsppDiam(thread)</td>
+                <td>@GetBsppIntDiam(thread)</td>
+                <td>@Thread.ProfileHeight(ThreadStandard.BSPP, CuttingType.External, GetBsppPitch(thread).GetDouble()).ToPrettyString()</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<p style="font-family: 'Roboto Mono', monospace; padding-left: 20px; padding-top: 10px;">
+    G&nbsp;&nbsp; - размер резьбы<br />
+    TPI           - шаг, нитки на дюйм<br />
+    P&nbsp;&nbsp; - шаг, мм<br />
+    D&nbsp;&nbsp; - верхний диаметр резьбы<br />
+    d&nbsp;&nbsp; - нижний диаметр резьбы<br />
+    H&nbsp;&nbsp; - высота профиля<br />
+</p>
+
+@code {
+
+    private string GetBsppDiam(string template)
+    {
+        Thread.GetBsppValues(template, out var diam, out _);
+        return diam;
+    }
+
+    private string GetBsppIntDiam(string template)
+    {
+        Thread.GetBsppValues(template, out var diam, out _);
+            return (diam.GetDouble() - 2 * Thread.ProfileHeight(ThreadStandard.BSPP, CuttingType.External, GetBsppPitch(template).GetDouble())).ToPrettyString();
+    }
+
+    private string GetBsppPitch(string template)
+    {
+        Thread.GetBsppValues(template, out _, out var pitch);
+        return pitch;
+    }
+
+}

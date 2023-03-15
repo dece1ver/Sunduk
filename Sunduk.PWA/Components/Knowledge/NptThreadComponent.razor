@@ -1,43 +1,55 @@
 ﻿<style>
     table, th, td {
+        font-family: 'Roboto';
         border: 1px solid gray;
         border-collapse: collapse;
         text-align: center;
-        padding: 4px;
+        padding: 2px;
         table-layout: fixed;
         width: 100%;
+        margin: 2px;
     }
 </style>
 
-<MudContainer MaxWidth=MaxWidth.False Class="mx-0 px-2">
-    <table>
-        <thead>
-        <td>K</td>
-        <td>TPI</td>
-        <td>P</td>
-        <td>L</td>
-        <td>l</td>
-        <td>D</td>
-        <td>d</td>
-        <td>H</td>
-        </thead>
-        <tbody>
-        @foreach (var thread in Thread.NptTemplates)
-        {
-            <tr>
-                <td>@thread</td>
-                <td>@((25.4 / GetNptPitch(thread).GetDouble()).ToString("N0"))</td>
-                <td>@GetNptPitch(thread)</td>
-                <td>@GetNptLength(thread)</td>
-                <td>@GetNptPlane(thread)</td>
-                <td>@GetNptDiam(thread)</td>
-                <td>@GetNptIntDiam(thread)</td>
-                <td>@Thread.ProfileHeight(ThreadStandard.NPT, CuttingType.External, GetNptPitch(thread).GetDouble()).ToPrettyString()</td>
-            </tr>
-        }
-        </tbody>
-    </table>
-</MudContainer>
+<table>
+    <thead>
+        <tr>
+            <td style="font-family: 'Roboto Mono', monospace;">K</td>
+            <td style="font-family: 'Roboto Mono', monospace;">TPI</td>
+            <td style="font-family: 'Roboto Mono', monospace;">P</td>
+            <td style="font-family: 'Roboto Mono', monospace;">L</td>
+            <td style="font-family: 'Roboto Mono', monospace;">l</td>
+            <td style="font-family: 'Roboto Mono', monospace;">D</td>
+            <td style="font-family: 'Roboto Mono', monospace;">d</td>
+            <td style="font-family: 'Roboto Mono', monospace;">H</td>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var thread in Thread.NptTemplates)
+    {
+        <tr>
+            <td>@thread</td>
+            <td>@((25.4 / GetNptPitch(thread).GetDouble()).ToPrettyString(1))</td>
+            <td>@GetNptPitch(thread)</td>
+            <td>@GetNptLength(thread)</td>
+            <td>@GetNptPlane(thread)</td>
+            <td>@GetNptDiam(thread)</td>
+            <td>@GetNptIntDiam(thread)</td>
+            <td>@Thread.ProfileHeight(ThreadStandard.NPT, CuttingType.External, GetNptPitch(thread).GetDouble()).ToPrettyString()</td>
+        </tr>
+    }
+    </tbody>
+</table>
+<p style="font-family: 'Roboto Mono', monospace; padding-left: 20px; padding-top: 10px;">
+    K&nbsp;&nbsp; - размер резьбы<br />
+    TPI           - шаг, нитки на дюйм<br/>
+    P&nbsp;&nbsp; - шаг, мм<br />
+    L&nbsp;&nbsp; - рабочая длина резьбы<br />
+    l&nbsp;&nbsp; - длина от торца до основной плоскости<br />
+    D&nbsp;&nbsp; - верхний диаметр резьбы<br />
+    d&nbsp;&nbsp; - нижний диаметр резьбы<br />
+    H&nbsp;&nbsp; - высота профиля<br />
+</p>
 
 @code {
 

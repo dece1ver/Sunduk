@@ -1,18 +1,18 @@
 ﻿<MudGrid Spacing="1">
-<MudItem xs="12" md="4">
-    <MudSelect Label="Тип" T="SequenceType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnSequenceChanged">
-        <MudSelectItem Value="@SequenceType.General">Общие</MudSelectItem>
-        @if (MachineType == MachineType.Turning)
-        {
-            <MudSelectItem Value="@SequenceType.Facing">Обработка торца</MudSelectItem>
-            <MudSelectItem Value="@SequenceType.ExternalTurning">Наружное точение</MudSelectItem>
-            <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
-            <MudSelectItem Value="@SequenceType.Burnishing">Накатка</MudSelectItem>
-        }
-        <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
-        <MudSelectItem Value="@SequenceType.Threading">Нарезание резьбы</MudSelectItem>
-    </MudSelect>
-</MudItem>
+    <MudItem xs="12" md="4">
+        <MudSelect Label="Тип" T="SequenceType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnSequenceChanged">
+            <MudSelectItem Value="@SequenceType.General">Общие</MudSelectItem>
+            @if (MachineType == MachineType.Turning)
+            {
+                <MudSelectItem Value="@SequenceType.Facing">Обработка торца</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.ExternalTurning">Наружное точение</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.Burnishing">Накатка</MudSelectItem>
+            }
+            <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
+            <MudSelectItem Value="@SequenceType.Threading">Нарезание резьбы</MudSelectItem>
+        </MudSelect>
+    </MudItem>
 
 @switch (Type)
 {
@@ -28,7 +28,7 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" md="4">
-            <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+            <MudSelect T="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool" ValueChanged="OnToolChanged">
                 @if (MachineType == MachineType.Turning)
                 {
                     @foreach (var tool in Tools.Where(x => x.MachineType is MachineType.Turning))
@@ -83,7 +83,7 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" md="4">
-            <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+            <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool" >
                 @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
                 {
                     <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
@@ -236,7 +236,7 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" md="4">
-            <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                 @foreach (var tool in Tools.Where(x => x is TurningExternalTool && (x as TurningExternalTool).Type == TurningExternalTool.Types.Bar))
                 {
                     <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
@@ -259,7 +259,7 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" md="4">
-            <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool" Variant="Variant.Filled" Margin="Margin.Dense">
+            <MudSelect ValueChanged="OnToolChanged" Label="Инструмент" T="Tool" Variant="Variant.Filled" Margin="Margin.Dense">
                 @if (MachineType == MachineType.Turning)
                 {
                     @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
@@ -397,7 +397,7 @@
                 {
                     case CuttingType.External:
                         <MudItem xs="12" sm="6" md="4">
-                            <MudSelect @bind-Value="Tool" Variant="@Variant.Filled" Margin="@Margin.Dense" Label="Инструмент" T="Tool">
+                            <MudSelect ValueChanged="OnToolChanged" Variant="@Variant.Filled" Margin="@Margin.Dense" Label="Инструмент" T="Tool">
                                 @foreach (var tool in Tools.Where(x => x is ThreadingExternalTool))
                                 {
                                     <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
@@ -407,7 +407,7 @@
                         break;
                     case CuttingType.Internal:
                         <MudItem xs="12" sm="6" md="4">
-                            <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                            <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                                 @foreach (var tool in Tools.Where(x => x is ThreadingInternalTool))
                                 {
                                     <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
@@ -457,11 +457,14 @@
                         </MudItem>
                         break;
                 }
-                <MudItem xs="6" md="3">
+                <MudItem xs="6" md="4">
                     <MudTextField Label="Диаметр резьбы" @bind-Value="_ThreadDiameter" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
                 </MudItem>
-                <MudItem xs="6" md="3">
+                <MudItem xs="6" md="4">
                     <MudTextField Label="Шаг резьбы" @bind-Value="_ThreadPitch" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField Label="Скорость резания" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                 </MudItem>
                 <MudItem xs="6" md="3">
                     <MudTextField Label="Начальная точка" @bind-Value="_ThreadStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
@@ -472,7 +475,7 @@
                 break;
             case ThreadingSequences.Tapping:
                 <MudItem xs="4">
-                    <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                    <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                         @if (MachineType == MachineType.Turning)
                         {
                             @foreach (var tool in Tools.Where(x => x is TurningTappingTool))
@@ -557,12 +560,6 @@
                 }
                 break;
         }
-        <MudItem xs="6" md="6">
-            <MudTextField Label="Скорость резания" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-        </MudItem>
-        <MudItem xs="6" md="6">
-            <MudTextField Label="Подача" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-        </MudItem>
         break;
 
     //Канавочные
@@ -588,7 +585,7 @@
                 break;
             case TurningGroovingSequences.Cutting when GrooveType is CuttingType.Radial:
                 <MudItem xs="12" md="4">
-                    <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                    <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                         @foreach (var tool in Tools.Where(x => x is GroovingExternalTool))
                         {
                             <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
@@ -600,7 +597,7 @@
         @if (GrooveType is CuttingType.Face)
         {
             <MudItem xs="12" md="4">
-                <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                     @foreach (var tool in Tools.Where(x => x is GroovingFaceTool))
                     {
                         <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
@@ -736,7 +733,7 @@
     // накатка
     case SequenceType.Burnishing:
         <MudItem xs="12" md="4">
-            <MudSelect @bind-Value="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+            <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                 @foreach (var tool in Tools.Where(x => x is TurningBurnishingTool))
                 {
                     <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
@@ -840,10 +837,34 @@
 
     //Всякие OnChanged
 
+    private void OnToolChanged(Tool value)
+    {
+        Tool = value;
+        switch (value)
+        {
+            case TurningTool turningTool:
+                _FeedRough = Operation.FeedRough(turningTool.Radius).ToPrettyString();
+                _FeedFinish = Operation.FeedFinish(turningTool.Radius).ToPrettyString();
+                break;
+            case DrillingTool drillingTool:
+                //SpeedFinish = Operation.DrillCuttingSpeed(WorkpieceMaterial, drillingTool);
+                _FeedFinish = Operation.DrillFeed(Machine, WorkpieceMaterial, drillingTool).ToPrettyString();
+                break;
+            case TurningGroovingTool groovingTool:
+                _FeedRough = Operation.GroovingFeedRough().ToPrettyString();
+                _FeedFinish = Operation.GroovingFeedFinish().ToPrettyString();
+                break;
+        }
+
+    }
+
     private void OnSequenceChanged(SequenceType value)
     {
         Type = value;
         Tool = null;
+        SpeedFinish = Operation.CuttingSpeedFinish(WorkpieceMaterial);
+        SpeedRough = Operation.CuttingSpeedRough(WorkpieceMaterial);
+        _FeedRough = string.Empty;
     }
 
     private void OnTurningSequenceChanged(TurningSequences value)
@@ -852,7 +873,6 @@
         switch (TurningSequence)
         {
             case TurningSequences.Facing:
-
                 break;
             case TurningSequences.FinishFacing:
                 _FacingProfStockAllow = string.Empty;
@@ -875,6 +895,15 @@
     {
         ThreadingSequence = value;
         Tool = null;
+        switch (value)
+        {
+            case ThreadingSequences.ThreadCutting:
+                SpeedRough = 120;
+                break;
+            case ThreadingSequences.Tapping:
+                SpeedRough = 5;
+                break;
+        }
     }
 
     private void OnThreadCuttingTypeChanged(CuttingType value)
@@ -886,6 +915,8 @@
     private void OnGrooveCuttingTypeChanged(CuttingType value)
     {
         GrooveType = value;
+        SpeedRough = Operation.GroovingSpeedRough(WorkpieceMaterial);
+        SpeedFinish = Operation.GroovingSpeedFinish(WorkpieceMaterial);
         switch (GrooveType)
         {
             case CuttingType.Radial when Tool is not (GroovingExternalTool or GroovingInternalTool):

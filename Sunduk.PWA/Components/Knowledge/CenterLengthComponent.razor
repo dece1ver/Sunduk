@@ -1,4 +1,17 @@
-﻿<MudSimpleTable Dense="true" Class="ml-1" Style="overflow-x: auto;" Elevation=0 Square=true>
+﻿<style>
+    table, th, td {
+        font-family: 'Roboto';
+        border: 1px solid gray;
+        border-collapse: collapse;
+        text-align: center;
+        padding: 2px;
+        table-layout: fixed;
+        width: 100%;
+        margin: 2px;
+    }
+</style>
+
+<table>
     <thead>
         <tr>
             @foreach (var h in headings)
@@ -18,7 +31,7 @@
             </tr>
         }
     </tbody>
-</MudSimpleTable>
+</table>
 
 @code {
     string[] headings = { "Центровка", "Общая глубина, мм", "Глубина конуса, мм" };
