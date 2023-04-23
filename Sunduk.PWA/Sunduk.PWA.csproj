@@ -5,10 +5,10 @@
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <AssemblyName>Sunduk</AssemblyName>
     <ApplicationIcon>wwwroot\favicon.ico</ApplicationIcon>
-    <AssemblyVersion>1.0.4.4</AssemblyVersion>
+    <AssemblyVersion>1.0.6.1</AssemblyVersion>
     <FileVersion>1.0.4.4</FileVersion>
     <Authors>dece1ver</Authors>
-    <Version>1.0.4</Version>
+    <Version>1.0.6</Version>
     <NeutralLanguage />
     <NoWin32Manifest>true</NoWin32Manifest>
 	<PublishTrimmed>false</PublishTrimmed>
