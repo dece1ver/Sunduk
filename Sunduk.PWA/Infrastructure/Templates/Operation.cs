@@ -237,8 +237,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     DrillingTool.Types.Insert => 200,
                     DrillingTool.Types.Solid => 120,
                     DrillingTool.Types.Tip => 120,
-                    DrillingTool.Types.Rapid => 20,
-                    DrillingTool.Types.Center => 20,
+                    DrillingTool.Types.Rapid => 30,
+                    DrillingTool.Types.Center => 30,
                     _ => 0,
                 },
                 _ => 0
@@ -299,8 +299,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     Material.Steel => drillingTool.Type switch
                     {
                         DrillingTool.Types.Insert => Math.Round(drillingTool.Diameter * 0.0028, 2),
-                        DrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
-                        DrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Solid => (drillingTool.Diameter > 2 ? drillingTool.Diameter * 0.015 : drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Tip => (drillingTool.Diameter > 2 ? drillingTool.Diameter * 0.015 : drillingTool.Diameter * 0.01),
                         DrillingTool.Types.Rapid => (drillingTool.Diameter * 0.01),
                         DrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
                         _ => 0,
@@ -308,8 +308,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     Material.Stainless => drillingTool.Type switch
                     {
                         DrillingTool.Types.Insert => Math.Round(drillingTool.Diameter * 0.0028, 2),
-                        DrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
-                        DrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Solid => (drillingTool.Diameter > 2 ? drillingTool.Diameter * 0.015 : drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Tip => (drillingTool.Diameter * 0.015),
                         DrillingTool.Types.Rapid => (drillingTool.Diameter * 0.01),
                         DrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
                         _ => 0,
@@ -317,8 +317,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     Material.Brass => drillingTool.Type switch
                     {
                         DrillingTool.Types.Insert => Math.Round(drillingTool.Diameter * 0.0028, 2),
-                        DrillingTool.Types.Solid => (drillingTool.Diameter * 0.01),
-                        DrillingTool.Types.Tip => (drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Solid => (drillingTool.Diameter > 2 ? drillingTool.Diameter * 0.015 : drillingTool.Diameter * 0.01),
+                        DrillingTool.Types.Tip => (drillingTool.Diameter > 2 ? drillingTool.Diameter * 0.015 : drillingTool.Diameter * 0.01),
                         DrillingTool.Types.Rapid => (drillingTool.Diameter * 0.01),
                         DrillingTool.Types.Center => (drillingTool.Diameter * 0.02),
                         _ => 0,
@@ -480,19 +480,19 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public static string MillingCustomOperation(Machine machine, CoordinateSystem coordinateSystem, Tool tool, string customOperation, Coolant coolant, bool polar, double safePlane)
         {
             if (tool is null) return string.Empty;
-            string direction = string.Empty;
+            var direction = string.Empty;
             if (coolant is not Coolant.General and not Coolant.Full)
             {
                 direction = Direction(tool);
             }
-            else if ((coolant is Coolant.General or Coolant.Full) && tool.Hand == Tool.ToolHand.Right)
-            {
-                direction = "M13";
-            }
-            else if ((coolant is Coolant.General or Coolant.Full) && tool.Hand == Tool.ToolHand.Left)
-            {
-                direction = "M14";
-            }
+            else
+                direction = coolant switch
+                {
+                    Coolant.General or Coolant.Full when tool.Hand == Tool.ToolHand.Right => "M13",
+                    Coolant.General or Coolant.Full when tool.Hand == Tool.ToolHand.Left => "M14",
+                    _ => direction
+                };
+
             return machine switch
             {
                 Machine.A110 =>

@@ -13,25 +13,37 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class RoughTurningSequence : TurningSequence
     {
         public override string Operation => string.Empty;
-        public override OperationTime MachineTime => this.OperationTime(Material);
-
+        public override OperationTime MachineTime => this.OperationTime();
+        public int SpeedRough { get; set; }
+        public double FeedRough { get; set; }
         public override string Name
         {
             get
             {
                 var name = Tool switch
                 {
-                    TurningExternalTool => $"Наружное черновое точение с Ø{this.Contour.FirstOrDefault().X} по Ø{this.Contour.LastOrDefault().X} на глубину {this.Contour.LastOrDefault().Z} мм",
-                    TurningInternalTool => $"Внутреннее черновое точение с Ø{this.Contour.FirstOrDefault().X} по Ø{this.Contour.LastOrDefault().X} на глубину {this.Contour.LastOrDefault().Z} мм",
-                    _ => $"Черновое точение Ø{this.Contour.LastOrDefault().X} на глубину {this.Contour.LastOrDefault().Z} мм",
+                    TurningExternalTool => $"Наружное черновое точение с Ø{this.Contour.FirstOrDefault()?.X} по Ø{this.Contour.LastOrDefault()?.X} на глубину {this.Contour.LastOrDefault()?.Z} мм",
+                    TurningInternalTool => $"Внутреннее черновое точение с Ø{this.Contour.FirstOrDefault()?.X} по Ø{this.Contour.LastOrDefault()?.X} на глубину {this.Contour.LastOrDefault()?.Z} мм",
+                    _ => $"Черновое точение Ø{this.Contour.LastOrDefault()?.X} на глубину {this.Contour.LastOrDefault()?.Z} мм",
                 };
                 return name;
             }
         }
 
-        public RoughTurningSequence(Machine machine, Material material, TurningTool tool, List<Element> contour, double stepOver, double roughStockAllow, double profStockAllow) 
+        public RoughTurningSequence(
+            Machine machine, 
+            Material material, 
+            TurningTool tool, 
+            List<Element> contour, 
+            double stepOver, 
+            double roughStockAllow, 
+            double profStockAllow, 
+            int speedRough,
+            double feedRough) 
             : base(machine, material, tool, contour, stepOver, roughStockAllow, profStockAllow)
         {
+            SpeedRough = speedRough;
+            FeedRough = feedRough;
         }
     }
 }

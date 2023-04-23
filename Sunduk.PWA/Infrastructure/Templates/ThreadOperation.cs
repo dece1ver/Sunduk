@@ -87,19 +87,19 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Нарезание резьбы
         /// </summary>
-        public static string ThreadCutting(Machine machine, Tool tool, ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNPTPlane)
+        public static string ThreadCutting(Machine machine, Tool tool, ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNptPlane, int speed)
         {
             if (tool is null ||
                 threadDiameter <= 0 ||
                 threadPitch <= 0 ||
                 startZ < endZ) return string.Empty;
-            string approachDiameter = Thread.ApproachDiameter(threadStandard, type, threadDiameter, threadPitch, endZ, startZ, threadNPTPlane).NC(1);
-            string endDiameter = Thread.EndDiameter(threadStandard, type, threadDiameter, threadPitch, endZ, startZ, threadNPTPlane).NC(2);
-            int minStep = Thread.Passes(threadStandard, type, threadPitch)[^2].Microns();
-            double lastPass = Thread.Passes(threadStandard, type, threadPitch)[^1];
-            int firstPass = Thread.Passes(threadStandard, type, threadPitch)[0].Microns();
-            int profile = Thread.ProfileHeight(threadStandard, type, threadPitch).Microns();
-            string threadShift = string.Empty;
+            var approachDiameter = Thread.ApproachDiameter(threadStandard, type, threadDiameter, threadPitch, endZ, startZ, threadNptPlane).NC(1);
+            var endDiameter = Thread.EndDiameter(threadStandard, type, threadDiameter, threadPitch, endZ, startZ, threadNptPlane).NC(2);
+            var minStep = Thread.Passes(threadStandard, type, threadPitch)[^2].Microns();
+            var lastPass = Thread.Passes(threadStandard, type, threadPitch)[^1];
+            var firstPass = Thread.Passes(threadStandard, type, threadPitch)[0].Microns();
+            var profile = Thread.ProfileHeight(threadStandard, type, threadPitch).Microns();
+            var threadShift = string.Empty;
             if (threadStandard == ThreadStandard.NPT)
             {
                 threadShift = type switch
@@ -115,8 +115,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machine.GS1500 =>
                 TurningReferentPoint +
                 tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{approachDiameter} Z{startZ.NC()} S{120.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97\n" +
-                $"G76 P0201{Thread.Profile(threadStandard)} Q{minStep} R{lastPass.NC()}\n" +
+                $"G0 X{approachDiameter} Z{startZ.NC()} S{speed.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97\n" +
+                $"G76 P0201{threadStandard.Profile()} Q{minStep} R{lastPass.NC()}\n" +
                 $"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}\n" +
                 $"G96 {CoolantOff(machine)}\n" +
                 TurningReferentPoint,
@@ -124,8 +124,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 Machine.L230A =>
                 tool.Description(ToolDescriptionOption.L230) + "\n" +
                 $"{CoolantOn(machine)}\n" +
-                $"G0 X{approachDiameter} Z{startZ.NC()} S{120.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97\n" +
-                $"G76 P0201{Thread.Profile(threadStandard)} Q{minStep} R{lastPass.NC()}\n" +
+                $"G0 X{approachDiameter} Z{startZ.NC()} S{speed.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97\n" +
+                $"G76 P0201{threadStandard.Profile()} Q{minStep} R{lastPass.NC()}\n" +
                 $"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}\n" +
                 $"G96 {CoolantOff(machine)}\n" +
                 TurningReferentPoint,

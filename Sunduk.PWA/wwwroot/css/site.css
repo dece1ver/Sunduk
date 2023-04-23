@@ -49,3 +49,12 @@
     padding-right: 10px;
     padding-left: 5px
 }
+
+.knowledgetable {
+    border: 1px solid gray;
+    border-collapse: collapse;
+    text-align: center;
+    padding: 4px;
+    table-layout: fixed;
+    width: 100%;
+}

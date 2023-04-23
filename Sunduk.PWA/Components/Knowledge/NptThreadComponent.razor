@@ -1,0 +1,96 @@
+﻿<style>
+    table, th, td {
+        font-family: 'Roboto';
+        border: 1px solid gray;
+        border-collapse: collapse;
+        text-align: center;
+        padding: 2px;
+        table-layout: fixed;
+        width: 100%;
+        margin: 2px;
+    }
+</style>
+
+<table>
+    <thead>
+        <tr>
+            <td style="font-family: 'Roboto Mono', monospace;">K</td>
+            <td style="font-family: 'Roboto Mono', monospace;">TPI</td>
+            <td style="font-family: 'Roboto Mono', monospace;">P</td>
+            <td style="font-family: 'Roboto Mono', monospace;">L</td>
+            <td style="font-family: 'Roboto Mono', monospace;">l</td>
+            <td style="font-family: 'Roboto Mono', monospace;">D</td>
+            <td style="font-family: 'Roboto Mono', monospace;">d</td>
+            <td style="font-family: 'Roboto Mono', monospace;">H</td>
+            <td style="font-family: 'Roboto Mono', monospace;">do*</td>
+            <td style="font-family: 'Roboto Mono', monospace;">lo*</td>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var thread in Thread.NptTemplates)
+    {
+        <tr>
+            <td>@thread</td>
+            <td>@((25.4 / GetNptPitch(thread).GetDouble()).ToPrettyString(1))</td>
+            <td>@GetNptPitch(thread)</td>
+            <td>@GetNptLength(thread)</td>
+            <td>@GetNptPlane(thread)</td>
+            <td>@GetNptDiam(thread)</td>
+            <td>@GetNptIntDiam(thread)</td>
+            <td>@Thread.ProfileHeight(ThreadStandard.NPT, CuttingType.External, GetNptPitch(thread).GetDouble()).ToPrettyString()</td>
+            <td>@Thread.NptHoleDiameter(thread).ToPrettyString()</td>
+            <td>@Thread.NptHoleLength(thread).ToPrettyString()</td>
+        </tr>
+    }
+    </tbody>
+</table>
+<p style="font-family: 'Roboto Mono', monospace; padding-left: 20px; padding-top: 10px;">
+    K&nbsp;&nbsp; - размер резьбы<br />
+    TPI           - шаг, нитки на дюйм<br/>
+    P&nbsp;&nbsp; - шаг, мм<br />
+    L&nbsp;&nbsp; - рабочая длина резьбы<br />
+    l&nbsp;&nbsp; - длина от торца до основной плоскости<br />
+    D&nbsp;&nbsp; - верхний диаметр резьбы<br />
+    d&nbsp;&nbsp; - нижний диаметр резьбы<br />
+    H&nbsp;&nbsp; - высота профиля<br />
+    do* - диаметр отверстия без конуса под нарезание резьбы<br />
+    lo* - глубина отверстия без конуса под нарезание резьбы<br />
+</p>
+
+@code {
+
+    private string GetNptDiam(string template)
+    {
+        Thread.GetNptValues(template, out var diam, 
+            out _, out _, out _, out _);
+        return diam;
+    }
+
+    private string GetNptIntDiam(string template)
+    {
+        Thread.GetNptValues(template, out _,
+            out var diam, out _, out _, out _);
+        return diam;
+    }
+
+    private string GetNptPitch(string template)
+    {
+        Thread.GetNptValues(template, out _,
+            out _, out var pitch, out _, out _);
+        return pitch;
+    }
+
+    private string GetNptLength(string template)
+    {
+        Thread.GetNptValues(template, out _,
+            out _, out _, out _, out var length);
+        return length.ToPrettyString(2);
+    }
+
+    private string GetNptPlane(string template)
+    {
+        Thread.GetNptValues(template, out _,
+            out _, out _, out var length, out _);
+        return length.ToPrettyString(2);
+    }
+}

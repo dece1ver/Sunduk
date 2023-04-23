@@ -4,7 +4,12 @@
             <MudIcon Size="Size.Large" Icon="@Icon" />
         </MudGrid>
         <MudGrid Justify="Justify.Center">
-            <MudText Typo="Typo.body2" Class="mt-4">@Label</MudText>
+            <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+                <MudText Typo="Typo.caption" Class="mt-4">@Label</MudText>
+            </MudHidden>
+            <MudHidden Breakpoint="Breakpoint.Xs">
+                <MudText Typo="Typo.body2" Class="mt-4">@Label</MudText>
+            </MudHidden>
         </MudGrid>
     </MudPaper>
 </MudLink>

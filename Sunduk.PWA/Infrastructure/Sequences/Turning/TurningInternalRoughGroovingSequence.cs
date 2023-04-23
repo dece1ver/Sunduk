@@ -1,4 +1,5 @@
 ﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Sequences.Turning.Base;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
@@ -22,7 +23,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             InnerCornerBlunt,
             OuterBluntType,
             InnerBluntType,
-            false);
+            false, SpeedRough, 0, FeedRough, 0);
         public override string Name => $"Канавка внутренняя {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}";
 
         public TurningInternalRoughGroovingSequence(
@@ -38,8 +39,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double outerCornerBlunt,
             double innerCornerBlunt,
             Blunt outerBluntType,
-            Blunt innerBluntType)
-            : base(machine, material, cuttingPoint, externalDiameter, internalDiameter, width, stepOver, profStockAllow, outerCornerBlunt, innerCornerBlunt, outerBluntType, innerBluntType)
+            Blunt innerBluntType, 
+            int speedRough,
+            double feedRough)
+            : base(machine, material, cuttingPoint, externalDiameter, internalDiameter, width, stepOver, profStockAllow, outerCornerBlunt, innerCornerBlunt, outerBluntType, innerBluntType, speedRough, 0, feedRough, 0)
         {
             Tool = tool;
         }

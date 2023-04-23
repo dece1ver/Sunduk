@@ -33,7 +33,7 @@
                 <MudGrid Spacing="0">
                     <MudHidden Breakpoint="Breakpoint.Xs">
                         <MudItem xs="12" sm="3" md="2">
-                            <MudRadioGroup @bind-SelectedOption="@ThreadType" Class="mt-2 mb-n2 ml-n6 d-flex justify-center">
+                            <MudRadioGroup @bind-SelectedOption="@ThreadType" Class="mt-2 mb-n2 ml-0 d-flex justify-center">
                                 <div>
                                     <div class="d-block">
                                         <MudRadio Option="@(CuttingType.External)" Color="Color.Primary">Наружная</MudRadio>
@@ -292,20 +292,20 @@
                                    $"G1 Z{EndPointZ.NC()}";
                             }
                         case CuttingType.Internal:
-                            var threadIntChamferStartX = ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch) + 2 * ThreadChamfer + InsertRadius;
+                            var threadIntChamferStartX = Thread.BsppHoleDiameter(CurrentThreadTemplate) + 2 * ThreadChamfer + InsertRadius;
                             if (Blunted)
                             {
                                 return $"G0 X{(threadIntChamferStartX + 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
                                    $"G1 Z0. F0.1\n" +
                                    $"X{threadIntChamferStartX.NC()} R{(InsertRadius + BluntSize).NC()}\n" +
-                                   $"X{(ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)).NC()} A45. R{(InsertRadius + BluntSize).NC()}\n" +
+                                   $"X{Thread.BsppHoleDiameter(CurrentThreadTemplate).NC()} A45. R{(InsertRadius + BluntSize).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()}";
                             }
                             else
                             {
                                 return $"G0 X{(threadIntChamferStartX).NC()} Z1. S180 M3\n" +
                                    $"G1 Z0. F0.1\n" +
-                                   $"X{(ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)).NC()} C{(ThreadChamfer + InsertRadius / 2).NC()}\n" +
+                                   $"X{Thread.BsppHoleDiameter(CurrentThreadTemplate).NC()} C{(ThreadChamfer + InsertRadius / 2).NC()}\n" +
                                    $"G1 Z{EndPointZ.NC()}";
                             }
                         default:

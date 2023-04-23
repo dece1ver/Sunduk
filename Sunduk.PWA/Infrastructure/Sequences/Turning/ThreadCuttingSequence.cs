@@ -17,7 +17,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double EndZ { get; set; }
         public double ThreadNptPlane { get; set; }
         public string StandardTemplate { get; set; }
-        public override string Operation => Templates.ThreadOperation.ThreadCutting(Machine, Tool, ThreadStandard, Type, ThreadDiameter, ThreadPitch, StartZ, EndZ, ThreadNptPlane);
+        public int Speed { get; set; }
+        public override string Operation => Templates.ThreadOperation.ThreadCutting(Machine, Tool, ThreadStandard, Type, ThreadDiameter, ThreadPitch, StartZ, EndZ, ThreadNptPlane, Speed);
         public override MachineType MachineType => MachineType.Turning;
         public override string Name
         {
@@ -37,7 +38,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         }
         public override OperationTime MachineTime => this.OperationTime();
 
-        public ThreadCuttingSequence(Machine machine, ThreadingTool tool, ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNptPlane, string standardTemplate = "")
+        public ThreadCuttingSequence(Machine machine, ThreadingTool tool, ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNptPlane, int speed, string standardTemplate = "")
         {
             Machine = machine;
             Tool = tool;
@@ -48,7 +49,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             StartZ = startZ;
             EndZ = endZ;
             ThreadNptPlane = threadNptPlane;
-            StandardTemplate = standardTemplate; 
+            StandardTemplate = standardTemplate;
+            Speed = speed;
         }
     }
 }

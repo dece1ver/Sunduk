@@ -1,8 +1,6 @@
 ﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
-using Sunduk.PWA.Infrastructure.Tools.Base;
-using Sunduk.PWA.Infrastructure.Tools.Turning;
 
-namespace Sunduk.PWA.Infrastructure.Sequences.Turning
+namespace Sunduk.PWA.Infrastructure.Sequences.Turning.Base
 {
     public class TurningGroovingSequence : Sequence
     {
@@ -18,6 +16,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public Blunt OuterBluntType { get; set; }
         public Blunt InnerBluntType { get; set; }
         public double ProfStockAllow { get; set; }
+        public int SpeedRough { get; set; }
+        public int SpeedFinish { get; set; }
+        public double FeedRough { get; set; }
+        public double FeedFinish { get; set; }
 
         public override MachineType MachineType => MachineType.Turning;
 
@@ -33,7 +35,11 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double outerCornerBlunt,
             double innerCornerBlunt,
             Blunt outerBluntType,
-            Blunt innerBluntType)
+            Blunt innerBluntType, 
+            int speedRough, 
+            int speedFinish, 
+            double feedRough, 
+            double feedFinish)
         {
             Machine = machine;
             Material = material;
@@ -47,6 +53,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             InnerCornerBlunt = innerCornerBlunt;
             OuterBluntType = outerBluntType;
             InnerBluntType = innerBluntType;
+            SpeedRough = speedRough;
+            SpeedFinish = speedFinish;
+            FeedRough = feedRough;
+            FeedFinish = feedFinish;
         }
     }
 }

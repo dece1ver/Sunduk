@@ -502,8 +502,18 @@ namespace Sunduk.PWA.Infrastructure
         /// <param name="index2">Индекс второго элемента</param>
         public static void Swap<T>(this List<T> list, int index1, int index2) => (list[index1], list[index2]) = (list[index2], list[index1]);
 
+
         /// <summary>
-        /// Конвертер Double
+        /// Конвертер Int
+        /// </summary>
+        public static Converter<int> IntConverter = new()
+        {
+            SetFunc = value => value.ToString(),
+            GetFunc = text => text.GetInt(0, GetNumberOption.OnlyPositive),
+        };
+
+        /// <summary>
+        /// Конвертер Int с дефолтным значением 1
         /// </summary>
         public static Converter<int> IntConverterFromOne = new()
         {

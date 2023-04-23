@@ -14,17 +14,18 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Milling
         public override MachineType MachineType => MachineType.Milling;
         public override string Operation => Templates.DrillingOperation.MillingPeckDrilling(
             Machine, 
-            CoordinateSystem, 
-            Material, 
+            CoordinateSystem,
             Tool as MillingDrillingTool, 
             Depth, 
             StartZ, 
             EndZ, 
+            Speed, 
+            Feed, 
             Holes, 
             Polar, 
             SafePlane);
-        public MillingPeckDrillingSequence(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane) 
-            : base(machine, material, tool, depth, startZ, endZ)
+        public MillingPeckDrillingSequence(Machine machine, CoordinateSystem coordinateSystem, Material material, MillingDrillingTool tool, double depth, double startZ, double endZ, int speed, double feed, List<Hole> holes, bool polar, double safePlane) 
+            : base(machine, material, tool, depth, startZ, endZ, speed, feed)
         {
             Holes = holes;
             Polar = polar;

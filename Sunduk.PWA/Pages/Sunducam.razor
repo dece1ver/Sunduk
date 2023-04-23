@@ -1,7 +1,8 @@
 ﻿@page "/sunducam"
+@using Sunduk.PWA.Infrastructure.Sequences.Turning.Base
 @inject IDialogService DialogService
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-2">
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pa-1 ma-0">
     <MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="fas fa-crutch">Раздел в разработке</MudAlert>
     <MudGrid Spacing="1">
         <MudItem xs="12" Class="@(Mode is not Mode.General ? "mb-n3" : "mb-0")">
