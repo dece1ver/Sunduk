@@ -628,6 +628,77 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
+        public static double BsppHoleDiameter(string template)
+        {
+            return template switch
+            {
+                "G1/16" => 6.7,
+                "G1/8" => 8.7,
+                "G1/4" => 11.6,
+                "G3/8" => 15.1,
+                "G1/2" => 18.7,
+                "G5/8" => 20.7,
+                "G3/4" => 24.2,
+                "G7/8" => 28,
+                "G1" => 30.5,
+                "G1⅛" => 35,
+                "G1¼" => 39,
+                "G1⅜" => 41.5,
+                "G1½" => 45,
+                "G1¾" => 51,
+                "G2" => 56.9,
+                "G2¼" => 63,
+                "G2½" => 72.4,
+                "G2¾" => 78.8,
+                "G3" => 85.1,
+                "G3¼" => 91.2,
+                "G3½" => 97.6,
+                "G3¾" => 103.9,
+                "G4" => 110.3,
+                "G4½" => 123,
+                "G5" => 135.7,
+                "G5½" => 148.4,
+                "G6" => 161.1,
+                _ => 0
+            };
+        }
+
+        public static double NptHoleDiameter(string template)
+        {
+            return template switch
+            {
+                "K1/16" => 6.4,
+                "K1/8" => 8.8,
+                "K1/4" => 11.3,
+                "K3/8" => 14.8,
+                "K1/2" => 18.3,
+                "K3/4" => 23.7,
+                "K1" => 29.7,
+                "K1¼" => 38.6,
+                "K1½" => 44.7,
+                "K2" => 56.6,
+                _ => 0
+            };
+        }
+
+        public static double NptHoleLength(string template)
+        {
+            return template switch
+            {
+                "K1/16" => 13,
+                "K1/8" => 14,
+                "K1/4" => 20,
+                "K3/8" => 21,
+                "K1/2" => 26.5,
+                "K3/4" => 26.5,
+                "K1" => 33.5,
+                "K1¼" => 34.5,
+                "K1½" => 34.5,
+                "K2" => 35,
+                _ => 0
+            };
+        }
+
         /// <summary>
         /// Угол подъема резьбы
         /// </summary>

@@ -22,6 +22,8 @@
             <td style="font-family: 'Roboto Mono', monospace;">D</td>
             <td style="font-family: 'Roboto Mono', monospace;">d</td>
             <td style="font-family: 'Roboto Mono', monospace;">H</td>
+            <td style="font-family: 'Roboto Mono', monospace;">do*</td>
+            <td style="font-family: 'Roboto Mono', monospace;">lo*</td>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +38,8 @@
             <td>@GetNptDiam(thread)</td>
             <td>@GetNptIntDiam(thread)</td>
             <td>@Thread.ProfileHeight(ThreadStandard.NPT, CuttingType.External, GetNptPitch(thread).GetDouble()).ToPrettyString()</td>
+            <td>@Thread.NptHoleDiameter(thread).ToPrettyString()</td>
+            <td>@Thread.NptHoleLength(thread).ToPrettyString()</td>
         </tr>
     }
     </tbody>
@@ -49,6 +53,8 @@
     D&nbsp;&nbsp; - верхний диаметр резьбы<br />
     d&nbsp;&nbsp; - нижний диаметр резьбы<br />
     H&nbsp;&nbsp; - высота профиля<br />
+    do* - диаметр отверстия без конуса под нарезание резьбы<br />
+    lo* - глубина отверстия без конуса под нарезание резьбы<br />
 </p>
 
 @code {

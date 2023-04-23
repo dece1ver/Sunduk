@@ -20,6 +20,7 @@
             <td style="font-family: 'Roboto Mono', monospace;">D</td>
             <td style="font-family: 'Roboto Mono', monospace;">d</td>
             <td style="font-family: 'Roboto Mono', monospace;">H</td>
+            <td style="font-family: 'Roboto Mono', monospace;">do*</td>
         </tr>
     </thead>
     <tbody>
@@ -32,6 +33,7 @@
                 <td>@GetBsppDiam(thread)</td>
                 <td>@GetBsppIntDiam(thread)</td>
                 <td>@Thread.ProfileHeight(ThreadStandard.BSPP, CuttingType.External, GetBsppPitch(thread).GetDouble()).ToPrettyString()</td>
+                <td>@Thread.BsppHoleDiameter(thread).ToPrettyString()</td>
             </tr>
         }
     </tbody>
@@ -43,6 +45,7 @@
     D&nbsp;&nbsp; - верхний диаметр резьбы<br />
     d&nbsp;&nbsp; - нижний диаметр резьбы<br />
     H&nbsp;&nbsp; - высота профиля<br />
+    do* - диаметр отверстия под нарезание резьбы<br />
 </p>
 
 @code {
