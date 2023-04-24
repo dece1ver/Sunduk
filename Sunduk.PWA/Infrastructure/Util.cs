@@ -6,6 +6,8 @@ using System.Linq;
 using MudBlazor;
 using Sunduk.PWA.Infrastructure.Sequences;
 using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Sequences.ContourElements;
+using Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base;
 using Sunduk.PWA.Infrastructure.Sequences.Milling;
 using Sunduk.PWA.Infrastructure.Sequences.Turning;
 using Sunduk.PWA.Infrastructure.Tools.Base;
@@ -578,6 +580,54 @@ namespace Sunduk.PWA.Infrastructure
         public static (int seqNo1, int seqNo2) GetCycleRange(this int count)
         {
             return (count * 2 - 1, count * 2);
+        }
+
+        public static string PathFromContour(List<Element> contour)
+        {
+            bool ValidArc(int index)
+            {
+                if (index >= contour.Count || index <= 0) return false;
+                double radius = ((contour[index] as Arc)!).Radius;
+                if (radius <= 0) return false; 
+                double? xDifference = (contour[index].X - contour[index - 1].X) / 2;
+                double? zDifference = contour[index].Z - contour[index - 1].Z;
+                double length = Math.Sqrt(Math.Pow(xDifference ?? 0, 2) + Math.Pow(zDifference ?? 0, 2));
+                return !(radius * 2 < length);
+            }
+
+            if (contour[0].X is null && contour[0].Z is null) return string.Empty;
+            string path = string.Empty;
+            foreach (var element in contour)
+            {
+                switch (element)
+                {
+                    case Point point:
+                        path += $"M {(point.Z * 4).ToString().Replace(",", ".")},{(-point.X / 2 * 4).ToString().Replace(",", ".")} ";
+                        if (point.Blunt > 0 && contour.Count > contour.IndexOf(point) + 1)
+                        {
+                            path += $"A{(point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},0,0{(point.Z > (contour[contour.IndexOf(point) + 1].Z) ? 0 : 1)},{(point.Z > (contour[contour.IndexOf(point) + 1].Z) ? -point.Blunt * 4 : point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(-contour[contour.IndexOf(point) + 1].X / 2 * 4).ToString().Replace(",", ".")} ";
+                        }
+                        break;
+                    case Line line:
+                        double? tempLineX = line.X ?? contour[contour.IndexOf(line) - 1].X;
+                        double? tempLineZ = line.Z ?? contour[contour.IndexOf(line) - 1].Z;
+                        path += $"L {(tempLineZ * 4).ToString().Replace(",", ".")},{(-tempLineX / 2 * 4).ToString().Replace(",", ".")} ";
+                        break;
+                    case Arc arc:
+                        double? tempArcX = arc.X ?? contour[contour.IndexOf(arc) - 1].X;
+                        double? tempArcZ = arc.Z ?? contour[contour.IndexOf(arc) - 1].Z;
+                        if (ValidArc(contour.IndexOf(arc)))
+                        {
+                            path += $"A{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},0,0{(arc.Direction is Infrastructure.Direction.CCW ? 0 : 1)},{(tempArcZ * 4).ToString().Replace(",", ".")},{(-tempArcX / 2 * 4).ToString().Replace(",", ".")} ";
+                        }
+                        else
+                        {
+                            path += $"L {(tempArcZ * 4).ToString().Replace(",", ".")},{(-tempArcX / 2 * 4).ToString().Replace(",", ".")} ";
+                        }
+                        break;
+                }
+            }
+            return path;
         }
     }
 }
