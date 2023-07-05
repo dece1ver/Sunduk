@@ -73,36 +73,35 @@
             {
                 <MudItem Class="mt-4 xs=12">
                     <MudPaper Outlined="true" Class="mt-1">
-                        <div style="text-align: center;" >
-                            <svg height="@FieldHeight" width="600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="@($"{0} {0} {ContourWidth} {ContourHeight}")">
-                                <defs>
-                                    @if (Contour[0].X != null && Contour[0].Z != null)
-                                    {
-                                        <g height="@(ContourHeight)" width="@(ContourWidth)" id="contour">
-                                            <path stroke="#FF5722" stroke-width="2" fill="none"
-                                                  d="@Path"/>
-                                        </g>
-                                    }
-                                    <g height="50" width="50" id="cs">
-                                        <path stroke="white" stroke-dasharray="10 5" stroke-width="1" fill="none"
-                                              d="M -180,0 L 60,0"/>
-                                    <path stroke="white" stroke-width="1" fill="none"
-                                          d="M 52,3 L 60,0, L52,-3" />
-                                    </g>
-                                </defs>
-                                <g transform="translate(@(Math.Round(ContourWidth / 2 - (MediumZ ?? 0) * 4)),@(Math.Round(ContourHeight / 2 + (MediumX ?? 0) * 2)))">
-                                    <use xlink:href="#contour"/>
-                                    <use xlink:href="#cs"/>
-                                    <text x="4" y="@(-Contour[0].X / 2 * 4)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="10">@($"X{Contour[0].X?.NC()} Z{Contour[0].Z?.NC()}")</text>
-                                    <text x="35" y="12" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="10">Z+</text>
-                                </g>
-                            </svg>
-                        </div>
+
+                    <div style="display: flex; justify-content: center; align-items: center; height: 200px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="600" height="300" viewBox="@($"0 0 600 300")">
+                            <g transform="scale(2) translate(200,100)">
+
+                                @if (ThreadType == CuttingType.External)
+                                {
+                                    <path d="M 0,-34.43 L -6.4,-41.63 L -72,-43.68011244269665 L -120,-43.68011244269665 L -120,-0 L 0,-0 L 0,-34.43" stroke="#FF5722" stroke-width="2" fill="none" />
+                                }
+                                @if (ThreadType == CuttingType.Internal)
+                                {
+                                    <path d="M 0,-43.64 L -6.4,-36.44 L -72,-34.389887557303354 L -120,-34.389887557303354 L -120,-60 L 0,-60 L 0,-43.64 " stroke="#FF5722" stroke-width="2" fill="none" />
+                                }
+                                
+                                <path stroke="white" stroke-dasharray="10 5" stroke-width="1" fill="none" d="M -180,0 L 60,0" />
+                                <path stroke="white" stroke-width="1" fill="none" d="M 52,3 L 60,0 L 52,-3" />
+                                <text x="3" y="@(ThreadType == CuttingType.External ? -30 : -45)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="8">@($"X{Contour[0].X?.NC()} Z{Contour[0].Z?.NC()}")</text>
+                                <text x="@(ThreadType == CuttingType.External ? -5 : -3)" y="@(ThreadType == CuttingType.External ? -45 : -30)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="8">@($"X{Contour[1].X?.NC()} Z{Contour[1].Z?.NC()}")</text>
+                                <text x="-80" y="@(ThreadType == CuttingType.External ? -50 : -25)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="8">@($"X{Contour[2].X?.NC()} Z{Contour[2].Z?.NC()}")</text>
+                                <text x="35" y="12" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="10">Z+</text>
+                            </g>
+                        </svg>
+                    </div>
+                       
                     </MudPaper>
                 </MudItem>
             }
             <MudItem Class="mt-4" xs="12">
-                <MudField Label="@Path" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n1">
+                <MudField Label="Информация" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n1">
                     <table>
                         <tr>
                             <td class="tl"><MudText Typo="Typo.caption">Верхний диаметр:</MudText></td>
@@ -558,15 +557,6 @@
         }
     }
 
-    public double FieldHeight
-    {
-        get
-        {
-            if (Contour.Count < 6) return 330;
-            return Contour.Count * 55;
-        }
-    }
-
     public string Path
     {
         get
@@ -623,13 +613,17 @@
 
     new ()
     {
-        new Point(ThreadType == CuttingType.External ? 17.215 : 21.82, 0),
-        new Line(ThreadType == CuttingType.External ? 20.815 : 18.22, -1.6),
-        new Line(ThreadType == CuttingType.External ? 20.715 + 2 * Math.Tan(1.79.Radians()) * Math.Abs(-18) : 18.32 - 2 * Math.Tan(1.79.Radians()) * Math.Abs(-18), -18),
-        new Line(ThreadType == CuttingType.External ? 20.715 + 2 * Math.Tan(1.79.Radians()) * Math.Abs(-18) : 18.32 - 2 * Math.Tan(1.79.Radians()) * Math.Abs(-18), -30),
-        new Line(ThreadType == CuttingType.External ? 0 : 30, -30),
-        new Line(ThreadType == CuttingType.External ? 0 : 30, 0),
-        new Line(ThreadType == CuttingType.External ? 17.215 : 21.82, 0),
+        new Point(ThreadType == CuttingType.External ? CalculatedNptChamferStartX + InsertRadius : CalculatedNptChamferStartX - InsertRadius, 0),
+        new Line(CalculatedNptChamferEndX, ThreadChamfer),
+        new Line(ThreadType == CuttingType.External ? CalculatedNptStart + 2 * Math.Tan(1.79.Radians()) * Math.Abs(EndPointZ) : CalculatedNptStart - 2 * Math.Tan(1.79.Radians()) * Math.Abs(EndPointZ), EndPointZ),
+        // контур для построения рисунка
+        //new Point(ThreadType == CuttingType.External ? 17.215 : 21.82, 0),
+        //new Line(ThreadType == CuttingType.External ? 20.815 : 18.22, -1.6),
+        //new Line(ThreadType == CuttingType.External ? 20.715 + 2 * Math.Tan(1.79.Radians()) * Math.Abs(-18) : 18.32 - 2 * Math.Tan(1.79.Radians()) * Math.Abs(-18), -18),
+        //new Line(ThreadType == CuttingType.External ? 20.715 + 2 * Math.Tan(1.79.Radians()) * Math.Abs(-18) : 18.32 - 2 * Math.Tan(1.79.Radians()) * Math.Abs(-18), -30),
+        //new Line(ThreadType == CuttingType.External ? 0 : 30, -30),
+        //new Line(ThreadType == CuttingType.External ? 0 : 30, 0),
+        //new Line(ThreadType == CuttingType.External ? 17.215 : 21.82, 0),
 
     };
 
