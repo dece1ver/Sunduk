@@ -547,6 +547,14 @@ namespace Sunduk.PWA.Infrastructure
         }
 
         /// <summary>
+        /// Время обработки при резьбофрезеровании
+        /// </summary>
+        public static OperationTime OperationTime(this ThreadMillingSequence tappingSequence)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Время обработки при нарезании резьбы резцом
         /// </summary>
         public static OperationTime OperationTime(this ThreadCuttingSequence threadCuttingSequence)

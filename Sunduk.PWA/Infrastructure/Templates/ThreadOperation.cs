@@ -59,6 +59,74 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
                 Machine.A110 =>
                 tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
+                $"{coordinateSystem}{(polar ? " G16" : string.Empty)} G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
+                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
+                $"G95 G84 Z{endZ.NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} P500 F{tool.Pitch.NC()}\n",
+                _ => string.Empty
+            };
+
+            AddPoints(ref result, holes, polar);
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                result += machine switch
+                {
+                    Machine.A110 =>
+                    $"G80\n" +
+                    $"{CoolantOff(machine)}\n" +
+                    $"{(polar ? "G15\n" : string.Empty)}" +
+                    SpindleStop + "\n" +
+                    MillingReferentPoint,
+                    _ => string.Empty
+                };
+            }
+            return result;
+        }
+
+        public static string ThreadMilling(Machine machine, CoordinateSystem coordinateSystem, MillingThreadCuttingTool tool, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
+        {
+            if (tool is null || startZ <= endZ) return string.Empty;
+            var spindleSpeed = cutSpeed.ToSpindleSpeed(tool.Diameter, 10);
+            string result = machine switch
+            {
+
+                Machine.A110 =>
+                tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
+                $"{coordinateSystem}{(polar ? "G16 " : string.Empty)} G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
+                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
+                $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
+                $"G95 G84 Z{endZ.NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} P500 F{tool.Pitch.NC()}\n",
+                _ => string.Empty
+            };
+
+            AddPoints(ref result, holes, polar);
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                result += machine switch
+                {
+                    Machine.A110 =>
+                    $"G80\n" +
+                    $"{CoolantOff(machine)}\n" +
+                    $"{(polar ? "G15\n" : string.Empty)}" +
+                    SpindleStop + "\n" +
+                    MillingReferentPoint,
+                    _ => string.Empty
+                };
+            }
+            return result;
+        }
+
+        public static string CustomThreadMilling(Machine machine, CoordinateSystem coordinateSystem, MillingThreadCuttingTool tool, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
+        {
+            if (tool is null || startZ <= endZ) return string.Empty;
+            var spindleSpeed = cutSpeed.ToSpindleSpeed(tool.Diameter, 10);
+            string result = machine switch
+            {
+
+                Machine.A110 =>
+                tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
                 $"{coordinateSystem}{(polar ? "G16 " : string.Empty)} G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
                 $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
                 $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +

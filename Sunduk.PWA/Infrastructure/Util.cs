@@ -213,49 +213,49 @@ namespace Sunduk.PWA.Infrastructure
             {
                 MillingBoreTool millingBoreTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{millingBoreTool.Position} ({millingBoreTool.Name} D{millingBoreTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
+                    ToolDescriptionOption.General => $"T{millingBoreTool.Position:D2} ({millingBoreTool.Name} D{millingBoreTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
                     ToolDescriptionOption.MillingToolChange => $"T{millingBoreTool.Position} M6 ({millingBoreTool.Name} D{millingBoreTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
                     ToolDescriptionOption.ToolTable => millingBoreTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 MillingChamferTool millingChamferTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{millingChamferTool.Position} ({millingChamferTool.Name} D{millingChamferTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingChamferTool.Angle.NC(option: NcDecimalPointOption.Without)})",
+                    ToolDescriptionOption.General => $"T{millingChamferTool.Position:D2} ({millingChamferTool.Name} D{millingChamferTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingChamferTool.Angle.NC(option: NcDecimalPointOption.Without)})",
                     ToolDescriptionOption.MillingToolChange => $"T{millingChamferTool.Position} M6 ({millingChamferTool.Name} D{millingChamferTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingChamferTool.Angle.NC(option: NcDecimalPointOption.Without)})",
                     ToolDescriptionOption.ToolTable => millingChamferTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 MillingDrillingTool millingDrillingTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{millingDrillingTool.Position} ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
+                    ToolDescriptionOption.General => $"T{millingDrillingTool.Position:D2} ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
                     ToolDescriptionOption.MillingToolChange => $"T{millingDrillingTool.Position} M6 ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
                     ToolDescriptionOption.ToolTable => millingDrillingTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 MillingSpecialTool millingSpecialTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{millingSpecialTool.Position} ({millingSpecialTool.Name})",
+                    ToolDescriptionOption.General => $"T{millingSpecialTool.Position:D2} ({millingSpecialTool.Name})",
                     ToolDescriptionOption.MillingToolChange => $"T{millingSpecialTool.Position} M6 ({millingSpecialTool.Name})",
                     ToolDescriptionOption.ToolTable => millingSpecialTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 MillingTappingTool millingTappingTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{millingTappingTool.Position} ({millingTappingTool.Name})",
+                    ToolDescriptionOption.General => $"T{millingTappingTool.Position:D2} ({millingTappingTool.Name})",
                     ToolDescriptionOption.MillingToolChange => $"T{millingTappingTool.Position} M6 ({millingTappingTool.Name})",
                     ToolDescriptionOption.ToolTable => millingTappingTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 MillingThreadCuttingTool millingThreadCuttingTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{millingThreadCuttingTool.Position} ({millingThreadCuttingTool.Name})",
+                    ToolDescriptionOption.General => $"T{millingThreadCuttingTool.Position:D2} ({millingThreadCuttingTool.Name})",
                     ToolDescriptionOption.MillingToolChange => $"T{millingThreadCuttingTool.Position} M6 ({millingThreadCuttingTool.Name})",
                     ToolDescriptionOption.ToolTable => millingThreadCuttingTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
                 MillingTool millingTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{millingTool.Position} ({millingTool.Name} D{millingTool.Diameter.NC(option: NcDecimalPointOption.Without)} L{millingTool.CuttingLength} Z{millingTool.Edges})",
+                    ToolDescriptionOption.General => $"T{millingTool.Position:D2} ({millingTool.Name} D{millingTool.Diameter.NC(option: NcDecimalPointOption.Without)} L{millingTool.CuttingLength} Z{millingTool.Edges})",
                     ToolDescriptionOption.MillingToolChange => $"T{millingTool.Position} M6 ({millingTool.Name} D{millingTool.Diameter.NC(option: NcDecimalPointOption.Without)} L{millingTool.CuttingLength} Z{millingTool.Edges})",
                     ToolDescriptionOption.ToolTable => millingTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,

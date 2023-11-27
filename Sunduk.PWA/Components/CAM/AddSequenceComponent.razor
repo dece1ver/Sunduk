@@ -14,306 +14,306 @@
         </MudSelect>
     </MudItem>
 
-@switch (Type)
-{
-    // Общие
-    case SequenceType.General:
-        <MudItem xs="12" md="4">
-            <MudSelect Label="Переход" T="GeneralSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="GeneralSequence">
-                @if (MachineType == MachineType.Turning)
-                {
-                    <MudSelectItem Value="@(GeneralSequences.Limiter)">Упор</MudSelectItem>
-                }
-                <MudSelectItem Value="@(GeneralSequences.CustomOperation)">Произвольная операция</MudSelectItem>
-            </MudSelect>
-        </MudItem>
-        <MudItem xs="12" md="4">
-            <MudSelect T="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool" ValueChanged="OnToolChanged">
-                @if (MachineType == MachineType.Turning)
-                {
-                    @foreach (var tool in Tools.Where(x => x.MachineType is MachineType.Turning))
+    @switch (Type)
+    {
+        // Общие
+        case SequenceType.General:
+            <MudItem xs="12" md="4">
+                <MudSelect Label="Переход" T="GeneralSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="GeneralSequence">
+                    @if (MachineType == MachineType.Turning)
                     {
-                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        <MudSelectItem Value="@(GeneralSequences.Limiter)">Упор</MudSelectItem>
                     }
-                }
-                @if (MachineType == MachineType.Milling)
-                {
-                    @foreach (var tool in Tools.Where(x => x.MachineType is MachineType.Milling))
-                    {
-                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-                    }
-                }
-            </MudSelect>
-        </MudItem>
-        @if (GeneralSequence == GeneralSequences.CustomOperation && MachineType == MachineType.Milling)
-        {
-            <MudItem xs="12" md="6">
-                <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="Coolant">
-                    <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
-                    <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
-                    <MudSelectItem Value="@(Coolant.Full)">Вся подача СОЖ</MudSelectItem>
-                    <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
+                    <MudSelectItem Value="@(GeneralSequences.CustomOperation)">Произвольная операция</MudSelectItem>
                 </MudSelect>
             </MudItem>
-            <MudItem xs="12" md="6">
-                <MudSelect Label="Тип системы координат" T="bool" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="ToolCallPolar">
-                    <MudSelectItem Value="false">Декартова</MudSelectItem>
-                    <MudSelectItem Value="true">Полярная</MudSelectItem>
-                </MudSelect>
-            </MudItem>
-        }
-        @if (GeneralSequence == GeneralSequences.CustomOperation)
-        {
-            <MudItem xs="12">
-                <MudTextField @bind-Value="CustomOperation" Label="Произвольная обработка" T="string" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Lines="@(CustomOperation is null ? 1 : CustomOperation.Count(x => x == '\n') + 2)"/>
-            </MudItem>
-        }
-        break;
-
-
-    // Обработка торца
-    case SequenceType.Facing:
-        <MudItem xs="12" md="4">
-            <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTurningSequenceChanged">
-                <MudSelectItem Value="@(TurningSequences.RoughFacing)">@("Черновое торцевание")</MudSelectItem>
-                <MudSelectItem Value="@(TurningSequences.FinishFacing)">@("Чистовое торцевание")</MudSelectItem>
-                <MudSelectItem Value="@(TurningSequences.RoughFacingCycle)">@("Черновое торцевание (Под G70)")</MudSelectItem>
-                <MudSelectItem Value="@(TurningSequences.FinishFacingCycle)">@("Чистовое торцевание (G70)")</MudSelectItem>
-                <MudSelectItem Value="@(TurningSequences.Facing)">@("Торцевание (черновое + чистовое)")</MudSelectItem>
-            </MudSelect>
-        </MudItem>
-        <MudItem xs="12" md="4">
-            <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool" >
-                @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
-                {
-                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-                }
-            </MudSelect>
-        </MudItem>
-        @switch (TurningSequence)
-        {
-            case TurningSequences.RoughFacing:
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Общий припуск" @bind-Value="_FacingRoughStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                break;
-            case TurningSequences.RoughFacingCycle:
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Общий припуск" @bind-Value="_FacingRoughStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                break;
-            case TurningSequences.FinishFacing:
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                break;
-            case TurningSequences.FinishFacingCycle:
-                <MudItem xs="12">
-                    <MudSelect @bind-Value="RepeatableRoughFacingSequence" Variant="Variant.Filled" Margin="Margin.Dense" Label="Черновая торцовка" T="Sequence">
-                        @foreach (var seq in Program.Where(x => x is RoughFacingSequence || x is FacingSequence || x is RoughFacingCycleSequence))
+            <MudItem xs="12" md="4">
+                <MudSelect T="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool" ValueChanged="OnToolChanged">
+                    @if (MachineType == MachineType.Turning)
+                    {
+                        @foreach (var tool in Tools.Where(x => x.MachineType is MachineType.Turning))
                         {
-                            switch (seq)
-                            {
-                                case RoughFacingSequence:
-                                case FacingSequence:
-                                case RoughFacingCycleSequence:
-                                    <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {seq.Description()}")</MudSelectItem>
-                                    break;
-                            }
+                            <MudSelectItem Value="@tool" Style="font-family: 'Roboto Mono', monospace;">@tool.Description()</MudSelectItem>
                         }
+                    }
+                    @if (MachineType == MachineType.Milling)
+                    {
+                        @foreach (var tool in Tools.Where(x => x.MachineType is MachineType.Milling))
+                        {
+                            <MudSelectItem Value="@tool" Style="font-family: 'Roboto Mono', monospace;">@tool.Description()</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+            </MudItem>
+            @if (GeneralSequence == GeneralSequences.CustomOperation && MachineType == MachineType.Milling)
+            {
+                <MudItem xs="12" md="6">
+                    <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="Coolant">
+                        <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
+                        <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
+                        <MudSelectItem Value="@(Coolant.Full)">Вся подача СОЖ</MudSelectItem>
+                        <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
                     </MudSelect>
                 </MudItem>
-                break;
-            case TurningSequences.Facing:
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Общий припуск" @bind-Value="_FacingRoughStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                break;
-            case TurningSequences.RoughTurning:
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Чистовой припуск по Х" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                break;
-            case TurningSequences.FinishTurning:
-                <MudItem xs="12">
-                    <ContourComponent></ContourComponent>
-                </MudItem>
-                break;
-        }
-        @if (TurningSequence is not TurningSequences.FinishFacingCycle)
-        {
-            <MudItem xs="12" md="@(_MediumBluntFieldSize)">
-                <MudTextField Label="@BluntLabel(FacingBluntType)" @bind-Value="_FacingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"
-                              @onfocusin="@(() => _calcFacingChamferDiameter = true)"/>
-            </MudItem>
-            <MudItem xs="12" md="@(_MediumBluntFieldSize)">
-                <MudSelect Label="Тип" T="Blunt" Variant="Variant.Filled" @bind-Value="FacingBluntType" Margin="Margin.Dense">
-                    <MudSelectItem Value="@(Blunt.SimpleChamfer)">Простая фаска</MudSelectItem>
-                    <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
-                    <MudSelectItem Value="@(Blunt.CustomChamfer)">Настраиваемая фаска</MudSelectItem>
-                </MudSelect>
-            </MudItem>
-            @if (FacingBluntType == Blunt.CustomChamfer)
-            {
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Угол фаски" @bind-Value="_FacingCustomChamferAngle" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="°" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Конечный диаметр фаски" @bind-Value="_FacingCustomChamferDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true"
-                                  @onfocusin="@(() => _calcFacingChamferDiameter = false)"/>
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Скругление на фаске" @bind-Value="_FacingCustomChamferBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true"/>
+                <MudItem xs="12" md="6">
+                    <MudSelect Label="Тип системы координат" T="bool" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="ToolCallPolar">
+                        <MudSelectItem Value="false">Декартова</MudSelectItem>
+                        <MudSelectItem Value="true">Полярная</MudSelectItem>
+                    </MudSelect>
                 </MudItem>
             }
-        }
-        if (TurningSequence is TurningSequences.RoughFacing or TurningSequences.RoughFacingCycle or TurningSequences.RoughTurning)
-        {
-            <MudItem xs="6" md="6">
-                <MudTextField Label="Черновая Vc" @bind-Value="SpeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-            </MudItem>
-            <MudItem xs="6" md="6">
-                <MudTextField Label="Черновая F" @bind-Value="_FeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-            </MudItem>
-        }
-        else if (TurningSequence is TurningSequences.FinishFacingCycle or TurningSequences.FinishFacing or TurningSequences.FinishTurning)
-        {
-            <MudItem xs="6" md="6">
-                <MudTextField Label="Чистовая Vc" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-            </MudItem>
-            <MudItem xs="6" md="6">
-                <MudTextField Label="Чистовая F" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-            </MudItem>
-        }
-        else
-        {
-            <MudItem xs="6" md="3">
-                <MudTextField Label="Черновая Vc" @bind-Value="SpeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <MudTextField Label="Черновая F" @bind-Value="_FeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <MudTextField Label="Чистовая Vc" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <MudTextField Label="Чистовая F" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-            </MudItem>
-        }
-        break;
+            @if (GeneralSequence == GeneralSequences.CustomOperation)
+            {
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="CustomOperation" Label="Произвольная обработка" T="string" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Lines="@(CustomOperation is null ? 1 : CustomOperation.Count(x => x == '\n') + 2)" />
+                </MudItem>
+            }
+            break;
 
 
-    //Токарные
-    case SequenceType.ExternalTurning:
-        <MudItem xs="12" md="4">
-            <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="TurningSequence">
-                <MudSelectItem Value="@(TurningSequences.RoughTurning)">Черновое точение (не написано)</MudSelectItem>
-                <MudSelectItem Value="@(TurningSequences.FinishTurning)">Чистовое точение (не написано)</MudSelectItem>
-            </MudSelect>
-        </MudItem>
-        <MudItem xs="12" md="4">
+        // Обработка торца
+        case SequenceType.Facing:
+            <MudItem xs="12" md="4">
+                <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTurningSequenceChanged">
+                    <MudSelectItem Value="@(TurningSequences.RoughFacing)">@("Черновое торцевание")</MudSelectItem>
+                        <MudSelectItem Value="@(TurningSequences.FinishFacing)">@("Чистовое торцевание")</MudSelectItem>
+                        <MudSelectItem Value="@(TurningSequences.RoughFacingCycle)">@("Черновое торцевание (Под G70)")</MudSelectItem>
+                        <MudSelectItem Value="@(TurningSequences.FinishFacingCycle)">@("Чистовое торцевание (G70)")</MudSelectItem>
+                        <MudSelectItem Value="@(TurningSequences.Facing)">@("Торцевание (черновое + чистовое)")</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+            <MudItem xs="12" md="4">
                 <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
-                @foreach (var tool in Tools.Where(x => x is TurningExternalTool && (x as TurningExternalTool).Type == TurningExternalTool.Types.Bar))
-                {
-                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-                }
-            </MudSelect>
-        </MudItem>
-        <MudItem xs="12">
-            <ContourComponent></ContourComponent>
-        </MudItem>
-        break;
-
-
-    //Сверлильные
-    case SequenceType.Drilling:
-        <MudItem xs="12" md="4">
-            <MudSelect Label="Переход" T="DrillingSequences" @bind-Value="DrillingSequence" Variant="Variant.Filled" Margin="Margin.Dense">
-                <MudSelectItem Value="@(DrillingSequences.HighSpeedDrilling)">Высокоскоростное сверление</MudSelectItem>
-                <MudSelectItem Value="@(DrillingSequences.PeckingDrilling)">Прерывистое сверление</MudSelectItem>
-                <MudSelectItem Value="@(DrillingSequences.PeckingDeepDrilling)">Глубокое сверление</MudSelectItem>
-            </MudSelect>
-        </MudItem>
-        <MudItem xs="12" md="4">
-            <MudSelect ValueChanged="OnToolChanged" Label="Инструмент" T="Tool" Variant="Variant.Filled" Margin="Margin.Dense">
-                @if (MachineType == MachineType.Turning)
-                {
-                    @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
+                    @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
                     {
                         <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                     }
-                }
-                @if (MachineType == MachineType.Milling)
+                </MudSelect>
+            </MudItem>
+            @switch (TurningSequence)
+            {
+                case TurningSequences.RoughFacing:
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Общий припуск" @bind-Value="_FacingRoughStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    break;
+                case TurningSequences.RoughFacingCycle:
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Общий припуск" @bind-Value="_FacingRoughStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    break;
+                case TurningSequences.FinishFacing:
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    break;
+                case TurningSequences.FinishFacingCycle:
+                    <MudItem xs="12">
+                        <MudSelect @bind-Value="RepeatableRoughFacingSequence" Variant="Variant.Filled" Margin="Margin.Dense" Label="Черновая торцовка" T="Sequence">
+                            @foreach (var seq in Program.Where(x => x is RoughFacingSequence || x is FacingSequence || x is RoughFacingCycleSequence))
+                            {
+                                switch (seq)
+                                {
+                                    case RoughFacingSequence:
+                                    case FacingSequence:
+                                    case RoughFacingCycleSequence:
+                                        <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {seq.Description()}")</MudSelectItem>
+                                        break;
+                                }
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    break;
+                case TurningSequences.Facing:
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Общий припуск" @bind-Value="_FacingRoughStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    break;
+                case TurningSequences.RoughTurning:
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Чистовой припуск по Х" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    break;
+                case TurningSequences.FinishTurning:
+                    <MudItem xs="12">
+                        <ContourComponent></ContourComponent>
+                    </MudItem>
+                    break;
+            }
+            @if (TurningSequence is not TurningSequences.FinishFacingCycle)
+            {
+                <MudItem xs="12" md="@(_MediumBluntFieldSize)">
+                    <MudTextField Label="@BluntLabel(FacingBluntType)" @bind-Value="_FacingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"
+                    @onfocusin="@(() => _calcFacingChamferDiameter = true)" />
+                </MudItem>
+                <MudItem xs="12" md="@(_MediumBluntFieldSize)">
+                    <MudSelect Label="Тип" T="Blunt" Variant="Variant.Filled" @bind-Value="FacingBluntType" Margin="Margin.Dense">
+                        <MudSelectItem Value="@(Blunt.SimpleChamfer)">Простая фаска</MudSelectItem>
+                        <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
+                        <MudSelectItem Value="@(Blunt.CustomChamfer)">Настраиваемая фаска</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                @if (FacingBluntType == Blunt.CustomChamfer)
                 {
-                    @foreach (var tool in Tools.Where(x => x is MillingDrillingTool))
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Угол фаски" @bind-Value="_FacingCustomChamferAngle" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="°" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Конечный диаметр фаски" @bind-Value="_FacingCustomChamferDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true"
+                        @onfocusin="@(() => _calcFacingChamferDiameter = false)" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Скругление на фаске" @bind-Value="_FacingCustomChamferBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                }
+            }
+            if (TurningSequence is TurningSequences.RoughFacing or TurningSequences.RoughFacingCycle or TurningSequences.RoughTurning)
+            {
+                <MudItem xs="6" md="6">
+                    <MudTextField Label="Черновая Vc" @bind-Value="SpeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                </MudItem>
+                <MudItem xs="6" md="6">
+                    <MudTextField Label="Черновая F" @bind-Value="_FeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                </MudItem>
+            }
+            else if (TurningSequence is TurningSequences.FinishFacingCycle or TurningSequences.FinishFacing or TurningSequences.FinishTurning)
+            {
+                <MudItem xs="6" md="6">
+                    <MudTextField Label="Чистовая Vc" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                </MudItem>
+                <MudItem xs="6" md="6">
+                    <MudTextField Label="Чистовая F" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="6" md="3">
+                    <MudTextField Label="Черновая Vc" @bind-Value="SpeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                </MudItem>
+                <MudItem xs="6" md="3">
+                    <MudTextField Label="Черновая F" @bind-Value="_FeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                </MudItem>
+                <MudItem xs="6" md="3">
+                    <MudTextField Label="Чистовая Vc" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                </MudItem>
+                <MudItem xs="6" md="3">
+                    <MudTextField Label="Чистовая F" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                </MudItem>
+            }
+            break;
+
+
+        // Точение наружное
+        case SequenceType.ExternalTurning:
+            <MudItem xs="12" md="4">
+                <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="TurningSequence">
+                    <MudSelectItem Value="@(TurningSequences.RoughTurning)">Черновое точение (не написано)</MudSelectItem>
+                    <MudSelectItem Value="@(TurningSequences.FinishTurning)">Чистовое точение (не написано)</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                    @foreach (var tool in Tools.Where(x => x is TurningExternalTool && (x as TurningExternalTool).Type == TurningExternalTool.Types.Bar))
                     {
                         <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                     }
-                }
-            </MudSelect>
-        </MudItem>
-        switch (DrillingSequence)
-        {
-            case DrillingSequences.HighSpeedDrilling:
-                <MudItem xs="12" sm="6" md="6">
-                    <MudTextField Label="Начальный Z" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" sm="6" md="6">
-                    <MudTextField Label="Конечный Z" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                break;
-            case DrillingSequences.PeckingDrilling:
-                <MudItem xs="12" sm="6" md="4">
-                    <MudTextField Label="Глубина" @bind-Value="_PeckingDepth" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" sm="6" md="4">
-                    <MudTextField Label="Начальный Z" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" sm="6" md="4">
-                    <MudTextField Label="Конечный Z" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                break;
-            case DrillingSequences.PeckingDeepDrilling:
-                <MudItem xs="12" sm="6" md="4">
-                    <MudTextField Label="Глубина" @bind-Value="_PeckingDeepDepth" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" sm="6" md="4">
-                    <MudTextField Label="Начальный Z" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" sm="6" md="4">
-                    <MudTextField Label="Конечный Z" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                break;
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12">
+                <ContourComponent></ContourComponent>
+            </MudItem>
+            break;
 
-        }
+
+        //Сверлильные
+        case SequenceType.Drilling:
+            <MudItem xs="12" md="4">
+                <MudSelect Label="Переход" T="DrillingSequences" @bind-Value="DrillingSequence" Variant="Variant.Filled" Margin="Margin.Dense">
+                    <MudSelectItem Value="@(DrillingSequences.HighSpeedDrilling)">Высокоскоростное сверление</MudSelectItem>
+                    <MudSelectItem Value="@(DrillingSequences.PeckingDrilling)">Прерывистое сверление</MudSelectItem>
+                    <MudSelectItem Value="@(DrillingSequences.PeckingDeepDrilling)">Глубокое сверление</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudSelect ValueChanged="OnToolChanged" Label="Инструмент" T="Tool" Variant="Variant.Filled" Margin="Margin.Dense">
+                    @if (MachineType == MachineType.Turning)
+                    {
+                        @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
+                        {
+                            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        }
+                    }
+                    @if (MachineType == MachineType.Milling)
+                    {
+                        @foreach (var tool in Tools.Where(x => x is MillingDrillingTool))
+                        {
+                            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+            </MudItem>
+            switch (DrillingSequence)
+            {
+                case DrillingSequences.HighSpeedDrilling:
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudTextField Label="Начальный Z" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudTextField Label="Конечный Z" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    break;
+                case DrillingSequences.PeckingDrilling:
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField Label="Глубина" @bind-Value="_PeckingDepth" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField Label="Начальный Z" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField Label="Конечный Z" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    break;
+                case DrillingSequences.PeckingDeepDrilling:
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField Label="Глубина" @bind-Value="_PeckingDeepDepth" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField Label="Начальный Z" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField Label="Конечный Z" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    break;
+
+            }
             @if (MachineType == MachineType.Milling)
             {
                 <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
-                    <MudNumericField Label="Количество отверстий" T="int" Min="1" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.HolesConverter" ValueChanged="OnHolesCountChanged"/>
+                    <MudNumericField Label="Количество отверстий" T="int" Min="1" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.HolesConverter" ValueChanged="OnHolesCountChanged" />
                 </MudItem>
                 <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
                     <MudSelect Label="Расположение" T="HolesSetterType" @bind-Value="HolesSetter" Variant="Variant.Filled" Margin="Margin.Dense">
@@ -326,15 +326,15 @@
                 {
                     case HolesSetterType.EvenlyCylinder:
                         <MudItem xs="6">
-                            <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter"/>
+                            <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                         </MudItem>
                         <MudItem xs="6">
-                            <MudTextField Label="Начальный угол" @bind-Value="StartAngle" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="°" Immediate="true" Converter="Util.DoubleConverter"/>
+                            <MudTextField Label="Начальный угол" @bind-Value="StartAngle" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="°" Immediate="true" Converter="Util.DoubleConverter" />
                         </MudItem>
                         break;
                     case HolesSetterType.Cylinder:
                         <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
-                            <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter"/>
+                            <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
                         </MudItem>
                         @foreach (var hole in Holes)
                         {
@@ -343,7 +343,7 @@
                                 <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
                                     <MudGrid>
                                         <MudItem xs=12>
-                                            <MudTextField Label="Угол" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter"/>
+                                            <MudTextField Label="Угол" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
                                         </MudItem>
                                     </MudGrid>
                                 </MudField>
@@ -358,10 +358,10 @@
                                 <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
                                     <MudGrid>
                                         <MudItem xs=6>
-                                            <MudTextField Label="X" @bind-Value="Holes[Holes.IndexOf(hole)].X" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter"/>
+                                            <MudTextField Label="X" @bind-Value="Holes[Holes.IndexOf(hole)].X" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
                                         </MudItem>
                                         <MudItem xs=6>
-                                            <MudTextField Label="Y" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter"/>
+                                            <MudTextField Label="Y" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
                                         </MudItem>
                                     </MudGrid>
                                 </MudField>
@@ -370,405 +370,491 @@
                         break;
                 }
             }
-        <MudItem xs="6" md="6">
-            <MudTextField Label="Скорость резания" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-        </MudItem>
-        <MudItem xs="6" md="6">
-            <MudTextField Label="Подача" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-        </MudItem>
-        break;
+            <MudItem xs="6" md="6">
+                <MudTextField Label="Скорость резания" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+            </MudItem>
+            <MudItem xs="6" md="6">
+                <MudTextField Label="Подача" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+            </MudItem>
+            break;
 
 
-    //Резьбонарезные
-    case SequenceType.Threading:
-        <MudItem xs="12" sm="6" md="4">
-            <MudSelect Label="Переход" T="ThreadingSequences" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnThreadingSequenceChanged">
-                @if (MachineType == MachineType.Turning)
-                {
-                    <MudSelectItem Value="@(ThreadingSequences.ThreadCutting)">Точение резьбы</MudSelectItem>
-                }
-                <MudSelectItem Value="@(ThreadingSequences.Tapping)">Нарезание метчиком</MudSelectItem>
-            </MudSelect>
-        </MudItem>
-        switch (ThreadingSequence)
-        {
-            case ThreadingSequences.ThreadCutting:
-                switch (ThreadType)
-                {
-                    case CuttingType.External:
-                        <MudItem xs="12" sm="6" md="4">
-                            <MudSelect ValueChanged="OnToolChanged" Variant="@Variant.Filled" Margin="@Margin.Dense" Label="Инструмент" T="Tool">
-                                @foreach (var tool in Tools.Where(x => x is ThreadingExternalTool))
-                                {
-                                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-                                }
-                            </MudSelect>
-                        </MudItem>
-                        break;
-                    case CuttingType.Internal:
-                        <MudItem xs="12" sm="6" md="4">
-                            <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
-                                @foreach (var tool in Tools.Where(x => x is ThreadingInternalTool))
-                                {
-                                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-                                }
-                            </MudSelect>
-                        </MudItem>
-                        break;
-                }
-                <MudItem xs="6" sm="6" md="ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 6 : 4">
-                    <MudSelect Label="Стандарт" T="ThreadStandard" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="ThreadStandard">
-                        <MudSelectItem Value="@(ThreadStandard.Metric)">Метрическая 60° (М)</MudSelectItem>
-                        <MudSelectItem Value="@(ThreadStandard.BSPP)">Трубная цилиндрическая 55° (G)</MudSelectItem>
-                        <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">Трапецеидальная 30° (Tr)</MudSelectItem>
-                        <MudSelectItem Value="@(ThreadStandard.NPT)">Коническая 60° (K)</MudSelectItem>
-                    </MudSelect>
-                </MudItem>
-                <MudItem xs="6" sm="6" md="ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 6 : 4">
-                    <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnThreadCuttingTypeChanged">
-                        <MudSelectItem Value="@(CuttingType.External)">Наружная</MudSelectItem>
-                        <MudSelectItem Value="@(CuttingType.Internal)">Внутренняя</MudSelectItem>
-                    </MudSelect>
-                </MudItem>
-                switch (ThreadStandard)
-                {
-                    case ThreadStandard.BSPP:
-                        <MudItem xs="6" sm="6" md="4">
-                            <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
-                                @foreach (var item in Thread.BsppTemplates)
-                                {
-                                    <MudSelectItem Value="@(item)">
-                                        <MudText>@item</MudText>
-                                    </MudSelectItem>
-                                }
-                            </MudSelect>
-                        </MudItem>
-                        break;
-                    case ThreadStandard.NPT:
-                        <MudItem xs="6" sm="6" md="4">
-                            <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
-                                @foreach (var item in Thread.NptTemplates)
-                                {
-                                    <MudSelectItem Value="@(item)">
-                                        <MudText>@item</MudText>
-                                    </MudSelectItem>
-                                }
-                            </MudSelect>
-                        </MudItem>
-                        break;
-                }
-                <MudItem xs="6" md="4">
-                    <MudTextField Label="Диаметр резьбы" @bind-Value="_ThreadDiameter" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="6" md="4">
-                    <MudTextField Label="Шаг резьбы" @bind-Value="_ThreadPitch" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Скорость резания" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-                </MudItem>
-                <MudItem xs="6" md="3">
-                    <MudTextField Label="Начальная точка" @bind-Value="_ThreadStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="6" md="3">
-                    <MudTextField Label="Конечная точка" @bind-Value="_ThreadEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                break;
-            case ThreadingSequences.Tapping:
-                <MudItem xs="4">
-                    <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
-                        @if (MachineType == MachineType.Turning)
-                        {
-                            @foreach (var tool in Tools.Where(x => x is TurningTappingTool))
-                            {
-                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-                            }
-                        }
-                        @if (MachineType == MachineType.Milling)
-                        {
-                            @foreach (var tool in Tools.Where(x => x is MillingTappingTool))
-                            {
-                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-                            }
-                        }
-                    </MudSelect>
-                </MudItem>
-                <MudItem xs="4">
-                    <MudTextField Label="Скорость резания" @bind-Value="_TapCutSpeed" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="4">
-                    <MudTextField Label="Начальная точка" @bind-Value="_TapStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                <MudItem xs="4">
-                    <MudTextField Label="Конечная точка" @bind-Value="_TapEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"/>
-                </MudItem>
-                @if (MachineType == MachineType.Milling)
-                {
-                    <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
-                        <MudNumericField Label="Количество отверстий" T="int" Min="1" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.HolesConverter" ValueChanged="OnHolesCountChanged"/>
-                    </MudItem>
-                    <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
-                        <MudSelect Label="Расположение" T="HolesSetterType" @bind-Value="HolesSetter" Variant="Variant.Filled" Margin="Margin.Dense">
-                            <MudSelectItem Value="@(HolesSetterType.Manual)">Вручную</MudSelectItem>
-                            <MudSelectItem Value="@(HolesSetterType.Cylinder)">На цилиндре</MudSelectItem>
-                        </MudSelect>
-                    </MudItem>
-                    switch (HolesSetter)
+        //Резьбонарезные
+        case SequenceType.Threading:
+            <MudItem xs="12" sm="6" md="4">
+                <MudSelect Label="Переход" T="ThreadingSequences" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnThreadingSequenceChanged">
+                    @if (MachineType == MachineType.Turning)
                     {
-                        case HolesSetterType.Manual:
-                            @foreach (var hole in Holes)
-                            {
-                                <MudItem xs="6" sm="4" md="3" lg="2">
-                                    <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
-                                        <MudGrid>
-                                            <MudItem xs=6>
-                                                <MudTextField Label="X" @bind-Value="Holes[Holes.IndexOf(hole)].X" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter"/>
-                                            </MudItem>
-                                            <MudItem xs=6>
-                                                <MudTextField Label="Y" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter"/>
-                                            </MudItem>
-                                        </MudGrid>
-                                    </MudField>
-                                </MudItem>
-                            }
-                            break;
-                        case HolesSetterType.Cylinder:
-                            <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
-                                <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter"/>
-                            </MudItem>
-                            @foreach (var hole in Holes)
-                            {
-                                <MudItem xs="6" sm="4" md="3" lg="2">
-                                    <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
-                                        <MudGrid>
-                                            <MudItem xs=12>
-                                                <MudTextField Label="Угол" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter"/>
-                                            </MudItem>
-                                        </MudGrid>
-                                    </MudField>
-                                </MudItem>
-                            }
-                            break;
-                        case HolesSetterType.EvenlyCylinder:
-                            <MudItem xs="6">
-                                <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter"/>
-                            </MudItem>
-                            <MudItem xs="6">
-                                <MudTextField Label="Начальный угол" @bind-Value="StartAngle" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="°" Immediate="true" Converter="Util.DoubleConverter"/>
-                            </MudItem>
-                            break;
+                        <MudSelectItem Value="@(ThreadingSequences.ThreadCutting)">Точение резьбы</MudSelectItem>
                     }
-                }
-                break;
-        }
-        break;
-
-    //Канавочные
-    case SequenceType.Grooving:
-        <MudItem xs="12" md="4">
-            <MudSelect Label="Переход" T="TurningGroovingSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="GroovingSequence">
-                <MudSelectItem Value="@(TurningGroovingSequences.Cutting)">Отрезка</MudSelectItem>
-                <MudSelectItem Value="@(TurningGroovingSequences.RoughGrooving)">Канавка черновая</MudSelectItem>
-                <MudSelectItem Value="@(TurningGroovingSequences.Grooving)">Канавка</MudSelectItem>
-            </MudSelect>
-        </MudItem>
-        @switch (GroovingSequence)
-        {
-            case TurningGroovingSequences.Grooving or TurningGroovingSequences.RoughGrooving when GrooveType is CuttingType.Radial:
-                <MudItem xs="12" md="4">
-                    <MudSelect @bind-Value="@Tool" Variant="@Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
-                        @foreach (var tool in Tools.Where(x => x is GroovingExternalTool or GroovingInternalTool))
-                        {
-                            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudItem>
-                break;
-            case TurningGroovingSequences.Cutting when GrooveType is CuttingType.Radial:
-                <MudItem xs="12" md="4">
-                    <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
-                        @foreach (var tool in Tools.Where(x => x is GroovingExternalTool))
-                        {
-                            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudItem>
-                break;
-        }
-        @if (GrooveType is CuttingType.Face)
-        {
-            <MudItem xs="12" md="4">
-                <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
-                    @foreach (var tool in Tools.Where(x => x is GroovingFaceTool))
+                    <MudSelectItem Value="@(ThreadingSequences.Tapping)">Нарезание метчиком</MudSelectItem>
+                    @if (MachineType == MachineType.Milling)
                     {
-                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        <MudSelectItem Value="@(ThreadingSequences.ThreadMilling)">Резьбофрезерование</MudSelectItem>
+                        <MudSelectItem Value="@(ThreadingSequences.CustomThreadMilling)">Резьбофрезерование (G165)</MudSelectItem>
                     }
                 </MudSelect>
             </MudItem>
-        }
-        switch (GroovingSequence)
-        {
-            case TurningGroovingSequences.Grooving or TurningGroovingSequences.RoughGrooving:
+            switch (ThreadingSequence)
+            {
+                case ThreadingSequences.ThreadCutting:
+                    switch (ThreadType)
+                    {
+                        case CuttingType.External:
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudSelect ValueChanged="OnToolChanged" Variant="@Variant.Filled" Margin="@Margin.Dense" Label="Инструмент" T="Tool">
+                                    @foreach (var tool in Tools.Where(x => x is ThreadingExternalTool))
+                                    {
+                                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            break;
+                        case CuttingType.Internal:
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                                    @foreach (var tool in Tools.Where(x => x is ThreadingInternalTool))
+                                    {
+                                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            break;
+                    }
+                    <MudItem xs="6" sm="6" md="ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 6 : 4">
+                        <MudSelect Label="Стандарт" T="ThreadStandard" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="ThreadStandard">
+                            <MudSelectItem Value="@(ThreadStandard.Metric)">Метрическая 60° (М)</MudSelectItem>
+                            <MudSelectItem Value="@(ThreadStandard.BSPP)">Трубная цилиндрическая 55° (G)</MudSelectItem>
+                            <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">Трапецеидальная 30° (Tr)</MudSelectItem>
+                            <MudSelectItem Value="@(ThreadStandard.NPT)">Коническая 60° (K)</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="6" sm="6" md="ThreadStandard is ThreadStandard.Metric or ThreadStandard.Trapezoidal ? 6 : 4">
+                        <MudSelect Label="Тип" T="CuttingType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnThreadCuttingTypeChanged">
+                            <MudSelectItem Value="@(CuttingType.External)">Наружная</MudSelectItem>
+                            <MudSelectItem Value="@(CuttingType.Internal)">Внутренняя</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    switch (ThreadStandard)
+                    {
+                        case ThreadStandard.BSPP:
+                            <MudItem xs="6" sm="6" md="4">
+                                <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
+                                    @foreach (var item in Thread.BsppTemplates)
+                                    {
+                                        <MudSelectItem Value="@(item)">
+                                            <MudText>@item</MudText>
+                                        </MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            break;
+                        case ThreadStandard.NPT:
+                            <MudItem xs="6" sm="6" md="4">
+                                <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTemplateChanged">
+                                    @foreach (var item in Thread.NptTemplates)
+                                    {
+                                        <MudSelectItem Value="@(item)">
+                                            <MudText>@item</MudText>
+                                        </MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            break;
+                    }
+                    <MudItem xs="6" md="4">
+                        <MudTextField Label="Диаметр резьбы" @bind-Value="_ThreadDiameter" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6" md="4">
+                        <MudTextField Label="Шаг резьбы" @bind-Value="_ThreadPitch" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Скорость резания" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <MudTextField Label="Начальная точка" @bind-Value="_ThreadStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <MudTextField Label="Конечная точка" @bind-Value="_ThreadEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    break;
+                case ThreadingSequences.Tapping:
+                    <MudItem xs="4">
+                        <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                            @if (MachineType == MachineType.Turning)
+                            {
+                                @foreach (var tool in Tools.Where(x => x is TurningTappingTool))
+                                {
+                                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                                }
+                            }
+                            @if (MachineType == MachineType.Milling)
+                            {
+                                @foreach (var tool in Tools.Where(x => x is MillingTappingTool))
+                                {
+                                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                                }
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField Label="Скорость резания" @bind-Value="_TapCutSpeed" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField Label="Начальная точка" @bind-Value="_TapStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField Label="Конечная точка" @bind-Value="_TapEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    @if (MachineType == MachineType.Milling)
+                    {
+                        <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+                            <MudNumericField Label="Количество отверстий" T="int" Min="1" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.HolesConverter" ValueChanged="OnHolesCountChanged" />
+                        </MudItem>
+                        <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+                            <MudSelect Label="Расположение" T="HolesSetterType" @bind-Value="HolesSetter" Variant="Variant.Filled" Margin="Margin.Dense">
+                                <MudSelectItem Value="@(HolesSetterType.Manual)">Вручную</MudSelectItem>
+                                <MudSelectItem Value="@(HolesSetterType.Cylinder)">На цилиндре</MudSelectItem>
+                                <MudSelectItem Value="@(HolesSetterType.EvenlyCylinder)">Равномерно на цилиндре</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        switch (HolesSetter)
+                        {
+                            case HolesSetterType.Manual:
+                                @foreach (var hole in Holes)
+                                {
+                                    <MudItem xs="6" sm="4" md="3" lg="2">
+                                        <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                            <MudGrid>
+                                                <MudItem xs=6>
+                                                    <MudTextField Label="X" @bind-Value="Holes[Holes.IndexOf(hole)].X" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                                                </MudItem>
+                                                <MudItem xs=6>
+                                                    <MudTextField Label="Y" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                                                </MudItem>
+                                            </MudGrid>
+                                        </MudField>
+                                    </MudItem>
+                                }
+                                break;
+                            case HolesSetterType.Cylinder:
+                                <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+                                    <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                                </MudItem>
+                                @foreach (var hole in Holes)
+                                {
+                                    <MudItem xs="6" sm="4" md="3" lg="2">
+                                        <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                            <MudGrid>
+                                                <MudItem xs=12>
+                                                    <MudTextField Label="Угол" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                                                </MudItem>
+                                            </MudGrid>
+                                        </MudField>
+                                    </MudItem>
+                                }
+                                break;
+                            case HolesSetterType.EvenlyCylinder:
+                                <MudItem xs="6">
+                                    <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudTextField Label="Начальный угол" @bind-Value="StartAngle" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="°" Immediate="true" Converter="Util.DoubleConverter" />
+                                </MudItem>
+                                break;
+                        }
+                    }
+                    break;
+                case ThreadingSequences.CustomThreadMilling or ThreadingSequences.ThreadMilling:
+                    <MudItem xs="4">
+                        <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                            @if (MachineType == MachineType.Milling)
+                            {
+                                @foreach (var tool in Tools.Where(x => x is MillingThreadCuttingTool))
+                                {
+                                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                                }
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField Label="Скорость резания" @bind-Value="_TapCutSpeed" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField Label="Начальная точка" @bind-Value="_TapStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField Label="Конечная точка" @bind-Value="_TapEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    @if (MachineType == MachineType.Milling)
+                    {
+                        <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+                            <MudNumericField Label="Количество отверстий" T="int" Min="1" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.HolesConverter" ValueChanged="OnHolesCountChanged" />
+                        </MudItem>
+                        <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+                            <MudSelect Label="Расположение" T="HolesSetterType" @bind-Value="HolesSetter" Variant="Variant.Filled" Margin="Margin.Dense">
+                                <MudSelectItem Value="@(HolesSetterType.Manual)">Вручную</MudSelectItem>
+                                <MudSelectItem Value="@(HolesSetterType.Cylinder)">На цилиндре</MudSelectItem>
+                                <MudSelectItem Value="@(HolesSetterType.EvenlyCylinder)">Равномерно на цилиндре</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        switch (HolesSetter)
+                        {
+                            case HolesSetterType.Manual:
+                                @foreach (var hole in Holes)
+                                {
+                                    <MudItem xs="6" sm="4" md="3" lg="2">
+                                        <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                            <MudGrid>
+                                                <MudItem xs=6>
+                                                    <MudTextField Label="X" @bind-Value="Holes[Holes.IndexOf(hole)].X" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                                                </MudItem>
+                                                <MudItem xs=6>
+                                                    <MudTextField Label="Y" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                                                </MudItem>
+                                            </MudGrid>
+                                        </MudField>
+                                    </MudItem>
+                                }
+                                break;
+                            case HolesSetterType.Cylinder:
+                                <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+                                    <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                                </MudItem>
+                                @foreach (var hole in Holes)
+                                {
+                                    <MudItem xs="6" sm="4" md="3" lg="2">
+                                        <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                            <MudGrid>
+                                                <MudItem xs=12>
+                                                    <MudTextField Label="Угол" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                                                </MudItem>
+                                            </MudGrid>
+                                        </MudField>
+                                    </MudItem>
+                                }
+                                break;
+                            case HolesSetterType.EvenlyCylinder:
+                                <MudItem xs="6">
+                                    <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudTextField Label="Начальный угол" @bind-Value="StartAngle" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="°" Immediate="true" Converter="Util.DoubleConverter" />
+                                </MudItem>
+                                break;
+                        }
+                    }
+                    break;
+            }
+            break;
+
+        //Канавочные
+        case SequenceType.Grooving:
+            <MudItem xs="12" md="4">
+                <MudSelect Label="Переход" T="TurningGroovingSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="GroovingSequence">
+                    <MudSelectItem Value="@(TurningGroovingSequences.Cutting)">Отрезка</MudSelectItem>
+                    <MudSelectItem Value="@(TurningGroovingSequences.RoughGrooving)">Канавка черновая</MudSelectItem>
+                    <MudSelectItem Value="@(TurningGroovingSequences.Grooving)">Канавка</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            @switch (GroovingSequence)
+            {
+                case TurningGroovingSequences.Grooving or TurningGroovingSequences.RoughGrooving when GrooveType is CuttingType.Radial:
+                    <MudItem xs="12" md="4">
+                        <MudSelect @bind-Value="@Tool" Variant="@Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                            @foreach (var tool in Tools.Where(x => x is GroovingExternalTool or GroovingInternalTool))
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    break;
+                case TurningGroovingSequences.Cutting when GrooveType is CuttingType.Radial:
+                    <MudItem xs="12" md="4">
+                        <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                            @foreach (var tool in Tools.Where(x => x is GroovingExternalTool))
+                            {
+                                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    break;
+            }
+            @if (GrooveType is CuttingType.Face)
+            {
                 <MudItem xs="12" md="4">
-                    <MudSelect Label="Тип" T="CuttingType" Value="GrooveType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnGrooveCuttingTypeChanged">
-                        <MudSelectItem Value="@(CuttingType.Radial)">Радиальная</MudSelectItem>
-                        <MudSelectItem Value="@(CuttingType.Face)">Торцевая</MudSelectItem>
+                    <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                        @foreach (var tool in Tools.Where(x => x is GroovingFaceTool))
+                        {
+                            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        }
                     </MudSelect>
                 </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Начальный диаметр" @bind-Value="_GroovingExternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Конечный диаметр" @bind-Value="_GroovingInternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                @if (GrooveType is CuttingType.Face)
-                {
-                <MudItem xs="12" md="3">
-                    <MudTextField Label="Начальная точка" @bind-Value="_GroovingStartPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                }
-                else
-                {
-                <MudItem xs="12" md="3">
-                    <MudTextField Label="Ширина" @bind-Value="_GroovingWidth" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                }
-                <MudItem xs="12" md="3">
-                    <MudTextField Label="Конечная точка" @bind-Value="_GroovingCuttingPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="3">
-                    <MudTextField Label="Шаг" @bind-Value="_GroovingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="3">
-                    <MudTextField Label="Припуск" @bind-Value="_GroovingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="3">
-                    <MudTextField Label="Притупление" @bind-Value="_OuterGroovingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="3">
-                    <MudSelect Label="Тип притупления" T="Blunt" Variant="Variant.Filled" @bind-Value="OuterGroovingBluntType" Margin="Margin.Dense">
-                        <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
-                        <MudSelectItem Value="@(Blunt.SimpleChamfer)">Фаска</MudSelectItem>
-                    </MudSelect>
-                </MudItem>
-                <MudItem xs="12" md="3">
-                    <MudTextField Label="Галтель" @bind-Value="_InnerGroovingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="3">
-                    <MudSelect Label="Тип галтели" T="Blunt" Variant="Variant.Filled" @bind-Value="InnerGroovingBluntType" Margin="Margin.Dense">
-                        <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
-                        <MudSelectItem Value="@(Blunt.SimpleChamfer)">Фаска</MudSelectItem>
-                        @*написать настриваемую фаску как на отрезке*@
-                    </MudSelect>
-                </MudItem>
-                @if (GroovingSequence is TurningGroovingSequences.RoughGrooving)
-                {
+            }
+            switch (GroovingSequence)
+            {
+                case TurningGroovingSequences.Grooving or TurningGroovingSequences.RoughGrooving:
+                    <MudItem xs="12" md="4">
+                        <MudSelect Label="Тип" T="CuttingType" Value="GrooveType" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnGrooveCuttingTypeChanged">
+                            <MudSelectItem Value="@(CuttingType.Radial)">Радиальная</MudSelectItem>
+                            <MudSelectItem Value="@(CuttingType.Face)">Торцевая</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Начальный диаметр" @bind-Value="_GroovingExternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Конечный диаметр" @bind-Value="_GroovingInternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    @if (GrooveType is CuttingType.Face)
+                    {
+                        <MudItem xs="12" md="3">
+                            <MudTextField Label="Начальная точка" @bind-Value="_GroovingStartPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                        </MudItem>
+                    }
+                    else
+                    {
+                        <MudItem xs="12" md="3">
+                            <MudTextField Label="Ширина" @bind-Value="_GroovingWidth" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                        </MudItem>
+                    }
+                    <MudItem xs="12" md="3">
+                        <MudTextField Label="Конечная точка" @bind-Value="_GroovingCuttingPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="3">
+                        <MudTextField Label="Шаг" @bind-Value="_GroovingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="3">
+                        <MudTextField Label="Припуск" @bind-Value="_GroovingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="3">
+                        <MudTextField Label="Притупление" @bind-Value="_OuterGroovingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="3">
+                        <MudSelect Label="Тип притупления" T="Blunt" Variant="Variant.Filled" @bind-Value="OuterGroovingBluntType" Margin="Margin.Dense">
+                            <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
+                            <MudSelectItem Value="@(Blunt.SimpleChamfer)">Фаска</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="3">
+                        <MudTextField Label="Галтель" @bind-Value="_InnerGroovingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="3">
+                        <MudSelect Label="Тип галтели" T="Blunt" Variant="Variant.Filled" @bind-Value="InnerGroovingBluntType" Margin="Margin.Dense">
+                            <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
+                            <MudSelectItem Value="@(Blunt.SimpleChamfer)">Фаска</MudSelectItem>
+                            @*написать настриваемую фаску как на отрезке*@
+                        </MudSelect>
+                    </MudItem>
+                    @if (GroovingSequence is TurningGroovingSequences.RoughGrooving)
+                    {
+                        <MudItem xs="6" md="6">
+                            <MudTextField Label="Скорость резания" @bind-Value="SpeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="6" md="6">
+                            <MudTextField Label="Подача" @bind-Value="_FeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                        </MudItem>
+                    }
+                    else if (GroovingSequence is TurningGroovingSequences.Grooving)
+                    {
+                        <MudItem xs="6" md="3">
+                            <MudTextField Label="Черновая Vc" @bind-Value="SpeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="6" md="3">
+                            <MudTextField Label="Черновая F" @bind-Value="_FeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="6" md="3">
+                            <MudTextField Label="Чистовая Vc" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="6" md="3">
+                            <MudTextField Label="Чистовая F" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                        </MudItem>
+                    }
+                    break;
+                case TurningGroovingSequences.Cutting:
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Начальный диаметр" @bind-Value="_CuttingExternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Конечный диаметр" @bind-Value="_CuttingInternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Конечная точка" @bind-Value="_CuttingPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="Шаг" @bind-Value="_CuttingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="@BluntLabel(CuttingBluntType)" @bind-Value="_CuttingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _calcCuttingChamferDiameter = true)" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudSelect Label="Тип" T="Blunt" Variant="Variant.Filled" @bind-Value="CuttingBluntType" Margin="Margin.Dense">
+                            <MudSelectItem Value="@(Blunt.SimpleChamfer)">Простая фаска</MudSelectItem>
+                            <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
+                            <MudSelectItem Value="@(Blunt.CustomChamfer)">Настраиваемая фаска</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    @if (CuttingBluntType == Blunt.CustomChamfer)
+                    {
+                        <MudItem xs="12" md="4">
+                            <MudTextField Label="Угол фаски" @bind-Value="_CuttingCustomChamferAngle" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="°" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudTextField Label="Конечный диаметр фаски" @bind-Value="_CuttingCustomChamferDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _calcCuttingChamferDiameter = false)" />
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudTextField Label="Скругление на фаске" @bind-Value="_CuttingCustomChamferBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                        </MudItem>
+                    }
                     <MudItem xs="6" md="6">
                         <MudTextField Label="Скорость резания" @bind-Value="SpeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                     </MudItem>
                     <MudItem xs="6" md="6">
                         <MudTextField Label="Подача" @bind-Value="_FeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                     </MudItem>
-                }
-                else if (GroovingSequence is TurningGroovingSequences.Grooving)
-                {
-                    <MudItem xs="6" md="3">
-                        <MudTextField Label="Черновая Vc" @bind-Value="SpeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-                    </MudItem>
-                    <MudItem xs="6" md="3">
-                        <MudTextField Label="Черновая F" @bind-Value="_FeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-                    </MudItem>
-                    <MudItem xs="6" md="3">
-                        <MudTextField Label="Чистовая Vc" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-                    </MudItem>
-                    <MudItem xs="6" md="3">
-                        <MudTextField Label="Чистовая F" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-                    </MudItem>
-                }
-                break;
-            case TurningGroovingSequences.Cutting:
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Начальный диаметр" @bind-Value="_CuttingExternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Конечный диаметр" @bind-Value="_CuttingInternalDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Конечная точка" @bind-Value="_CuttingPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Шаг" @bind-Value="_CuttingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="@BluntLabel(CuttingBluntType)" @bind-Value="_CuttingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _calcCuttingChamferDiameter = true)" />
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudSelect Label="Тип" T="Blunt" Variant="Variant.Filled" @bind-Value="CuttingBluntType" Margin="Margin.Dense">
-                        <MudSelectItem Value="@(Blunt.SimpleChamfer)">Простая фаска</MudSelectItem>
-                        <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
-                        <MudSelectItem Value="@(Blunt.CustomChamfer)">Настраиваемая фаска</MudSelectItem>
-                    </MudSelect>
-                </MudItem>
-                @if (CuttingBluntType == Blunt.CustomChamfer)
-                {
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Угол фаски" @bind-Value="_CuttingCustomChamferAngle" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="°" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Конечный диаметр фаски" @bind-Value="_CuttingCustomChamferDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" @onfocusin="@(() => _calcCuttingChamferDiameter = false)" />
-                </MudItem>
-                <MudItem xs="12" md="4">
-                    <MudTextField Label="Скругление на фаске" @bind-Value="_CuttingCustomChamferBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
-                </MudItem>
-                }
-                <MudItem xs="6" md="6">
-                    <MudTextField Label="Скорость резания" @bind-Value="SpeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-                </MudItem>
-                <MudItem xs="6" md="6">
-                    <MudTextField Label="Подача" @bind-Value="_FeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-                </MudItem>
-                break;
-        }
-        break;
+                    break;
+            }
+            break;
 
-    // накатка
-    case SequenceType.Burnishing:
-        <MudItem xs="12" md="4">
-            <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
-                @foreach (var tool in Tools.Where(x => x is TurningBurnishingTool))
-                {
-                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
-                }
-            </MudSelect>
-        </MudItem>
-        <MudItem xs="12" md="4">
-            <MudTextField Label="Диаметр" @bind-Value="_BurnishingDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true"/>
-        </MudItem>
-        <MudItem xs="12" md="6">
-            <MudTextField Label="Начальная точка" @bind-Value="_BurnishingStart" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true"/>
-        </MudItem>
-        <MudItem xs="12" md="6">
-            <MudTextField Label="Конечная точка" @bind-Value="_BurnishingEnd" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true"/>
-        </MudItem>
-        <MudItem xs="6" md="6">
-            <MudTextField Label="Скорость резания" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-        </MudItem>
-        <MudItem xs="6" md="6">
-            <MudTextField Label="Подача" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
-        </MudItem>
-        break;
+        // накатка
+        case SequenceType.Burnishing:
+            <MudItem xs="12" md="4">
+                <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                    @foreach (var tool in Tools.Where(x => x is TurningBurnishingTool))
+                    {
+                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudTextField Label="Диаметр" @bind-Value="_BurnishingDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField Label="Начальная точка" @bind-Value="_BurnishingStart" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField Label="Конечная точка" @bind-Value="_BurnishingEnd" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+            </MudItem>
+            <MudItem xs="6" md="6">
+                <MudTextField Label="Скорость резания" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+            </MudItem>
+            <MudItem xs="6" md="6">
+                <MudTextField Label="Подача" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+            </MudItem>
+            break;
     }
-        </MudGrid>
-        <MudItem Class="mt-4" xs="12" sm="12" md="12">
-            <MudTextField T="string" DisableUnderLine="true" Label="Предпросмотр" Style="font-family: 'Roboto Mono', monospace; font-size: medium;"
-                          ReadOnly="true" Variant="Variant.Filled" Text="@("\n" + ExampleText.Trim('\n'))" Lines="@(ExampleText.Trim('\n').Count(x => x == '\n') + 3)"/>
-        </MudItem>
-        <MudItem Class="d-flex flex-row-reverse py-0 px-0 mt-4">
-            <MudButton Variant="Variant.Outlined" Size="Size.Large"
-                       EndIcon="@Icons.TwoTone.PlaylistAdd" Color="Color.Primary"
-                       OnClick="Submit" Disabled="@(string.IsNullOrEmpty(ExampleText))">
-                Добавить
-            </MudButton>
-        </MudItem>
+</MudGrid>
+<MudItem Class="mt-4" xs="12" sm="12" md="12">
+    <MudTextField T="string" DisableUnderLine="true" Label="Предпросмотр" Style="font-family: 'Roboto Mono', monospace; font-size: medium;"
+                  ReadOnly="true" Variant="Variant.Filled" Text="@("\n" + ExampleText.Trim('\n'))" Lines="@(ExampleText.Trim('\n').Count(x => x == '\n') + 3)" />
+</MudItem>
+<MudItem Class="d-flex flex-row-reverse py-0 px-0 mt-4">
+    <MudButton Variant="Variant.Outlined" Size="Size.Large"
+               EndIcon="@Icons.TwoTone.PlaylistAdd" Color="Color.Primary"
+               OnClick="Submit" Disabled="@(string.IsNullOrEmpty(ExampleText))">
+        Добавить
+    </MudButton>
+</MudItem>
 
 
 @code {
@@ -864,6 +950,7 @@
         Tool = null;
         SpeedFinish = Operation.CuttingSpeedFinish(WorkpieceMaterial);
         SpeedRough = Operation.CuttingSpeedRough(WorkpieceMaterial);
+        ThreadingSequence = MachineType is MachineType.Turning ? ThreadingSequences.ThreadCutting : ThreadingSequences.Tapping;
         _FeedRough = string.Empty;
     }
 
@@ -932,38 +1019,38 @@
         switch (ThreadStandard)
         {
             case ThreadStandard.Metric:
-            {
-                Thread.GetMetricValues(CurrentThreadTemplate, out var diameter, out var pitch);
-                _ThreadDiameter = diameter;
-                _ThreadPitch = pitch;
-                ThreadNPTPlane = 0;
-                break;
-            }
+                {
+                    Thread.GetMetricValues(CurrentThreadTemplate, out var diameter, out var pitch);
+                    _ThreadDiameter = diameter;
+                    _ThreadPitch = pitch;
+                    ThreadNPTPlane = 0;
+                    break;
+                }
             case ThreadStandard.BSPP:
-            {
-                Thread.GetBsppValues(CurrentThreadTemplate, out var diameter, out var pitch);
-                _ThreadDiameter = diameter;
-                _ThreadPitch = pitch;
-                ThreadNPTPlane = 0;
-                break;
-            }
+                {
+                    Thread.GetBsppValues(CurrentThreadTemplate, out var diameter, out var pitch);
+                    _ThreadDiameter = diameter;
+                    _ThreadPitch = pitch;
+                    ThreadNPTPlane = 0;
+                    break;
+                }
             case ThreadStandard.Trapezoidal:
-            {
-                Thread.GetTrapezoidalValues(CurrentThreadTemplate, out var diameter, out var pitch);
-                _ThreadDiameter = diameter;
-                _ThreadPitch = pitch;
-                ThreadNPTPlane = 0;
-                break;
-            }
+                {
+                    Thread.GetTrapezoidalValues(CurrentThreadTemplate, out var diameter, out var pitch);
+                    _ThreadDiameter = diameter;
+                    _ThreadPitch = pitch;
+                    ThreadNPTPlane = 0;
+                    break;
+                }
             case ThreadStandard.NPT:
-            {
-                Thread.GetNptValues(CurrentThreadTemplate, out var externalDiameter, out var internalDiameter, out var pitch, out var planeLength, out var threadLength);
-                _ThreadDiameter = externalDiameter;
-                _ThreadPitch = pitch;
-                _ThreadEnd = (-threadLength).ToPrettyString(); // наверно тоже строку стоит возвращать
-                ThreadNPTPlane = planeLength;
-                break;
-            }
+                {
+                    Thread.GetNptValues(CurrentThreadTemplate, out var externalDiameter, out var internalDiameter, out var pitch, out var planeLength, out var threadLength);
+                    _ThreadDiameter = externalDiameter;
+                    _ThreadPitch = pitch;
+                    _ThreadEnd = (-threadLength).ToPrettyString(); // наверно тоже строку стоит возвращать
+                    ThreadNPTPlane = planeLength;
+                    break;
+                }
         }
     }
 
@@ -1046,6 +1133,15 @@
     private string _TapEnd { get; set; } = "-";
     private double TapEnd => _TapEnd.GetDouble(numberOption: Util.GetNumberOption.Any);
 
+    //Резьбофрезерование
+    private string _ThreadMillingCutSpeed { get; set; }
+    private double ThreadMillingCutSpeed => _ThreadMillingCutSpeed.GetDouble(numberOption: Util.GetNumberOption.Any);
+
+    private string _ThreadMillingStart { get; set; }
+    private double ThreadMillingStart => _ThreadMillingStart.GetDouble(numberOption: Util.GetNumberOption.Any);
+
+    private string _ThreadMillingEnd { get; set; } = "-";
+    private double ThreadMillingEnd => _ThreadMillingEnd.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     //Торцовка
     bool _calcFacingChamferDiameter = true;
@@ -1284,7 +1380,7 @@
     ///     на кнопку.
     /// </summary>
     //Пример
-        public string ExampleText
+    public string ExampleText
     {
         get
         {
