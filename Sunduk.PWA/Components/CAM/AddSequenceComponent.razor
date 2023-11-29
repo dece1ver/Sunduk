@@ -29,19 +29,9 @@
             </MudItem>
             <MudItem xs="12" md="4">
                 <MudSelect T="Tool" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool" ValueChanged="OnToolChanged">
-                    @if (MachineType == MachineType.Turning)
+                    @foreach (var tool in Tools.Where(x => x.MachineType == MachineType))
                     {
-                        @foreach (var tool in Tools.Where(x => x.MachineType is MachineType.Turning))
-                        {
-                            <MudSelectItem Value="@tool" Style="font-family: 'Roboto Mono', monospace;">@tool.Description()</MudSelectItem>
-                        }
-                    }
-                    @if (MachineType == MachineType.Milling)
-                    {
-                        @foreach (var tool in Tools.Where(x => x.MachineType is MachineType.Milling))
-                        {
-                            <MudSelectItem Value="@tool" Style="font-family: 'Roboto Mono', monospace;">@tool.Description()</MudSelectItem>
-                        }
+                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
                     }
                 </MudSelect>
             </MudItem>
@@ -75,9 +65,9 @@
         case SequenceType.Facing:
             <MudItem xs="12" md="4">
                 <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTurningSequenceChanged">
-                    <MudSelectItem Value="@(TurningSequences.RoughFacing)">@("Черновое торцевание")</MudSelectItem>
+                    <MudSelectItem Value="@(TurningSequences.RoughFacing)">@("Черновое торцевание (G72)")</MudSelectItem>
                         <MudSelectItem Value="@(TurningSequences.FinishFacing)">@("Чистовое торцевание")</MudSelectItem>
-                        <MudSelectItem Value="@(TurningSequences.RoughFacingCycle)">@("Черновое торцевание (Под G70)")</MudSelectItem>
+                        <MudSelectItem Value="@(TurningSequences.RoughFacingCycle)">@("Черновое торцевание (G72 под G70)")</MudSelectItem>
                         <MudSelectItem Value="@(TurningSequences.FinishFacingCycle)">@("Чистовое торцевание (G70)")</MudSelectItem>
                         <MudSelectItem Value="@(TurningSequences.Facing)">@("Торцевание (черновое + чистовое)")</MudSelectItem>
                     </MudSelect>
@@ -479,7 +469,7 @@
                     </MudItem>
                     break;
                 case ThreadingSequences.Tapping:
-                    <MudItem xs="4">
+                    <MudItem xs="12" md="4">
                         <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                             @if (MachineType == MachineType.Turning)
                             {
@@ -566,7 +556,7 @@
                     }
                     break;
                 case ThreadingSequences.CustomThreadMilling or ThreadingSequences.ThreadMilling:
-                    <MudItem xs="4">
+                    <MudItem xs="12" sm="6" md="4">
                         <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                             @if (MachineType == MachineType.Milling)
                             {
@@ -577,21 +567,24 @@
                             }
                         </MudSelect>
                     </MudItem>
-                    <MudItem xs="4">
-                        <MudTextField Label="Скорость резания" @bind-Value="_TapCutSpeed" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudItem xs="6">
+                        <MudTextField Label="Диаметр резьбы" @bind-Value="_ThreadMillingDiameter" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                     </MudItem>
-                    <MudItem xs="4">
-                        <MudTextField Label="Начальная точка" @bind-Value="_TapStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudItem xs="6">
+                        <MudTextField Label="Скорость резания" @bind-Value="_ThreadMillingCutSpeed" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                     </MudItem>
-                    <MudItem xs="4">
-                        <MudTextField Label="Конечная точка" @bind-Value="_TapEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    <MudItem xs="6">
+                        <MudTextField Label="Начальная точка" @bind-Value="_ThreadMillingStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField Label="Конечная точка" @bind-Value="_ThreadMillingEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                     </MudItem>
                     @if (MachineType == MachineType.Milling)
                     {
-                        <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+                        <MudItem xs="@(HolesSetter is HolesSetterType.Manual ? 6 : 4)">
                             <MudNumericField Label="Количество отверстий" T="int" Min="1" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.HolesConverter" ValueChanged="OnHolesCountChanged" />
                         </MudItem>
-                        <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+                        <MudItem xs="@(HolesSetter is HolesSetterType.Manual ? 6 : 4)">
                             <MudSelect Label="Расположение" T="HolesSetterType" @bind-Value="HolesSetter" Variant="Variant.Filled" Margin="Margin.Dense">
                                 <MudSelectItem Value="@(HolesSetterType.Manual)">Вручную</MudSelectItem>
                                 <MudSelectItem Value="@(HolesSetterType.Cylinder)">На цилиндре</MudSelectItem>
@@ -1134,6 +1127,9 @@
     private double TapEnd => _TapEnd.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     //Резьбофрезерование
+    private string _ThreadMillingDiameter { get; set; }
+    private double ThreadMillingDiameter => _ThreadMillingDiameter.GetDouble(numberOption: Util.GetNumberOption.Any);
+
     private string _ThreadMillingCutSpeed { get; set; }
     private double ThreadMillingCutSpeed => _ThreadMillingCutSpeed.GetDouble(numberOption: Util.GetNumberOption.Any);
 
