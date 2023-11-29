@@ -84,7 +84,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return result;
         }
 
-        public static string ThreadMilling(Machine machine, CoordinateSystem coordinateSystem, MillingThreadCuttingTool tool, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
+        public static string ThreadMilling(Machine machine, CoordinateSystem coordinateSystem, MillingThreadCuttingTool tool, double diameter, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
             var spindleSpeed = cutSpeed.ToSpindleSpeed(tool.Diameter, 10);
@@ -118,9 +118,25 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return result;
         }
 
-        public static string CustomThreadMilling(Machine machine, CoordinateSystem coordinateSystem, MillingThreadCuttingTool tool, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
+        public static string CustomThreadMilling(
+            Machine machine, 
+            CoordinateSystem coordinateSystem, 
+            MillingThreadCuttingTool tool, 
+            double diameter, 
+            double cutSpeed, 
+            double cutFeed, 
+            double startZ, 
+            double endZ,
+            int roughPasses,
+            double roughStepOver,
+            double profStockAllow,
+            double exitPlane,
+            bool fullCut, 
+            List<Hole> holes, 
+            bool polar, 
+            double safePlane)
         {
-            if (tool is null || startZ <= endZ) return string.Empty;
+            if (tool is null || startZ <= endZ || diameter <= 0 || cutSpeed <= 0 || cutFeed <= 0 || roughPasses < 1 || roughStepOver <= 0 || profStockAllow <= 0) return string.Empty;
             var spindleSpeed = cutSpeed.ToSpindleSpeed(tool.Diameter, 10);
             string result = machine switch
             {
@@ -130,7 +146,10 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"{coordinateSystem}{(polar ? "G16 " : string.Empty)} G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
                 $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
                 $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
-                $"G95 G84 Z{endZ.NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} P500 F{tool.Pitch.NC()}\n",
+                $"G166 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} " +
+                $"T{tool.Diameter.NC(option: NcDecimalPointOption.Without)} D{diameter.NC(option: NcDecimalPointOption.Without)} H{tool.Pitch.NC(option: NcDecimalPointOption.Without)} Z{endZ.NC(option: NcDecimalPointOption.Without)} E{roughPasses} " +
+                $"W{roughStepOver.NC(option: NcDecimalPointOption.Without)} R{profStockAllow.NC(option: NcDecimalPointOption.Without)} U{exitPlane.NC(option: NcDecimalPointOption.Without)} " +
+                $"A{(fullCut ? 1 : 0)} S{spindleSpeed} F{cutFeed.ToFeedPerMin(spindleSpeed, 10)}\n",
                 _ => string.Empty
             };
 
@@ -141,7 +160,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 result += machine switch
                 {
                     Machine.A110 =>
-                    $"G80\n" +
+                    $"G67\n" +
                     $"{CoolantOff(machine)}\n" +
                     $"{(polar ? "G15\n" : string.Empty)}" +
                     SpindleStop + "\n" +

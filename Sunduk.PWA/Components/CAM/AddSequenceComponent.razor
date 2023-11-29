@@ -469,7 +469,7 @@
                     </MudItem>
                     break;
                 case ThreadingSequences.Tapping:
-                    <MudItem xs="12" md="4">
+                    <MudItem xs="12" sm="6" md="4">
                         <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                             @if (MachineType == MachineType.Turning)
                             {
@@ -567,24 +567,47 @@
                             }
                         </MudSelect>
                     </MudItem>
-                    <MudItem xs="6">
+                    <MudItem xs="6" md="4">
                         <MudTextField Label="Диаметр резьбы" @bind-Value="_ThreadMillingDiameter" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                     </MudItem>
-                    <MudItem xs="6">
+                    <MudItem xs="6" md="4">
                         <MudTextField Label="Скорость резания" @bind-Value="_ThreadMillingCutSpeed" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                     </MudItem>
-                    <MudItem xs="6">
+                    <MudItem xs="6" md="4">
+                        <MudTextField Label="Подача мм/об" @bind-Value="_ThreadMillingCutFeed" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6" md="4">
                         <MudTextField Label="Начальная точка" @bind-Value="_ThreadMillingStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
                     </MudItem>
-                    <MudItem xs="6">
+                    <MudItem xs="6" md="4">
                         <MudTextField Label="Конечная точка" @bind-Value="_ThreadMillingEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6" md="4">
+                        <MudNumericField Label="Черновые проходы" @bind-Value="_ThreadMillingRoughPasses" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6" md="4">
+                        <MudTextField Label="Черновой съем" @bind-Value="_ThreadMillingRoughStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6" md="4">
+                        <MudTextField Label="Припуск на чистовую" @bind-Value="_ThreadMillingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6" md="4">
+                        <MudTextField Label="Выход по Z" @bind-Value="_ThreadMillingExitPlane" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="6" md="4">
+                        <MudField Variant="Variant.Filled" Label="Проходы" InnerPadding="false">
+                            <MudToggleIconButton @bind-Toggled="@ThreadMillingFullCut" ToggledSize="@Size.Small"
+                                                 Icon="@Icons.Material.Filled.RepeatOne" Size="@Size.Small"
+                                             ToggledIcon="@Icons.Material.Filled.Repeat"/>
+                            <span>@(ThreadMillingFullCut ? "Все витки" : "Один проход")</span>
+                        </MudField>
                     </MudItem>
                     @if (MachineType == MachineType.Milling)
                     {
-                        <MudItem xs="@(HolesSetter is HolesSetterType.Manual ? 6 : 4)">
+                        <MudItem xs="@(HolesSetter is not HolesSetterType.Cylinder ? 6 : 4)" md="4">
                             <MudNumericField Label="Количество отверстий" T="int" Min="1" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.HolesConverter" ValueChanged="OnHolesCountChanged" />
                         </MudItem>
-                        <MudItem xs="@(HolesSetter is HolesSetterType.Manual ? 6 : 4)">
+                        <MudItem xs="@(HolesSetter is not HolesSetterType.Cylinder ? 6 : 4)" md="4">
                             <MudSelect Label="Расположение" T="HolesSetterType" @bind-Value="HolesSetter" Variant="Variant.Filled" Margin="Margin.Dense">
                                 <MudSelectItem Value="@(HolesSetterType.Manual)">Вручную</MudSelectItem>
                                 <MudSelectItem Value="@(HolesSetterType.Cylinder)">На цилиндре</MudSelectItem>
@@ -1128,16 +1151,34 @@
 
     //Резьбофрезерование
     private string _ThreadMillingDiameter { get; set; }
-    private double ThreadMillingDiameter => _ThreadMillingDiameter.GetDouble(numberOption: Util.GetNumberOption.Any);
+    private double ThreadMillingDiameter => _ThreadMillingDiameter.GetDouble();
 
     private string _ThreadMillingCutSpeed { get; set; }
-    private double ThreadMillingCutSpeed => _ThreadMillingCutSpeed.GetDouble(numberOption: Util.GetNumberOption.Any);
+    private double ThreadMillingCutSpeed => _ThreadMillingCutSpeed.GetDouble();
+
+    private string _ThreadMillingCutFeed { get; set; }
+    private double ThreadMillingCutFeed => _ThreadMillingCutFeed.GetDouble();
 
     private string _ThreadMillingStart { get; set; }
     private double ThreadMillingStart => _ThreadMillingStart.GetDouble(numberOption: Util.GetNumberOption.Any);
 
-    private string _ThreadMillingEnd { get; set; } = "-";
+    private string _ThreadMillingEnd { get; set; }
     private double ThreadMillingEnd => _ThreadMillingEnd.GetDouble(numberOption: Util.GetNumberOption.Any);
+
+    private string _ThreadMillingRoughPasses { get; set; }
+    private int ThreadMillingRoughPasses => _ThreadMillingRoughPasses.GetInt();
+
+    private string _ThreadMillingRoughStepOver { get; set; }
+    private double ThreadMillingRoughStepOver => _ThreadMillingRoughStepOver.GetDouble();
+
+    private string _ThreadMillingProfStockAllow { get; set; }
+    private double ThreadMillingProfStockAllow => _ThreadMillingProfStockAllow.GetDouble();
+
+    private string _ThreadMillingExitPlane { get; set; }
+    private double ThreadMillingExitPlane => _ThreadMillingExitPlane.GetDouble(numberOption: Util.GetNumberOption.Any);
+
+    private bool ThreadMillingFullCut { get; set; }
+
 
     //Торцовка
     bool _calcFacingChamferDiameter = true;
@@ -1622,6 +1663,48 @@
                             return CurrentSequence.Operation;
                     }
                     break;
+                case SequenceType.Threading when ThreadingSequence is ThreadingSequences.ThreadMilling:
+                    if (ThreadMillingCutSpeed <= 0) return string.Empty;
+                    CurrentSequence = new ThreadMillingSequence(
+                                Machine,
+                                CoordinateSystem,
+                                Tool as MillingThreadCuttingTool,
+                                ThreadMillingDiameter,
+                                ThreadMillingCutSpeed,
+                                ThreadMillingCutFeed,
+                                ThreadMillingStart,
+                                ThreadMillingEnd,
+                                ThreadMillingRoughPasses,
+                                ThreadMillingRoughStepOver,
+                                ThreadMillingProfStockAllow,
+                                ThreadMillingExitPlane,
+                                ThreadMillingFullCut,
+                                HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ?
+                                    PolarHoles(HolesCount, HolesRadius, StartAngle, HolesSetter is HolesSetterType.EvenlyCylinder) : Holes,
+                                HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder,
+                                SafePlane);
+                    return CurrentSequence.Operation;
+                case SequenceType.Threading when ThreadingSequence is ThreadingSequences.CustomThreadMilling:
+                    if (ThreadMillingCutSpeed <= 0) return string.Empty;
+                    CurrentSequence = new ThreadMillingCustomSequence(
+                                Machine,
+                                CoordinateSystem,
+                                Tool as MillingThreadCuttingTool,
+                                ThreadMillingDiameter,
+                                ThreadMillingCutSpeed,
+                                ThreadMillingCutFeed,
+                                ThreadMillingStart,
+                                ThreadMillingEnd,
+                                ThreadMillingRoughPasses,
+                                ThreadMillingRoughStepOver,
+                                ThreadMillingProfStockAllow,
+                                ThreadMillingExitPlane,
+                                ThreadMillingFullCut,
+                                HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ?
+                                    PolarHoles(HolesCount, HolesRadius, StartAngle, HolesSetter is HolesSetterType.EvenlyCylinder) : Holes,
+                                HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder,
+                                SafePlane);
+                    return CurrentSequence.Operation;
                 case SequenceType.Grooving when GroovingSequence == TurningGroovingSequences.Cutting:
                     if (SpeedRough <= 0 || FeedRough <= 0) return string.Empty;
                     CurrentSequence = new TurningCutOffSequence(

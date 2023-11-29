@@ -12,14 +12,31 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Milling
             Machine, 
             CoordinateSystem, 
             Tool, 
-            CutSpeed, 
+            CutSpeed,  
+            ThreadDiameter,  
             StartZ, 
             EndZ, 
             Holes, 
             Polar, 
             SafePlane);
-        public ThreadMillingNormalSequence(Machine machine, CoordinateSystem coordinateSystem, MillingThreadCuttingTool tool, double threadDiameter, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
-            : base(machine, tool, threadDiameter, cutSpeed, startZ, endZ)
+        public ThreadMillingNormalSequence(
+            Machine machine,
+            CoordinateSystem coordinateSystem,
+            MillingThreadCuttingTool tool,
+            double threadDiameter,
+            double cutSpeed,
+            double cutFeed,
+            double startZ,
+            double endZ,
+            int roughPasses,
+            double roughStepOver,
+            double profStockAllow,
+            double exitPlane,
+            bool fullCut,
+            List<Hole> holes,
+            bool polar,
+            double safePlane)
+            : base(machine, coordinateSystem, tool, threadDiameter, cutSpeed, cutFeed, startZ, endZ, roughPasses, roughStepOver, profStockAllow, exitPlane, fullCut, holes, polar, safePlane)
         { }
     }
 }
