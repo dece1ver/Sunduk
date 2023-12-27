@@ -335,7 +335,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// шапка
         /// </summary>
-        public static string Header(Machine machine, string number, string name, string author, string drawVersion) => machine switch
+        public static string Header(Machine machine, string number, string name, string author, string drawVersion, TimeSpan timeSpan) => machine switch
         {
             Machine.GS1500 =>
             "%\n" +
@@ -344,21 +344,21 @@ namespace Sunduk.PWA.Infrastructure.Templates
             "G10 L2 P1 Z-100. B300. (G54)\n" +
             "G10 L2 P2 Z400. (G55)\n" +
             $"({author}) ({DateTime.Now:dd.MM.yy})\n" +
-            "(0M0S)\n",
+            $"({timeSpan.Minutes}M{timeSpan.Seconds}S)\n",
 
             Machine.L230A =>
             "%\n" +
             $"O0001 ({number})\n" +
             $"({name})({drawVersion.Replace(',', '.')})\n" +
             $"({author})({DateTime.Now:dd.MM.yy})\n" +
-            "(0M0S)\n",
+            $"({timeSpan.Minutes}M{timeSpan.Seconds}S)\n",
 
             Machine.A110 =>
             "%\n" +
             $"O0001 ({number})\n" +
             $"({name})({drawVersion.Replace(',', '.')})\n" +
             $"({author})({DateTime.Now:dd.MM.yy})\n" +
-            "(0M0S)\n",
+            $"({timeSpan.Minutes}M{timeSpan.Seconds}S)\n",
 
             _ => string.Empty,
         };

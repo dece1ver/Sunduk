@@ -23,8 +23,11 @@
                     @if (MachineType == MachineType.Turning)
                     {
                         <MudSelectItem Value="@(GeneralSequences.Limiter)">Упор</MudSelectItem>
+                        <MudSelectItem Value="@(GeneralSequences.TailStockOn)">Подвод задней бабки</MudSelectItem>
+                        <MudSelectItem Value="@(GeneralSequences.TailStockOff)">Отвод задней бабки</MudSelectItem>
                     }
                     <MudSelectItem Value="@(GeneralSequences.CustomOperation)">Произвольная операция</MudSelectItem>
+                    <MudSelectItem Value="@(GeneralSequences.Stop)">Остановка</MudSelectItem>
                 </MudSelect>
             </MudItem>
             <MudItem xs="12" md="4">
@@ -35,28 +38,37 @@
                     }
                 </MudSelect>
             </MudItem>
-            @if (GeneralSequence == GeneralSequences.CustomOperation && MachineType == MachineType.Milling)
-            {
-                <MudItem xs="12" md="6">
-                    <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="Coolant">
-                        <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
-                        <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
-                        <MudSelectItem Value="@(Coolant.Full)">Вся подача СОЖ</MudSelectItem>
-                        <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
-                    </MudSelect>
-                </MudItem>
-                <MudItem xs="12" md="6">
-                    <MudSelect Label="Тип системы координат" T="bool" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="ToolCallPolar">
-                        <MudSelectItem Value="false">Декартова</MudSelectItem>
-                        <MudSelectItem Value="true">Полярная</MudSelectItem>
-                    </MudSelect>
-                </MudItem>
-            }
-            @if (GeneralSequence == GeneralSequences.CustomOperation)
-            {
+            @switch (GeneralSequence) {
+                case GeneralSequences.CustomOperation:
+                @if (MachineType == MachineType.Milling)
+                {
+                    <MudItem xs="12" md="6">
+                        <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="Coolant">
+                            <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
+                            <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
+                            <MudSelectItem Value="@(Coolant.Full)">Вся подача СОЖ</MudSelectItem>
+                            <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudSelect Label="Тип системы координат" T="bool" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="ToolCallPolar">
+                            <MudSelectItem Value="false">Декартова</MudSelectItem>
+                            <MudSelectItem Value="true">Полярная</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                }
                 <MudItem xs="12">
                     <MudTextField @bind-Value="CustomOperation" Label="Произвольная обработка" T="string" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Lines="@(CustomOperation is null ? 1 : CustomOperation.Count(x => x == '\n') + 2)" />
                 </MudItem>
+                break;
+                case GeneralSequences.Stop:
+                <MudItem xs="6">
+                    <MudTextField @bind-Value="CustomOperation" Label="Комментарий" T="string" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudSwitch T="bool" @bind-Value="@OptionalStop" Label="Опционально" Color="Color.Primary" />
+                </MudItem>
+                break;
             }
             break;
 
@@ -1098,6 +1110,7 @@
 
     private TurningGroovingSequences GroovingSequence { get; set; }
 
+    private bool OptionalStop { get; set; }
 
     private Tool Tool { get; set; }
     private string CustomOperation { get; set; } = string.Empty;
@@ -1423,20 +1436,35 @@
         {
             switch (Type)
             {
-                case SequenceType.General when GeneralSequence is GeneralSequences.Limiter:
-                    CurrentSequence = new LimiterSequence(Machine, Tool, CuttingExternalDiameter);
-                    return CurrentSequence.Operation;
-                case SequenceType.General when GeneralSequence is GeneralSequences.CustomOperation:
-                    switch (MachineType)
+                case SequenceType.General:
+                    switch (GeneralSequence)
                     {
-                        case MachineType.Turning:
-                            CurrentSequence = new TurningCustomSequence(Machine, Tool, CustomOperation);
+                        case GeneralSequences.Limiter:
+                            CurrentSequence = new LimiterSequence(Machine, Tool, CuttingExternalDiameter);
                             return CurrentSequence.Operation;
-                        case MachineType.Milling:
-                            CurrentSequence = new MillingCustomSequence(Machine, CoordinateSystem, Tool, CustomOperation, Coolant, ToolCallPolar, SafePlane);
+                        case GeneralSequences.CustomOperation:
+                            switch (MachineType)
+                            {
+                                case MachineType.Turning:
+                                    CurrentSequence = new TurningCustomSequence(Machine, Tool, CustomOperation);
+                                    return CurrentSequence.Operation;
+                                case MachineType.Milling:
+                                    CurrentSequence = new MillingCustomSequence(Machine, CoordinateSystem, Tool, CustomOperation, Coolant, ToolCallPolar, SafePlane);
+                                    return CurrentSequence.Operation;
+                            }
+                            break;
+                        case GeneralSequences.Stop:
+                            CurrentSequence = new StopSequence(OptionalStop, CustomOperation);
+                            return CurrentSequence.Operation;
+                        case GeneralSequences.TailStockOn:
+                            CurrentSequence = new TailstockOnSequence(Machine);
+                            return CurrentSequence.Operation;
+                        case GeneralSequences.TailStockOff:
+                            CurrentSequence = new TailstockOffSequence(Machine);
                             return CurrentSequence.Operation;
                     }
                     break;
+                    
                 case SequenceType.Facing when TurningSequence is TurningSequences.Facing:
                     if (SpeedRough <= 0 || FeedRough <= 0 || (FacingRoughStockAllow > 0 && SpeedFinish <= 0 || FeedFinish <= 0)) return string.Empty;
                     CurrentSequence = new FacingSequence(

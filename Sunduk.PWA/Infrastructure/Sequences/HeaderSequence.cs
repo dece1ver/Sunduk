@@ -1,4 +1,5 @@
 ﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Time;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,9 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public string Author { get; set; }
         public string DrawVersion { get; set; }
         public string ToolTable { get; set; }
-        public override string Operation => $"{Templates.Operation.Header(Machine, DetailNumber, DetailName, Author, DrawVersion)}{ToolTable}";
+        public TimeSpan FullTime { get; set; }
+        public override OperationTime MachineTime => new(0, 0);
+        public override string Operation => $"{Templates.Operation.Header(Machine, DetailNumber, DetailName, Author, DrawVersion, FullTime)}{ToolTable}";
         public override MachineType MachineType => MachineType.Any;
 
         public HeaderSequence(Machine machine, string number, string name, string author, string drawVersion, string toolTable)

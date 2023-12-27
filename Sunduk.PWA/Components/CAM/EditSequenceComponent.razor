@@ -41,6 +41,14 @@
                 <MudTextField @bind-Value="CustomOperation" Label="Произвольная обработка" T="string" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Lines="@(CustomOperation is null ? 1 : CustomOperation.Count(x => x == '\n') + 2)" />
             </MudItem>
             break;
+        case StopSequence stopSequence:
+            <MudItem xs="6">
+                <MudTextField @bind-Value="CustomOperation" Label="Комментарий" T="string" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+            </MudItem>
+            <MudItem xs="6">
+                <MudSwitch T="bool" @bind-Value="@Optional" Label="Опционально" Color="Color.Primary" />
+            </MudItem>
+        break;
         case LimiterSequence limiterSequence:
             <MudItem xs="12" md="6">
                 <MudSelect @bind-Value="Tool" Label="Инструмент" T="Tool" Variant="Variant.Filled" Margin="Margin.Dense">
@@ -586,6 +594,11 @@
     {
         switch (Sequence)
         {
+            case StopSequence stopSequence:
+                CustomOperation = stopSequence.Comment;
+                Optional = stopSequence.Optional;
+                break;
+
             // фрезерные
             case MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence:
                 Tool = millingHighSpeedDrillingSequence.Tool;
@@ -804,6 +817,8 @@
     [Parameter] public Sequence Sequence { get; set; }
     [Parameter] public CoordinateSystem CoordinateSystem { get; set; }
 
+    public bool Optional { get; set; }
+
     public Sequence CurrentSequence { get; set; }
     private string CurrentThreadTemplate { get; set; }
     private double ThreadNptPlane { get; set; }
@@ -819,7 +834,7 @@
 
     public Sequence RepeatableRoughFacingSequence { get; set; }
     bool _calcChamferDiameter = true;
-    
+
     private double ExternalDiameter { get; set; }
     private double InternalDiameter { get; set; }
 
@@ -916,6 +931,10 @@
         {
             switch (Sequence)
             {
+                case StopSequence stopSequence:
+                    CurrentSequence = new StopSequence(Optional, CustomOperation);
+                    return CurrentSequence.Operation;
+
                 // фрезерные
                 case MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence:
                     CurrentSequence = new MillingHighSpeedDrillingSequence(

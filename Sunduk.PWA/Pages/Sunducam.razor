@@ -268,7 +268,7 @@
     public List<Tool> Tools { get; set; } = new();
 
     #region Фрезерный инструмент
-    
+
     public List<MillingBoreTool> MillingBoreTools => Tools.OfType<MillingBoreTool>().ToList();
     public List<MillingChamferTool> MillingChamferTools => Tools.OfType<MillingChamferTool>().ToList();
     public List<MillingDrillingTool> MillingDrillingTools => Tools.OfType<MillingDrillingTool>().ToList();
@@ -491,7 +491,7 @@
         Tools.AddRange(await LocalStorage.GetItemAsync<List<TurningExternalBurnishingTool>>(nameof(TurningExternalBurnishingTools)) ?? new List<TurningExternalBurnishingTool>());
         Tools.AddRange(await LocalStorage.GetItemAsync<List<TurningInternalBurnishingTool>>(nameof(TurningInternalBurnishingTools)) ?? new List<TurningInternalBurnishingTool>());
 
-    // TurningDrilling
+        // TurningDrilling
         var turningDrillingTools = await LocalStorage.GetItemAsync<List<TurningDrillingTool>>(nameof(TurningDrillingTools)) ?? new List<TurningDrillingTool>();
         if (turningDrillingTools.Count == 0)
         {
@@ -586,7 +586,7 @@
             Machine.GS1500 => CoordinateSystem.G54,
             Machine.A110 => CoordinateSystem.G57,
             _ => throw new ArgumentOutOfRangeException(nameof(machine), machine, null)
-            };
+        };
         Machine = machine;
         _ = SaveMachine();
     }
@@ -677,6 +677,7 @@
                         newHeaderSequence.Author = NcAuthor;
                         newHeaderSequence.DrawVersion = NcDrawingVersion;
                         newHeaderSequence.ToolTable = Util.GetToolTable(Machine, Program);
+                        newHeaderSequence.FullTime = TimeSpan.FromSeconds(Program.FullOperationTime().FullTime);
                         Program[i] = newHeaderSequence;
                         break;
                     case SafetyStringSequence:
@@ -807,6 +808,11 @@
                 }
                 else if (Program.Count > Program.IndexOf(sequence) + 1 && Program.IndexOf(sequence) > 1)
                 {
+                    if (!sequence.Operation.Contains("\n"))
+                    {
+                        result.Add(sequence.Operation);
+                        break;
+                    }
                     string first = sequence.Operation.Split('\n', 2)[0], other = sequence.Operation.Split('\n', 2)[1];
                     var nextSequence = Program[i + 1];
                     switch (nextSequence)

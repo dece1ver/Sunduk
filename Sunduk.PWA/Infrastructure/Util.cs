@@ -10,6 +10,7 @@ using Sunduk.PWA.Infrastructure.Sequences.ContourElements;
 using Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base;
 using Sunduk.PWA.Infrastructure.Sequences.Milling;
 using Sunduk.PWA.Infrastructure.Sequences.Turning;
+using Sunduk.PWA.Infrastructure.Sequences.Turning.Base;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 using Sunduk.PWA.Infrastructure.Tools.Milling;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
@@ -281,10 +282,10 @@ namespace Sunduk.PWA.Infrastructure
                 },
                 GroovingInternalTool groovingInternalTool => option switch
                 {
-                    ToolDescriptionOption.General => $"T{groovingInternalTool.Position.ToolNumber()} ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{groovingInternalTool.Position.ToolNumber()} ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{groovingInternalTool.Position.ToolNumber()} G54 M58 ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{groovingInternalTool.Position.ToolNumber()} G55 M58 ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
+                    ToolDescriptionOption.General => $"T{groovingInternalTool.Position.ToolNumber()} ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK RAST" : "KAK OTR")})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{groovingInternalTool.Position.ToolNumber()} ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK RAST" : "KAK OTR")})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayLeft => $"T{groovingInternalTool.Position.ToolNumber()} G54 M58 ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK RAST" : "KAK OTR")})".Replace(',', '.'),
+                    ToolDescriptionOption.GoodwayRight => $"T{groovingInternalTool.Position.ToolNumber()} G55 M58 ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK RAST" : "KAK OTR")})".Replace(',', '.'),
                     ToolDescriptionOption.ToolTable => groovingInternalTool.Description().Split('(')[1].TrimEnd(')'),
                     _ => string.Empty,
                 },
@@ -309,7 +310,7 @@ namespace Sunduk.PWA.Infrastructure
                 ThreadingInternalTool threadingInternalTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{threadingInternalTool.Position.ToolNumber()} ({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{threadingInternalTool.Position.ToolNumber()}({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{threadingInternalTool.Position.ToolNumber()} ({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
                     ToolDescriptionOption.GoodwayLeft => $"T{threadingInternalTool.Position.ToolNumber()} G54 M58 ({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
                     ToolDescriptionOption.GoodwayRight => $"T{threadingInternalTool.Position.ToolNumber()} G55 M58 ({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
                     ToolDescriptionOption.ToolTable => threadingInternalTool.Description().Split('(')[1].TrimEnd(')'),
@@ -318,7 +319,7 @@ namespace Sunduk.PWA.Infrastructure
                 TurningExternalBurnishingTool turningExternalBurnishingTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{turningExternalBurnishingTool.Position.ToolNumber()} ({turningExternalBurnishingTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{turningExternalBurnishingTool.Position.ToolNumber()}({turningExternalBurnishingTool.Name})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{turningExternalBurnishingTool.Position.ToolNumber()} ({turningExternalBurnishingTool.Name})".Replace(',', '.'),
                     ToolDescriptionOption.GoodwayLeft => $"T{turningExternalBurnishingTool.Position.ToolNumber()} G54 M58 ({turningExternalBurnishingTool.Name})".Replace(',', '.'),
                     ToolDescriptionOption.GoodwayRight => $"T{turningExternalBurnishingTool.Position.ToolNumber()} G55 M58 ({turningExternalBurnishingTool.Name})".Replace(',', '.'),
                     ToolDescriptionOption.ToolTable => turningExternalBurnishingTool.Description().Split('(')[1].TrimEnd(')'),
@@ -327,7 +328,7 @@ namespace Sunduk.PWA.Infrastructure
                 TurningInternalBurnishingTool turningInternalBurnishingTool => option switch
                 {
                     ToolDescriptionOption.General => $"T{turningInternalBurnishingTool.Position.ToolNumber()} ({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{turningInternalBurnishingTool.Position.ToolNumber()}({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
+                    ToolDescriptionOption.L230 => $"T{turningInternalBurnishingTool.Position.ToolNumber()} ({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
                     ToolDescriptionOption.GoodwayLeft => $"T{turningInternalBurnishingTool.Position.ToolNumber()} G54 M58 ({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
                     ToolDescriptionOption.GoodwayRight => $"T{turningInternalBurnishingTool.Position.ToolNumber()} G55 M58 ({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
                     ToolDescriptionOption.ToolTable => turningInternalBurnishingTool.Description().Split('(')[1].TrimEnd(')'),
@@ -456,6 +457,12 @@ namespace Sunduk.PWA.Infrastructure
                         RoughFacingSequence roughFacingSequence => $"({roughFacingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
                         ThreadCuttingSequence threadCuttingSequence => $"({threadCuttingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
                         TurningCutOffSequence turningCutOffSequence => $"({turningCutOffSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        TurningExternalGroovingSequence turningGroovingSequence => $"({turningGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        TurningInternalGroovingSequence turningInternalGroovingSequence => $"({turningInternalGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        TurningExternalRoughGroovingSequence turningExternalRoughGroovingSequence => $"({turningExternalRoughGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        TurningInternalRoughGroovingSequence turningInternalRoughGroovingSequence => $"({turningInternalRoughGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        TurningFaceGroovingSequence turningFaceGroovingSequence => $"({turningFaceGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        TurningFaceRoughGroovingSequence turningFaceRoughGroovingSequence => $"({turningFaceRoughGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
                         TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence => $"({turningHighSpeedDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
                         TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence => $"({turningPeckDeepDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
                         TurningPeckDrillingSequence turningPeckDrillingSequence => $"({turningPeckDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
@@ -472,6 +479,12 @@ namespace Sunduk.PWA.Infrastructure
                         RoughFacingCycleSequence roughFacingCycleSequence => $"({roughFacingCycleSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
                         RoughFacingSequence roughFacingSequence => $"({roughFacingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
                         ThreadCuttingSequence threadCuttingSequence => $"({threadCuttingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        TurningExternalGroovingSequence turningGroovingSequence => $"({turningGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        TurningInternalGroovingSequence turningInternalGroovingSequence => $"({turningInternalGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        TurningExternalRoughGroovingSequence turningExternalRoughGroovingSequence => $"({turningExternalRoughGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        TurningInternalRoughGroovingSequence turningInternalRoughGroovingSequence => $"({turningInternalRoughGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        TurningFaceGroovingSequence turningFaceGroovingSequence => $"({turningFaceGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        TurningFaceRoughGroovingSequence turningFaceRoughGroovingSequence => $"({turningFaceRoughGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
                         TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence => $"({turningHighSpeedDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
                         TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence => $"({turningPeckDeepDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
                         TurningPeckDrillingSequence turningPeckDrillingSequence => $"({turningPeckDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",

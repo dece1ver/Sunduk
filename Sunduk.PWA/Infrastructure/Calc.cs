@@ -11,6 +11,7 @@ using Sunduk.PWA.Infrastructure.CAM;
 using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 using static MudBlazor.Defaults;
+using Sunduk.PWA.Infrastructure.Sequences;
 
 namespace Sunduk.PWA.Infrastructure
 {
@@ -593,8 +594,6 @@ namespace Sunduk.PWA.Infrastructure
         public static OperationTime OperationTime(this TailstockOffSequence _) => new(0, 15);
 
 
-
-
         /// <summary>
         /// Общее время обработки
         /// </summary>
@@ -604,6 +603,8 @@ namespace Sunduk.PWA.Infrastructure
             var cuttingTime = sequences.Sum(x => x.MachineTime.CuttingTime);
             var rapidTime = sequences.Sum(x => x.MachineTime.RapidTime);
             var sequencesWithRapidMovement = sequences.Count(x => x is 
+                not HeaderSequence and 
+                not SafetyStringSequence and 
                 not TailstockOnSequence and 
                 not TailstockOffSequence and 
                 not StopSequence);
