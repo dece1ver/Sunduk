@@ -8,7 +8,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class TurningInternalGroovingSequence : TurningGroovingSequence
     {
         public GroovingInternalTool Tool { get; set; }
-
+        public override OperationTime MachineTime => this.OperationTime();
         public override MachineType MachineType => MachineType.Turning;
         public override string Operation => Templates.GroovingOperation.GroovingSequence(
             Machine,
@@ -30,7 +30,6 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             FeedRough, 
             FeedFinish);
         public override string Name => $"Канавка внутренняя {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}";
-        public override OperationTime MachineTime => this.OperationTime();
 
         public TurningInternalGroovingSequence(
             Machine machine,

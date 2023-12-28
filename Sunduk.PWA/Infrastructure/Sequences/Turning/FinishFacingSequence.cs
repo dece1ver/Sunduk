@@ -1,5 +1,6 @@
 ﻿using Sunduk.PWA.Infrastructure.CAM;
 using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
@@ -18,6 +19,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double CornerBlunt { get; set; }
         public int SpeedFinish { get; set; }
         public double FeedFinish { get; set; }
+        public override OperationTime MachineTime => this.OperationTime();
         public override string Operation => Templates.FacingOperation.FinishFacing(
             Machine, 
             Material, 

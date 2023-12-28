@@ -22,6 +22,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double CornerBlunt { get; set; }
         public int SpeedRough { get; set; }
         public double FeedRough { get; set; }
+        public override OperationTime MachineTime => this.OperationTime();
         public override string Operation => Templates.FacingOperation.Facing(
             Machine, 
             Material, 
@@ -50,7 +51,6 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
                 return name;
                 } 
             }
-        public override OperationTime MachineTime => this.OperationTime();
 
         public RoughFacingSequence(
             Machine machine, 

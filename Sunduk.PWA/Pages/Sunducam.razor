@@ -811,7 +811,7 @@
                     if (!sequence.Operation.Contains("\n"))
                     {
                         result.Add(sequence.Operation);
-                        break;
+                        continue;
                     }
                     string first = sequence.Operation.Split('\n', 2)[0], other = sequence.Operation.Split('\n', 2)[1];
                     var nextSequence = Program[i + 1];
