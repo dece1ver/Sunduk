@@ -300,7 +300,116 @@ namespace Sunduk.PWA.Infrastructure
             return new OperationTime(cuttingTime, rapidTime);
         }
 
-        
+        /// <summary>
+        /// Время обработки при торцевании
+        /// </summary>
+        public static OperationTime OperationTime(this FacingSequence facingSequence)
+        {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+
+            var startX = facingSequence.ExternalDiameter;
+            var endX = facingSequence.InternalDiameter;
+            var startZ = facingSequence.RoughStockAllow;
+            var endZ = facingSequence.ProfStockAllow;
+            var speedRough = facingSequence.SpeedRough;
+            var speedFinish = facingSequence.SpeedFinish;
+            var feedRough = facingSequence.FeedRough;
+            var feedFinish = facingSequence.FeedFinish;
+            var fullLength = startZ - endZ;
+            var steps = (int)Math.Round(fullLength / facingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            var spinsRough = (speedRough * 1000) / (Math.PI * ((startX - endX) / 2));
+            var spinsFinish = (speedFinish * 1000) / (Math.PI * ((startX - endX) / 2));
+            if (spinsRough > 3000) spinsRough = 3000;
+            if (spinsFinish > 3000) spinsFinish = 3000;
+            cuttingTime += steps * CrossTurningTime(startX, endX, spinsRough, feedRough);
+            cuttingTime += CrossTurningTime(startX, endX, spinsFinish, feedFinish);
+            rapidTime += steps + 1 * CrossRapidTime(startX, endX);
+
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        /// <summary>
+        /// Время обработки при чистовом торцевании по циклу
+        /// </summary>
+        public static OperationTime OperationTime(this FinishFacingCycleSequence finishFacingCycleSequence)
+        {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+
+            double startX;
+            double endX;
+
+            var roughSeq = finishFacingCycleSequence.RoughSequence;
+            switch (roughSeq)
+            {
+                case RoughFacingSequence roughFacingSequence:
+                    startX = roughFacingSequence.ExternalDiameter;
+                    endX = roughFacingSequence.InternalDiameter;
+                    break;
+                case RoughFacingCycleSequence roughFacingCycleSequence:
+                    startX = roughFacingCycleSequence.ExternalDiameter;
+                    endX = roughFacingCycleSequence.InternalDiameter;
+                    break;
+                case FacingSequence facingSequence:
+                    startX = facingSequence.ExternalDiameter;
+                    endX = facingSequence.InternalDiameter;
+                    break;
+                default: return new OperationTime(0, 0);
+            }
+            var feedFinish = finishFacingCycleSequence.FeedFinish;
+            var speedFinish = finishFacingCycleSequence.SpeedFinish;
+            var spinsFinish = (speedFinish * 1000) / (Math.PI * ((startX - endX) / 2));
+            cuttingTime += CrossTurningTime(startX, endX, spinsFinish, feedFinish);
+            rapidTime += CrossRapidTime(startX, endX);
+
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        /// <summary>
+        /// Время обработки при чистовом торцевании
+        /// </summary>
+        public static OperationTime OperationTime(this FinishFacingSequence finishFacingSequence)
+        {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+
+            var startX = finishFacingSequence.ExternalDiameter;
+            var endX = finishFacingSequence.InternalDiameter;
+
+            var feedFinish = finishFacingSequence.FeedFinish;
+            var speedFinish = finishFacingSequence.SpeedFinish;
+            var spinsFinish = (speedFinish * 1000) / (Math.PI * ((startX - endX) / 2));
+            cuttingTime += CrossTurningTime(startX, endX, spinsFinish, feedFinish);
+            rapidTime += CrossRapidTime(startX, endX);
+
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        /// <summary>
+        /// Время обработки при черновом торцевании по циклу
+        /// </summary>
+        public static OperationTime OperationTime(this RoughFacingCycleSequence roughFacingCycleSequence)
+        {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            
+            var startX = roughFacingCycleSequence.ExternalDiameter;
+            var endX = roughFacingCycleSequence.InternalDiameter;
+            var startZ = roughFacingCycleSequence.RoughStockAllow;
+            var endZ = roughFacingCycleSequence.ProfStockAllow;
+            var speedRough = roughFacingCycleSequence.SpeedRough;
+            var feedRough = roughFacingCycleSequence.FeedRough;
+            var fullLength = startZ - endZ;
+            var steps = (int)Math.Round(fullLength / roughFacingCycleSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            var spins = (speedRough * 1000) / (Math.PI * ((startX - endX) / 2));
+            if (spins > 3000) spins = 3000;
+            cuttingTime += steps * CrossTurningTime(startX, endX, spins, feedRough);
+
+            rapidTime += steps * CrossRapidTime(startX, endX);
+
+            return new OperationTime(cuttingTime, rapidTime);
+        }
 
         /// <summary>
         /// Время обработки при черновом торцевании
@@ -309,7 +418,7 @@ namespace Sunduk.PWA.Infrastructure
         {
             double cuttingTime = 0;
             double rapidTime = 5;
-            
+
             var startX = roughFacingSequence.ExternalDiameter;
             var endX = roughFacingSequence.InternalDiameter;
             var startZ = roughFacingSequence.RoughStockAllow;
@@ -415,7 +524,7 @@ namespace Sunduk.PWA.Infrastructure
         /// Время обработки наружной канавки
         /// </summary>
         public static OperationTime OperationTime(this TurningExternalGroovingSequence turningExternalGroovingSequence)
-            {
+        {
             double cuttingTime = 0;
             double rapidTime = 5;
             var startX = turningExternalGroovingSequence.ExternalDiameter;
@@ -424,7 +533,7 @@ namespace Sunduk.PWA.Infrastructure
             var stepsX = (int)Math.Round(fullLengthX / turningExternalGroovingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
             var width = turningExternalGroovingSequence.Width;
             if (width < turningExternalGroovingSequence.Tool.Width) width = turningExternalGroovingSequence.Tool.Width;
-            var stepsZ = (int)Math.Round(width / (turningExternalGroovingSequence.Tool.Width * 2 ), MidpointRounding.ToPositiveInfinity);
+            var stepsZ = (int)Math.Round(width / (turningExternalGroovingSequence.Tool.Width * 2), MidpointRounding.ToPositiveInfinity);
             var roughSpeed = turningExternalGroovingSequence.SpeedRough;
             var roughFeed = turningExternalGroovingSequence.FeedRough;
             var finishSpeed = turningExternalGroovingSequence.SpeedFinish;
@@ -437,6 +546,33 @@ namespace Sunduk.PWA.Infrastructure
             cuttingTime += 2 * (fullLengthX + Operation.Escaping()).AxialTurningTime(finishSpins, finishFeed);
 
             rapidTime += stepsZ * (stepsX * AxialRapidTime(turningExternalGroovingSequence.StepOver + Operation.Escaping()));
+            rapidTime += 3 * AxialRapidTime(fullLengthX + Operation.Escaping());
+            rapidTime += AxialRapidTime(fullLengthX); // ???
+
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        /// <summary>
+        /// Время обработки наружной черновой канавки
+        /// </summary>
+        public static OperationTime OperationTime(this TurningExternalRoughGroovingSequence turningExternalRoughGroovingSequence)
+            {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            var startX = turningExternalRoughGroovingSequence.ExternalDiameter;
+            var endX = turningExternalRoughGroovingSequence.InternalDiameter;
+            var fullLengthX = (startX - endX) / 2;
+            var stepsX = (int)Math.Round(fullLengthX / turningExternalRoughGroovingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            var width = turningExternalRoughGroovingSequence.Width;
+            if (width < turningExternalRoughGroovingSequence.Tool.Width) width = turningExternalRoughGroovingSequence.Tool.Width;
+            var stepsZ = (int)Math.Round(width / (turningExternalRoughGroovingSequence.Tool.Width * 2 ), MidpointRounding.ToPositiveInfinity);
+            var roughSpeed = turningExternalRoughGroovingSequence.SpeedRough;
+            var roughFeed = turningExternalRoughGroovingSequence.FeedRough;
+            var roughSpins = (roughSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
+            if (roughSpins > 3000) roughSpins = 3000;
+            cuttingTime += stepsZ * (stepsX * (turningExternalRoughGroovingSequence.StepOver + Operation.Escaping()).AxialTurningTime(roughSpins, roughFeed));
+
+            rapidTime += stepsZ * (stepsX * AxialRapidTime(turningExternalRoughGroovingSequence.StepOver + Operation.Escaping()));
             rapidTime += 3 * AxialRapidTime(fullLengthX + Operation.Escaping());
             rapidTime += AxialRapidTime(fullLengthX); // ???
 
@@ -477,6 +613,37 @@ namespace Sunduk.PWA.Infrastructure
         }
 
         /// <summary>
+        /// Время обработки внутренней канавки
+        /// </summary>
+        public static OperationTime OperationTime(this TurningInternalRoughGroovingSequence turningInternalRoughGroovingSequence)
+        {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            var startX = turningInternalRoughGroovingSequence.ExternalDiameter;
+            var endX = turningInternalRoughGroovingSequence.InternalDiameter;
+            var fullLengthX = (startX - endX) / 2;
+            var stepsX = (int)Math.Round(fullLengthX / turningInternalRoughGroovingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            var width = turningInternalRoughGroovingSequence.Width;
+            if (width < turningInternalRoughGroovingSequence.Tool.Width) width = turningInternalRoughGroovingSequence.Tool.Width;
+            var stepsZ = (int)Math.Round(width / turningInternalRoughGroovingSequence.Tool.Width, MidpointRounding.ToPositiveInfinity);
+            var roughSpeed = turningInternalRoughGroovingSequence.SpeedRough;
+            var roughFeed = turningInternalRoughGroovingSequence.FeedRough;
+
+            var roughSpins = (roughSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
+
+            if (roughSpins > 3000) roughSpins = 3000;
+
+            cuttingTime += stepsZ * (stepsX * (turningInternalRoughGroovingSequence.StepOver + Operation.Escaping()).AxialTurningTime(roughSpins, roughFeed));
+
+            rapidTime += stepsZ * (stepsX * AxialRapidTime(turningInternalRoughGroovingSequence.StepOver + Operation.Escaping()));
+            rapidTime += 3 * AxialRapidTime(fullLengthX + Operation.Escaping());
+            rapidTime += 2 * AxialRapidTime(Math.Abs(turningInternalRoughGroovingSequence.CuttingPoint) + Operation.Escaping());
+            rapidTime += AxialRapidTime(fullLengthX); // ???
+
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        /// <summary>
         /// Время обработки торцевой канавки
         /// </summary>
         public static OperationTime OperationTime(this TurningFaceGroovingSequence turningFaceGroovingSequence)
@@ -502,6 +669,34 @@ namespace Sunduk.PWA.Infrastructure
             cuttingTime += 2 * (length + Operation.Escaping()).AxialTurningTime(finishSpins, finishFeed);
 
             rapidTime += stepsX * (stepsZ * AxialRapidTime(turningFaceGroovingSequence.StepOver + Operation.Escaping()));
+            rapidTime += 3 * AxialRapidTime(length + Operation.Escaping());
+            rapidTime += AxialRapidTime(length); // ???
+
+            return new OperationTime(cuttingTime, rapidTime);
+        }
+
+        /// <summary>
+        /// Время обработки торцевой черновой канавки
+        /// </summary>
+        public static OperationTime OperationTime(this TurningFaceRoughGroovingSequence turningFaceRoughGroovingSequence)
+        {
+            double cuttingTime = 0;
+            double rapidTime = 5;
+            var startX = turningFaceRoughGroovingSequence.ExternalDiameter;
+            var endX = turningFaceRoughGroovingSequence.InternalDiameter;
+            var width = (turningFaceRoughGroovingSequence.ExternalDiameter - turningFaceRoughGroovingSequence.InternalDiameter) / 2;
+            var length = Math.Abs(turningFaceRoughGroovingSequence.CuttingPoint) + Math.Abs(turningFaceRoughGroovingSequence.Width); // надо переделать, вместо ширины сделать конечный Z или что-то такое
+            var stepsZ = (int)Math.Round(length / turningFaceRoughGroovingSequence.StepOver, MidpointRounding.ToPositiveInfinity);
+            if (width < turningFaceRoughGroovingSequence.Tool.Width) width = turningFaceRoughGroovingSequence.Tool.Width;
+            var stepsX = (int)Math.Round(width * 2 / turningFaceRoughGroovingSequence.Tool.Width, MidpointRounding.ToPositiveInfinity);
+            var roughSpeed = turningFaceRoughGroovingSequence.SpeedRough;
+            var roughFeed = turningFaceRoughGroovingSequence.FeedRough;
+
+            var roughSpins = (roughSpeed * 1000) / (Math.PI * ((startX + endX) / 2));
+            if (roughSpins > 3000) roughSpins = 3000;
+            cuttingTime += stepsX * (stepsZ * (turningFaceRoughGroovingSequence.StepOver + Operation.Escaping()).AxialTurningTime(roughSpins, roughFeed));
+
+            rapidTime += stepsX * (stepsZ * AxialRapidTime(turningFaceRoughGroovingSequence.StepOver + Operation.Escaping()));
             rapidTime += 3 * AxialRapidTime(length + Operation.Escaping());
             rapidTime += AxialRapidTime(length); // ???
 
@@ -550,9 +745,9 @@ namespace Sunduk.PWA.Infrastructure
         /// <summary>
         /// Время обработки при резьбофрезеровании
         /// </summary>
-        public static OperationTime OperationTime(this ThreadMillingSequence tappingSequence)
+        public static OperationTime OperationTime(this ThreadMillingSequence threadMillingSequence)
         {
-            throw new NotImplementedException();
+            return new OperationTime(0,0);
         }
 
         /// <summary>
@@ -573,6 +768,7 @@ namespace Sunduk.PWA.Infrastructure
             return new OperationTime(cuttingTime, rapidTime);
         }
 
+
         /// <summary>
         /// Время работы упора
         /// </summary>
@@ -592,6 +788,11 @@ namespace Sunduk.PWA.Infrastructure
         /// Время отвода задней бабки
         /// </summary>
         public static OperationTime OperationTime(this TailstockOffSequence _) => new(0, 15);
+
+        /// <summary>
+        /// Время кастомного перехода
+        /// </summary>
+        public static OperationTime OperationTime(this CustomSequence _) => new(0, 0);
 
 
         /// <summary>

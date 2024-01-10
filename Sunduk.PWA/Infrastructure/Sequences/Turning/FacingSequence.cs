@@ -1,5 +1,6 @@
 ﻿using Sunduk.PWA.Infrastructure.CAM;
 using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
@@ -8,6 +9,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     {
         public Machine Machine { get; set; }
         public Material Material { get; set; }
+        public override OperationTime MachineTime => this.OperationTime();
         public TurningExternalTool Tool { get; set; }
         public double ExternalDiameter { get; set; }
         public double InternalDiameter { get; set; }
@@ -52,6 +54,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
                 return name;
             } 
         }
+
+
 
         public FacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter,
             double internalDiameter,
