@@ -74,7 +74,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 {
                     Machine.A110 =>
                     $"G80\n" +
-                    $"{CoolantOff(machine)}\n" +
+                    $"G94 {CoolantOff(machine)}\n" +
                     $"{(polar ? "G15\n" : string.Empty)}" +
                     SpindleStop + "\n" +
                     MillingReferentPoint,
