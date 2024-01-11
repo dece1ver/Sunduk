@@ -1,5 +1,6 @@
 ﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Sequences.Turning.Base;
+using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
@@ -7,7 +8,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class TurningInternalRoughGroovingSequence : TurningGroovingSequence
     {
         public GroovingInternalTool Tool { get; set; }
-
+        public override OperationTime MachineTime => this.OperationTime();
         public override MachineType MachineType => MachineType.Turning;
         public override string Operation => Templates.GroovingOperation.GroovingSequence(
             Machine,

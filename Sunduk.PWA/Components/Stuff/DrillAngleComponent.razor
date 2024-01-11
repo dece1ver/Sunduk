@@ -10,6 +10,21 @@
                           @onfocus="() => CurrentImage = Images.DrillAngle"
                           @onfocusout="() => CurrentImage = Images.Drill"/>
         </MudItem>
+        <MudItem xs="12">
+            <MudField Label="Углы" Variant="Variant.Filled">
+                <MudGrid>
+                    <MudItem xs="4">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@(() => _DrillAngle = "118")">118°</MudButton>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@(() => _DrillAngle = "140")">140°</MudButton>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@(() => _DrillAngle = "152")">152°</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+        </MudItem>
         @if (DrillDiameter > 0 && DrillAngle > 0 && DrillAngle < 180)
         {
             <MudItem xs="12">

@@ -9,7 +9,7 @@
 
                 @foreach (var tool in Tools.Where(x => x.MachineType is MachineType.Milling))
                 {
-                    <MudText>@tool.Description()</MudText>
+                    <MudText Style="font-family: 'Roboto Mono', monospace">@tool.Description()</MudText>
                 }
             </MudTabPanel>
 

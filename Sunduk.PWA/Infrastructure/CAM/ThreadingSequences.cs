@@ -2,6 +2,6 @@
 {
     public enum ThreadingSequences
     {
-        ThreadCutting, Tapping
+        ThreadCutting, Tapping, ThreadMilling, CustomThreadMilling
     }
 }

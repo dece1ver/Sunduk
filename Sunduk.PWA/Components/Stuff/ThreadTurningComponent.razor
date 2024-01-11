@@ -69,6 +69,37 @@
         @*<MudDivider Class="my-4"/>*@
         @if (Thread.Valid(ThreadDiameter, ThreadPitch))
         {
+            @if (ThreadStandard == ThreadStandard.NPT)
+            {
+                <MudItem Class="mt-4 xs=12">
+                    <MudPaper Outlined="true" Class="mt-1">
+
+                    <div style="display: flex; justify-content: center; align-items: center; height: 200px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="600" height="300" viewBox="@($"0 0 600 300")">
+                            <g transform="scale(2) translate(200,100)">
+
+                                @if (ThreadType == CuttingType.External)
+                                {
+                                    <path d="M 0,-34.43 L -6.4,-41.63 L -72,-43.68011244269665 L -120,-43.68011244269665 L -120,-0 L 0,-0 L 0,-34.43" stroke="#FF5722" stroke-width="2" fill="none" />
+                                }
+                                @if (ThreadType == CuttingType.Internal)
+                                {
+                                    <path d="M 0,-43.64 L -6.4,-36.44 L -72,-34.389887557303354 L -120,-34.389887557303354 L -120,-60 L 0,-60 L 0,-43.64 " stroke="#FF5722" stroke-width="2" fill="none" />
+                                }
+                                
+                                <path stroke="white" stroke-dasharray="10 5" stroke-width="1" fill="none" d="M -180,0 L 60,0" />
+                                <path stroke="white" stroke-width="1" fill="none" d="M 52,3 L 60,0 L 52,-3" />
+                                <text x="3" y="@(ThreadType == CuttingType.External ? -30 : -45)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="8">@($"X{Contour[0].X?.NC()} Z{Contour[0].Z?.NC()}")</text>
+                                <text x="@(ThreadType == CuttingType.External ? -5 : -3)" y="@(ThreadType == CuttingType.External ? -45 : -30)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="8">@($"X{Contour[1].X?.NC()} Z{Contour[1].Z?.NC()}")</text>
+                                <text x="-80" y="@(ThreadType == CuttingType.External ? -50 : -25)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="8">@($"X{Contour[2].X?.NC()} Z{Contour[2].Z?.NC()}")</text>
+                                <text x="35" y="12" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="10">Z+</text>
+                            </g>
+                        </svg>
+                    </div>
+                       
+                    </MudPaper>
+                </MudItem>
+            }
             <MudItem Class="mt-4" xs="12">
                 <MudField Label="Информация" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n1">
                     <table>
@@ -227,7 +258,7 @@
                     CuttingType.External => $" R-{Thread.IntNptThreadShift(EndPointZ, StartPointZ).NC(2)}",
                     CuttingType.Internal => $" R{Thread.IntNptThreadShift(EndPointZ, StartPointZ).NC(2)}",
                     _ => string.Empty
-                    };
+                };
             }
             return string.Empty;
         }
@@ -430,45 +461,170 @@
         switch (ThreadStandard)
         {
             case ThreadStandard.Metric:
-            {
-                Thread.GetMetricValues(CurrentThreadTemplate, out string diameter, out string pitch);
-                ThreadDiameterString = diameter;
-                ThreadPitchString = pitch;
-                PlaneLength = 0;
-                EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
-                ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
-                break;
-            }
+                {
+                    Thread.GetMetricValues(CurrentThreadTemplate, out string diameter, out string pitch);
+                    ThreadDiameterString = diameter;
+                    ThreadPitchString = pitch;
+                    PlaneLength = 0;
+                    EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
+                    ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
+                    break;
+                }
             case ThreadStandard.BSPP:
-            {
-                Thread.GetBsppValues(CurrentThreadTemplate, out string diameter, out string pitch);
-                ThreadDiameterString = diameter;
-                ThreadPitchString = pitch;
-                PlaneLength = 0;
-                EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
-                ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
-                break;
-            }
+                {
+                    Thread.GetBsppValues(CurrentThreadTemplate, out string diameter, out string pitch);
+                    ThreadDiameterString = diameter;
+                    ThreadPitchString = pitch;
+                    PlaneLength = 0;
+                    EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
+                    ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
+                    break;
+                }
             case ThreadStandard.Trapezoidal:
-            {
-                Thread.GetTrapezoidalValues(CurrentThreadTemplate, out string diameter, out string pitch);
-                ThreadDiameterString = diameter;
-                ThreadPitchString = pitch;
-                PlaneLength = 0;
-                EndPointZ = -30;
-                ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
-                break;
-            }
+                {
+                    Thread.GetTrapezoidalValues(CurrentThreadTemplate, out string diameter, out string pitch);
+                    ThreadDiameterString = diameter;
+                    ThreadPitchString = pitch;
+                    PlaneLength = 0;
+                    EndPointZ = -30;
+                    ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
+                    break;
+                }
             case ThreadStandard.NPT:
-            {
-                Thread.GetNptValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
-                ThreadDiameterString = externalDiameter;
-                ThreadPitchString = pitch;
-                PlaneLength = planeLength;
-                EndPointZ = -threadLength - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
-                ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
-                break;
-            }
+                {
+                    Thread.GetNptValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
+                    ThreadDiameterString = externalDiameter;
+                    ThreadPitchString = pitch;
+                    PlaneLength = planeLength;
+                    EndPointZ = -threadLength - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
+                    ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
+                    break;
+                }
         }
     }
+
+
+    public double? MediumX
+    {
+        get
+        {
+            double? minX = Contour.Select(x => x.X).Min();
+            if (minX > 0) minX = 0;
+            double? maxX = Contour.Select(x => x.X).Max();
+            return (maxX + minX) / 2;
+        }
+    }
+
+    public double? MaxLength
+    {
+        get
+        {
+            double? minZ = Contour.Select(x => x.Z).Min();
+            double? maxZ = Contour.Select(x => x.Z).Max();
+            return maxZ - minZ;
+        }
+    }
+
+    public double? MediumZ
+    {
+        get
+        {
+            double? minZ = Contour.Select(x => x.Z).Min();
+            double? maxZ = Contour.Select(x => x.Z).Max();
+            return (maxZ + minZ) / 2;
+        }
+    }
+
+    public double ContourHeight
+    {
+        get
+        {
+            double maxHeight = 200;
+            double tempCalc = 21.84 * 2 + 20;
+            if (tempCalc > maxHeight) maxHeight = tempCalc;
+            return Math.Abs(maxHeight);
+        }
+    }
+
+    public double ContourWidth
+    {
+        get
+        {
+            double maxWidth = 400;
+            double tempCalc = (MaxLength ?? 0) * 6;
+            if (tempCalc > maxWidth) maxWidth = tempCalc;
+            return Math.Abs(maxWidth);
+        }
+    }
+
+    public string Path
+    {
+        get
+        {
+            if (Contour[0].X is null && Contour[0].Z is null) return string.Empty;
+            string path = string.Empty;
+            foreach (var element in Contour)
+            {
+                switch (element)
+                {
+                    case Point point:
+                        path += $"M {(point.Z * 4).ToString().Replace(",", ".")},{(-point.X / 2 * 4).ToString().Replace(",", ".")} ";
+                        if (point.Blunt > 0 && Contour.Count > Contour.IndexOf(point) + 1)
+                        {
+                            path += $"A{(point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},0,0{(point.Z > (Contour[Contour.IndexOf(point) + 1].Z) ? 0 : 1)},{(point.Z > (Contour[Contour.IndexOf(point) + 1].Z) ? -point.Blunt * 4 : point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(-Contour[Contour.IndexOf(point) + 1].X / 2 * 4).ToString().Replace(",", ".")} ";
+                        }
+                        break;
+                    case Line line:
+                        double? tempLineX = line.X ?? Contour[Contour.IndexOf(line) - 1].X;
+                        double? tempLineZ = line.Z ?? Contour[Contour.IndexOf(line) - 1].Z;
+                        path += $"L {(tempLineZ * 4).ToString().Replace(",", ".")},{(-tempLineX / 2 * 4).ToString().Replace(",", ".")} ";
+                        break;
+                    case Arc arc:
+                        double? tempArcX = arc.X ?? Contour[Contour.IndexOf(arc) - 1].X;
+                        double? tempArcZ = arc.Z ?? Contour[Contour.IndexOf(arc) - 1].Z;
+                        if (ValidArc(Contour.IndexOf(arc)))
+                        {
+                            path += $"A{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},0,0{(arc.Direction is Infrastructure.Direction.CCW ? 0 : 1)},{(tempArcZ * 4).ToString().Replace(",", ".")},{(-tempArcX / 2 * 4).ToString().Replace(",", ".")} ";
+                        }
+                        else
+                        {
+                            path += $"L {(tempArcZ * 4).ToString().Replace(",", ".")},{(-tempArcX / 2 * 4).ToString().Replace(",", ".")} ";
+                        }
+                        break;
+                }
+            }
+            return path;
+        }
+        set { }
+    }
+
+    bool ValidArc(int index)
+    {
+        if (index >= Contour.Count || index <= 0) return false;
+        double radius = ((Contour[index] as Arc)!).Radius;
+        if (radius <= 0) return false;
+        double? xDifference = (Contour[index].X - Contour[index - 1].X) / 2;
+        double? zDifference = Contour[index].Z - Contour[index - 1].Z;
+        double length = Math.Sqrt(Math.Pow(xDifference ?? 0, 2) + Math.Pow(zDifference ?? 0, 2));
+        return !(radius * 2 < length);
+    }
+
+    public List<Element> Contour =>
+
+    new ()
+    {
+        new Point(ThreadType == CuttingType.External ? CalculatedNptChamferStartX + InsertRadius : CalculatedNptChamferStartX - InsertRadius, 0),
+        new Line(CalculatedNptChamferEndX, ThreadChamfer),
+        new Line(ThreadType == CuttingType.External ? CalculatedNptStart + 2 * Math.Tan(1.79.Radians()) * Math.Abs(EndPointZ) : CalculatedNptStart - 2 * Math.Tan(1.79.Radians()) * Math.Abs(EndPointZ), EndPointZ),
+        // контур для построения рисунка
+        //new Point(ThreadType == CuttingType.External ? 17.215 : 21.82, 0),
+        //new Line(ThreadType == CuttingType.External ? 20.815 : 18.22, -1.6),
+        //new Line(ThreadType == CuttingType.External ? 20.715 + 2 * Math.Tan(1.79.Radians()) * Math.Abs(-18) : 18.32 - 2 * Math.Tan(1.79.Radians()) * Math.Abs(-18), -18),
+        //new Line(ThreadType == CuttingType.External ? 20.715 + 2 * Math.Tan(1.79.Radians()) * Math.Abs(-18) : 18.32 - 2 * Math.Tan(1.79.Radians()) * Math.Abs(-18), -30),
+        //new Line(ThreadType == CuttingType.External ? 0 : 30, -30),
+        //new Line(ThreadType == CuttingType.External ? 0 : 30, 0),
+        //new Line(ThreadType == CuttingType.External ? 17.215 : 21.82, 0),
+
+    };
+
 }

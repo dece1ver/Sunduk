@@ -205,7 +205,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public const string Bspp1N3d8 = "G1⅜";
         public const string Bspp1N1d2 = "G1½";
         public const string Bspp1N3d4 = "G1¾";
-        public const string Bspp2 = "G1¾";
+        public const string Bspp2 = "G2";
         public const string Bspp2N1d4 = "G2¼";
         public const string Bspp2N1d2 = "G2½";
         public const string Bspp2N3d4 = "G2¾";
