@@ -5,6 +5,10 @@
         Metric,
         BSPP,
         Trapezoidal,
-        NPT
+        NPT, 
+        BSPT, 
+        UNC, 
+        UNF, 
+        UNEF
     }
 }

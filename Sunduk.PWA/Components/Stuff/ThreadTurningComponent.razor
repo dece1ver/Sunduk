@@ -15,6 +15,10 @@
                 <MudSelectItem Value="@(ThreadStandard.BSPP)">@(ThreadStandard.BSPP.Description())</MudSelectItem>
                 <MudSelectItem Value="@(ThreadStandard.Trapezoidal)">@(ThreadStandard.Trapezoidal.Description())</MudSelectItem>
                 <MudSelectItem Value="@(ThreadStandard.NPT)">@(ThreadStandard.NPT.Description())</MudSelectItem>
+                <MudSelectItem Value="@(ThreadStandard.BSPT)">@(ThreadStandard.BSPT.Description())</MudSelectItem>
+                <MudSelectItem Value="@(ThreadStandard.UNC)">@(ThreadStandard.UNC.Description())</MudSelectItem>
+                <MudSelectItem Value="@(ThreadStandard.UNF)">@(ThreadStandard.UNF.Description())</MudSelectItem>
+                <MudSelectItem Value="@(ThreadStandard.UNEF)">@(ThreadStandard.UNEF.Description())</MudSelectItem>
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="6">
@@ -69,7 +73,7 @@
         @*<MudDivider Class="my-4"/>*@
         @if (Thread.Valid(ThreadDiameter, ThreadPitch))
         {
-            @if (ThreadStandard == ThreadStandard.NPT)
+            @if (ThreadStandard is ThreadStandard.NPT or ThreadStandard.BSPT)
             {
                 <MudItem Class="mt-4 xs=12">
                     <MudPaper Outlined="true" Class="mt-1">
@@ -226,6 +230,10 @@
                 ThreadStandard.BSPP => Thread.BsppTemplates,
                 ThreadStandard.Trapezoidal => Thread.TrapezoidalTemplates,
                 ThreadStandard.NPT => Thread.NptTemplates,
+                ThreadStandard.BSPT => ThreadType is CuttingType.External ? Thread.BsptTemplatesEx : Thread.BsptTemplatesIn,
+                ThreadStandard.UNC => Thread.UncTemplates,
+                ThreadStandard.UNF => Thread.UnfTemplates,
+                ThreadStandard.UNEF => Thread.UnefTemplates,
                 _ => new HashSet<string> { }
             };
         }
@@ -251,7 +259,7 @@
     {
         get
         {
-            if (ThreadStandard == ThreadStandard.NPT)
+            if (ThreadStandard is ThreadStandard.NPT or ThreadStandard.BSPT)
             {
                 return ThreadType switch
                 {
@@ -342,7 +350,7 @@
                         default:
                             return string.Empty;
                     }
-                case ThreadStandard.NPT:
+                case ThreadStandard.NPT or ThreadStandard.BSPT:
                     switch (ThreadType)
                     {
                         case CuttingType.External:
@@ -497,6 +505,46 @@
                     ThreadPitchString = pitch;
                     PlaneLength = planeLength;
                     EndPointZ = -threadLength - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
+                    ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
+                    break;
+                }
+            case ThreadStandard.BSPT:
+                {
+                    Thread.GetBsptValues(CurrentThreadTemplate, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength);
+                    ThreadDiameterString = externalDiameter;
+                    ThreadPitchString = pitch;
+                    PlaneLength = planeLength;
+                    EndPointZ = -threadLength - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
+                    ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
+                    break;
+                }
+            case ThreadStandard.UNC:
+                {
+                    Thread.GetUncValues(CurrentThreadTemplate, out string diameter, out string pitch);
+                    ThreadDiameterString = diameter;
+                    ThreadPitchString = pitch;
+                    PlaneLength = 0;
+                    EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
+                    ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
+                    break;
+                }
+            case ThreadStandard.UNF:
+                {
+                    Thread.GetUnfValues(CurrentThreadTemplate, out string diameter, out string pitch);
+                    ThreadDiameterString = diameter;
+                    ThreadPitchString = pitch;
+                    PlaneLength = 0;
+                    EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
+                    ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
+                    break;
+                }
+            case ThreadStandard.UNEF:
+                {
+                    Thread.GetUnefValues(CurrentThreadTemplate, out string diameter, out string pitch);
+                    ThreadDiameterString = diameter;
+                    ThreadPitchString = pitch;
+                    PlaneLength = 0;
+                    EndPointZ = -20 - Math.Round(Thread.ThreadRunout(ThreadStandard, ThreadPitch, ThreadType), 1);
                     ThreadChamfer = Thread.ThreadChamfer(ThreadStandard, ThreadPitch, ThreadType);
                     break;
                 }

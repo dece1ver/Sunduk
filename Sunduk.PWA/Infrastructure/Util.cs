@@ -414,7 +414,11 @@ namespace Sunduk.PWA.Infrastructure
                 ThreadStandard.Metric => "Метрическая 60° (М)",
                 ThreadStandard.BSPP => "Трубная цилиндрическая 55° (G)",
                 ThreadStandard.Trapezoidal => "Трапециедальная 30° (Tr)",
-                ThreadStandard.NPT => "Коническая 60° (K)",
+                ThreadStandard.NPT => "Коническая 60° (К)",
+                ThreadStandard.BSPT => "Коническая 55° (R/Rc)",
+                ThreadStandard.UNC => "UNC 60°",
+                ThreadStandard.UNF => "UNF 60°",
+                ThreadStandard.UNEF => "UNEF 60°",
                 _ => string.Empty,
             };
         }
