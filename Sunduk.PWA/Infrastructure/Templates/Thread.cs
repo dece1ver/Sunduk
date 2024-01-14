@@ -11,7 +11,6 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public enum PassesOption { FullPasses, Infeed }
 
 
-
         #region Шаблоны
         public static readonly HashSet<string> MetricTemplates = new()
         {
@@ -209,7 +208,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public const string Bspp2N1d4 = "G2¼";
         public const string Bspp2N1d2 = "G2½";
         public const string Bspp2N3d4 = "G2¾";
-        public const string Bspp3N = "G3";
+        public const string Bspp3 = "G3";
         public const string Bspp3N1d4 = "G3¼";
         public const string Bspp3N1d2 = "G3½";
         public const string Bspp3N3d4 = "G3¾";
@@ -239,7 +238,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             Bspp2N1d4,
             Bspp2N1d2,
             Bspp2N3d4,
-            Bspp3N,
+            Bspp3,
             Bspp3N1d4,
             Bspp3N1d2,
             Bspp3N3d4,
@@ -248,6 +247,232 @@ namespace Sunduk.PWA.Infrastructure.Templates
             Bspp5,
             Bspp5N1d2,
             Bspp6
+        };
+
+        public const string Bspt1d16Ex = "R1/16";
+        public const string Bspt1d8Ex = "R1/8";
+        public const string Bspt1d4Ex = "R1/4";
+        public const string Bspt3d8Ex = "R3/8";
+        public const string Bspt1d2Ex = "R1/2";
+        public const string Bspt3d4Ex = "R3/4";
+        public const string Bspt1Ex = "R1";
+        public const string Bspt1N1d4Ex = "R1¼";
+        public const string Bspt1N1d2Ex = "R1½";
+        public const string Bspt2Ex = "R2";
+        public const string Bspt2N1d2Ex = "R2½";
+        public const string Bspt3Ex = "R3";
+        public const string Bspt3N1d2Ex = "R3½";
+        public const string Bspt4Ex = "R4";
+        public const string Bspt5Ex = "R5";
+        public const string Bspt6Ex = "R6";
+
+        public static readonly HashSet<string> BsptTemplatesEx = new()
+        {
+            Bspt1d16Ex,
+            Bspt1d8Ex,
+            Bspt1d4Ex,
+            Bspt3d8Ex,
+            Bspt1d2Ex,
+            Bspt3d4Ex,
+            Bspt1Ex,
+            Bspt1N1d4Ex,
+            Bspt1N1d2Ex,
+            Bspt2Ex,
+            Bspt2N1d2Ex,
+            Bspt3Ex,
+            Bspt3N1d2Ex,
+            Bspt4Ex,
+            Bspt5Ex,
+            Bspt6Ex
+        };
+
+        public const string Bspt1d16In = "Rc1/16";
+        public const string Bspt1d8In = "Rc1/8";
+        public const string Bspt1d4In = "Rc1/4";
+        public const string Bspt3d8In = "Rc3/8";
+        public const string Bspt1d2In = "Rc1/2";
+        public const string Bspt3d4In = "Rc3/4";
+        public const string Bspt1In = "Rc1";
+        public const string Bspt1N1d4In = "Rc1¼";
+        public const string Bspt1N1d2In = "Rc1½";
+        public const string Bspt2In = "Rc2";
+        public const string Bspt2N1d2In = "Rc2½";
+        public const string Bspt3In = "Rc3";
+        public const string Bspt3N1d2In = "Rc3½";
+        public const string Bspt4In = "Rc4";
+        public const string Bspt5In = "Rc5";
+        public const string Bspt6In = "Rc6";
+
+        public static readonly HashSet<string> BsptTemplatesIn = new()
+        {
+            Bspt1d16In,
+            Bspt1d8In,
+            Bspt1d4In,
+            Bspt3d8In,
+            Bspt1d2In,
+            Bspt3d4In,
+            Bspt1In,
+            Bspt1N1d4In,
+            Bspt1N1d2In,
+            Bspt2In,
+            Bspt2N1d2In,
+            Bspt3In,
+            Bspt3N1d2In,
+            Bspt4In,
+            Bspt5In,
+            Bspt6In
+        };
+
+        public const string Unc1 = "UNC #1";
+        public const string Unc2 = "UNC #2";
+        public const string Unc3 = "UNC #3";
+        public const string Unc4 = "UNC #4";
+        public const string Unc5 = "UNC #5";
+        public const string Unc6 = "UNC #6";
+        public const string Unc8 = "UNC #8";
+        public const string Unc10 = "UNC #10";
+        public const string Unc12 = "UNC #12";
+        public const string Unc1d4 = "UNC 1/4";
+        public const string Unc5d16 = "UNC 5/16";
+        public const string Unc3d8 = "UNC 3/8";
+        public const string Unc7d16 = "UNC 7/16";
+        public const string Unc1d2 = "UNC 1/2";
+        public const string Unc9d16 = "UNC 9/16";
+        public const string Unc5d8 = "UNC 5/8";
+        public const string Unc3d4 = "UNC 3/4";
+        public const string Unc7d8 = "UNC 7/8";
+        public const string Unc1N = "UNC 1";
+        public const string Unc1N1d8 = "UNC 1⅛";
+        public const string Unc1N1d4 = "UNC 1¼";
+        public const string Unc1N3d8 = "UNC 1⅜";
+        public const string Unc1N1d2 = "UNC 1½";
+        public const string Unc1N3d4 = "UNC 1¾";
+        public const string Unc2N = "UNC 2";
+        public const string Unc2N1d4 = "UNC 2¼";
+        public const string Unc2N1d2 = "UNC 2½";
+        public const string Unc2N3d4 = "UNC 2¾";
+        public const string Unc3N = "UNC 3";
+        public const string Unc3N1d4 = "UNC 3¼";
+        public const string Unc3N1d2 = "UNC 3½";
+        public const string Unc3N3d4 = "UNC 3¾";
+        public const string Unc4N = "UNC 4";
+
+        public static readonly HashSet<string> UncTemplates = new()
+        {
+            Unc1,
+            Unc2,
+            Unc3,
+            Unc4,
+            Unc5,
+            Unc6,
+            Unc8,
+            Unc10,
+            Unc12,
+            Unc1d4,
+            Unc5d16,
+            Unc3d8,
+            Unc7d16,
+            Unc1d2,
+            Unc9d16,
+            Unc5d8,
+            Unc3d4,
+            Unc7d8,
+            Unc1N,
+            Unc1N1d8,
+            Unc1N1d4,
+            Unc1N3d8,
+            Unc1N1d2,
+            Unc1N3d4,
+            Unc2N,
+            Unc2N1d4,
+            Unc2N1d2,
+            Unc2N3d4,
+            Unc3N,
+            Unc3N1d4,
+            Unc3N1d2,
+            Unc3N3d4,
+            Unc4N
+        };
+
+
+        public const string Unf0 = "UNF #0";
+        public const string Unf1 = "UNF #1";
+        public const string Unf2 = "UNF #2";
+        public const string Unf3 = "UNF #3";
+        public const string Unf4 = "UNF #4";
+        public const string Unf5 = "UNF #5";
+        public const string Unf6 = "UNF #6";
+        public const string Unf8 = "UNF #8";
+        public const string Unf10 = "UNF #10";
+        public const string Unf12 = "UNF #12";
+        public const string Unf1d4 = "UNF 1/4";
+        public const string Unf5d16 = "UNF 5/16";
+        public const string Unf3d8 = "UNF 3/8";
+        public const string Unf7d16 = "UNF 7/16";
+        public const string Unf1d2 = "UNF 1/2";
+        public const string Unf9d16 = "UNF 9/16";
+        public const string Unf5d8 = "UNF 5/8";
+        public const string Unf3d4 = "UNF 3/4";
+        public const string Unf7d8 = "UNF 7/8";
+        public const string Unf1N = "UNF 1";
+        public const string Unf1N1d8 = "UNF 1⅛";
+        public const string Unf1N1d4 = "UNF 1¼";
+        public const string Unf1N3d8 = "UNF 1⅜";
+        public const string Unf1N1d2 = "UNF 1½";
+
+        public static readonly HashSet<string> UnfTemplates = new()
+        {
+            Unf0,
+            Unf1,
+            Unf2,
+            Unf3,
+            Unf4,
+            Unf5,
+            Unf6,
+            Unf8,
+            Unf10,
+            Unf12,
+            Unf1d4,
+            Unf5d16,
+            Unf3d8,
+            Unf7d16,
+            Unf1d2,
+            Unf9d16,
+            Unf5d8,
+            Unf3d4,
+            Unf7d8,
+            Unf1N,
+            Unf1N1d8,
+            Unf1N1d4,
+            Unf1N3d8,
+            Unf1N1d2
+        };
+
+        public const string Unef12 = "UNEF #12";
+        public const string Unef1d4 = "UNEF 1/4";
+        public const string Unef5d16 = "UNEF 5/16";
+        public const string Unef3d8 = "UNEF 3/8";
+        public const string Unef7d16 = "UNEF 7/16";
+        public const string Unef1d2 = "UNEF 1/2";
+        public const string Unef9d16 = "UNEF 9/16";
+        public const string Unef5d8 = "UNEF 5/8";
+        public const string Unef3d4 = "UNEF 3/4";
+        public const string Unef7d8 = "UNEF 7/8";
+        public const string Unef1N = "UNEF 1";
+
+        public static readonly HashSet<string> UnefTemplates = new()
+        {
+            Unef12,
+            Unef1d4,
+            Unef5d16,
+            Unef3d8,
+            Unef7d16,
+            Unef1d2,
+            Unef9d16,
+            Unef5d8,
+            Unef3d4,
+            Unef7d8,
+            Unef1N,
         };
 
         public static readonly HashSet<string> TrapezoidalTemplates = new()
@@ -327,7 +552,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public const string Npt1 = "K1";
         public const string Npt1N1d4 = "K1¼";
         public const string Npt1N1d2 = "K1½";
-        public const string Npt2 = "K1½";
+        public const string Npt2 = "K2";
 
         public static readonly HashSet<string> NptTemplates = new()
         {
@@ -342,291 +567,6 @@ namespace Sunduk.PWA.Infrastructure.Templates
             Npt1N1d2,
             Npt2
         };
-
-        public static string SimpleThreadTemplate(string template)
-        {
-            return template
-                .Replace("½", " 1/2")
-                .Replace("¼", " 1/4")
-                .Replace("¾", " 3/4")
-                .Replace("⅜", " 3/8")
-                .Replace("⅛", " 1/8");
-        }
-        #endregion
-
-        #region Чтение шаблонов
-        public static void GetMetricValues(string template, out string diameter, out string pitch)
-        {
-            diameter = template.Split("M")[1].Split('x')[0];
-            pitch = template.Split("M")[1].Split('x')[1].Split()[0];
-        }
-
-        public static void GetBsppValues(string template, out string diameter, out string pitch)
-        {
-            switch (template)
-            {
-                case "G1/16":
-                    diameter = "7.723";
-                    pitch = "0.907";
-                    break;
-                case "G1/8":
-                    diameter = "9.728";
-                    pitch = "0.907";
-                    break;
-                case "G1/4":
-                    diameter = "13.157";
-                    pitch = "1.337";
-                    break;
-                case "G3/8":
-                    diameter = "16.662";
-                    pitch = "1.337";
-                    break;
-                case "G1/2":
-                    diameter = "20.995";
-                    pitch = "1.814";
-                    break;
-                case "G5/8":
-                    diameter = "22.911";
-                    pitch = "1.814";
-                    break;
-                case "G3/4":
-                    diameter = "26.441";
-                    pitch = "1.814";
-                    break;
-                case "G7/8":
-                    diameter = "30.201";
-                    pitch = "1.814";
-                    break;
-                case "G1":
-                    diameter = "33.249";
-                    pitch = "2.309";
-                    break;
-                case "G1⅛":
-                    diameter = "37.897";
-                    pitch = "2.309";
-                    break;
-                case "G1¼":
-                    diameter = "41.91";
-                    pitch = "2.309";
-                    break;
-                case "G1⅜":
-                    diameter = "44.323";
-                    pitch = "2.309";
-                    break;
-                case "G1½":
-                    diameter = "47.803";
-                    pitch = "2.309";
-                    break;
-                case "G1¾":
-                    diameter = "53.746";
-                    pitch = "2.309";
-                    break;
-                case "G2":
-                    diameter = "59.614";
-                    pitch = "2.309";
-                    break;
-                case "G2¼":
-                    diameter = "65.71";
-                    pitch = "2.309";
-                    break;
-                case "G2½":
-                    diameter = "75.184";
-                    pitch = "2.309";
-                    break;
-                case "G2¾":
-                    diameter = "81.534";
-                    pitch = "2.309";
-                    break;
-                case "G3":
-                    diameter = "87.884";
-                    pitch = "2.309";
-                    break;
-                case "G3¼":
-                    diameter = "93.98";
-                    pitch = "2.309";
-                    break;
-                case "G3½":
-                    diameter = "100.33";
-                    pitch = "2.309";
-                    break;
-                case "G3¾":
-                    diameter = "106.68";
-                    pitch = "2.309";
-                    break;
-                case "G4":
-                    diameter = "113.03";
-                    pitch = "2.309";
-                    break;
-                case "G4½":
-                    diameter = "125.73";
-                    pitch = "2.309";
-                    break;
-                case "G5":
-                    diameter = "138.43";
-                    pitch = "2.309";
-                    break;
-                case "G5½":
-                    diameter = "151.13";
-                    pitch = "2.309";
-                    break;
-                case "G6":
-                    diameter = "163.83";
-                    pitch = "2.309";
-                    break;
-                default:
-                    diameter = string.Empty;
-                    pitch = string.Empty;
-                    break;
-            }
-        }
-
-        public static void GetTrapezoidalValues(string template, out string diameter, out string pitch)
-        {
-            var result = template.Split("Tr")[1].Split('x');
-            diameter = result[0];
-            pitch = result[1].Split()[0];
-        }
-
-        public static void GetNptValues(string template, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength)
-        {
-            switch (template)
-            {
-                case "K1/16":
-                    externalDiameter = "7.895";
-                    internalDiameter = "6.389";
-                    pitch = "0.941";
-                    planeLength = 4.064;
-                    threadLength = 6.5;
-                    break;
-                case "K1/8":
-                    externalDiameter = "10.272";
-                    internalDiameter = "8.766";
-                    pitch = "0.941";
-                    planeLength = 4.572;
-                    threadLength = 7;
-                    break;
-                case "K1/4":
-                    externalDiameter = "13.572";
-                    internalDiameter = "11.314";
-                    pitch = "1.411";
-                    planeLength = 5.08;
-                    threadLength = 9.5;
-                    break;
-                case "K3/8":
-                    externalDiameter = "17.055";
-                    internalDiameter = "14.797";
-                    pitch = "1.411";
-                    planeLength = 6.096;
-                    threadLength = 10.5;
-                    break;
-                case "K1/2":
-                    externalDiameter = "21.223";
-                    internalDiameter = "18.321";
-                    pitch = "1.814";
-                    planeLength = 8.128;
-                    threadLength = 13.5;
-                    break;
-                case "K3/4":
-                    externalDiameter = "26.568";
-                    internalDiameter = "23.666";
-                    pitch = "1.814";
-                    planeLength = 8.611;
-                    threadLength = 14;
-                    break;
-                case "K1":
-                    externalDiameter = "33.228";
-                    internalDiameter = "29.694";
-                    pitch = "2.209";
-                    planeLength = 10.16;
-                    threadLength = 17.5;
-                    break;
-                case "K1¼":
-                    externalDiameter = "41.985";
-                    internalDiameter = "38.451";
-                    pitch = "2.209";
-                    planeLength = 10.668;
-                    threadLength = 18;
-                    break;
-                case "K1½":
-                    externalDiameter = "48.054";
-                    internalDiameter = "44.52";
-                    pitch = "2.209";
-                    planeLength = 10.668;
-                    threadLength = 18.5;
-                    break;
-                case "K2":
-                    externalDiameter = "60.092";
-                    internalDiameter = "56.558";
-                    pitch = "2.209";
-                    planeLength = 11.074;
-                    threadLength = 19;
-                    break;
-                default:
-                    externalDiameter = string.Empty;
-                    internalDiameter = string.Empty;
-                    pitch = string.Empty;
-                    planeLength = 0;
-                    threadLength = 0;
-                    break;
-            }
-        }
-        #endregion
-
-        #region Расчеты параметров резьб
-        /// <summary>
-        /// Зазор на трапецеидальной резьбе в зависимости от шага
-        /// </summary>
-        /// <param name="threadPitch">Шаг</param>
-        public static double TrapezoidalClearance(double threadPitch)
-        {
-            return threadPitch switch
-            {
-                <= 1.5 => 0.15,
-                <= 5 => 0.25,
-                <= 12 => 0.5,
-                <= 40 => 1,
-                _ => 0,
-            };
-        }
-
-        /// <summary>
-        /// Номинальная высота профиля
-        /// </summary>
-        /// <param name="threadStandard">Стандарт резьбы</param>
-        /// <param name="threadPitch">Шаг резьбы</param>
-        /// <returns></returns>
-        public static double NominalHeight(ThreadStandard threadStandard, double threadPitch)
-        {
-            return threadStandard switch
-            {
-                ThreadStandard.Metric => Math.Sqrt(3) / 2 * threadPitch,
-                ThreadStandard.BSPP => 0.960491 * threadPitch,
-                ThreadStandard.Trapezoidal => 1.866 * threadPitch,
-                ThreadStandard.NPT => 0.866 * threadPitch,
-                _ => 0,
-            };
-        }
-
-        /// <summary>
-        /// Рабочая высота профиля
-        /// </summary>
-        /// <param name="threadStandard">Стандарт резьбы</param>
-        /// <param name="type">Тип резьбы</param>
-        /// <param name="threadPitch">Шаг резьбы</param>
-        /// <returns></returns>
-        public static double ProfileHeight(ThreadStandard threadStandard, CuttingType type, double threadPitch)
-        {
-            return threadStandard switch
-            {
-                ThreadStandard.Metric => type == CuttingType.External
-                ? (17.0 / 24.0 * NominalHeight(threadStandard, threadPitch))
-                : (5.0 / 8.0 * NominalHeight(threadStandard, threadPitch)),
-                ThreadStandard.BSPP => 0.640327 * threadPitch,
-                ThreadStandard.Trapezoidal => 0.5 * threadPitch + TrapezoidalClearance(threadPitch),
-                ThreadStandard.NPT => 0.8 * threadPitch,
-                _ => 0,
-            };
-        }
 
         public static double BsppHoleDiameter(string template)
         {
@@ -699,6 +639,730 @@ namespace Sunduk.PWA.Infrastructure.Templates
             };
         }
 
+        public static string SimpleThreadTemplate(string template)
+        {
+            return template
+                .Replace("½", " 1/2")
+                .Replace("¼", " 1/4")
+                .Replace("¾", " 3/4")
+                .Replace("⅜", " 3/8")
+                .Replace("⅛", " 1/8");
+        }
+        #endregion
+
+        #region Чтение шаблонов
+        public static void GetMetricValues(string template, out string diameter, out string pitch)
+        {
+            diameter = template.Split("M")[1].Split('x')[0];
+            pitch = template.Split("M")[1].Split('x')[1].Split()[0];
+        }
+
+        public static void GetBsppValues(string template, out string diameter, out string pitch)
+        {
+            switch (template)
+            {
+                case Bspp1d16:
+                    diameter = "7.723";
+                    pitch = "0.907";
+                    break;
+                case Bspp1d8:
+                    diameter = "9.728";
+                    pitch = "0.907";
+                    break;
+                case Bspp1d4:
+                    diameter = "13.157";
+                    pitch = "1.337";
+                    break;
+                case Bspp3d8:
+                    diameter = "16.662";
+                    pitch = "1.337";
+                    break;
+                case Bspp1d2:
+                    diameter = "20.995";
+                    pitch = "1.814";
+                    break;
+                case Bspp5d8:
+                    diameter = "22.911";
+                    pitch = "1.814";
+                    break;
+                case Bspp3d4:
+                    diameter = "26.441";
+                    pitch = "1.814";
+                    break;
+                case Bspp7d8:
+                    diameter = "30.201";
+                    pitch = "1.814";
+                    break;
+                case Bspp1:
+                    diameter = "33.249";
+                    pitch = "2.309";
+                    break;
+                case Bspp1N1d8:
+                    diameter = "37.897";
+                    pitch = "2.309";
+                    break;
+                case Bspp1N1d4:
+                    diameter = "41.91";
+                    pitch = "2.309";
+                    break;
+                case Bspp1N3d8:
+                    diameter = "44.323";
+                    pitch = "2.309";
+                    break;
+                case Bspp1N1d2:
+                    diameter = "47.803";
+                    pitch = "2.309";
+                    break;
+                case Bspp1N3d4:
+                    diameter = "53.746";
+                    pitch = "2.309";
+                    break;
+                case Bspp2:
+                    diameter = "59.614";
+                    pitch = "2.309";
+                    break;
+                case Bspp2N1d4:
+                    diameter = "65.71";
+                    pitch = "2.309";
+                    break;
+                case Bspp2N1d2:
+                    diameter = "75.184";
+                    pitch = "2.309";
+                    break;
+                case Bspp2N3d4:
+                    diameter = "81.534";
+                    pitch = "2.309";
+                    break;
+                case Bspp3:
+                    diameter = "87.884";
+                    pitch = "2.309";
+                    break;
+                case Bspp3N1d4:
+                    diameter = "93.98";
+                    pitch = "2.309";
+                    break;
+                case Bspp3N1d2:
+                    diameter = "100.33";
+                    pitch = "2.309";
+                    break;
+                case Bspp3N3d4:
+                    diameter = "106.68";
+                    pitch = "2.309";
+                    break;
+                case Bspp4:
+                    diameter = "113.03";
+                    pitch = "2.309";
+                    break;
+                case Bspp4N1d2:
+                    diameter = "125.73";
+                    pitch = "2.309";
+                    break;
+                case Bspp5:
+                    diameter = "138.43";
+                    pitch = "2.309";
+                    break;
+                case Bspp5N1d2:
+                    diameter = "151.13";
+                    pitch = "2.309";
+                    break;
+                case Bspp6:
+                    diameter = "163.83";
+                    pitch = "2.309";
+                    break;
+                default:
+                    diameter = string.Empty;
+                    pitch = string.Empty;
+                    break;
+            }
+        }
+
+        public static void GetTrapezoidalValues(string template, out string diameter, out string pitch)
+        {
+            var result = template.Split("Tr")[1].Split('x');
+            diameter = result[0];
+            pitch = result[1].Split()[0];
+        }
+
+        public static void GetNptValues(string template, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength)
+        {
+            switch (template)
+            {
+                case Npt1d16:
+                    externalDiameter = "7.895";
+                    internalDiameter = "6.389";
+                    pitch = "0.941";
+                    planeLength = 4.064;
+                    threadLength = 6.5;
+                    break;
+                case Npt1d8:
+                    externalDiameter = "10.272";
+                    internalDiameter = "8.766";
+                    pitch = "0.941";
+                    planeLength = 4.572;
+                    threadLength = 7;
+                    break;
+                case Npt1d4:
+                    externalDiameter = "13.572";
+                    internalDiameter = "11.314";
+                    pitch = "1.411";
+                    planeLength = 5.08;
+                    threadLength = 9.5;
+                    break;
+                case Npt3d8:
+                    externalDiameter = "17.055";
+                    internalDiameter = "14.797";
+                    pitch = "1.411";
+                    planeLength = 6.096;
+                    threadLength = 10.5;
+                    break;
+                case Npt1d2:
+                    externalDiameter = "21.223";
+                    internalDiameter = "18.321";
+                    pitch = "1.814";
+                    planeLength = 8.128;
+                    threadLength = 13.5;
+                    break;
+                case Npt3d4:
+                    externalDiameter = "26.568";
+                    internalDiameter = "23.666";
+                    pitch = "1.814";
+                    planeLength = 8.611;
+                    threadLength = 14;
+                    break;
+                case Npt1:
+                    externalDiameter = "33.228";
+                    internalDiameter = "29.694";
+                    pitch = "2.209";
+                    planeLength = 10.16;
+                    threadLength = 17.5;
+                    break;
+                case Npt1N1d4:
+                    externalDiameter = "41.985";
+                    internalDiameter = "38.451";
+                    pitch = "2.209";
+                    planeLength = 10.668;
+                    threadLength = 18;
+                    break;
+                case Npt1N1d2:
+                    externalDiameter = "48.054";
+                    internalDiameter = "44.52";
+                    pitch = "2.209";
+                    planeLength = 10.668;
+                    threadLength = 18.5;
+                    break;
+                case Npt2:
+                    externalDiameter = "60.092";
+                    internalDiameter = "56.558";
+                    pitch = "2.209";
+                    planeLength = 11.074;
+                    threadLength = 19;
+                    break;
+                default:
+                    externalDiameter = string.Empty;
+                    internalDiameter = string.Empty;
+                    pitch = string.Empty;
+                    planeLength = 0;
+                    threadLength = 0;
+                    break;
+            }
+        }
+
+        public static void GetBsptValues(string template, out string externalDiameter, out string internalDiameter, out string pitch, out double planeLength, out double threadLength)
+        {
+            switch (template)
+            {
+                case Bspt1d16Ex or Bspt1d16In:
+                    externalDiameter = "7.723";
+                    internalDiameter = "6.561";
+                    pitch = "0.907";
+                    planeLength = 4;
+                    threadLength = 6.5;
+                    break;
+                case Bspt1d8Ex or Bspt1d8In:
+                    externalDiameter = "9.147";
+                    internalDiameter = "8.566";
+                    pitch = "0.907";
+                    planeLength = 4;
+                    threadLength = 6.5;
+                    break;
+                case Bspt1d4Ex or Bspt1d4In:
+                    externalDiameter = "13.157";
+                    internalDiameter = "11.445";
+                    pitch = "1.337";
+                    planeLength = 6;
+                    threadLength = 9.7;
+                    break;
+                case Bspt3d8Ex or Bspt3d8In:
+                    externalDiameter = "16.662";
+                    internalDiameter = "14.95";
+                    pitch = "1.337";
+                    planeLength = 6.4;
+                    threadLength = 10.1;
+                    break;
+                case Bspt1d2Ex or Bspt1d2In:
+                    externalDiameter = "20.955";
+                    internalDiameter = "18.631";
+                    pitch = "1.814";
+                    planeLength = 8.2;
+                    threadLength = 13.2;
+                    break;
+                case Bspt3d4Ex or Bspt3d4In:
+                    externalDiameter = "26.441";
+                    internalDiameter = "24.117";
+                    pitch = "1.814";
+                    planeLength = 9.5;
+                    threadLength = 14.5;
+                    break;
+                case Bspt1Ex or Bspt1In:
+                    externalDiameter = "33.249";
+                    internalDiameter = "30.291";
+                    pitch = "2.309";
+                    planeLength = 10.4;
+                    threadLength = 16.8;
+                    break;
+                case Bspt1N1d4Ex or Bspt1N1d4In:
+                    externalDiameter = "41.91";
+                    internalDiameter = "38.952";
+                    pitch = "2.309";
+                    planeLength = 12.7;
+                    threadLength = 19.1;
+                    break;
+                case Bspt1N1d2Ex or Bspt1N1d2In:
+                    externalDiameter = "47.803";
+                    internalDiameter = "44.845";
+                    pitch = "2.309";
+                    planeLength = 12.7;
+                    threadLength = 19.1;
+                    break;
+                case Bspt2Ex or Bspt2In:
+                    externalDiameter = "59.614";
+                    internalDiameter = "56.565";
+                    pitch = "2.309";
+                    planeLength = 15.9;
+                    threadLength = 23.4;
+                    break;
+                case Bspt2N1d2Ex or Bspt2N1d2In:
+                    externalDiameter = "75.184";
+                    internalDiameter = "72.226";
+                    pitch = "2.309";
+                    planeLength = 17.5;
+                    threadLength = 26.7;
+                    break;
+                case Bspt3Ex or Bspt3In:
+                    externalDiameter = "87.884";
+                    internalDiameter = "84.926";
+                    pitch = "2.309";
+                    planeLength = 20.6;
+                    threadLength = 29.8;
+                    break;
+                case Bspt3N1d2Ex or Bspt3N1d2In:
+                    externalDiameter = "100.33";
+                    internalDiameter = "97.372";
+                    pitch = "2.309";
+                    planeLength = 22.2;
+                    threadLength = 31.4;
+                    break;
+                case Bspt4Ex or Bspt4In:
+                    externalDiameter = "113.03";
+                    internalDiameter = "110.072";
+                    pitch = "2.309";
+                    planeLength = 25.4;
+                    threadLength = 35.8;
+                    break;
+                case Bspt5Ex or Bspt5In:
+                    externalDiameter = "138.43";
+                    internalDiameter = "135.472";
+                    pitch = "2.309";
+                    planeLength = 28.6;
+                    threadLength = 40.1;
+                    break;
+                case Bspt6Ex or Bspt6In:
+                    externalDiameter = "163.83";
+                    internalDiameter = "160.872";
+                    pitch = "2.309";
+                    planeLength = 28.6;
+                    threadLength = 40.1;
+                    break;
+
+                default:
+                    externalDiameter = string.Empty;
+                    internalDiameter = string.Empty;
+                    pitch = string.Empty;
+                    planeLength = 0;
+                    threadLength = 0;
+                    break;
+            }
+        }
+
+        public static void GetUncValues(string template, out string diameter, out string pitch)
+        {
+            switch (template)
+            {
+                case Unc1:
+                    diameter = "1.8542";
+                    pitch = "0.3969";
+                    break;
+                case Unc2:
+                    diameter = "2.1844";
+                    pitch = "0.4536";
+                    break;
+                case Unc3:
+                    diameter = "2.5146";
+                    pitch = "0.5292";
+                    break;
+                case Unc4:
+                    diameter = "2.8448";
+                    pitch = "0.635";
+                    break;
+                case Unc5:
+                    diameter = "3.175";
+                    pitch = "0.635";
+                    break;
+                case Unc6:
+                    diameter = "3.5052";
+                    pitch = "0.7938";
+                    break;
+                case Unc8:
+                    diameter = "4.1656";
+                    pitch = "0.7938";
+                    break;
+                case Unc10:
+                    diameter = "4.826";
+                    pitch = "1.0583";
+                    break;
+                case Unc12:
+                    diameter = "5.4864";
+                    pitch = "1.0583";
+                    break;
+                case Unc1d4:
+                    diameter = "6.35";
+                    pitch = "1.27";
+                    break;
+                case Unc5d16:
+                    diameter = "7.9375";
+                    pitch = "1.4111";
+                    break;
+                case Unc3d8:
+                    diameter = "9.525";
+                    pitch = "1.5875";
+                    break;
+                case Unc7d16:
+                    diameter = "11.1125";
+                    pitch = "1.8143";
+                    break;
+                case Unc1d2:
+                    diameter = "12.7";
+                    pitch = "1.9538";
+                    break;
+                case Unc9d16:
+                    diameter = "14.2875";
+                    pitch = "2.1167";
+                    break;
+                case Unc5d8:
+                    diameter = "15.875";
+                    pitch = "2.3091";
+                    break;
+                case Unc3d4:
+                    diameter = "19.05";
+                    pitch = "2.54";
+                    break;
+                case Unc7d8:
+                    diameter = "22.225";
+                    pitch = "2.8222";
+                    break;
+                case Unc1N:
+                    diameter = "25.4";
+                    pitch = "3.175";
+                    break;
+                case Unc1N1d8:
+                    diameter = "28.575";
+                    pitch = "3.6286";
+                    break;
+                case Unc1N1d4:
+                    diameter = "31.75";
+                    pitch = "3.6286";
+                    break;
+                case Unc1N3d8:
+                    diameter = "34.925";
+                    pitch = "4.2333";
+                    break;
+                case Unc1N1d2:
+                    diameter = "38.1";
+                    pitch = "4.2333";
+                    break;
+                case Unc1N3d4:
+                    diameter = "44.45";
+                    pitch = "5.08";
+                    break;
+                case Unc2N:
+                    diameter = "50.8";
+                    pitch = "5.6444";
+                    break;
+                case Unc2N1d4:
+                    diameter = "57.15";
+                    pitch = "5.6444";
+                    break;
+                case Unc2N1d2:
+                    diameter = "63.5";
+                    pitch = "6.35";
+                    break;
+                case Unc2N3d4:
+                    diameter = "69.85";
+                    pitch = "6.35";
+                    break;
+                case Unc3N:
+                    diameter = "76.2";
+                    pitch = "6.35";
+                    break;
+                case Unc3N1d4:
+                    diameter = "82.55";
+                    pitch = "6.35";
+                    break;
+                case Unc3N1d2:
+                    diameter = "88.9";
+                    pitch = "6.35";
+                    break;
+                case Unc3N3d4:
+                    diameter = "95.25";
+                    pitch = "6.35";
+                    break;
+                case Unc4N:
+                    diameter = "101.6";
+                    pitch = "6.35";
+                    break;
+
+                default:
+                    diameter = string.Empty;
+                    pitch = string.Empty;
+                    break;
+            }
+        }
+
+        public static void GetUnfValues(string template, out string diameter, out string pitch)
+        {
+            switch (template)
+            {
+                case Unf0:
+                    diameter = "1.524";
+                    pitch = "0.3175";
+                    break;
+                case Unf1:
+                    diameter = "1.8542";
+                    pitch = "0.3528";
+                    break;
+                case Unf2:
+                    diameter = "2.1844";
+                    pitch = "0.3969";
+                    break;
+                case Unf3:
+                    diameter = "2.5146";
+                    pitch = "0.4536";
+                    break;
+                case Unf4:
+                    diameter = "2.8448";
+                    pitch = "0.5292";
+                    break;
+                case Unf5:
+                    diameter = "3.175";
+                    pitch = "0.5773";
+                    break;
+                case Unf6:
+                    diameter = "3.5052";
+                    pitch = "0.635";
+                    break;
+                case Unf8:
+                    diameter = "4.1656";
+                    pitch = "0.7056";
+                    break;
+                case Unf10:
+                    diameter = "4.826";
+                    pitch = "0.7938";
+                    break;
+                case Unf12:
+                    diameter = "5.4864";
+                    pitch = "0.9071";
+                    break;
+                case Unf1d4:
+                    diameter = "6.35";
+                    pitch = "0.9071";
+                    break;
+                case Unf5d16:
+                    diameter = "7.9375";
+                    pitch = "1.0583";
+                    break;
+                case Unf3d8:
+                    diameter = "9.525";
+                    pitch = "1.0583";
+                    break;
+                case Unf7d16:
+                    diameter = "11.1125";
+                    pitch = "1.27";
+                    break;
+                case Unf1d2:
+                    diameter = "12.7";
+                    pitch = "1.27";
+                    break;
+                case Unf9d16:
+                    diameter = "14.2875";
+                    pitch = "1.4111";
+                    break;
+                case Unf5d8:
+                    diameter = "15.875";
+                    pitch = "1.4111";
+                    break;
+                case Unf3d4:
+                    diameter = "19.05";
+                    pitch = "1.5875";
+                    break;
+                case Unf7d8:
+                    diameter = "22.225";
+                    pitch = "1.8143";
+                    break;
+                case Unf1N:
+                    diameter = "25.4";
+                    pitch = "2.1167";
+                    break;
+                case Unf1N1d8:
+                    diameter = "28.575";
+                    pitch = "2.1167";
+                    break;
+                case Unf1N1d4:
+                    diameter = "31.75";
+                    pitch = "2.1167";
+                    break;
+                case Unf1N3d8:
+                    diameter = "34.925";
+                    pitch = "2.1167";
+                    break;
+                case Unf1N1d2:
+                    diameter = "38.1";
+                    pitch = "2.1167";
+                    break;
+
+                default:
+                    diameter = string.Empty;
+                    pitch = string.Empty;
+                    break;
+            }
+        }
+
+        public static void GetUnefValues(string template, out string diameter, out string pitch)
+        {
+            switch (template)
+            {
+                case Unef12:
+                    diameter = "5.4864";
+                    pitch = "0.7938";
+                    break;
+                case Unef1d4:
+                    diameter = "6.35";
+                    pitch = "0.7938";
+                    break;
+                case Unef5d16:
+                    diameter = "7.9375";
+                    pitch = "0.7938";
+                    break;
+                case Unef3d8:
+                    diameter = "9.525";
+                    pitch = "0.7938";
+                    break;
+                case Unef7d16:
+                    diameter = "11.1125";
+                    pitch = "0.9071";
+                    break;
+                case Unef1d2:
+                    diameter = "12.7";
+                    pitch = "0.9071";
+                    break;
+                case Unef9d16:
+                    diameter = "14.2875";
+                    pitch = "1.0583";
+                    break;
+                case Unef5d8:
+                    diameter = "15.875";
+                    pitch = "1.0583";
+                    break;
+                case Unef3d4:
+                    diameter = "19.05";
+                    pitch = "1.27";
+                    break;
+                case Unef7d8:
+                    diameter = "22.225";
+                    pitch = "1.27";
+                    break;
+                case Unef1N:
+                    diameter = "25.4";
+                    pitch = "1.27";
+                    break;
+
+                default:
+                    diameter = string.Empty;
+                    pitch = string.Empty;
+                    break;
+            }
+        }
+        #endregion
+
+        #region Расчеты параметров резьб
+        /// <summary>
+        /// Зазор на трапецеидальной резьбе в зависимости от шага
+        /// </summary>
+        /// <param name="threadPitch">Шаг</param>
+        public static double TrapezoidalClearance(double threadPitch)
+        {
+            return threadPitch switch
+            {
+                <= 1.5 => 0.15,
+                <= 5 => 0.25,
+                <= 12 => 0.5,
+                <= 40 => 1,
+                _ => 0,
+            };
+        }
+
+        /// <summary>
+        /// Номинальная высота профиля
+        /// </summary>
+        /// <param name="threadStandard">Стандарт резьбы</param>
+        /// <param name="threadPitch">Шаг резьбы</param>
+        /// <returns></returns>
+        public static double NominalHeight(ThreadStandard threadStandard, double threadPitch)
+        {
+            return threadStandard switch
+            {
+                ThreadStandard.Metric or ThreadStandard.UNC or ThreadStandard.UNF or ThreadStandard.UNEF => Math.Sqrt(3) / 2 * threadPitch,
+                ThreadStandard.BSPP => 0.960491 * threadPitch,
+                ThreadStandard.Trapezoidal => 1.866 * threadPitch,
+                ThreadStandard.NPT => 0.866 * threadPitch,
+                ThreadStandard.BSPT => 0.960237 * threadPitch,
+                _ => 0,
+            };
+        }
+
+        /// <summary>
+        /// Рабочая высота профиля
+        /// </summary>
+        /// <param name="threadStandard">Стандарт резьбы</param>
+        /// <param name="type">Тип резьбы</param>
+        /// <param name="threadPitch">Шаг резьбы</param>
+        /// <returns></returns>
+        public static double ProfileHeight(ThreadStandard threadStandard, CuttingType type, double threadPitch)
+        {
+            return threadStandard switch
+            {
+                ThreadStandard.Metric or ThreadStandard.UNC or ThreadStandard.UNF or ThreadStandard.UNEF => type == CuttingType.External
+                ? (17.0 / 24.0 * NominalHeight(threadStandard, threadPitch))
+                : (5.0 / 8.0 * NominalHeight(threadStandard, threadPitch)),
+                ThreadStandard.BSPP => 0.640327 * threadPitch,
+                ThreadStandard.Trapezoidal => 0.5 * threadPitch + TrapezoidalClearance(threadPitch),
+                ThreadStandard.NPT => 0.8 * threadPitch,
+                ThreadStandard.BSPT => 0.640327 * threadPitch,
+                _ => 0,
+            };
+        }
+
+
+
         /// <summary>
         /// Угол подъема резьбы
         /// </summary>
@@ -742,7 +1406,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <returns></returns>
         public static int PassesCount(ThreadStandard threadStandard, double threadPitch)
         {
-            if (threadStandard == ThreadStandard.Metric)
+            if (threadStandard is ThreadStandard.Metric or ThreadStandard.UNC or ThreadStandard.UNF or ThreadStandard.UNEF)
             {
                 return threadPitch switch
                 {
@@ -757,7 +1421,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     _ => 0,
                 };
             }
-            else if (threadStandard == ThreadStandard.BSPP)
+            else if (threadStandard is ThreadStandard.BSPP)
             {
                 return Math.Round(threadPitch.ThreadConvert(), 1) switch
                 {
@@ -769,7 +1433,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     _ => 0,
                 };
             }
-            else if (threadStandard == ThreadStandard.Trapezoidal)
+            else if (threadStandard is ThreadStandard.Trapezoidal)
             {
                 return threadPitch switch
                 {
@@ -783,7 +1447,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     _ => 0,
                 };
             }
-            else if (threadStandard == ThreadStandard.NPT)
+            else if (threadStandard is ThreadStandard.NPT or ThreadStandard.BSPT)
             {
                 return Math.Round(threadPitch.ThreadConvert(), 1) switch
                 {
@@ -843,7 +1507,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         },
                         _ => 0
                     };
-                case ThreadStandard.BSPP:
+                case ThreadStandard.BSPP or ThreadStandard.UNC or ThreadStandard.UNF or ThreadStandard.UNEF:
                     return threadType switch
                     {
                         CuttingType.External => threadPitch switch
@@ -866,14 +1530,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         },
                         _ => 0
                     };
-                case ThreadStandard.NPT:
+                case ThreadStandard.NPT or ThreadStandard.BSPT:
                     return threadPitch switch
                     {
                         <= 0.941 => // 27
                             1,
                         <= 1.814 => // 14
                             1.6,
-                        > 1.814 => //>14
+                        > 1.814 => // >14
                             2,
                         _ => 0
                     };
@@ -922,7 +1586,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
                 case ThreadStandard.Metric:
                     return Math.Round(1.25 * threadPitch, 2);
-                case ThreadStandard.BSPP:
+                case ThreadStandard.BSPP or ThreadStandard.UNC or ThreadStandard.UNF or ThreadStandard.UNEF:
                     return threadType switch
                     {
                         CuttingType.External => threadPitch switch
@@ -952,17 +1616,62 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         _ => 0
                     };
                 case ThreadStandard.NPT:
-                    return threadPitch switch
+                    return threadType switch
                     {
-                        <= 0.941 => // 27
-                            2.5,
-                        <= 1.411 => // 18
-                            3.5,
-                        <= 1.814 => // 14
-                            4.5,
-                        > 1.814 =>  // >14
-                            5.5,
-                        _ => 0
+                        CuttingType.External => threadPitch switch
+                        {
+                            <= 0.941 => // 27
+                                2.5,
+                            <= 1.411 => // 18
+                                3.5,
+                            <= 1.814 => // 14
+                                4.5,
+                            > 1.814 =>  // >14
+                                5.5,
+                            _ => 0
+                        },
+                        CuttingType.Internal => threadPitch switch
+                        {
+                            <= 0.941 => // 27
+                                3,
+                            <= 1.411 => // 18
+                                4,
+                            <= 1.814 => // 14
+                                4.5,
+                            > 1.814 =>  // >14
+                                6.5,
+                            _ => 0
+                        },
+                        _ => 0,
+                    };
+                case ThreadStandard.BSPT:
+                    return threadType switch
+                    {
+                        CuttingType.External => threadPitch switch
+                        {
+                            <= 0.907 => // 28
+                                2,
+                            <= 1.337 => // 18
+                                3,
+                            <= 1.814 => // 14
+                                3.5,
+                            > 1.814 =>  // >14
+                                4.5,
+                            _ => 0
+                        },
+                        CuttingType.Internal => threadPitch switch
+                        {
+                            <= 0.907 => // 27
+                                3,
+                            <= 1.337 => // 18
+                                4,
+                            <= 1.814 => // 14
+                                5.5,
+                            > 1.814 =>  // >14
+                                7,
+                            _ => 0
+                        },
+                        _ => 0,
                     };
                 case ThreadStandard.Trapezoidal:
                     return 0;
@@ -1024,8 +1733,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
         {
             return threadStandard switch
             {
-                ThreadStandard.Metric => "60",
-                ThreadStandard.BSPP => "55",
+                ThreadStandard.Metric or ThreadStandard.UNC or ThreadStandard.UNF or ThreadStandard.UNEF => "60",
+                ThreadStandard.BSPP or ThreadStandard.BSPT => "55",
                 ThreadStandard.Trapezoidal => "30",
                 ThreadStandard.NPT => "60",
                 _ => string.Empty,
@@ -1059,7 +1768,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         {
             return threadStandard switch
             {
-                ThreadStandard.Metric => type == CuttingType.External
+                ThreadStandard.Metric or ThreadStandard.UNC or ThreadStandard.UNF or ThreadStandard.UNEF => type == CuttingType.External
                 ? threadDiameter + 1
                 : threadDiameter - threadPitch - 1,
                 ThreadStandard.BSPP => type == CuttingType.External
@@ -1068,7 +1777,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 ThreadStandard.Trapezoidal => type == CuttingType.External
                 ? threadDiameter + 1
                 : threadDiameter - threadPitch - 1,
-                ThreadStandard.NPT => type == CuttingType.External
+                ThreadStandard.NPT or ThreadStandard.BSPT => type == CuttingType.External
                 ? threadDiameter + 2 * ExtNptThreadShift(threadLength, planeLength) + 1
                 : threadDiameter - CalculatedProfile(threadStandard, type, threadPitch) - 2 * IntNptThreadShift(threadLength, 0) - 1,
                 _ => double.NaN,
@@ -1090,7 +1799,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         {
             return threadStandard switch
             {
-                ThreadStandard.Metric => type == CuttingType.External
+                ThreadStandard.Metric or ThreadStandard.UNC or ThreadStandard.UNF or ThreadStandard.UNEF => type == CuttingType.External
                 ? threadDiameter - CalculatedProfile(threadStandard, type, threadPitch)
                 : threadDiameter + threadPitch / 16 / Math.Sin(60.Radians()),
                 ThreadStandard.BSPP => type == CuttingType.External
@@ -1099,7 +1808,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 ThreadStandard.Trapezoidal => type == CuttingType.External
                 ? threadDiameter - CalculatedProfile(threadStandard, type, threadPitch)
                 : threadDiameter + 2 * TrapezoidalClearance(threadPitch),
-                ThreadStandard.NPT => type == CuttingType.External
+                ThreadStandard.NPT or ThreadStandard.BSPT => type == CuttingType.External
                 ? threadDiameter - CalculatedProfile(threadStandard, type, threadPitch) + 2 * ExtNptThreadShift(threadLength, planeLength)
                 : threadDiameter - 2 * IntNptThreadShift(threadLength, 0),
                 _ => double.NaN,
