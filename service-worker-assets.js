@@ -801,11 +801,11 @@
       "url": "_framework\/icudt.dat"
     },
     {
-      "hash": "sha256-ZRP7ITnwaTlXcTCfnyUoyPwcQNlk65P4kBXVMbmYKLU=",
+      "hash": "sha256-DZ4lAtCi+kPSlyeuWB+kQtBuqUjBUEIzmo7EJVlkR8U=",
       "url": "_framework\/blazor.boot.json"
     },
     {
-      "hash": "sha256-R8jTwddnvb0vMB7RMvfFoxXUGaAGsGcgDizlT2lbBPc=",
+      "hash": "sha256-EVcrM8lb7RqYRPwS+H3TvjEgec9QGl41bxOSP9zpuvw=",
       "url": "_framework\/Sunduk.dll"
     },
     {
@@ -1169,5 +1169,5 @@
       "url": "_content\/MudBlazor\/MudBlazor.min.js"
     }
   ],
-  "version": "7HZ0tybr"
+  "version": "6j8WMytQ"
 };
