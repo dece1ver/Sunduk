@@ -117,7 +117,7 @@
                         </tr>
                         <tr>
                             <td class="tl"><MudText Typo="Typo.caption">Шаг:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@(ThreadPitch.ToPrettyString() + (ThreadStandard is ThreadStandard.BSPP or ThreadStandard.NPT ? $" ({25.4/ThreadPitch:N0} TPI)" : ""))</MudText></td>
+                        <td><MudText Typo="Typo.caption">@(ThreadPitch.ToPrettyString() + (ThreadStandard is ThreadStandard.BSPP or ThreadStandard.BSPT or ThreadStandard.NPT or ThreadStandard.UNC or ThreadStandard.UNF or ThreadStandard.UNEF ? $" ({ThreadPitch.ToTpi()} TPI)" : ""))</MudText></td>
                         </tr>
                         <tr>
                             <td class="tl"><MudText Typo="Typo.caption">Общая высота профиля:</MudText></td>

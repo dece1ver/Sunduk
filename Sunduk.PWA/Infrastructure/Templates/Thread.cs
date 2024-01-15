@@ -1680,6 +1680,12 @@ namespace Sunduk.PWA.Infrastructure.Templates
             }
         }
 
+        public static string ToTpi(this double thredPitch)
+        {
+            var tpi = 25.4 / thredPitch;
+            return tpi.ToPrettyString(1).Replace(".0", "");
+        }
+
         /// <summary>
         /// Считает проходы при нарезании резьбы
         /// </summary>
