@@ -1,16 +1,9 @@
 ﻿@using MudBlazor.Services
-@implements IAsyncDisposable
 
-<style>
-    .ex{padding-right: @Design.GetPaddingRight(breakpoint); font-family: 'Roboto Mono', monospace; font-size: @Design.GetFontSize(breakpoint);}
-</style>
-<style>
-    .desc{font-size: @Design.GetFontSize(breakpoint); font-style: italic; font-weight: lighter}
-</style>
 
 <MudText Typo=Typo.body2 Class="mt-2">
     Команда G00 перемещает инструмент на позицию, указанную относительно системы координат заготовки на скорости ускоренного подвода.
-    Указание позиции допускается в <MudLink Typo=Typo.body2 @onclick="(()=>absMbox.Show())">абсолютных</MudLink> и <MudLink Typo=Typo.body2 @onclick="(()=>incMbox.Show())">относительных</MudLink> значениях.
+    Указание позиции допускается в <MudLink Typo=Typo.body2 @onclick="(()=>absMbox.ShowAsync())">абсолютных</MudLink> и <MudLink Typo=Typo.body2 @onclick="(()=>incMbox.ShowAsync())">относительных</MudLink> значениях.
     Скорость ускоренного подвода для каждой оси задается в параметре системы ЧПУ №1420 и не может задаваться в адресе F.
 </MudText>
 <MudField Variant=Variant.Filled Label="Пример УП" DisableUnderLine=true>
@@ -37,11 +30,7 @@
 
 @code 
 {
-    [Inject] IBreakpointService BreakpointListener { get; set; }
-
     private Guid _subscriptionId;
-    private Breakpoint breakpoint;
-
     MudMessageBox absMbox { get; set; }
     MudMessageBox incMbox { get; set; }
 
@@ -49,22 +38,14 @@
 	{
 		if (firstRender)
 		{
-			var subscriptionResult = await BreakpointListener.Subscribe((breakpoint) =>
-			{
-				InvokeAsync(StateHasChanged);
-			}, new ResizeOptions
+			new ResizeOptions
 			{
 				ReportRate = 250,
 				NotifyOnBreakpointOnly = true,
-			});
-
-			breakpoint = subscriptionResult.Breakpoint;
-			_subscriptionId = subscriptionResult.SubscriptionId;
+			};
 			StateHasChanged();
 		}
 
 		await base.OnAfterRenderAsync(firstRender);
 	}
-	public async ValueTask DisposeAsync() => await BreakpointListener.Unsubscribe(_subscriptionId);
-
 }

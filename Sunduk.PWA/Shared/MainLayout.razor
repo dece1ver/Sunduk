@@ -1,14 +1,15 @@
 ﻿@inject IDialogService DialogService
 @inherits LayoutComponentBase
 @using MudBlazor.Services
-@implements IAsyncDisposable
 
-<MudScrollToTop>
-    <MudFab Color="Color.Primary" Icon="@Icons.Filled.KeyboardArrowUp" />
-</MudScrollToTop>
-
+<MudThemeProvider />
+<MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
+
+<MudScrollToTop>
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.KeyboardArrowUp" />
+</MudScrollToTop>
 
 <MudThemeProvider Theme="theme" />
 <MudLayout>
@@ -24,13 +25,13 @@
             <MudText>@Breakpoint</MudText>
         }
         <MudTooltip Text="Обратная связь" Placement="Placement.Start">
-            <MudIconButton Icon="@Icons.Material.Filled.Feedback" OnClick="OpenFeedBackDialog" Color="Color.Inherit" Edge="Edge.End" />
+            <MudIconButton Icon="@Icons.Material.Filled.Feedback" @onclick="OpenFeedBackDialogAsync" Color="Color.Inherit" Edge="Edge.End" />
         </MudTooltip>
         <MudTooltip Text="QR-код и установка" Placement="Placement.Start">
-            <MudIconButton Icon="@Icons.Material.Filled.QrCodeScanner" OnClick="OpenQrDialog" Color="Color.Inherit" Edge="Edge.End" />
+            <MudIconButton Icon="@Icons.Material.Filled.QrCodeScanner" @onclick="OpenQrDialogAsync" Color="Color.Inherit" Edge="Edge.End" />
         </MudTooltip>
         <MudTooltip Text="@version" Placement="Placement.Start">
-            <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" OnClick="OpenChangelogDialog" Color="Color.Inherit" Edge="Edge.End" />
+            <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" @onclick="OpenChangelogDialogAsync" Color="Color.Inherit" Edge="Edge.End" />
         </MudTooltip>
         
     </MudAppBar>
@@ -54,33 +55,22 @@
     public static bool DebugMode { get; set; } = false;
     public bool ExperimentalMode { get; set; } = DebugMode;
 
-    [Inject] IBreakpointService BreakpointListener { get; set; }
-
     private Guid _subscriptionId;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            var subscriptionResult = await BreakpointListener.Subscribe((breakpoint) =>
-            {
-                Breakpoint = breakpoint;
-                InvokeAsync(StateHasChanged);
-            }, new ResizeOptions
+            new ResizeOptions
             {
                 ReportRate = 250,
                 NotifyOnBreakpointOnly = true,
-            });
-
-            Breakpoint = subscriptionResult.Breakpoint;
-            _subscriptionId = subscriptionResult.SubscriptionId;
+            };
             StateHasChanged();
         }
 
         await base.OnAfterRenderAsync(firstRender);
     }
-
-    public async ValueTask DisposeAsync() => await BreakpointListener.Unsubscribe(_subscriptionId);
 
     public Breakpoint Breakpoint { get; set; }
 
@@ -88,35 +78,42 @@
 
     bool _drawerOpen = true;
 
-    private void OpenQrDialog()
+    private Task OpenQrDialogAsync()
     {
-        var parameters = new DialogParameters();
-        var options = new DialogOptions() { FullScreen = false, CloseButton = true };
-        DialogService.Show<QrDialog>(string.Empty, parameters, options);
+        var options = new DialogOptions() { 
+            FullScreen = false, 
+            CloseButton = true,
+            CloseOnEscapeKey = true};
+        return DialogService.ShowAsync<QrDialog>(string.Empty, options);
     }
 
-    private void OpenFeedBackDialog()
+    private Task OpenFeedBackDialogAsync()
     {
-        var parameters = new DialogParameters();
-        var options = new DialogOptions() { FullScreen = false, CloseButton = true };
-        DialogService.Show<FeedBackDialog>("Обратная связь", parameters, options);
+        var options = new DialogOptions() { 
+            FullScreen = false, 
+            CloseButton = true,
+            CloseOnEscapeKey = true,
+        };
+        return DialogService.ShowAsync<FeedBackDialog>("Обратная связь", options);
     }
 
-    private void OpenChangelogDialog()
+    private Task OpenChangelogDialogAsync()
     {
-        var parameters = new DialogParameters();
-        var options = new DialogOptions() { FullScreen = false, CloseButton = true };
-        DialogService.Show<ChangelogDialog>("Описание", parameters, options);
+        var options = new DialogOptions() { 
+            FullScreen = false, 
+            CloseButton = true,
+            CloseOnEscapeKey = true
+        };
+        return DialogService.ShowAsync<ChangelogDialog>("Описание", options);
     }
 
     MudTheme theme = new MudTheme()
     {
-        Palette = new Palette()
+        PaletteLight = new()
         {
             Black = "#2D2D30",
             Primary = "#FF5722",
             Background = "#1E1E1E",
-            BackgroundGrey = "#2D2D30",
             Surface = "#252526",
             DrawerBackground = "#2D2D30",
             DrawerText = "rgba(255,255,255, 0.60)",

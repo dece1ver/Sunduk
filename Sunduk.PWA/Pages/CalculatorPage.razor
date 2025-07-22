@@ -30,7 +30,7 @@
         {
             <MudItem xs="12">
                 <MudExpansionPanel Text="Как считать?">
-                    <MudTextField Variant="Variant.Text" Margin="Margin.Dense" Class="monofield" T="string" @bind-Value="@CalcInfo" ReadOnly="true" DisableUnderLine="true" Lines="(CalcInfo.Count(x => x == '\n') + 2)" />
+                    <MudTextField Variant="Variant.Text" Margin="Margin.Dense" Class="monofield" T="string" @bind-Value="@CalcInfo" ReadOnly="true" Underline="false" Lines="(CalcInfo.Count(x => x == '\n') + 2)" />
                 </MudExpansionPanel>
                 
             </MudItem>

@@ -6,13 +6,13 @@
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="6">
-            <MudField Label="Параметры скругления" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1"
+            <MudField Label="Параметры скругления" Variant="Variant.Filled" Underline="false" Class="mt-1"
             @onfocusout="(() => CurrentImage = RadiusType == Radius.External ? Images.ExternalRadius : Images.InternalRadius)">
                 <MudGrid Spacing="0">
                     <MudItem xs="12">
                         <MudRadioGroup SelectedOptionChanged="OnRadiusTypeChanged" T="Radius"  Class="mb-n2 d-flex justify-center">
-                            <MudRadio Option="@Radius.External" Color="Color.Primary">Наружное</MudRadio>
-                            <MudRadio Option="@Radius.Internal" Color="Color.Primary">Внутреннее</MudRadio>
+                            <MudRadio Value="@Radius.External" Color="Color.Primary">Наружное</MudRadio>
+                            <MudRadio Value="@Radius.Internal" Color="Color.Primary">Внутреннее</MudRadio>
                         </MudRadioGroup>
                     </MudItem>
                     <MudItem xs="12">
@@ -99,7 +99,7 @@
             </div>
         </MudHidden>
         <MudItem xs="12">
-            <MudField Label="Результат" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n1">
+            <MudField Label="Результат" Variant="Variant.Filled" Underline="false" Class="mt-n1">
                 <MudGrid Spacing="1">
                     <MudItem xs="12" Class="mt-2">
                         @if (RadiusDiameter > 0 && RadiusSize > 0)
@@ -130,8 +130,8 @@
             <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
                 <MudItem xs="12" md="4">
                             <MudRadioGroup T="bool" @bind-SelectedOption="showClassicRadius" Class="ma-n3">
-                                <MudRadio Option="true" Color="Color.Primary">Обычное</MudRadio>
-                                <MudRadio Option="false" Color="Color.Primary">Обратное</MudRadio>
+                                <MudRadio Value="true" Color="Color.Primary">Обычное</MudRadio>
+                                <MudRadio Value="false" Color="Color.Primary">Обратное</MudRadio>
                             </MudRadioGroup>
                         </MudItem>
                 <MudItem xs="12">

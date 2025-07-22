@@ -1,4 +1,6 @@
-﻿<MudDialog>
+﻿@inject IDialogService DialogService
+
+<MudDialog>
     <DialogContent>
         <div class="ma-0" style="height:500px;width:300px;overflow: auto;">
             <MudPaper Elevation="0">
@@ -37,8 +39,6 @@
 </MudDialog>
 @code 
 {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-
     #region Ссылки
     private const string wikiPwaLink = @"
 https://ru.wikipedia.org/wiki/%D0%9F%D1%80%D0%BE%D0%B3%D1%80%D0%B5%D1%81%D1%81%D0%B8%D0%B2%D0%BD%D0%BE%D0%B5_%D0%B2%D0%B5%D0%B1-%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5
@@ -116,5 +116,11 @@ https://github.com/dece1ver/Sunduk
 
     public List<ChangelogInfo> Info = new();
 
-    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
 }

@@ -1,18 +1,10 @@
 ﻿@using MudBlazor.Services
-@implements IAsyncDisposable
-
-<style>
-    .ex{padding-right: @Design.GetPaddingRight(breakpoint); font-family: 'Roboto Mono', monospace; font-size: @Design.GetFontSize(breakpoint);}
-</style>
-<style>
-    .desc{font-size: @Design.GetFontSize(breakpoint); font-style: italic; font-weight: lighter}
-</style>
 
 <MudText Typo="Typo.body2" Class="mt-2">
-    Программирование обработки на станках с числовым программным управлением (ЧПУ) Fanuc, осуществляется на языке <MudLink Typo=Typo.body2 @onclick="(() => gCodeMbox.Show())">G-кодов</MudLink>.
+    Программирование обработки на станках с числовым программным управлением (ЧПУ) Fanuc, осуществляется на языке <MudLink Typo=Typo.body2 @onclick="(() => gCodeMbox.ShowAsync())">G-кодов</MudLink>.
     Набор команд, по которым происходит обработка, называется управляющей программой (УП). Управляющая программа состоит из блоков (строк),
     которые могут иметь одну, или несколько команд (G-кодов, M-кодов и пр), каждый блок завершается символом конца блока (EOB - End Of Block).
-    Любая УП дожна начинаться с блока с <MudLink Typo=Typo.body2 @onclick="(() => programNumberMbox.Show())">номером УП</MudLink> и заканчиваться командой завершения.
+    Любая УП дожна начинаться с блока с <MudLink Typo=Typo.body2 @onclick="(() => programNumberMbox.ShowAsync())">номером УП</MudLink> и заканчиваться командой завершения.
 </MudText>
 
 <MudField Variant=Variant.Filled Label="Пример УП" DisableUnderLine=true>
@@ -84,7 +76,7 @@
 <MudText Typo="Typo.body2">
     Если не брать во внимание подготовительные коды отвечающие за выбор инструмента, вращение шпинделя,
     то обработка по УП представляет собой движение рабочих органов станка по указанным координатам, описывающим траеторию движения инструмента.
-    Принято указывать координы относительно заранее определенной <MudLink Typo=Typo.body2 @onclick="(() => coordinateSystemMbox.Show())">системы координат заготовки</MudLink> (нулевой точки детали).
+    Принято указывать координы относительно заранее определенной <MudLink Typo=Typo.body2 @onclick="(() => coordinateSystemMbox.ShowAsync())">системы координат заготовки</MudLink> (нулевой точки детали).
 </MudText>
 <MudDivider />
 <MudText Typo="Typo.body2">@info2</MudText>
@@ -136,7 +128,7 @@
 
             <tr>
                 <td><MudLink Href="/knowledge/programming-g01">G01</MudLink></td>
-                <td>Линейная <MudLink Typo=Typo.body2 @onclick="(() => interpolationMbox.Show())">интерполяция</MudLink> – перемещение по прямой линии на указанной подаче</td>
+                <td>Линейная <MudLink Typo=Typo.body2 @onclick="(() => interpolationMbox.ShowAsync())">интерполяция</MudLink> – перемещение по прямой линии на указанной подаче</td>
 
             </tr>
         </tbody>
@@ -172,32 +164,24 @@
 
 @code 
 {
-    [Inject] IBreakpointService BreakpointListener { get; set; }
 
     private Guid _subscriptionId;
-    private Breakpoint breakpoint;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (firstRender)
 		{
-			var subscriptionResult = await BreakpointListener.Subscribe((breakpoint) =>
-			{
-				InvokeAsync(StateHasChanged);
-			}, new ResizeOptions
+			new ResizeOptions
 			{
 				ReportRate = 250,
 				NotifyOnBreakpointOnly = true,
-			});
+			};
 
-			breakpoint = subscriptionResult.Breakpoint;
-			_subscriptionId = subscriptionResult.SubscriptionId;
 			StateHasChanged();
 		}
 
 		await base.OnAfterRenderAsync(firstRender);
 	}
-	public async ValueTask DisposeAsync() => await BreakpointListener.Unsubscribe(_subscriptionId);
 
     MudMessageBox gCodeMbox { get; set; }
     MudMessageBox programNumberMbox { get; set; }

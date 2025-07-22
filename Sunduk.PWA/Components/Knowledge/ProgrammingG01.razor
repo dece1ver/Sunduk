@@ -1,5 +1,4 @@
 ﻿@using MudBlazor.Services
-@implements IAsyncDisposable
 
 <style>
     .ex{padding-right: @Design.GetPaddingRight(breakpoint); font-family: 'Roboto Mono', monospace; font-size: @Design.GetFontSize(breakpoint);}
@@ -10,7 +9,7 @@
 
 <MudText Typo=Typo.body2 Class="mt-2">
     Команда G01 подает инструмент вдоль прямой линии по координатам указанным относительно центра системы координат заготовки.
-    Указание позиции допускается в <MudLink Typo=Typo.body2 @onclick="(()=>absMbox.Show())">абсолютных</MudLink> и <MudLink Typo=Typo.body2 @onclick="(()=>incMbox.Show())">относительных</MudLink> значениях.
+    Указание позиции допускается в <MudLink Typo=Typo.body2 @onclick="(()=>absMbox.ShowAsync())">абсолютных</MudLink> и <MudLink Typo=Typo.body2 @onclick="(()=>incMbox.ShowAsync())">относительных</MudLink> значениях.
     Скорость подачи задается кодом F и действует до ввода нового значения, нет необходимости задавать её в каждом блоке.
     Скорость подачи, заданная F-кодом, измеряется вдоль траектории движения инструмента, следовательно при движении по нескольким осям одновременно,
     скорость подачи для каждой оси пересчитывается для поддержания необходимой общей скорости подачи.
@@ -45,8 +44,6 @@
 </MudMessageBox>
 @code 
 {
-    [Inject] IBreakpointService BreakpointListener { get; set; }
-
     private Guid _subscriptionId;
     private Breakpoint breakpoint;
 
@@ -57,21 +54,14 @@
 	{
 		if (firstRender)
 		{
-			var subscriptionResult = await BreakpointListener.Subscribe((breakpoint) =>
-			{
-				InvokeAsync(StateHasChanged);
-			}, new ResizeOptions
+			new ResizeOptions
 			{
 				ReportRate = 250,
 				NotifyOnBreakpointOnly = true,
-			});
-
-			breakpoint = subscriptionResult.Breakpoint;
-			_subscriptionId = subscriptionResult.SubscriptionId;
+			};
 			StateHasChanged();
 		}
 
 		await base.OnAfterRenderAsync(firstRender);
 	}
-	public async ValueTask DisposeAsync() => await BreakpointListener.Unsubscribe(_subscriptionId);
 }

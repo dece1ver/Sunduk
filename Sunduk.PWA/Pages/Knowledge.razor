@@ -4,7 +4,7 @@
 <MudContainer MaxWidth="MaxWidth.False" Class="mt-0 pl-0 pr-1">
     <MudGrid Spacing="1" Class="mx-n1">
         <MudItem xs="12" sm="4" lg="3" >
-            <MudList Dense="true" Clickable="true" @bind-SelectedItem="selectedItem" @bind-SelectedValue="Article" Class="mt-n2">
+            <MudList Dense="true" T="string" Clickable="true" @* @bind-SelectedItem="selectedItem" @bind-SelectedValue="Article" *@ Class="mt-n2">
                 @*<MudListItem Dense="true" Class="pl-1" DisableGutters="true" Icon="@Icons.Material.Filled.Info" Value="About" Href="@($"/knowledge/{About}")">
                     <MudText Class="mx-n4" Typo="Typo.body2">О разделе</MudText>
                 </MudListItem>*@
@@ -95,9 +95,7 @@
 {
     [Parameter]
     public object Article { get; set; } = CenterLength;
-    MudListItem selectedItem;
 
-    [Inject] IBreakpointService BreakpointListener { get; set; }
 
     private Guid _subscriptionId;
 
@@ -105,25 +103,16 @@
     {
         if (firstRender)
         {
-            var subscriptionResult = await BreakpointListener.Subscribe((breakpoint) =>
+            new ResizeOptions
             {
-                Breakpoint = breakpoint;
-                InvokeAsync(StateHasChanged);
-            }, new ResizeOptions
-                {
-                    ReportRate = 250,
-                    NotifyOnBreakpointOnly = true,
-                });
-
-            Breakpoint = subscriptionResult.Breakpoint;
-            _subscriptionId = subscriptionResult.SubscriptionId;
+                ReportRate = 250,
+                NotifyOnBreakpointOnly = true,
+            };
             StateHasChanged();
         }
 
         await base.OnAfterRenderAsync(firstRender);
     }
-
-    public async ValueTask DisposeAsync() => await BreakpointListener.Unsubscribe(_subscriptionId);
 
     public Breakpoint Breakpoint { get; set; }
     

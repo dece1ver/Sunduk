@@ -43,7 +43,7 @@
                 <MudItem xs="12" sm="6">
                     <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
                         @* onfocusout=DropSelection, но он дропает даже при нажатии кнопок, поэтому убрал пока *@
-                        <MudList Clickable="true" @bind-SelectedItem="SelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" Dense="true" DisableGutters=true>
+                        <MudList Clickable="true" @bind-SelectedItem="CurrentSelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" Dense="true" DisableGutters=true>
                             @if (Program != null)
                             {
                                 foreach (var seq in Program)
@@ -104,7 +104,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense">
-                        <MudTextField T="string" DisableUnderLine="true"
+                        <MudTextField T="string" Underline="false"
                                       Style="font-family: 'Roboto Mono', monospace; font-size: medium;"
                                       Variant="Variant.Text" @bind-Text="@ProgramText"
                                       ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
@@ -251,9 +251,8 @@
 
     public Mode Mode { get; set; } = Mode.General;
 
-    public string HighLight => SelectedSequence is null ? string.Empty : Program[(int)SelectedSequenceIndex].Operation.Split('\n')[0];
+    public string HighLight => CurrentSelectedSequence is null ? string.Empty : Program[(int)SelectedSequenceIndex].Operation.Split('\n')[0];
 
-    public MudListItem SelectedSequence;
     public object SelectedSequenceIndex = 0;
     public Sequence CurrentSelectedSequence { get; set; }
 
@@ -621,9 +620,9 @@
             { nameof(okMessage), okMessage }
         };
         var options = new DialogOptions() { FullScreen = false, CloseButton = false };
-        var dialog = DialogService.Show<ConfirmDialog>("Подтверждение", parameters, options);
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Подтверждение", parameters, options);
         var result = await dialog.Result;
-        return !result.Cancelled;
+        return !result.Canceled;
     }
 
     private void RemoveSequence(Sequence seq)
@@ -647,7 +646,7 @@
 
     private void DropSelection()
     {
-        SelectedSequence = null;
+        CurrentSelectedSequence = null;
         SelectedSequenceIndex = null;
     }
 

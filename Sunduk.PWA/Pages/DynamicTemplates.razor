@@ -1,0 +1,67 @@
+﻿@page "/dynamic-templates"
+@using Sunduk.PWA.Infrastructure.DynamicTemplatesData
+
+<MudExpansionPanels MultiExpansion="true">
+    @foreach (var template in templates)
+    {
+        <MudExpansionPanel Text="@template.Name">
+            <MudList T="string">
+                @foreach (var variable in @template.Variables)
+                {
+                    <MudListItem Text="@($"{variable.Name} = {variable.Expression}")" />
+                }
+            </MudList>
+            <MudTextField T="string" Label="Outlined" Variant="Variant.Outlined" @bind-Value="@template.Content" />
+        </MudExpansionPanel>
+    }
+</MudExpansionPanels>
+
+
+@code {
+    private List<TemplateDefinition> templates = new();
+
+    protected override void OnInitialized()
+    {
+        templates = FakeTemplateDataGenerator.Generate();
+    }
+
+
+    public static class FakeTemplateDataGenerator
+    {
+        private static readonly Random _rand = new();
+
+        public static List<TemplateDefinition> Generate(int count = 3)
+        {
+            var templates = new List<TemplateDefinition>();
+
+            for (int i = 1; i <= count; i++)
+            {
+                var variables = new List<VariableDefinition>
+            {
+                new VariableDefinition { Name = "Length", Expression = $"{RandomDouble(100, 500):0.##}" },
+                new VariableDefinition { Name = "Width", Expression = $"{RandomDouble(50, 200):0.##}" },
+                new VariableDefinition { Name = "Height", Expression = "Length / 10 + Width / 20" },
+                new VariableDefinition { Name = "Volume", Expression = "Length * Width * Height" },
+                new VariableDefinition { Name = "Diagonal", Expression = "Math.Sqrt(Length*Length + Width*Width)" }
+            };
+
+                string content = $"Шаблон №{i}: " +
+                    "Размеры: {Length} x {Width} x {Height}, " +
+                    "Объём: {Volume}, Диагональ основания: {Diagonal}";
+
+                templates.Add(new TemplateDefinition
+                {
+                    Name = $"Шаблон {i}",
+                    Content = content,
+                    Variables = variables
+                });
+            }
+
+            return templates;
+        }
+
+        private static double RandomDouble(double min, double max)
+            => _rand.NextDouble() * (max - min) + min;
+    }
+
+}
