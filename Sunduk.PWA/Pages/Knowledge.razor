@@ -4,11 +4,11 @@
 <MudContainer MaxWidth="MaxWidth.False" Class="mt-0 pl-0 pr-1">
     <MudGrid Spacing="1" Class="mx-n1">
         <MudItem xs="12" sm="4" lg="3" >
-            <MudList Dense="true" T="string" Clickable="true" @* @bind-SelectedItem="selectedItem" @bind-SelectedValue="Article" *@ Class="mt-n2">
-                @*<MudListItem Dense="true" Class="pl-1" DisableGutters="true" Icon="@Icons.Material.Filled.Info" Value="About" Href="@($"/knowledge/{About}")">
+            <MudList Dense="true" T="string" @bind-Value="Article" Class="mt-n1">
+                @* <MudListItem Dense="true" Class="pl-1" Gutters="false" Icon="@Icons.Material.Filled.Info" Value="About" Href="@($"/knowledge/{About}")">
                     <MudText Class="mx-n4" Typo="Typo.body2">О разделе</MudText>
-                </MudListItem>*@
-                <MudListItem Dense="true" Class="pl-1" DisableGutters="true" Icon="@Icons.Material.Filled.Folder">
+                </MudListItem> *@
+                <MudListItem Dense="true" Class="pl-1" Gutters="false" Icon="@Icons.Material.Filled.Folder">
                     <ChildContent>
                         <MudText Class="mx-n4" Typo="Typo.body2">Справочник</MudText>
                     </ChildContent>
@@ -28,7 +28,7 @@
                     </NestedList>
                 </MudListItem>
 
-                <MudListItem Dense="true" Class="pl-1" DisableGutters="true" Icon="@Icons.Material.Filled.Folder">
+                <MudListItem Dense="true" Class="pl-1" Gutters="false" Icon="@Icons.Material.Filled.Folder">
                     <ChildContent>
                         <MudText Class="mx-n4" Typo="Typo.body2">Fanuc</MudText>
                     </ChildContent>
@@ -94,7 +94,7 @@
 @code 
 {
     [Parameter]
-    public object Article { get; set; } = CenterLength;
+    public string Article { get; set; }
 
 
     private Guid _subscriptionId;
@@ -109,6 +109,7 @@
                 NotifyOnBreakpointOnly = true,
             };
             StateHasChanged();
+            Article = CenterLength;
         }
 
         await base.OnAfterRenderAsync(firstRender);

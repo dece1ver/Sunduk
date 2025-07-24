@@ -1,0 +1,21 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudText>@Message</MudText>
+        <MudTextField T="string" @bind-Text="Input"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Submit">ОК</MudButton>
+    </DialogActions>
+</MudDialog>
+@code
+{
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string Message { get; set; }
+    [Parameter] public bool AutoGrow { get; set; }
+    public string Input { get; set; }
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(Input));
+    void Cancel() => MudDialog.Cancel();
+}

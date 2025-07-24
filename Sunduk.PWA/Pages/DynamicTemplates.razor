@@ -1,30 +1,100 @@
 ﻿@page "/dynamic-templates"
-@using Sunduk.PWA.Infrastructure.DynamicTemplatesData
+@using NCalc
+@using Sunduk.PWA.Infrastructure.DynamicTemplatesData 
+@using BlazorDownloadFile
+@using System.Text.Json
+@using System.Text
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
+
+КНОПКА ДОБАВЛЕНИЯ ШАБЛОНОВ
 <MudExpansionPanels MultiExpansion="true">
     @foreach (var template in templates)
     {
-        <MudExpansionPanel Text="@template.Name">
-            <MudList T="string">
-                @foreach (var variable in @template.Variables)
-                {
-                    <MudListItem Text="@($"{variable.Name} = {variable.Expression}")" />
-                }
-            </MudList>
-            <MudTextField T="string" Label="Outlined" Variant="Variant.Outlined" @bind-Value="@template.Content" />
+        <MudExpansionPanel Gutters="false" Dense="true">
+            <TitleContent>
+                <MudGrid Class="align-start d-flex ma-0 pa-0" Spacing="0">
+                    <MudText>@template.Name</MudText>
+                    <MudSpacer/>
+                    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="() => OpenRenameDialogAsync(template)" Icon="@Icons.Material.Outlined.DriveFileRenameOutline"/>
+                </MudGrid>
+            </TitleContent>
+            <ChildContent>
+                <MudToolBar Dense="true">
+                    <MudIconButton Variant="Variant.Text"
+                                   OnClick="async () => { template.Variables.Add(new VariableDefinition()); await PersistAsync(); }"
+                                   Icon="@Icons.Material.Filled.Add"
+                                   Color="Color.Secondary"/>
+                    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="async () => { Calculate(template); await PersistAsync(); }" Icon="@Icons.Material.TwoTone.Calculate" Color="Color.Primary" />
+                    <MudSpacer/>
+                    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="() => { }" Icon="@Icons.Material.Outlined.FileDownload" Color="Color.Primary" />
+                    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="() => { }" Icon="@Icons.Material.Outlined.FileUpload" Color="Color.Primary" />
+                </MudToolBar>
+                <MudGrid Spacing="1" Class="ma-0">
+                    <MudItem xs="6">
+                        <MudTextField T="string" Label="Заготовка" Variant="Variant.Filled" @bind-Value="@template.Content" AutoGrow="true" Style="font-family: 'Roboto Mono', monospace;" />
+                        <MudTextField T="string"
+                                      Label="Результат"
+                                      Variant="Variant.Filled"
+                                      AutoGrow="true"
+                                      Style="font-family: 'Roboto Mono', monospace;"
+                                      Value="template.Result"
+                                      ReadOnly="true" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudList T="string" Dense="true">
+                            <MudField Label="Переменные" Variant="Variant.Filled" Underline="false" InnerPadding="false" FullWidth="true">
+                                @foreach (var variable in @template.Variables)
+                                {
+                                    <MudListItem Gutters="false">
+                                        <MudGrid Spacing="0" Class="ma-0 pa-0">
+                                            <MudItem xs="4">
+                                                <MudTextField @bind-Text="variable.Name" Label="Имя" Variant="Variant.Text" />
+                                            </MudItem>
+                                            <MudItem xs="8">
+                                                <MudTextField @bind-Text="variable.Expression" Label="Значение" Variant="Variant.Text" />
+                                            </MudItem>
+                                        </MudGrid>
+                                    </MudListItem>
+                                }
+                            </MudField>
+                        </MudList>
+                    </MudItem>
+                </MudGrid>
+            </ChildContent>
         </MudExpansionPanel>
     }
 </MudExpansionPanels>
 
 
 @code {
+    [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
     private List<TemplateDefinition> templates = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        templates = FakeTemplateDataGenerator.Generate();
+        templates = await LocalStorage.GetItemAsync<List<TemplateDefinition>>(nameof(templates))
+                ?? new List<TemplateDefinition>();
     }
 
+    private async Task PersistAsync()
+        => await LocalStorage.SetItemAsync(nameof(templates), templates);
+
+    private async Task DownloadTemplatesAsync()
+    {
+        var json = JsonSerializer.Serialize(templates, new JsonSerializerOptions { WriteIndented = true });
+        var bytes = Encoding.UTF8.GetBytes(json);
+        await BlazorDownloadFileService.DownloadFile("templates.json", bytes, "application/json");
+    }
+
+    private async Task DownloadTemplateAsync(TemplateDefinition template)
+    {
+        var json = JsonSerializer.Serialize(template, new JsonSerializerOptions { WriteIndented = true });
+        var bytes = Encoding.UTF8.GetBytes(json);
+        await BlazorDownloadFileService.DownloadFile($"{template.Name}.json", bytes, "application/json");
+    }
 
     public static class FakeTemplateDataGenerator
     {
@@ -45,8 +115,8 @@
                 new VariableDefinition { Name = "Diagonal", Expression = "Math.Sqrt(Length*Length + Width*Width)" }
             };
 
-                string content = $"Шаблон №{i}: " +
-                    "Размеры: {Length} x {Width} x {Height}, " +
+                string content = $"Шаблон №{i}:\n" +
+                    "Размеры: {Length} x {Width} x {Height}\n" +
                     "Объём: {Volume}, Диагональ основания: {Diagonal}";
 
                 templates.Add(new TemplateDefinition
@@ -64,4 +134,58 @@
             => _rand.NextDouble() * (max - min) + min;
     }
 
+    private void Calculate(TemplateDefinition tpl)
+    {
+        try
+        {
+            var values = new Dictionary<string, double>();
+            bool progress;
+            int maxIter = tpl.Variables.Count * 2;
+            do
+            {
+                progress = false;
+                foreach (var v in tpl.Variables)
+                {
+                    if (values.ContainsKey(v.Name)) continue;
+                    var expr = new Expression(v.Expression.Replace(',','.'), ExpressionOptions.CaseInsensitiveStringComparer);
+                    foreach (var kv in values)
+                        expr.Parameters[kv.Key] = kv.Value;
+                    if (expr.HasErrors()) continue;
+                    var eval = expr.Evaluate();
+                    if (eval is double d)
+                    {
+                        values[v.Name] = d;
+                        progress = true;
+                    }
+                }
+                if (--maxIter < 0) throw new Exception("Возможно, циклическая зависимость");
+            } while (progress);
+
+            tpl.Result = System.Text.RegularExpressions.Regex
+                .Replace(tpl.Content, @"\{(.*?)\}", m =>
+                {
+                    var sub = new Expression(m.Groups[1].Value, ExpressionOptions.CaseInsensitiveStringComparer);
+                    foreach (var kv in values)
+                        sub.Parameters[kv.Key] = kv.Value;
+                    var r = sub.Evaluate();
+                    return r is double x ? x.ToString("0.###").Replace(',','.') : "[?]";
+                });
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private async Task OpenRenameDialogAsync(TemplateDefinition template)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+
+        var dialog = await DialogService.ShowAsync<UserInputDialog>("Переименовать", options);
+        var result = await dialog.Result;
+        if (result.Canceled) return;
+        template.Name = result.Data.ToString();
+
+    }
 }

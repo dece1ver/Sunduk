@@ -6,6 +6,7 @@ namespace Sunduk.PWA.Infrastructure.DynamicTemplatesData
     {
         public string Name { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
-        public List<VariableDefinition> Variables { get; set; } = new();
+        public List<VariableDefinition> Variables { get; set; } = [];
+        public string Result { get; set; } = string.Empty;
     }
 }
