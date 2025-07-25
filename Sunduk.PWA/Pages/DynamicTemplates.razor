@@ -11,7 +11,7 @@
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 
-<MudPopover Open="@(LocalStorageIsWorking || LocalStorageWorkCompleted)">
+<MudPopover Open="@(LocalStorageIsWorking || LocalStorageWorkCompleted)" AnchorOrigin="Origin.TopCenter">
     @if (LocalStorageIsWorking)
     {
         <MudProgressCircular Color="Color.Primary" Style="height:30px;width:30px;" Indeterminate="true" Class="mx-2 mt-2 mb-n0" />
@@ -21,14 +21,14 @@
         <MudIcon Color="Color.Primary" Style="height:30px;width:30px;" Icon="@Icons.Material.Outlined.DoneAll" Class="mx-2 mt-2 mb-n0" />
     }
 </MudPopover>
+
 <MudToolBar Dense="true">
     <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="AddTemplate" Icon="@Icons.Material.Outlined.PostAdd" />
         <MudSpacer/>
     <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="DownloadTemplatesAsync" Icon="@Icons.Material.Outlined.FileDownload" />
     <MudFileUpload T="IBrowserFile" Accept=".json" FilesChanged="UploadTemplates">
         <ActivatorContent>
-            <MudIconButton Variant="Variant.Text" Color="Color.Primary" Icon="@Icons.Material.Outlined.FileUpload">
-            </MudIconButton>
+            <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Outlined.FileUpload"/>
         </ActivatorContent>
     </MudFileUpload>
 </MudToolBar>
@@ -46,14 +46,13 @@
             </TitleContent>
             <ChildContent>
                 <MudToolBar Dense="true">
-                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }" Icon="@Icons.Material.Filled.PlaylistAdd" Color="Color.Secondary" />
-                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { Calculate(template); PersistAsync().AndForget(); }" Icon="@Icons.Material.TwoTone.Calculate" Color="Color.Primary" />
+                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }" Icon="@Icons.Material.Outlined.PlaylistAdd" Color="Color.Primary" />
+                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { Calculate(template); PersistAsync().AndForget(); }" Icon="@Icons.Material.Outlined.Calculate" Color="Color.Primary" />
                     <MudSpacer/>
-                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => DownloadTemplateAsync(template)" Icon="@Icons.Material.Outlined.FileDownload" Color="Color.Primary" />
+                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => DownloadTemplateAsync(template)" Icon="@Icons.Material.Outlined.Download"/>
                     <MudFileUpload T="IBrowserFile" Accept=".json" FilesChanged="(f => UploadTemplate(f, template))">
                         <ActivatorContent>
-                            <MudIconButton Variant="Variant.Text" Color="Color.Primary" Icon="@Icons.Material.Outlined.FileUpload">
-                            </MudIconButton>
+                            <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Outlined.Upload"/>
                         </ActivatorContent>
                     </MudFileUpload>
                     
