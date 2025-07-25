@@ -4,12 +4,34 @@
 @using BlazorDownloadFile
 @using System.Text.Json
 @using System.Text
+@using Sunduk.PWA.Infrastructure.Extensions
+@using System.Threading
+@using System.IO
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 
-
-КНОПКА ДОБАВЛЕНИЯ ШАБЛОНОВ
+<MudPopover Open="@(LocalStorageIsWorking || LocalStorageWorkCompleted)">
+    @if (LocalStorageIsWorking)
+    {
+        <MudProgressCircular Color="Color.Primary" Style="height:30px;width:30px;" Indeterminate="true" Class="mx-2 mt-2 mb-n0" />
+    }
+    @if (LocalStorageWorkCompleted)
+    {
+        <MudIcon Color="Color.Primary" Style="height:30px;width:30px;" Icon="@Icons.Material.Outlined.DoneAll" Class="mx-2 mt-2 mb-n0" />
+    }
+</MudPopover>
+<MudToolBar Dense="true">
+    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="AddTemplate" Icon="@Icons.Material.Outlined.PostAdd" />
+        <MudSpacer/>
+    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="DownloadTemplatesAsync" Icon="@Icons.Material.Outlined.FileDownload" />
+    <MudFileUpload T="IBrowserFile" Accept=".json" FilesChanged="UploadTemplates">
+        <ActivatorContent>
+            <MudIconButton Variant="Variant.Text" Color="Color.Primary" Icon="@Icons.Material.Outlined.FileUpload">
+            </MudIconButton>
+        </ActivatorContent>
+    </MudFileUpload>
+</MudToolBar>
 <MudExpansionPanels MultiExpansion="true">
     @foreach (var template in templates)
     {
@@ -19,48 +41,63 @@
                     <MudText>@template.Name</MudText>
                     <MudSpacer/>
                     <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="() => OpenRenameDialogAsync(template)" Icon="@Icons.Material.Outlined.DriveFileRenameOutline"/>
+                    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="() => OpenDeleteDialogAsync(template)" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error"/>
                 </MudGrid>
             </TitleContent>
             <ChildContent>
                 <MudToolBar Dense="true">
-                    <MudIconButton Variant="Variant.Text"
-                                   OnClick="async () => { template.Variables.Add(new VariableDefinition()); await PersistAsync(); }"
-                                   Icon="@Icons.Material.Filled.Add"
-                                   Color="Color.Secondary"/>
-                    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="async () => { Calculate(template); await PersistAsync(); }" Icon="@Icons.Material.TwoTone.Calculate" Color="Color.Primary" />
+                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }" Icon="@Icons.Material.Filled.PlaylistAdd" Color="Color.Secondary" />
+                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { Calculate(template); PersistAsync().AndForget(); }" Icon="@Icons.Material.TwoTone.Calculate" Color="Color.Primary" />
                     <MudSpacer/>
-                    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="() => { }" Icon="@Icons.Material.Outlined.FileDownload" Color="Color.Primary" />
-                    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="() => { }" Icon="@Icons.Material.Outlined.FileUpload" Color="Color.Primary" />
+                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => DownloadTemplateAsync(template)" Icon="@Icons.Material.Outlined.FileDownload" Color="Color.Primary" />
+                    <MudFileUpload T="IBrowserFile" Accept=".json" FilesChanged="(f => UploadTemplate(f, template))">
+                        <ActivatorContent>
+                            <MudIconButton Variant="Variant.Text" Color="Color.Primary" Icon="@Icons.Material.Outlined.FileUpload">
+                            </MudIconButton>
+                        </ActivatorContent>
+                    </MudFileUpload>
+                    
                 </MudToolBar>
                 <MudGrid Spacing="1" Class="ma-0">
                     <MudItem xs="6">
-                        <MudTextField T="string" Label="Заготовка" Variant="Variant.Filled" @bind-Value="@template.Content" AutoGrow="true" Style="font-family: 'Roboto Mono', monospace;" />
+                        <MudTextField T="string" 
+                                      Label="Заготовка" 
+                                      Variant="Variant.Filled" 
+                                      @bind-Value="@template.Content" 
+                                      AutoGrow="true"
+                                      Immediate="true"
+                                      Lines="@(template.Content.Count(c => c == '\n') + 1)"
+                                      Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
                         <MudTextField T="string"
                                       Label="Результат"
                                       Variant="Variant.Filled"
-                                      AutoGrow="true"
-                                      Style="font-family: 'Roboto Mono', monospace;"
+                                      AutoGrow="true" 
+                                      Immediate="true"
+                                      Lines="@(template.Result.Count(c => c == '\n') + 1)"
+                                      Style="font-family: 'Roboto Mono', monospace; font-size: 12px;"
                                       Value="template.Result"
                                       ReadOnly="true" />
                     </MudItem>
                     <MudItem xs="6">
-                        <MudList T="string" Dense="true">
-                            <MudField Label="Переменные" Variant="Variant.Filled" Underline="false" InnerPadding="false" FullWidth="true">
+                        <MudField Label="Переменные" Variant="Variant.Filled" Underline="false" InnerPadding="false" FullWidth="true">
+                            <MudList T="string" Dense="true">
+                            
                                 @foreach (var variable in @template.Variables)
                                 {
-                                    <MudListItem Gutters="false">
-                                        <MudGrid Spacing="0" Class="ma-0 pa-0">
-                                            <MudItem xs="4">
-                                                <MudTextField @bind-Text="variable.Name" Label="Имя" Variant="Variant.Text" />
-                                            </MudItem>
-                                            <MudItem xs="8">
-                                                <MudTextField @bind-Text="variable.Expression" Label="Значение" Variant="Variant.Text" />
-                                            </MudItem>
-                                        </MudGrid>
-                                    </MudListItem>
+                                    <MudGrid Spacing="0" Class="ma-0 pa-0">
+                                        <MudItem xs="3">
+                                            <MudTextField Margin="Margin.Dense" @bind-Text="variable.Name" Label="Имя" Variant="Variant.Text" Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
+                                        </MudItem>
+                                        <MudItem xs="8">
+                                            <MudTextField Margin="Margin.Dense" @bind-Text="variable.Expression" Label="Значение" Variant="Variant.Text" Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
+                                        </MudItem>
+                                        <MudItem xs="1">
+                                            <MudIconButton Variant="Variant.Text" Class="mx-0 mt-2 pa-0" OnClick="() => OpenDeleteDialogAsync(template, variable)" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" />
+                                        </MudItem>
+                                    </MudGrid>
                                 }
-                            </MudField>
-                        </MudList>
+                            </MudList>
+                        </MudField>
                     </MudItem>
                 </MudGrid>
             </ChildContent>
@@ -71,16 +108,59 @@
 
 @code {
     [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+    private readonly SemaphoreSlim _persistSemaphore = new(1, 1);
     private List<TemplateDefinition> templates = new();
+    public bool LocalStorageIsWorking { get; set; }
+    public bool LocalStorageWorkCompleted { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         templates = await LocalStorage.GetItemAsync<List<TemplateDefinition>>(nameof(templates))
                 ?? new List<TemplateDefinition>();
+        foreach (var template in templates)
+        {
+            template.Content += "\n";
+            template.Result += "\n";
+            StateHasChanged();
+            template.Content.TrimEnd('\n');
+            template.Result.TrimEnd('\n');
+            StateHasChanged();
+        }
+    }
+
+    private void AddTemplate()
+    {
+        templates.Add(new TemplateDefinition() { Name = $"Новый шаблон"});
+        PersistAsync().AndForget();
     }
 
     private async Task PersistAsync()
-        => await LocalStorage.SetItemAsync(nameof(templates), templates);
+    {
+        await _persistSemaphore.WaitAsync();
+        try
+        {
+            LocalStorageWorkCompleted = false;
+            LocalStorageIsWorking = true;
+            StateHasChanged();
+
+            await LocalStorage.SetItemAsync(nameof(templates), templates);
+
+            await Task.Delay(1000);
+
+            StateHasChanged();
+            LocalStorageWorkCompleted = true;
+            LocalStorageIsWorking = false;
+            StateHasChanged();
+
+            await Task.Delay(1000);
+            LocalStorageWorkCompleted = false;
+            StateHasChanged();
+        }
+        finally
+        {
+            _persistSemaphore.Release();
+        }
+    }
 
     private async Task DownloadTemplatesAsync()
     {
@@ -96,44 +176,6 @@
         await BlazorDownloadFileService.DownloadFile($"{template.Name}.json", bytes, "application/json");
     }
 
-    public static class FakeTemplateDataGenerator
-    {
-        private static readonly Random _rand = new();
-
-        public static List<TemplateDefinition> Generate(int count = 3)
-        {
-            var templates = new List<TemplateDefinition>();
-
-            for (int i = 1; i <= count; i++)
-            {
-                var variables = new List<VariableDefinition>
-            {
-                new VariableDefinition { Name = "Length", Expression = $"{RandomDouble(100, 500):0.##}" },
-                new VariableDefinition { Name = "Width", Expression = $"{RandomDouble(50, 200):0.##}" },
-                new VariableDefinition { Name = "Height", Expression = "Length / 10 + Width / 20" },
-                new VariableDefinition { Name = "Volume", Expression = "Length * Width * Height" },
-                new VariableDefinition { Name = "Diagonal", Expression = "Math.Sqrt(Length*Length + Width*Width)" }
-            };
-
-                string content = $"Шаблон №{i}:\n" +
-                    "Размеры: {Length} x {Width} x {Height}\n" +
-                    "Объём: {Volume}, Диагональ основания: {Diagonal}";
-
-                templates.Add(new TemplateDefinition
-                {
-                    Name = $"Шаблон {i}",
-                    Content = content,
-                    Variables = variables
-                });
-            }
-
-            return templates;
-        }
-
-        private static double RandomDouble(double min, double max)
-            => _rand.NextDouble() * (max - min) + min;
-    }
-
     private void Calculate(TemplateDefinition tpl)
     {
         try
@@ -147,16 +189,19 @@
                 foreach (var v in tpl.Variables)
                 {
                     if (values.ContainsKey(v.Name)) continue;
-                    var expr = new Expression(v.Expression.Replace(',','.'), ExpressionOptions.CaseInsensitiveStringComparer);
+                    var expr = new Expression(v.Expression.Replace(',','.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions);
                     foreach (var kv in values)
                         expr.Parameters[kv.Key] = kv.Value;
                     if (expr.HasErrors()) continue;
-                    var eval = expr.Evaluate();
-                    if (eval is double d)
+                    var raw = expr.Evaluate();
+                    double d = raw switch
                     {
-                        values[v.Name] = d;
-                        progress = true;
-                    }
+                        double dd => dd,
+                        int ii => ii,
+                        long ll => ll,
+                        _ => throw new Exception($"Неподдерживаемый тип: {raw?.GetType()}")
+                    };
+                    values[v.Name] = d;
                 }
                 if (--maxIter < 0) throw new Exception("Возможно, циклическая зависимость");
             } while (progress);
@@ -164,7 +209,7 @@
             tpl.Result = System.Text.RegularExpressions.Regex
                 .Replace(tpl.Content, @"\{(.*?)\}", m =>
                 {
-                    var sub = new Expression(m.Groups[1].Value, ExpressionOptions.CaseInsensitiveStringComparer);
+                    var sub = new Expression(m.Groups[1].Value, ExpressionOptions.IgnoreCaseAtBuiltInFunctions);
                     foreach (var kv in values)
                         sub.Parameters[kv.Key] = kv.Value;
                     var r = sub.Evaluate();
@@ -181,11 +226,76 @@
     private async Task OpenRenameDialogAsync(TemplateDefinition template)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
-
         var dialog = await DialogService.ShowAsync<UserInputDialog>("Переименовать", options);
         var result = await dialog.Result;
-        if (result.Canceled) return;
-        template.Name = result.Data.ToString();
+        if (result == null || result.Canceled) return;
+        template.Name = $"{result.Data}";
+        PersistAsync().AndForget();
+    }
 
+    private async Task OpenDeleteDialogAsync(TemplateDefinition template)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<ConfirmDialog> { { x => x.OkMessage, "Удалить" } };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Удаление", parameters, options);
+        var result = await dialog.Result;
+        if (result == null || result.Canceled) return;
+        templates.Remove(template);
+        PersistAsync().AndForget();
+    }
+
+    private async Task OpenDeleteDialogAsync(TemplateDefinition template, VariableDefinition variable)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Удаление",
+            $"Вы точно хотите удалить переменную{(!string.IsNullOrWhiteSpace(variable.Name) ? $" {variable.Name}" : "")}{(!string.IsNullOrWhiteSpace(variable.Expression) ? $": {variable.Expression}" : "")}?",
+            yesText: "Удалить", cancelText: "Отмена");
+        if (result != true) return;
+        template.Variables.Remove(variable);
+        PersistAsync().AndForget();
+    }
+    private async Task UploadTemplate(IBrowserFile file, TemplateDefinition template)
+    {
+        using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024);
+        using var reader = new StreamReader(stream);
+        var json = await reader.ReadToEndAsync();
+
+        var loaded = JsonSerializer.Deserialize<TemplateDefinition>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (loaded is null)
+        {
+            Snackbar.Add("Ошибка: не удалось загрузить шаблон из файла", Severity.Error);
+            return;
+        }
+        template.Name = loaded.Name;
+        template.Content = loaded.Content;
+        template.Variables = loaded.Variables ?? new List<VariableDefinition>();
+        template.Result = loaded.Result;
+        PersistAsync().AndForget();
+        StateHasChanged();
+    }
+
+    private async Task UploadTemplates(IBrowserFile file)
+    {
+        using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024);
+        using var reader = new StreamReader(stream);
+        var json = await reader.ReadToEndAsync();
+
+        var loaded = JsonSerializer.Deserialize<List<TemplateDefinition>>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (loaded is null)
+        {
+            Snackbar.Add("Ошибка: не удалось загрузить шаблон из файла", Severity.Error);
+            return;
+        }
+        templates = loaded;
+        PersistAsync().AndForget();
+        StateHasChanged();
     }
 }

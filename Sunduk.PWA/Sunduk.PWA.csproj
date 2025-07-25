@@ -14,6 +14,7 @@
 	<PublishTrimmed>false</PublishTrimmed>
 	<UserSecretsId>d8e95f7a-203c-4a38-b42e-fa8e200063e5</UserSecretsId>
 	<Description>Sunduk</Description>
+	<Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
