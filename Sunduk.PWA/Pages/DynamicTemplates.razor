@@ -61,7 +61,6 @@
         </ActivatorContent>
     </MudFileUpload>
     <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="DownloadTemplatesAsync" Icon="@Icons.Material.Outlined.FileDownload" />
-    
 </MudToolBar>
 
 <MudExpansionPanels MultiExpansion="true">
@@ -128,10 +127,23 @@
                                 {
                                     <MudGrid Spacing="0" Class="ma-0 pa-0">
                                         <MudItem xs="3">
-                                            <MudTextField Margin="Margin.Dense" @bind-Text="variable.Name" Label="Имя" Variant="Variant.Text" Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
+                                            <MudTextField 
+                                                Margin="Margin.Dense" 
+                                                @bind-Text="variable.Name" 
+                                                Error="variable.HasError" 
+                                                ErrorText="@variable.Error" 
+                                                Label="Имя" 
+                                                Variant="Variant.Text" 
+                                                Immediate="true"
+                                                Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
                                         </MudItem>
                                         <MudItem xs="8">
-                                            <MudTextField Margin="Margin.Dense" @bind-Text="variable.Expression" Label="Значение" Variant="Variant.Text" Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
+                                            <MudTextField 
+                                                Margin="Margin.Dense" 
+                                                @bind-Text="variable.Expression" 
+                                                Label="Значение" 
+                                                Variant="Variant.Text" 
+                                                Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
                                         </MudItem>
                                         <MudItem xs="1">
                                             <MudIconButton Variant="Variant.Text" Class="mx-0 mt-2 pa-0" OnClick="() => OpenDeleteDialogAsync(template, variable)" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" />
@@ -150,7 +162,7 @@
 @code {
     [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
-    private const string DefaultDragClass = "rounded-lg border-2 border-dashed border-hidden align-start d-flex object-fill mud-theme-transparent ma-3";
+    private const string DefaultDragClass = "border-2 border-dashed border-hidden align-start d-flex object-fill mud-theme-transparent ma-3";
     private string _dragClass = DefaultDragClass;
     private readonly List<string> _fileNames = new();
     private MudFileUpload<IReadOnlyList<IBrowserFile>>? _fileUpload;
@@ -253,15 +265,28 @@
         PersistAsync().AndForget();
     }
 
+    private readonly Dictionary<string, string> _variableMapping = new Dictionary<string, string>();
+
     private void Calculate(TemplateDefinition tpl)
     {
         try
         {
-            var values = new Dictionary<string, double>();
-            var maxIter = tpl.Variables.Count * 2; // Максимальное количество итераций
-            var currentIter = 0;
+            _variableMapping.Clear();
 
+            var values = new Dictionary<string, double>();
+            var maxIter = tpl.Variables.Count * 2;
+            var currentIter = 0;
             bool hasProgress;
+
+            int mappingCounter = 0;
+            foreach (var v in tpl.Variables.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
+            {
+                if (ContainsCyrillic(v.Name) && !_variableMapping.ContainsKey(v.Name))
+                {
+                    _variableMapping[v.Name] = $"var_{mappingCounter++}";
+                }
+            }
+
             do
             {
                 hasProgress = false;
@@ -269,19 +294,26 @@
 
                 foreach (var v in tpl.Variables)
                 {
-                    // Пропускаем уже вычисленные переменные
-                    if (values.ContainsKey(v.Name)) continue;
+                    if (string.IsNullOrWhiteSpace(v.Name) || string.IsNullOrWhiteSpace(v.Expression))
+                        continue;
+
+                    if (values.ContainsKey(v.Name))
+                        continue;
 
                     try
                     {
-                        var expr = new Expression(v.Expression.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions);
+                        string processedExpression = ProcessExpressionForNCalc(v.Expression);
 
-                        // Подставляем уже известные значения
+                        var expr = new Expression(processedExpression.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions);
+
                         foreach (var kv in values)
-                            expr.Parameters[kv.Key] = kv.Value;
+                        {
+                            string paramName = GetMappedName(kv.Key);
+                            expr.Parameters[paramName] = kv.Value;
+                        }
 
-                        // Проверяем, есть ли ошибки (например, неопределенные переменные)
-                        if (expr.HasErrors()) continue;
+                        if (expr.HasErrors())
+                            continue;
 
                         var raw = expr.Evaluate();
                         double d = raw switch
@@ -296,53 +328,63 @@
                     }
                     catch
                     {
-                        // Если не удалось вычислить на этой итерации, попробуем на следующей
                         continue;
                     }
                 }
 
-                // Есть прогресс, если количество вычисленных переменных увеличилось
                 hasProgress = values.Count > initialCount;
                 currentIter++;
 
-                // Защита от бесконечного цикла
                 if (currentIter >= maxIter)
                 {
-                    // Проверяем, остались ли невычисленные переменные
-                    var unresolved = tpl.Variables.Where(v => !values.ContainsKey(v.Name)).ToList();
-                    if (unresolved.Any())
+                    var validUnresolved = tpl.Variables
+                        .Where(v => !string.IsNullOrWhiteSpace(v.Name) &&
+                                   !string.IsNullOrWhiteSpace(v.Expression) &&
+                                   !values.ContainsKey(v.Name))
+                        .ToList();
+
+                    if (validUnresolved.Any())
                     {
-                        var unresolvedNames = string.Join(", ", unresolved.Select(v => $"{v.Name}: {v.Expression}"));
+                        var unresolvedNames = string.Join(", ", validUnresolved.Select(v => $"{v.Name}: {v.Expression}"));
                         throw new Exception($"Не удалось вычислить переменные (возможно, циклическая зависимость или неопределенные переменные): {unresolvedNames}");
                     }
                     break;
                 }
+            }
+            while (hasProgress && values.Count < tpl.Variables.Count(v => !string.IsNullOrWhiteSpace(v.Name) && !string.IsNullOrWhiteSpace(v.Expression)));
 
-            } while (hasProgress && values.Count < tpl.Variables.Count);
+            var validNotResolved = tpl.Variables
+                .Where(v => !string.IsNullOrWhiteSpace(v.Name) &&
+                           !string.IsNullOrWhiteSpace(v.Expression) &&
+                           !values.ContainsKey(v.Name))
+                .ToList();
 
-            // Проверяем, все ли переменные были вычислены
-            var notResolved = tpl.Variables.Where(v => !values.ContainsKey(v.Name)).ToList();
-            if (notResolved.Any())
+            if (validNotResolved.Any())
             {
-                var notResolvedNames = string.Join(", ", notResolved.Select(v => $"{v.Name}: {v.Expression}"));
+                var notResolvedNames = string.Join(", ", validNotResolved.Select(v => $"{v.Name}: {v.Expression}"));
                 throw new Exception($"Не удалось вычислить переменные: {notResolvedNames}");
             }
 
-            // Выполняем подстановку в шаблон
             tpl.Result = System.Text.RegularExpressions.Regex
                 .Replace(tpl.Content, @"\{(.*?)\}", m =>
                 {
                     try
                     {
-                        var sub = new Expression(m.Groups[1].Value.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions);
+                        string processedExpression = ProcessExpressionForNCalc(m.Groups[1].Value);
+
+                        var sub = new Expression(processedExpression.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions);
+
                         foreach (var kv in values)
-                            sub.Parameters[kv.Key] = kv.Value;
+                        {
+                            string paramName = GetMappedName(kv.Key);
+                            sub.Parameters[paramName] = kv.Value;
+                        }
 
                         if (sub.HasErrors())
                             return "[?]";
 
                         var r = sub.Evaluate();
-                        return r is double x ? x.ToString("0.###").Replace(',', '.') :
+                        return r is double d ? d.ToString("0.###").Replace(',', '.') :
                                r is int i ? i.ToString() :
                                r is long l ? l.ToString() :
                                r?.ToString() ?? "[?]";
@@ -360,6 +402,43 @@
         }
     }
 
+    private string ProcessExpressionForNCalc(string expression)
+    {
+        if (string.IsNullOrWhiteSpace(expression))
+            return expression;
+
+        string result = expression;
+
+        var cyrillicVariables = _variableMapping.Keys
+            .OrderByDescending(name => name.Length)
+            .ToList();
+
+        foreach (var originalName in cyrillicVariables)
+        {
+            var asciiName = _variableMapping[originalName];
+
+            string pattern = @"(?<![а-яА-ЯёЁa-zA-Z0-9_])" +
+                            System.Text.RegularExpressions.Regex.Escape(originalName) +
+                            @"(?![а-яА-ЯёЁa-zA-Z0-9_])";
+
+            result = System.Text.RegularExpressions.Regex.Replace(result, pattern, asciiName);
+        }
+
+        return result;
+    }
+
+    private string GetMappedName(string originalName)
+    {
+        return _variableMapping.ContainsKey(originalName) ? _variableMapping[originalName] : originalName;
+    }
+
+    private bool ContainsCyrillic(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return false;
+
+        return text.Any(c => (c >= 'а' && c <= 'я') || (c >= 'А' && c <= 'Я') || c == 'ё' || c == 'Ё');
+    }
     private async Task OpenRenameDialogAsync(TemplateDefinition template)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
@@ -384,11 +463,20 @@
 
     private async Task OpenDeleteDialogAsync(TemplateDefinition template, VariableDefinition variable)
     {
-        bool? result = await DialogService.ShowMessageBox(
-            "Удаление",
-            $"Вы точно хотите удалить переменную{(!string.IsNullOrWhiteSpace(variable.Name) ? $" {variable.Name}" : "")}{(!string.IsNullOrWhiteSpace(variable.Expression) ? $": {variable.Expression}" : "")}?",
-            yesText: "Удалить", cancelText: "Отмена");
-        if (result != true) return;
+        if (!string.IsNullOrWhiteSpace(variable.Name) || !string.IsNullOrWhiteSpace(variable.Expression))
+        {
+            var namePart = string.IsNullOrWhiteSpace(variable.Name) ? "" : $" {variable.Name}";
+            var exprPart = string.IsNullOrWhiteSpace(variable.Expression) ? "" : $": {variable.Expression}";
+            var message = $"Вы точно хотите удалить переменную{namePart}{exprPart}?";
+
+            var result = await DialogService.ShowMessageBox(
+                "Удаление", message,
+                yesText: "Удалить", cancelText: "Отмена");
+
+            if (result != true)
+                return;
+        }
+
         template.Variables.Remove(variable);
         PersistAsync().AndForget();
     }
