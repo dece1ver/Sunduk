@@ -7,6 +7,7 @@
 @using Sunduk.PWA.Infrastructure.Extensions
 @using System.Threading
 @using System.IO
+@using BlazorTextEditor
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
@@ -36,7 +37,9 @@
 
 
 <MudToolBar Dense="true">
-    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="AddTemplate" Icon="@Icons.Material.Outlined.PostAdd" />
+    <MudButtonGroup>
+        <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="AddTemplate" Icon="@Icons.Material.Outlined.PostAdd" />
+    </MudButtonGroup>
     <MudFileUpload T="IReadOnlyList<IBrowserFile>" Class="flex-grow-1"
                    @ref="@_fileUpload"
                    OnFilesChanged="OnInputFileChanged"
@@ -63,15 +66,15 @@
     <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="DownloadTemplatesAsync" Icon="@Icons.Material.Outlined.FileDownload" />
 </MudToolBar>
 
-<MudExpansionPanels MultiExpansion="true">
+<MudExpansionPanels MultiExpansion="true" Square="true">
     @foreach (var template in templates)
     {
-        <MudExpansionPanel Gutters="false" Dense="true" ExpandedChanged="@(() => Calculate(template))" Class="ma-1">
+        <MudExpansionPanel>
             <TitleContent>
-                <MudGrid Class="align-start d-flex ma-0 pa-0" Spacing="1">
-                    <MudText>@template.Name</MudText>
+                <MudGrid Class="align-start d-flex" Spacing="1">
+                    <MudText Class="mt-1 mb-n1">@template.Name</MudText>
                     <MudSpacer />
-                    <MudButtonGroup Class="mx-3 my-n2" Variant="Variant.Outlined">
+                    <MudButtonGroup Class="mx-3 mt-0 mb-n1" Variant="Variant.Outlined">
                         @if (templates.IndexOf(template) < templates.Count - 1)
                         {
                             <MudIconButton Variant="Variant.Text" OnClick="() => MoveDown(template)" Icon="@Icons.Material.Outlined.ArrowDropDown" />
@@ -90,14 +93,8 @@
                     <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { Calculate(template); PersistAsync().AndForget(); }" Icon="@Icons.Material.Outlined.Calculate" Color="Color.Primary" />
                     <MudSpacer />
                     <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }" Icon="@Icons.Material.Outlined.PlaylistAdd" />
-                    <MudDivider DividerType="DividerType.Inset" />
+                        <MudDivider Vertical="true"/>
                     <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => DownloadTemplateAsync(template)" Icon="@Icons.Material.Outlined.Download" />
-                    <MudFileUpload T="IBrowserFile" Accept=".json" FilesChanged="(f => UploadTemplate(f, template))">
-                        <ActivatorContent>
-                            <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Outlined.Upload" />
-                        </ActivatorContent>
-                    </MudFileUpload>
-
                 </MudToolBar>
                 <MudGrid Spacing="1" Class="ma-0">
                     <MudItem xs="6">
@@ -160,40 +157,27 @@
 </MudExpansionPanels>
 
 @code {
+    // =====================================
+    // ВНЕДРЕНИЕ ЗАВИСИМОСТЕЙ
+    // =====================================
     [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
+    // =====================================
+    // СОСТОЯНИЕ КОМПОНЕНТА И ПЕРЕМЕННЫЕ
+    // =====================================
     private const string DefaultDragClass = "border-2 border-dashed border-hidden align-start d-flex object-fill mud-theme-transparent ma-3";
     private string _dragClass = DefaultDragClass;
     private readonly List<string> _fileNames = new();
     private MudFileUpload<IReadOnlyList<IBrowserFile>>? _fileUpload;
-
-    private async Task ClearAsync()
-    {
-        await (_fileUpload?.ClearAsync() ?? Task.CompletedTask);
-        _fileNames.Clear();
-        ClearDragClass();
-    }
-
-    private Task OpenFilePickerAsync()
-        => _fileUpload?.OpenFilePickerAsync() ?? Task.CompletedTask;
-
-    private void OnInputFileChanged(InputFileChangeEventArgs e)
-    {
-        ClearDragClass();
-        var files = e.GetMultipleFiles();
-        UploadTemplates(files.FirstOrDefault());
-    }
-
-    private void SetDragClass()
-        => _dragClass = $"{DefaultDragClass.Replace("border-hidden ", "")} mud-border-primary";
-
-    private void ClearDragClass()
-        => _dragClass = DefaultDragClass;
     private readonly SemaphoreSlim _persistSemaphore = new(1, 1);
     public List<TemplateDefinition> templates { get; set; } = new();
     public bool LocalStorageIsWorking { get; set; }
     public bool LocalStorageWorkCompleted { get; set; }
+    private readonly Dictionary<string, string> _variableMapping = new Dictionary<string, string>();
 
+    // =====================================
+    // ИНИЦИАЛИЗАЦИЯ КОМПОНЕНТА
+    // =====================================
     protected override async Task OnInitializedAsync()
     {
         templates = await LocalStorage.GetItemAsync<List<TemplateDefinition>>(nameof(templates))
@@ -201,12 +185,36 @@
         StateHasChanged();
     }
 
+    // =====================================
+    // УПРАВЛЕНИЕ ШАБЛОНАМИ
+    // =====================================
     private void AddTemplate()
     {
-        templates.Add(new TemplateDefinition() { Name = $"Новый шаблон", Variables  = new() { new VariableDefinition() } } );
+        templates.Add(new TemplateDefinition() { Name = $"Новый шаблон", Variables = new() { new VariableDefinition() } });
         PersistAsync().AndForget();
     }
 
+    private void MoveUp(TemplateDefinition template)
+    {
+        var i = templates.IndexOf(template);
+        templates.Remove(template);
+        templates.Insert(i - 1, template);
+        StateHasChanged();
+        PersistAsync().AndForget();
+    }
+
+    private void MoveDown(TemplateDefinition template)
+    {
+        var i = templates.IndexOf(template);
+        templates.Remove(template);
+        templates.Insert(i + 1, template);
+        StateHasChanged();
+        PersistAsync().AndForget();
+    }
+
+    // =====================================
+    // РАБОТА С ЛОКАЛЬНЫМ ХРАНИЛИЩЕМ
+    // =====================================
     private async Task PersistAsync()
     {
         await _persistSemaphore.WaitAsync();
@@ -233,8 +241,16 @@
         }
     }
 
+    // =====================================
+    // ЭКСПОРТ ШАБЛОНОВ
+    // =====================================
     private async Task DownloadTemplatesAsync()
     {
+        if (templates.Count < 1)
+        {
+            Snackbar.Add("Нечего скачивать", Severity.Warning);
+            return;
+        }
         var json = JsonSerializer.Serialize(templates, new JsonSerializerOptions { WriteIndented = true });
         var bytes = Encoding.UTF8.GetBytes(json);
         await BlazorDownloadFileService.DownloadFile("sunduk-dt-all.json", bytes, "application/json");
@@ -247,26 +263,72 @@
         await BlazorDownloadFileService.DownloadFile($"sunduk-dt-{template.Name}.json", bytes, "application/json");
     }
 
-    private void MoveUp(TemplateDefinition template)
+    // =====================================
+    // ИМПОРТ ШАБЛОНОВ
+    // =====================================
+
+    private async Task UploadTemplates(IBrowserFile file)
     {
-        var i = templates.IndexOf(template);
-        templates.Remove(template);
-        templates.Insert(i - 1, template);
-        StateHasChanged();
+        using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024);
+        using var reader = new StreamReader(stream);
+        var json = await reader.ReadToEndAsync();
+
+        List<TemplateDefinition>? loaded = null;
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+
+
+        try
+        {
+            loaded = JsonSerializer.Deserialize<List<TemplateDefinition>>(json, options);
+        }
+        catch (JsonException ex)
+        {
+            Snackbar.Add($"Ошибка чтения JSON: {ex.Message}", Severity.Error);
+            return;
+        }
+
+        if (loaded == null || loaded.Count == 0)
+        {
+            Snackbar.Add("Ошибка: не удалось загрузить ни одного шаблона из файла", Severity.Error);
+            return;
+        }
+
+        if (templates.Any())
+        {
+            var result = await DialogService.ShowMessageBox(
+                "Импорт шаблонов",
+                $"Добавить шаблоны: {loaded.Count} шт. к существующим или заменить всё?",
+                yesText: "Добавить", noText: "Заменить", cancelText: "Отмена");
+
+            switch (result)
+            {
+                case true:
+                    templates.AddRange(loaded);
+                    break;
+                case false:
+                    templates = loaded;
+                    break;
+                default:
+                    return;
+            }
+        }
+        else
+        {
+            templates = loaded;
+        }
+
         PersistAsync().AndForget();
+        StateHasChanged();
     }
 
-    private void MoveDown(TemplateDefinition template)
-    {
-        var i = templates.IndexOf(template);
-        templates.Remove(template);
-        templates.Insert(i + 1, template);
-        StateHasChanged();
-        PersistAsync().AndForget();
-    }
-
-    private readonly Dictionary<string, string> _variableMapping = new Dictionary<string, string>();
-
+    // =====================================
+    // ЛОГИКА ВЫЧИСЛЕНИЯ ШАБЛОНОВ
+    // =====================================
     private void Calculate(TemplateDefinition tpl)
     {
         try
@@ -439,6 +501,10 @@
 
         return text.Any(c => (c >= 'а' && c <= 'я') || (c >= 'А' && c <= 'Я') || c == 'ё' || c == 'Ё');
     }
+
+    // =====================================
+    // ДИАЛОГОВЫЕ ОКНА
+    // =====================================
     private async Task OpenRenameDialogAsync(TemplateDefinition template)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
@@ -452,11 +518,15 @@
 
     private async Task OpenDeleteDialogAsync(TemplateDefinition template)
     {
-        var options = new DialogOptions { CloseOnEscapeKey = true };
-        var parameters = new DialogParameters<ConfirmDialog> { { x => x.OkMessage, "Удалить" } };
-        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Удаление", parameters, options);
-        var result = await dialog.Result;
-        if (result == null || result.Canceled) return;
+        var namePart = !string.IsNullOrWhiteSpace(template.Name) ? $" \"{template.Name}\"" : "";
+        var message = $"Вы точно хотите удалить шаблон{namePart}?";
+
+        var result = await DialogService.ShowMessageBox(
+            "Удаление шаблона", message,
+            yesText: "Удалить", cancelText: "Отмена");
+
+        if (result != true) return;
+
         templates.Remove(template);
         PersistAsync().AndForget();
     }
@@ -473,106 +543,36 @@
                 "Удаление", message,
                 yesText: "Удалить", cancelText: "Отмена");
 
-            if (result != true)
-                return;
+            if (result != true) return;
         }
 
         template.Variables.Remove(variable);
         PersistAsync().AndForget();
     }
-    private async Task UploadTemplate(IBrowserFile file, TemplateDefinition template)
+
+    // =====================================
+    // ОБРАБОТЧИКИ UI СОБЫТИЙ
+    // =====================================
+    private async Task ClearAsync()
     {
-        using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024);
-        using var reader = new StreamReader(stream);
-        var json = await reader.ReadToEndAsync();
-
-        var loaded = JsonSerializer.Deserialize<TemplateDefinition>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
-
-        if (loaded is null)
-        {
-            Snackbar.Add("Ошибка: не удалось загрузить шаблон из файла", Severity.Error);
-            return;
-        }
-        template.Name = loaded.Name;
-        template.Content = loaded.Content;
-        template.Variables = loaded.Variables ?? new List<VariableDefinition>();
-        template.Result = loaded.Result;
-        PersistAsync().AndForget();
-        StateHasChanged();
+        await (_fileUpload?.ClearAsync() ?? Task.CompletedTask);
+        _fileNames.Clear();
+        ClearDragClass();
     }
 
-    private async Task UploadTemplates(IBrowserFile file)
+    private Task OpenFilePickerAsync()
+        => _fileUpload?.OpenFilePickerAsync() ?? Task.CompletedTask;
+
+    private void OnInputFileChanged(InputFileChangeEventArgs e)
     {
-        using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024);
-        using var reader = new StreamReader(stream);
-        var json = await reader.ReadToEndAsync();
-
-        List<TemplateDefinition>? loaded = null;
-
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-
-        try
-        {
-            // как список
-            loaded = JsonSerializer.Deserialize<List<TemplateDefinition>>(json, options);
-        }
-        catch (JsonException)
-        {
-            // возможно одиночный
-        }
-
-        if (loaded == null)
-        {
-            try
-            {
-                var single = JsonSerializer.Deserialize<TemplateDefinition>(json, options);
-                if (single is not null)
-                    loaded = new List<TemplateDefinition> { single };
-            }
-            catch (JsonException ex)
-            {
-                Snackbar.Add($"Ошибка чтения JSON: {ex.Message}", Severity.Error);
-                return;
-            }
-        }
-
-        if (loaded == null || loaded.Count == 0)
-        {
-            Snackbar.Add("Ошибка: не удалось загрузить ни одного шаблона из файла", Severity.Error);
-            return;
-        }
-
-        if (templates.Any())
-        {
-            var result = await DialogService.ShowMessageBox(
-                "Импорт шаблонов",
-                $"Добавить шаблоны: {loaded.Count} шт. к существующим или заменить всё?",
-                yesText: "Добавить", noText: "Заменить", cancelText: "Отмена");
-
-            switch (result)
-            {
-                case true:
-                    templates.AddRange(loaded);
-                    break;
-                case false:
-                    templates = loaded;
-                    break;
-                default:
-                    return;
-            }
-        }
-        else
-        {
-            templates = loaded;
-        }
-
-        PersistAsync().AndForget();
-        StateHasChanged();
+        ClearDragClass();
+        var files = e.GetMultipleFiles();
+        UploadTemplates(files.FirstOrDefault());
     }
+
+    private void SetDragClass()
+        => _dragClass = $"{DefaultDragClass.Replace("border-hidden ", "")} mud-border-primary";
+
+    private void ClearDragClass()
+        => _dragClass = DefaultDragClass;
 }
