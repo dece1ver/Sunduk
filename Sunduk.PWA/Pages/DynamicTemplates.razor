@@ -63,32 +63,37 @@
     <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="DownloadTemplatesAsync" Icon="@Icons.Material.Outlined.FileDownload" />
     
 </MudToolBar>
-<MudDivider />
 
-<MudDropContainer T="TemplateDefinition" Items="templates" ItemsSelector="@((_, _) => true)" ItemDropped="ItemUpdated">
-    <ChildContent>
-        <MudDropZone T="TemplateDefinition" AllowReorder="true">
-            <MudSpacer />
-        </MudDropZone>
-    </ChildContent>
-    <ItemRenderer>
-        <MudExpansionPanel Gutters="false" Dense="true" ExpandedChanged="@(() => Calculate(context))" Class="ma-1">
+<MudExpansionPanels MultiExpansion="true">
+    @foreach (var template in templates)
+    {
+        <MudExpansionPanel Gutters="false" Dense="true" ExpandedChanged="@(() => Calculate(template))" Class="ma-1">
             <TitleContent>
                 <MudGrid Class="align-start d-flex ma-0 pa-0" Spacing="1">
-                    <MudText>@context.Name</MudText>
-                    <MudSpacer/>
-                    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="() => OpenRenameDialogAsync(context)" Icon="@Icons.Material.Outlined.DriveFileRenameOutline" />
-                    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="() => OpenDeleteDialogAsync(context)" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" />
+                    <MudText>@template.Name</MudText>
+                    <MudSpacer />
+                    <MudButtonGroup Class="mx-3 my-n2" Variant="Variant.Outlined">
+                        @if (templates.IndexOf(template) < templates.Count - 1)
+                        {
+                            <MudIconButton Variant="Variant.Text" OnClick="() => MoveDown(template)" Icon="@Icons.Material.Outlined.ArrowDropDown" />
+                        }
+                        @if (templates.IndexOf(template) > 0)
+                        {
+                            <MudIconButton Variant="Variant.Text" OnClick="() => MoveUp(template)" Icon="@Icons.Material.Outlined.ArrowDropUp" />
+                        }
+                        <MudIconButton Variant="Variant.Text" OnClick="() => OpenRenameDialogAsync(template)" Icon="@Icons.Material.Outlined.DriveFileRenameOutline" />
+                        <MudIconButton Variant="Variant.Text" OnClick="() => OpenDeleteDialogAsync(template)" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error"/>
+                    </MudButtonGroup>
                 </MudGrid>
             </TitleContent>
             <ChildContent>
                 <MudToolBar Dense="true">
-                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { Calculate(context); PersistAsync().AndForget(); }" Icon="@Icons.Material.Outlined.Calculate" Color="Color.Primary" />
+                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { Calculate(template); PersistAsync().AndForget(); }" Icon="@Icons.Material.Outlined.Calculate" Color="Color.Primary" />
                     <MudSpacer />
-                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { context.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }" Icon="@Icons.Material.Outlined.PlaylistAdd" />
-                        <MudDivider DividerType="DividerType.Inset"/>
-                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => DownloadTemplateAsync(context)" Icon="@Icons.Material.Outlined.Download" />
-                    <MudFileUpload T="IBrowserFile" Accept=".json" FilesChanged="(f => UploadTemplate(f, context))">
+                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }" Icon="@Icons.Material.Outlined.PlaylistAdd" />
+                    <MudDivider DividerType="DividerType.Inset" />
+                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => DownloadTemplateAsync(template)" Icon="@Icons.Material.Outlined.Download" />
+                    <MudFileUpload T="IBrowserFile" Accept=".json" FilesChanged="(f => UploadTemplate(f, template))">
                         <ActivatorContent>
                             <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Outlined.Upload" />
                         </ActivatorContent>
@@ -100,26 +105,26 @@
                         <MudTextField T="string"
                                       Label="Заготовка"
                                       Variant="Variant.Filled"
-                                      @bind-Value="@context.Content"
+                                      @bind-Value="@template.Content"
                                       AutoGrow="true"
                                       Immediate="true"
-                                      Lines="@(context.Content.Count(c => c == '\n') + 1)"
+                                      Lines="@(template.Content.Count(c => c == '\n') + 1)"
                                       Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
                         <MudTextField T="string"
                                       Label="Результат"
                                       Variant="Variant.Filled"
                                       AutoGrow="true"
                                       Immediate="true"
-                                      Lines="@(context.Result.Count(c => c == '\n') + 1)"
+                                      Lines="@(template.Result.Count(c => c == '\n') + 1)"
                                       Style="font-family: 'Roboto Mono', monospace; font-size: 12px;"
-                                      Value="context.Result"
+                                      Value="template.Result"
                                       ReadOnly="true" />
                     </MudItem>
                     <MudItem xs="6">
                         <MudField Label="Переменные" Variant="Variant.Filled" Underline="false" InnerPadding="false" FullWidth="true">
                             <MudList T="string" Dense="true">
 
-                                @foreach (var variable in @context.Variables)
+                                @foreach (var variable in @template.Variables)
                                 {
                                     <MudGrid Spacing="0" Class="ma-0 pa-0">
                                         <MudItem xs="3">
@@ -129,7 +134,7 @@
                                             <MudTextField Margin="Margin.Dense" @bind-Text="variable.Expression" Label="Значение" Variant="Variant.Text" Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
                                         </MudItem>
                                         <MudItem xs="1">
-                                            <MudIconButton Variant="Variant.Text" Class="mx-0 mt-2 pa-0" OnClick="() => OpenDeleteDialogAsync(context, variable)" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" />
+                                            <MudIconButton Variant="Variant.Text" Class="mx-0 mt-2 pa-0" OnClick="() => OpenDeleteDialogAsync(template, variable)" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" />
                                         </MudItem>
                                     </MudGrid>
                                 }
@@ -139,8 +144,8 @@
                 </MudGrid>
             </ChildContent>
         </MudExpansionPanel>
-    </ItemRenderer>
-</MudDropContainer>
+    }
+</MudExpansionPanels>
 
 @code {
     [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
@@ -230,17 +235,23 @@
         await BlazorDownloadFileService.DownloadFile($"sunduk-dt-{template.Name}.json", bytes, "application/json");
     }
 
-    private void ItemUpdated(MudItemDropInfo<TemplateDefinition> dropItem)
+    private void MoveUp(TemplateDefinition template)
     {
-        if (dropItem is { Item: TemplateDefinition i })
-        {
-            templates.Remove(i);
-            templates.Insert(dropItem.IndexInZone, i);
-            StateHasChanged();
-            PersistAsync().AndForget();
-        }
+        var i = templates.IndexOf(template);
+        templates.Remove(template);
+        templates.Insert(i - 1, template);
+        StateHasChanged();
+        PersistAsync().AndForget();
     }
 
+    private void MoveDown(TemplateDefinition template)
+    {
+        var i = templates.IndexOf(template);
+        templates.Remove(template);
+        templates.Insert(i + 1, template);
+        StateHasChanged();
+        PersistAsync().AndForget();
+    }
 
     private void Calculate(TemplateDefinition tpl)
     {
@@ -420,12 +431,12 @@
 
         try
         {
-            // Пытаемся как список
+            // как список
             loaded = JsonSerializer.Deserialize<List<TemplateDefinition>>(json, options);
         }
         catch (JsonException)
         {
-            // Игнорируем, пробуем как одиночный объект
+            // возможно одиночный
         }
 
         if (loaded == null)
