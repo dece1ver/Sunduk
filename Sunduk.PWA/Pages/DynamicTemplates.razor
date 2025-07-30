@@ -37,9 +37,7 @@
 
 
 <MudToolBar Dense="true">
-    <MudButtonGroup>
-        <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="AddTemplate" Icon="@Icons.Material.Outlined.PostAdd" />
-    </MudButtonGroup>
+    <MudButton Variant="Variant.Outlined" OnClick="AddTemplate" EndIcon="@Icons.Material.Outlined.PostAdd" Size="Size.Small">Добавить шаблон</MudButton>
     <MudFileUpload T="IReadOnlyList<IBrowserFile>" Class="flex-grow-1"
                    @ref="@_fileUpload"
                    OnFilesChanged="OnInputFileChanged"
@@ -165,7 +163,9 @@
     // =====================================
     // СОСТОЯНИЕ КОМПОНЕНТА И ПЕРЕМЕННЫЕ
     // =====================================
-    private const string DefaultDragClass = "border-2 border-dashed border-hidden align-start d-flex object-fill mud-theme-transparent ma-3";
+    private const string RadianToDegreeFunction = "Deg";
+    private const string DegreeToRadianFunction = "Rad";
+    private const string DefaultDragClass = "border-2 border-dashed align-start d-flex object-fill mud-theme-transparent ma-3";
     private string _dragClass = DefaultDragClass;
     private readonly List<string> _fileNames = new();
     private MudFileUpload<IReadOnlyList<IBrowserFile>>? _fileUpload;
@@ -367,6 +367,34 @@
                         string processedExpression = ProcessExpressionForNCalc(v.Expression);
 
                         var expr = new Expression(processedExpression.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions);
+
+                        expr.Functions[DegreeToRadianFunction] = (args) =>
+                        {
+                            if (args.Count() > 1) throw new ArgumentOutOfRangeException($"Слишком много аргументов для функции {DegreeToRadianFunction}");
+                            double d = args[0].Evaluate() switch
+                            {
+                                double dd => dd,
+                                int ii => ii,
+                                long ll => ll,
+                                string ss => ToDouble(ss.Replace(',', '.')),
+                                _ => throw new ArgumentException($"Неподдерживаемый тип: {args?.GetType()}")
+                            };
+                            return d * Math.PI / 180;
+                        };
+
+                        expr.Functions[RadianToDegreeFunction] = (args) =>
+                        {
+                            if (args.Count() > 1) throw new ArgumentOutOfRangeException($"Слишком много аргументов для функции {RadianToDegreeFunction}");
+                            double d = args[0].Evaluate() switch
+                            {
+                                double dd => dd,
+                                int ii => ii,
+                                long ll => ll,
+                                string ss => ToDouble(ss.Replace(',', '.')),
+                                _ => throw new ArgumentException($"Неподдерживаемый тип: {args?.GetType()}")
+                            };
+                            return d * 180 / Math.PI;
+                        };
 
                         foreach (var kv in values)
                         {
@@ -575,4 +603,18 @@
 
     private void ClearDragClass()
         => _dragClass = DefaultDragClass;
+
+    // =====================================
+    // УТИЛИТЫ
+    // =====================================
+    double ToDouble(object raw)
+    {
+        return raw switch
+        {
+            int i => i,
+            long l => l,
+            double d => d,
+            _ => throw new ArgumentException($"Неподдерживаемый тип аргумента: {raw.GetType()}")
+        };
+    }
 }
