@@ -21,6 +21,13 @@
         z-index: 10;
         opacity: 0;
     }
+
+    .variable-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding-top: 8px;
+    }
 </style>
 
 <MudPopover Open="@(LocalStorageIsWorking || LocalStorageWorkCompleted)" AnchorOrigin="Origin.TopCenter">
@@ -33,8 +40,6 @@
         <MudIcon Color="Color.Primary" Style="height:30px;width:30px;" Icon="@Icons.Material.Outlined.DoneAll" Class="mx-2 mt-2 mb-n0" />
     }
 </MudPopover>
-
-
 
 <MudToolBar Dense="true">
     <MudButton Variant="Variant.Outlined" OnClick="AddTemplate" EndIcon="@Icons.Material.Outlined.PostAdd" Size="Size.Small">Добавить шаблон</MudButton>
@@ -51,10 +56,10 @@
                    @ondragend="@ClearDragClass">
         <ActivatorContent>
             <MudPaper Outlined="true" Class="@_dragClass">
-                <MudSpacer/>
+                <MudSpacer />
                 <MudFileUpload T="IBrowserFile" Accept=".json" FilesChanged="UploadTemplates">
                     <ActivatorContent>
-                        <MudSpacer/>
+                        <MudSpacer />
                         <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Outlined.FileUpload" />
                     </ActivatorContent>
                 </MudFileUpload>
@@ -82,7 +87,7 @@
                             <MudIconButton Variant="Variant.Text" OnClick="() => MoveUp(template)" Icon="@Icons.Material.Outlined.ArrowDropUp" />
                         }
                         <MudIconButton Variant="Variant.Text" OnClick="() => OpenRenameDialogAsync(template)" Icon="@Icons.Material.Outlined.DriveFileRenameOutline" />
-                        <MudIconButton Variant="Variant.Text" OnClick="() => OpenDeleteDialogAsync(template)" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error"/>
+                        <MudIconButton Variant="Variant.Text" OnClick="() => OpenDeleteDialogAsync(template)" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" />
                     </MudButtonGroup>
                 </MudGrid>
             </TitleContent>
@@ -91,26 +96,27 @@
                     <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { Calculate(template); PersistAsync().AndForget(); }" Icon="@Icons.Material.Outlined.Calculate" Color="Color.Primary" />
                     <MudSpacer />
                     <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }" Icon="@Icons.Material.Outlined.PlaylistAdd" />
-                        <MudDivider Vertical="true"/>
+                    <MudDivider Vertical="true" />
                     <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => DownloadTemplateAsync(template)" Icon="@Icons.Material.Outlined.Download" />
                 </MudToolBar>
                 <MudGrid Spacing="1" Class="ma-0">
                     <MudItem xs="6">
                         <MudTextField T="string"
                                       Label="Заготовка"
+                                      Style="font-family: 'Roboto Mono', monospace; font-size: 10px;"
                                       Variant="Variant.Filled"
-                                      @bind-Value="@template.Content"
                                       AutoGrow="true"
+                                      @bind-Value="@template.Content"
                                       Immediate="true"
                                       Lines="@(template.Content.Count(c => c == '\n') + 1)"
-                                      Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
+                                       />
                         <MudTextField T="string"
                                       Label="Результат"
+                                      Style="font-family: 'Roboto Mono', monospace; font-size: 12px;"
                                       Variant="Variant.Filled"
                                       AutoGrow="true"
                                       Immediate="true"
                                       Lines="@(template.Result.Count(c => c == '\n') + 1)"
-                                      Style="font-family: 'Roboto Mono', monospace; font-size: 12px;"
                                       Value="template.Result"
                                       ReadOnly="true" />
                     </MudItem>
@@ -120,28 +126,53 @@
 
                                 @foreach (var variable in @template.Variables)
                                 {
-                                    <MudGrid Spacing="0" Class="ma-0 pa-0">
-                                        <MudItem xs="3">
-                                            <MudTextField 
-                                                Margin="Margin.Dense" 
-                                                @bind-Text="variable.Name" 
-                                                Error="variable.HasError" 
-                                                ErrorText="@variable.Error" 
-                                                Label="Имя" 
-                                                Variant="Variant.Text" 
-                                                Immediate="true"
-                                                Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
+                                    var index = template.Variables.IndexOf(variable);
+                                    <MudGrid Spacing="0" Class="ma-0 pa-0 align-center d-flex flex-row flex-nowrap">
+                                        <MudItem>
+                                            <MudTextField Margin="Margin.None"
+                                                          @bind-Text="variable.Name"
+                                                          Error="variable.HasError"
+                                                          ErrorText="@variable.Error"
+                                                          Placeholder="Имя"
+                                                          Variant="Variant.Text"
+                                                          Immediate="true"
+                                                          Class="pt-0"
+                                                          Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
                                         </MudItem>
-                                        <MudItem xs="8">
-                                            <MudTextField 
-                                                Margin="Margin.Dense" 
-                                                @bind-Text="variable.Expression" 
-                                                Label="Значение" 
-                                                Variant="Variant.Text" 
-                                                Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
+
+                                        <MudItem Class="px-1">
+                                            <MudText Style="font-size: 18px; line-height: 1.2">:</MudText>
                                         </MudItem>
-                                        <MudItem xs="1">
-                                            <MudIconButton Variant="Variant.Text" Class="mx-0 mt-2 pa-0" OnClick="() => OpenDeleteDialogAsync(template, variable)" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" />
+
+                                        <MudItem Class="flex-grow-1 flex-shrink-1">
+                                            <MudTextField Margin="Margin.None"
+                                                          @bind-Text="variable.Expression"
+                                                          Placeholder="Значение"
+                                                          Variant="Variant.Text"
+                                                          Class="pt-0"
+                                                          Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
+                                        </MudItem>
+
+                                        <MudItem Class="variable-buttons">
+                                            <MudIconButton Variant="Variant.Text"
+                                                           Size="Size.Small"
+                                                           Disabled="@(index == 0)"
+                                                           OnClick="() => MoveVariableUp(template, variable)"
+                                                           Icon="@Icons.Material.Outlined.ArrowDropUp" />
+                                            <MudIconButton Variant="Variant.Text"
+                                                           Size="Size.Small"
+                                                           Disabled="@(index == template.Variables.Count - 1)"
+                                                           OnClick="() => MoveVariableDown(template, variable)"
+                                                           Icon="@Icons.Material.Outlined.ArrowDropDown" />
+                                        </MudItem>
+
+                                        <MudItem>
+                                            <MudIconButton Variant="Variant.Text"
+                                                           Size="Size.Small"
+                                                           Class="mt-1"
+                                                           OnClick="() => OpenDeleteDialogAsync(template, variable)"
+                                                           Icon="@Icons.Material.Outlined.Delete"
+                                                           Color="Color.Error" />
                                         </MudItem>
                                     </MudGrid>
                                 }
@@ -174,6 +205,7 @@
     public bool LocalStorageIsWorking { get; set; }
     public bool LocalStorageWorkCompleted { get; set; }
     private readonly Dictionary<string, string> _variableMapping = new Dictionary<string, string>();
+    public List<string> CalculationErrors { get; set; } = new();
 
     // =====================================
     // ИНИЦИАЛИЗАЦИЯ КОМПОНЕНТА
@@ -210,6 +242,33 @@
         templates.Insert(i + 1, template);
         StateHasChanged();
         PersistAsync().AndForget();
+    }
+
+    // =====================================
+    // МЕТОДЫ ПЕРЕМЕЩЕНИЯ ПЕРЕМЕННЫХ ВНУТРИ ШАБЛОНА
+    // =====================================
+    private void MoveVariableUp(TemplateDefinition template, VariableDefinition variable)
+    {
+        var index = template.Variables.IndexOf(variable);
+        if (index > 0)
+        {
+            template.Variables.RemoveAt(index);
+            template.Variables.Insert(index - 1, variable);
+            PersistAsync().AndForget();
+            StateHasChanged();
+        }
+    }
+
+    private void MoveVariableDown(TemplateDefinition template, VariableDefinition variable)
+    {
+        var index = template.Variables.IndexOf(variable);
+        if (index < template.Variables.Count - 1)
+        {
+            template.Variables.RemoveAt(index);
+            template.Variables.Insert(index + 1, variable);
+            PersistAsync().AndForget();
+            StateHasChanged();
+        }
     }
 
     // =====================================
@@ -333,6 +392,7 @@
     {
         try
         {
+            CalculationErrors.Clear();
             _variableMapping.Clear();
 
             var values = new Dictionary<string, double>();
@@ -366,11 +426,11 @@
                     {
                         string processedExpression = ProcessExpressionForNCalc(v.Expression);
 
-                        var expr = new Expression(processedExpression.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions);
+                        var expr = new Expression(processedExpression.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions | ExpressionOptions.CaseInsensitiveStringComparer);
 
                         expr.Functions[DegreeToRadianFunction] = (args) =>
                         {
-                            if (args.Count() > 1) throw new ArgumentOutOfRangeException($"Слишком много аргументов для функции {DegreeToRadianFunction}");
+                            if (args.Count() > 1) ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {DegreeToRadianFunction}");
                             double d = args[0].Evaluate() switch
                             {
                                 double dd => dd,
@@ -384,14 +444,14 @@
 
                         expr.Functions[RadianToDegreeFunction] = (args) =>
                         {
-                            if (args.Count() > 1) throw new ArgumentOutOfRangeException($"Слишком много аргументов для функции {RadianToDegreeFunction}");
+                            if (args.Count() > 1) ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {RadianToDegreeFunction}");
                             double d = args[0].Evaluate() switch
                             {
                                 double dd => dd,
                                 int ii => ii,
                                 long ll => ll,
                                 string ss => ToDouble(ss.Replace(',', '.')),
-                                _ => throw new ArgumentException($"Неподдерживаемый тип: {args?.GetType()}")
+                                _ => ThrowLogged<ArgumentException>($"Неподдерживаемый тип: {args?.GetType()}"),
                             };
                             return d * 180 / Math.PI;
                         };
@@ -411,7 +471,7 @@
                             double dd => dd,
                             int ii => ii,
                             long ll => ll,
-                            _ => throw new Exception($"Неподдерживаемый тип: {raw?.GetType()}")
+                            _ => ThrowLogged<ArgumentException>($"Неподдерживаемый тип: {raw?.GetType()}"),
                         };
 
                         values[v.Name] = d;
@@ -452,7 +512,7 @@
             if (validNotResolved.Any())
             {
                 var notResolvedNames = string.Join(", ", validNotResolved.Select(v => $"{v.Name}: {v.Expression}"));
-                throw new Exception($"Не удалось вычислить переменные: {notResolvedNames}");
+                throw new Exception($"Не удалось вычислить переменные: {notResolvedNames}\n{string.Join("\n\n", CalculationErrors)}");
             }
 
             tpl.Result = System.Text.RegularExpressions.Regex
@@ -462,7 +522,7 @@
                     {
                         string processedExpression = ProcessExpressionForNCalc(m.Groups[1].Value);
 
-                        var sub = new Expression(processedExpression.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions);
+                        var sub = new Expression(processedExpression.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions | ExpressionOptions.CaseInsensitiveStringComparer);
 
                         foreach (var kv in values)
                         {
@@ -616,5 +676,16 @@
             double d => d,
             _ => throw new ArgumentException($"Неподдерживаемый тип аргумента: {raw.GetType()}")
         };
+    }
+
+    double ThrowLogged<T>(string message) where T : Exception
+    {
+        CalculationErrors.Add(message);
+
+        var ctor = typeof(T).GetConstructor(new[] { typeof(string) });
+        if (ctor == null)
+            throw new InvalidOperationException($"У исключения {typeof(T).Name} отсутствует конструктор с параметром string.");
+
+        throw (T)ctor.Invoke(new object[] { message });
     }
 }

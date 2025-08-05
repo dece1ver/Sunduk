@@ -1,21 +1,57 @@
-﻿<MudDialog>
+﻿<MudDialog OnKeyUp="HandleKeyDown">
     <DialogContent>
         <MudText>@Message</MudText>
-        <MudTextField T="string" @bind-Text="Input"/>
+        <MudTextField T="string"
+                      @ref="textField"
+                      @bind-Text="Input"
+                      AutoFocus="true"
+                      />
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Отмена</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Submit">ОК</MudButton>
     </DialogActions>
 </MudDialog>
-@code
-{
+
+@code {
     [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
 
     [Parameter] public string Message { get; set; } = string.Empty;
     [Parameter] public bool AutoGrow { get; set; } = false;
     [Parameter] public string Input { get; set; } = string.Empty;
 
-    void Submit() => MudDialog.Close(DialogResult.Ok(Input));
-    void Cancel() => MudDialog.Cancel();
+    private MudTextField<string> textField;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(1);
+            await textField.FocusAsync();
+            await textField.SelectAsync();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(Input));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs args)
+    {
+        switch (args.Key)
+        {
+            case "Enter":
+            case "NumpadEnter":
+                Submit();
+                break;
+        }
+    }
 }
