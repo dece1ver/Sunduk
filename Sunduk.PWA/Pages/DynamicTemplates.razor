@@ -317,7 +317,7 @@
 
     private async Task DownloadTemplateAsync(TemplateDefinition template)
     {
-        var json = JsonSerializer.Serialize(template, new JsonSerializerOptions { WriteIndented = true });
+        var json = JsonSerializer.Serialize(new List<TemplateDefinition>() { template }, new JsonSerializerOptions { WriteIndented = true });
         var bytes = Encoding.UTF8.GetBytes(json);
         await BlazorDownloadFileService.DownloadFile($"sunduk-dt-{template.Name}.json", bytes, "application/json");
     }
