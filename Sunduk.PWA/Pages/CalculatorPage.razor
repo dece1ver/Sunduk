@@ -1,4 +1,7 @@
 ﻿@page "/calculator"
+@using NCalc
+
+@inject ISnackbar Snackbar
 
 <style>
     .monofield {
@@ -6,47 +9,127 @@
     }
 </style>
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-3">
-    <MudGrid Justify="Justify.SpaceAround">
-        <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="DiameterString" InputMode="inputMode" T="string" Label="Диаметр" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
-        </MudItem>
-        <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="EdgesString" InputMode="inputMode" T="string" Label="Зубья" Variant="Variant.Filled" Immediate="true" />
-        </MudItem>
-        <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="CutSpeedString" @onfocusin="@(() => CalcSpins = true)" InputMode="inputMode" T="string" Label="Скорость" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="м/мин" Immediate="true" />
-        </MudItem>
-        <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="FeedString" @onfocusin="@(() => CalcMinFeed = true)" InputMode="inputMode" T="string" Label="Подача" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="@FeedUnits" Immediate="true" />
-        </MudItem>
-        <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="SpindleSpeedString" @onfocusin="@(() => CalcSpins = false)" InputMode="inputMode" T="string" Label="Обороты" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="об/мин" Immediate="true" />
-        </MudItem>
-        <MudItem xs="6" sm="5" md="5" lg="5">
-            <MudTextField @bind-Value="MinFeedString" @onfocusin="@(() => CalcMinFeed = false)" InputMode="inputMode" T="string" Label="Подача" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
-        </MudItem>
-        @*@if (!string.IsNullOrEmpty(CalcInfo))
-        {
-            <MudItem xs="12">
-                <MudExpansionPanel Text="Как считать?">
-                    <MudTextField Variant="Variant.Text" Margin="Margin.Dense" Class="monofield" T="string" @bind-Value="@CalcInfo" ReadOnly="true" Underline="false" Lines="(CalcInfo.Count(x => x == '\n') + 2)" />
-                </MudExpansionPanel>
-                
-            </MudItem>
-        }*@
-    </MudGrid>
+<MudGrid Class="pa-2" Spacing="1">
+    <MudItem xs="12" md="6">
+        <MudField Variant="Variant.Filled" Label="Калькулятор режимов" Underline="false">
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudTextField @bind-Value="DiameterString" InputMode="inputMode" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField @bind-Value="EdgesString" InputMode="inputMode" T="string" Label="Зубья" Variant="Variant.Text" Immediate="true" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField @bind-Value="CutSpeedString" @onfocusin="@(() => CalcSpins = true)" InputMode="inputMode" T="string" Label="Скорость" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="м/мин" Immediate="true" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField @bind-Value="FeedString" @onfocusin="@(() => CalcMinFeed = true)" InputMode="inputMode" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="@FeedUnits" Immediate="true" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField @bind-Value="SpindleSpeedString" @onfocusin="@(() => CalcSpins = false)" InputMode="inputMode" T="string" Label="Обороты" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="об/мин" Immediate="true" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField @bind-Value="MinFeedString" @onfocusin="@(() => CalcMinFeed = false)" InputMode="inputMode" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
+                </MudItem>
+            </MudGrid>
+        </MudField>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudField Variant="Variant.Filled" Label="Калькулятор" Underline="false">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudGrid Spacing="0">
+                        <MudItem xs="12">
+                            <MudTextField Margin="Margin.Dense" Label="Выражение" @bind-Value="UserExpression" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudTextField Margin="Margin.Dense" Label="Результат" @bind-Value="Answer" />
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
 
-    
+                <MudItem xs="12">
+                    <MudGrid Spacing="1">
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => UserExpression = string.Empty)">C</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("/"))">/</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("*"))">×</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="EraseLeftExpr">⌫</MudButton>
+                        </MudItem>
 
-</MudContainer>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("7"))">7</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("8"))">8</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("9"))">9</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("-"))">-</MudButton>
+                        </MudItem>
 
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("4"))">4</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("5"))">5</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("6"))">6</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("+"))">+</MudButton>
+                        </MudItem>
+
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("1"))">1</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("2"))">2</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("3"))">3</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("%"))">%</MudButton>
+                        </MudItem>
+
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("3.1416"))">Pi</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("0"))">0</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("."))">.</MudButton>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="Calculate"
+                                ButtonType="ButtonType.Submit" Color="Color.Primary">=</MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+            </MudGrid>
+        </MudField>
+    </MudItem>
+</MudGrid>
 
 @code
 {
     InputMode inputMode = InputMode.@decimal;
     public bool CalcSpins { get; set; } = true;
     public bool CalcMinFeed { get; set; } = true;
+
+    private const string RadianToDegreeFunction = "Deg";
+    private const string DegreeToRadianFunction = "Rad";
 
     #region Диаметр
 
@@ -228,4 +311,76 @@
         set { }
     }
 
+    public string Answer { get; set; } = "";
+    public string UserExpression { get; set; } = "";
+
+    void AddToExpr(string text) => UserExpression += text;
+
+    void EraseLeftExpr()
+    {
+        if (UserExpression.Length > 0) UserExpression = UserExpression[..^1];
+    }
+
+    void ClearCalculator()
+    {
+        UserExpression = string.Empty;
+        Answer = string.Empty;
+    }
+
+    void Calculate()
+    {
+        List<string> calcErrors = new();
+        try
+        {
+            var expr = new Expression(UserExpression.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions | ExpressionOptions.CaseInsensitiveStringComparer);
+            expr.Functions[DegreeToRadianFunction] = (args) =>
+                {
+                    if (args.Count() > 1) Util.ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {DegreeToRadianFunction}", calcErrors);
+                    double d = args[0].Evaluate() switch
+                    {
+                        double dd => dd,
+                        int ii => ii,
+                        long ll => ll,
+                        string ss => Util.ToDouble(ss.Replace(',', '.')),
+                        _ => throw new ArgumentException($"Неподдерживаемый тип: {args?.GetType()}")
+                    };
+                    return d * Math.PI / 180;
+                };
+
+            expr.Functions[RadianToDegreeFunction] = (args) =>
+            {
+                if (args.Count() > 1) Util.ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {RadianToDegreeFunction}", calcErrors);
+                double d = args[0].Evaluate() switch
+                {
+                    double dd => dd,
+                    int ii => ii,
+                    long ll => ll,
+                    string ss => Util.ToDouble(ss.Replace(',', '.')),
+                    _ => Util.ThrowLogged<ArgumentException>($"Неподдерживаемый тип: {args?.GetType()}", calcErrors),
+                };
+                return d * 180 / Math.PI;
+            };
+            if (expr.HasErrors())
+            {
+                Snackbar.Add(expr.Error.Message);
+                return;
+            }
+            var r = expr.Evaluate();
+            if (r is null)
+            {
+                Snackbar.Add("Не удалось вычислить");
+                return;
+            }
+
+            Answer = r is double d ? d.ToString("0.###").Replace(',', '.') :
+                     r is int i ? i.ToString() :
+                     r is long l ? l.ToString() :
+                     r?.ToString() ?? "[?]";
+            return;
+        }
+        catch
+        {
+            Snackbar.Add($"Ошибки при вычислении: {string.Join(", ", calcErrors)}");
+        }
+    }
 }

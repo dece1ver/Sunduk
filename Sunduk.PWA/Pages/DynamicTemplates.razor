@@ -430,13 +430,13 @@
 
                         expr.Functions[DegreeToRadianFunction] = (args) =>
                         {
-                            if (args.Count() > 1) ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {DegreeToRadianFunction}");
+                            if (args.Count() > 1) Util.ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {DegreeToRadianFunction}", CalculationErrors);
                             double d = args[0].Evaluate() switch
                             {
                                 double dd => dd,
                                 int ii => ii,
                                 long ll => ll,
-                                string ss => ToDouble(ss.Replace(',', '.')),
+                                string ss => Util.ToDouble(ss.Replace(',', '.')),
                                 _ => throw new ArgumentException($"Неподдерживаемый тип: {args?.GetType()}")
                             };
                             return d * Math.PI / 180;
@@ -444,14 +444,14 @@
 
                         expr.Functions[RadianToDegreeFunction] = (args) =>
                         {
-                            if (args.Count() > 1) ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {RadianToDegreeFunction}");
+                            if (args.Count() > 1) Util.ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {RadianToDegreeFunction}", CalculationErrors);
                             double d = args[0].Evaluate() switch
                             {
                                 double dd => dd,
                                 int ii => ii,
                                 long ll => ll,
-                                string ss => ToDouble(ss.Replace(',', '.')),
-                                _ => ThrowLogged<ArgumentException>($"Неподдерживаемый тип: {args?.GetType()}"),
+                                string ss => Util.ToDouble(ss.Replace(',', '.')),
+                                _ => Util.ThrowLogged<ArgumentException>($"Неподдерживаемый тип: {args?.GetType()}", CalculationErrors),
                             };
                             return d * 180 / Math.PI;
                         };
@@ -471,7 +471,7 @@
                             double dd => dd,
                             int ii => ii,
                             long ll => ll,
-                            _ => ThrowLogged<ArgumentException>($"Неподдерживаемый тип: {raw?.GetType()}"),
+                            _ => Util.ThrowLogged<ArgumentException>($"Неподдерживаемый тип: {raw?.GetType()}", CalculationErrors),
                         };
 
                         values[v.Name] = d;
@@ -664,28 +664,4 @@
     private void ClearDragClass()
         => _dragClass = DefaultDragClass;
 
-    // =====================================
-    // УТИЛИТЫ
-    // =====================================
-    double ToDouble(object raw)
-    {
-        return raw switch
-        {
-            int i => i,
-            long l => l,
-            double d => d,
-            _ => throw new ArgumentException($"Неподдерживаемый тип аргумента: {raw.GetType()}")
-        };
-    }
-
-    double ThrowLogged<T>(string message) where T : Exception
-    {
-        CalculationErrors.Add(message);
-
-        var ctor = typeof(T).GetConstructor(new[] { typeof(string) });
-        if (ctor == null)
-            throw new InvalidOperationException($"У исключения {typeof(T).Name} отсутствует конструктор с параметром string.");
-
-        throw (T)ctor.Invoke(new object[] { message });
-    }
 }
