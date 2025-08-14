@@ -40,10 +40,10 @@
                 <MudItem xs="12">
                     <MudGrid Spacing="0">
                         <MudItem xs="12">
-                            <MudTextField Margin="Margin.Dense" Label="Выражение" @bind-Value="UserExpression" />
+                            <MudTextField Margin="Margin.Dense" Label="Выражение" @bind-Value="UserExpression" InputMode="inputMode"/>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudTextField Margin="Margin.Dense" Label="Результат" @bind-Value="Answer" />
+                            <MudTextField Margin="Margin.Dense" Label="Результат" @bind-Value="Answer" ReadOnly="true"/>
                         </MudItem>
                     </MudGrid>
                 </MudItem>

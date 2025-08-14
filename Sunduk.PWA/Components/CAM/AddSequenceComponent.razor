@@ -1389,7 +1389,7 @@
     private double GroovingWidth => _GroovingWidth.GetDouble();
 
     private string _GroovingStartPoint { get; set; }
-    private double GroovingStartPoint => _GroovingStartPoint.GetDouble();
+    private double GroovingStartPoint => _GroovingStartPoint.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     private string _GroovingCuttingPoint { get; set; } = "-";
     private double GroovingCuttingPoint => _GroovingCuttingPoint.GetDouble(numberOption: Util.GetNumberOption.Any);

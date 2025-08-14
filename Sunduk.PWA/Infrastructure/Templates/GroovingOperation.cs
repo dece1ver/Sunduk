@@ -107,7 +107,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             Blunt innerBluntType,
             bool doFinish, int speedRough, int speedFinish, double feedRough, double feedFinish)
         {
-            if (!Enum.IsDefined(typeof(Material), material))
+            if (!Enum.IsDefined(material))
                 throw new InvalidEnumArgumentException(nameof(material), (int)material, typeof(Material));
             var external = tool is GroovingExternalTool;
             var clearance = external ? 1 : -1;
@@ -371,15 +371,15 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
             var outerBluntLetter = outerBluntType is Blunt.SimpleChamfer ? "C" : "R";
             var innerBluntLetter = innerBluntType is Blunt.SimpleChamfer ? "C" : "R";
-            var bluntUpper = $"X{upperPoint.NC()}\n";
+            var bluntUpper = $"X{upperPoint.NC()}{(speedFinish != speedRough ? $" S{speedFinish} {Direction(tool)}" : "")}\n";
             var bluntLower = $"X{lowerPoint.NC()}\n";
             string roughBluntUpper;
             string roughBluntLower;
             if (outerCornerBlunt > 0)
             {
                 bluntUpper =
-                $"X{(upperPoint + outerBluntSize * 2).NC()}\n" +
-                $"G1 Z{startPoint.NC()} F{feedFinish.NC()}\n" +
+                $"X{(upperPoint + outerBluntSize * 2).NC()}{(speedFinish != speedRough ? $" S{speedFinish} {Direction(tool)}" : "")}\n" +
+                $"G1 Z{startPoint.NC()}{(feedFinish != feedRough ? $" F{feedFinish.NC()}": "")}\n" +
                 $"X{upperPoint.NC()} {outerBluntLetter}{outerBluntSize.NC()}\n";
                 bluntLower =
                 $"X{(lowerPoint - outerBluntSize * 2).NC()}\n" +
@@ -451,7 +451,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     cutting +=
                         $"G0 Z{(startPoint + clearance).NC()}\n" +
                         roughBluntUpper +
-                        $"Z{(endPoint + profStockAllow).NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n" +
+                        $"Z{(endPoint + profStockAllow).NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}{(feedFinish != feedRough ? $" F{feedFinish.NC()}" : "")}\n" +
                         $"X{centerPoint.NC()}\n" +
                         $"G0 Z{(startPoint + clearance).NC()}\n" +
                         roughBluntLower +
@@ -467,7 +467,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         TurningReferentPoint +
                         tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
                         $"{CoolantOn(machine)}\n" +
-                        $"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedFinish} {Direction(tool)}\n" +
+                        $"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedRough} {Direction(tool)}\n" +
                         roughCutting +
                         cutting +
                         $"G0 Z{(startPoint + clearance * 2).NC(0)}\n" +
@@ -477,7 +477,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     Machine.L230A =>
                         tool.Description(ToolDescriptionOption.L230) + "\n" +
                         $"{CoolantOn(machine)}\n" +
-                        $"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedFinish} {Direction(tool)}\n" +
+                        $"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedRough} {Direction(tool)}\n" +
                         roughCutting +
                         cutting +
                         $"G0 Z{(startPoint + clearance * 2).NC(0)}\n" +
@@ -509,7 +509,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                         cutting +=
                             $"{(!useCycles ? $"G0 Z{(startPoint + clearance).NC()}\n" : string.Empty)}" +
                             bluntUpper +
-                            $"Z{endPoint.NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}\n" +
+                            $"{(outerCornerBlunt > 0 ? "G1 " : "")}Z{endPoint.NC()}{(innerBluntSize > 0 ? $" {innerBluntLetter}{innerBluntSize.NC()}" : string.Empty)}{(feedFinish != feedRough ? $" F{feedFinish.NC()}" : "")}\n" +
                             $"X{centerPoint.NC()}\n" +
                             $"G0 Z{(startPoint + clearance).NC()}\n" +
                             bluntLower +
