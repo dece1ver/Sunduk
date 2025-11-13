@@ -1,5 +1,6 @@
 ﻿@page "/calculator"
 @using NCalc
+@using Sunduk.PWA.Infrastructure.Extensions
 
 @inject ISnackbar Snackbar
 
@@ -50,69 +51,97 @@
 
                 <MudItem xs="12">
                     <MudGrid Spacing="1">
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => UserExpression = string.Empty)">C</MudButton>
+                        
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Sin))">Sin</MudButton>
                         </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("/"))">/</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("²"))">X²</MudButton>
                         </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("*"))">×</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("/"))">/</MudButton>
                         </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="EraseLeftExpr">⌫</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("*"))">×</MudButton>
                         </MudItem>
-
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("7"))">7</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(ClearCalculator)">C</MudButton>
                         </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("8"))">8</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="EraseLeftExpr">⌫</MudButton>
                         </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("9"))">9</MudButton>
+                        
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Cos))">Cos</MudButton>
                         </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("-"))">-</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => { })">√X</MudButton>
                         </MudItem>
-
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("4"))">4</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("7"))">7</MudButton>
                         </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("5"))">5</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("8"))">8</MudButton>
                         </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("6"))">6</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("9"))">9</MudButton>
                         </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("+"))">+</MudButton>
-                        </MudItem>
-
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("1"))">1</MudButton>
-                        </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("2"))">2</MudButton>
-                        </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("3"))">3</MudButton>
-                        </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("%"))">%</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("-"))">−</MudButton>
                         </MudItem>
 
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("3.1416"))">Pi</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Tan))">Tan</MudButton>
                         </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("0"))">0</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("^"))">Xⁿ</MudButton>
                         </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="@(() => AddToExpr("."))">.</MudButton>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("4"))">4</MudButton>
                         </MudItem>
-                        <MudItem xs="3">
-                            <MudButton Size="Size.Large" Variant="Variant.Outlined" FullWidth="true" OnClick="Calculate"
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("5"))">5</MudButton>
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("6"))">6</MudButton>
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("+"))">+</MudButton>
+                        </MudItem>
+
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Atan))">ATAN</MudButton>
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("𝜋"))">𝜋</MudButton>
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("1"))">1</MudButton>
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("2"))">2</MudButton>
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("3"))">3</MudButton>
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("%"))">%</MudButton>
+                        </MudItem>
+
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("("))">(</MudButton>
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr(")"))">)</MudButton>
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("0"))">0</MudButton>
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("."))">.</MudButton>
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="Calculate"
                                 ButtonType="ButtonType.Submit" Color="Color.Primary">=</MudButton>
                         </MudItem>
                     </MudGrid>
@@ -130,6 +159,14 @@
 
     private const string RadianToDegreeFunction = "Deg";
     private const string DegreeToRadianFunction = "Rad";
+
+    enum TrigonometricFunction
+    {
+        Sin,
+        Cos,
+        Tan,
+        Atan
+    }
 
     #region Диаметр
 
@@ -327,12 +364,49 @@
         Answer = string.Empty;
     }
 
+    void CalculateTrigonometricFunction(TrigonometricFunction function)
+    {
+        if (!double.TryParse(UserExpression
+            .TrimStart("Sin(")
+            .TrimStart("Cos(")
+            .TrimStart("Tan(")
+            .TrimStart("Atan(")
+            .TrimEnd(')')
+            .Replace(".", ","), out var userExpr))
+        {
+            UserExpression = "";
+            Answer = "";
+            return;
+        }
+        switch (function) {
+            case TrigonometricFunction.Sin:
+                UserExpression = $"Sin({userExpr})".Replace(',', '.');
+                Answer = Math.Sin(userExpr.Radians()).ToString("0.####").Replace(',', '.');
+                break;
+            case TrigonometricFunction.Cos:
+                UserExpression = $"Cos({userExpr})".Replace(',', '.');
+                Answer = Math.Cos(userExpr.Radians()).ToString("0.####").Replace(',', '.');
+                break;
+            case TrigonometricFunction.Tan:
+                UserExpression = $"Tan({userExpr})".Replace(',', '.');
+                Answer = Math.Tan(userExpr.Radians()).ToString("0.####").Replace(',', '.');
+                break;
+            case TrigonometricFunction.Atan:
+                UserExpression = $"Atan({userExpr})".Replace(',', '.');
+                Answer = Math.Atan(userExpr).Degrees().ToString("0.####").Replace(',', '.');
+                break;
+            default:
+                break;
+        }
+    }
+
     void Calculate()
     {
         List<string> calcErrors = new();
         try
         {
-            var expr = new Expression(UserExpression.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions | ExpressionOptions.CaseInsensitiveStringComparer);
+            var userExpr = UserExpression.Replace("𝜋", Math.PI.ToString()).Replace("²", "**2").Replace("^", "**").Replace(',', '.');
+            var expr = new Expression(userExpr, ExpressionOptions.IgnoreCaseAtBuiltInFunctions | ExpressionOptions.CaseInsensitiveStringComparer);
             expr.Functions[DegreeToRadianFunction] = (args) =>
                 {
                     if (args.Count() > 1) Util.ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {DegreeToRadianFunction}", calcErrors);
@@ -371,11 +445,12 @@
                 Snackbar.Add("Не удалось вычислить");
                 return;
             }
-
-            Answer = r is double d ? d.ToString("0.###").Replace(',', '.') :
-                     r is int i ? i.ToString() :
-                     r is long l ? l.ToString() :
-                     r?.ToString() ?? "[?]";
+            var result = r is double d ? d.ToString("0.####").Replace(',', '.') :
+                         r is int i ? i.ToString() :
+                         r is long l ? l.ToString() :
+                         r?.ToString() ?? "[?]";
+            UserExpression = result;
+            Answer = result;
             return;
         }
         catch

@@ -3,14 +3,14 @@
         font-family: 'Roboto Mono', monospace;
     }
 </style>
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+<MudContainer Class="mt-2">
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="6">
             <MudField Label="Параметры скругления" Variant="Variant.Filled" Underline="false" Class="mt-1"
             @onfocusout="(() => CurrentImage = RadiusType == Radius.External ? Images.ExternalRadius : Images.InternalRadius)">
                 <MudGrid Spacing="0">
                     <MudItem xs="12">
-                        <MudRadioGroup SelectedOptionChanged="OnRadiusTypeChanged" T="Radius"  Class="mb-n2 d-flex justify-center">
+                        <MudRadioGroup ValueChanged="OnRadiusTypeChanged" T="Radius"  Class="mb-n2 d-flex justify-center">
                             <MudRadio Value="@Radius.External" Color="Color.Primary">Наружное</MudRadio>
                             <MudRadio Value="@Radius.Internal" Color="Color.Primary">Внутреннее</MudRadio>
                         </MudRadioGroup>

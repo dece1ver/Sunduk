@@ -19,5 +19,25 @@ namespace Sunduk.PWA.Infrastructure.Extensions
         {
             return !string.IsNullOrEmpty(str) && predicate(str[^1]);
         }
+
+        /// <summary>
+        /// Удаляет все начальные вхождения указанной подстроки из текущей строки.
+        /// </summary>
+        /// <param name="source">Исходная строка.</param>
+        /// <param name="prefix">Подстрока, которую нужно удалить с начала строки.</param>
+        /// <param name="comparisonType">Тип сравнения (по умолчанию — Ordinal).</param>
+        /// <returns>Строка без начальных вхождений <paramref name="prefix"/>.</returns>
+        public static string TrimStart(this string source, string prefix, StringComparison comparisonType = StringComparison.Ordinal)
+        {
+            if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(prefix))
+                return source;
+
+            while (source.StartsWith(prefix, comparisonType))
+            {
+                source = source[prefix.Length..];
+            }
+
+            return source;
+        }
     }
 }

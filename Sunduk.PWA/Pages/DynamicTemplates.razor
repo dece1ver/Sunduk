@@ -1,6 +1,6 @@
 ﻿@page "/dynamic-templates"
 @using NCalc
-@using Sunduk.PWA.Infrastructure.DynamicTemplatesData 
+@using Sunduk.PWA.Infrastructure.DynamicTemplatesData
 @using BlazorDownloadFile
 @using System.Text.Json
 @using System.Text
@@ -22,11 +22,50 @@
         opacity: 0;
     }
 
-    .variable-buttons {
+    .variable-card {
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+
+        .variable-card:hover {
+            border-left-color: var(--mud-palette-primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .variable-card.has-error {
+            border-left-color: var(--mud-palette-error);
+        }
+
+    .calculating-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255,255,255,0.8);
         display: flex;
-        flex-direction: column;
-        gap: 2px;
-        padding-top: 8px;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+    }
+
+    .code-field .mud-input {
+        font-family: 'Roboto Mono', monospace;
+        font-size: 12px;
+    }
+
+    .template-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .save-indicator {
+        font-size: 0.75rem;
+        color: var(--mud-palette-text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
 </style>
 
@@ -37,179 +76,278 @@
     }
     @if (LocalStorageWorkCompleted)
     {
-        <MudIcon Color="Color.Primary" Style="height:30px;width:30px;" Icon="@Icons.Material.Outlined.DoneAll" Class="mx-2 mt-2 mb-n0" />
+        <MudIcon Color="Color.Success" Style="height:30px;width:30px;" Icon="@Icons.Material.Outlined.CloudDone" Class="mx-2 mt-2 mb-n0" />
     }
 </MudPopover>
 
-<MudToolBar Dense="true">
-    <MudButton Variant="Variant.Outlined" OnClick="AddTemplate" EndIcon="@Icons.Material.Outlined.PostAdd" Size="Size.Small">Добавить шаблон</MudButton>
-    <MudFileUpload T="IReadOnlyList<IBrowserFile>" Class="flex-grow-1"
-                   @ref="@_fileUpload"
-                   OnFilesChanged="OnInputFileChanged"
-                   AppendMultipleFiles
-                   Hidden="@false"
-                   InputClass="file-upload-input"
-                   tabindex="-1"
-                   @ondrop="@ClearDragClass"
-                   @ondragenter="@SetDragClass"
-                   @ondragleave="@ClearDragClass"
-                   @ondragend="@ClearDragClass">
+<MudToolBar Dense="true" Class="gap-2">
+    <MudButton Variant="Variant.Outlined"
+               OnClick="AddTemplate"
+               StartIcon="@Icons.Material.Outlined.PostAdd"
+               Size="Size.Small">
+        Добавить шаблон
+    </MudButton>
+
+    <MudFileUpload T="IBrowserFile"
+                   Accept=".json"
+                   FilesChanged="UploadTemplates"
+                   Class="flex-shrink-0">
         <ActivatorContent>
-            <MudPaper Outlined="true" Class="@_dragClass">
-                <MudSpacer />
-                <MudFileUpload T="IBrowserFile" Accept=".json" FilesChanged="UploadTemplates">
-                    <ActivatorContent>
-                        <MudSpacer />
-                        <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Outlined.FileUpload" />
-                    </ActivatorContent>
-                </MudFileUpload>
-            </MudPaper>
+            <MudButton Variant="Variant.Text"
+                       StartIcon="@Icons.Material.Outlined.FileUpload"
+                       Size="Size.Small">
+                Импорт
+            </MudButton>
         </ActivatorContent>
     </MudFileUpload>
-    <MudIconButton Variant="Variant.Text" Class="ma-0 pa-0" OnClick="DownloadTemplatesAsync" Icon="@Icons.Material.Outlined.FileDownload" />
+
+    <MudButton Variant="Variant.Text"
+               OnClick="DownloadTemplatesAsync"
+               StartIcon="@Icons.Material.Outlined.FileDownload"
+               Size="Size.Small"
+               Disabled="@(templates.Count == 0)">
+        Экспорт всех
+    </MudButton>
+
+    <MudSpacer />
+
+    @if (_lastSaveTime.HasValue)
+    {
+        <div class="save-indicator">
+            <MudIcon Icon="@Icons.Material.Outlined.CloudDone" Size="Size.Small" />
+            <span>Сохранено @GetTimeSinceLastSave()</span>
+        </div>
+    }
 </MudToolBar>
 
-<MudExpansionPanels MultiExpansion="true" Square="true">
+<MudExpansionPanels MultiExpansion="true" Square="true" Class="mt-2">
     @foreach (var template in templates)
     {
         <MudExpansionPanel>
             <TitleContent>
-                <MudGrid Class="align-start d-flex" Spacing="1">
-                    <MudText Class="mt-1 mb-n1">@template.Name</MudText>
+                <div class="template-header">
+                    <MudText Typo="Typo.subtitle1">@template.Name</MudText>
+
+                    @if (_calculating.ContainsKey(template) && _calculating[template])
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                    }
+                    else if (!string.IsNullOrEmpty(template.Result))
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Icon="@Icons.Material.Outlined.CheckCircle">
+                            Вычислено
+                        </MudChip>
+                    }
+
                     <MudSpacer />
-                    <MudButtonGroup Class="mx-3 mt-0 mb-n1" Variant="Variant.Outlined">
-                        @if (templates.IndexOf(template) < templates.Count - 1)
-                        {
-                            <MudIconButton Variant="Variant.Text" OnClick="() => MoveDown(template)" Icon="@Icons.Material.Outlined.ArrowDropDown" />
-                        }
+
+                    <MudButtonGroup Variant="Variant.Text" Size="Size.Small">
                         @if (templates.IndexOf(template) > 0)
                         {
-                            <MudIconButton Variant="Variant.Text" OnClick="() => MoveUp(template)" Icon="@Icons.Material.Outlined.ArrowDropUp" />
+                            <MudIconButton Icon="@Icons.Material.Outlined.ArrowUpward"
+                                           OnClick="() => MoveUp(template)"
+                                           Title="Переместить вверх" />
                         }
-                        <MudIconButton Variant="Variant.Text" OnClick="() => OpenRenameDialogAsync(template)" Icon="@Icons.Material.Outlined.DriveFileRenameOutline" />
-                        <MudIconButton Variant="Variant.Text" OnClick="() => OpenDeleteDialogAsync(template)" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" />
+                        @if (templates.IndexOf(template) < templates.Count - 1)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Outlined.ArrowDownward"
+                                           OnClick="() => MoveDown(template)"
+                                           Title="Переместить вниз" />
+                        }
+                        <MudIconButton Icon="@Icons.Material.Outlined.DriveFileRenameOutline"
+                                       OnClick="() => OpenRenameDialogAsync(template)"
+                                       Title="Переименовать" />
+                        <MudIconButton Icon="@Icons.Material.Outlined.Delete"
+                                       OnClick="() => OpenDeleteDialogAsync(template)"
+                                       Color="Color.Error"
+                                       Title="Удалить" />
                     </MudButtonGroup>
-                </MudGrid>
+                </div>
             </TitleContent>
-            <ChildContent>
-                <MudToolBar Dense="true">
-                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { Calculate(template); PersistAsync().AndForget(); }" Icon="@Icons.Material.Outlined.Calculate" Color="Color.Primary" />
-                    <MudSpacer />
-                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }" Icon="@Icons.Material.Outlined.PlaylistAdd" />
-                    <MudDivider Vertical="true" />
-                    <MudIconButton Variant="Variant.Text" Class="my-0 py-0" OnClick="() => DownloadTemplateAsync(template)" Icon="@Icons.Material.Outlined.Download" />
-                </MudToolBar>
-                <MudGrid Spacing="1" Class="ma-0">
-                    <MudItem xs="6">
-                        <MudTextField T="string"
-                                      Label="Заготовка"
-                                      Style="font-family: 'Roboto Mono', monospace; font-size: 10px;"
-                                      Variant="Variant.Filled"
-                                      AutoGrow="true"
-                                      @bind-Value="@template.Content"
-                                      Immediate="true"
-                                      Lines="@(template.Content.Count(c => c == '\n') + 1)"
-                                       />
-                        <MudTextField T="string"
-                                      Label="Результат"
-                                      Style="font-family: 'Roboto Mono', monospace; font-size: 12px;"
-                                      Variant="Variant.Filled"
-                                      AutoGrow="true"
-                                      Immediate="true"
-                                      Lines="@(template.Result.Count(c => c == '\n') + 1)"
-                                      Value="template.Result"
-                                      ReadOnly="true" />
-                    </MudItem>
-                    <MudItem xs="6">
-                        <MudField Label="Переменные" Variant="Variant.Filled" Underline="false" InnerPadding="false" FullWidth="true">
-                            <MudList T="string" Dense="true">
 
-                                @foreach (var variable in @template.Variables)
+            <ChildContent>
+                <div style="position: relative;">
+                    @if (_calculating.ContainsKey(template) && _calculating[template])
+                    {
+                        <div class="calculating-overlay">
+                            <MudProgressCircular Indeterminate="true" />
+                        </div>
+                    }
+
+                    <MudToolBar Dense="true" Class="gap-2 mb-3">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   OnClick="() => CalculateAsync(template)"
+                                   StartIcon="@Icons.Material.Outlined.Calculate"
+                                   Size="Size.Small">
+                            Вычислить
+                        </MudButton>
+
+                        <MudSpacer />
+
+                        <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
+                            <MudButton StartIcon="@Icons.Material.Outlined.PlaylistAdd"
+                                       OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }">
+                                Добавить переменную
+                            </MudButton>
+                            <MudIconButton Icon="@Icons.Material.Outlined.Download"
+                                           OnClick="() => DownloadTemplateAsync(template)"
+                                           Title="Скачать шаблон" />
+                        </MudButtonGroup>
+                    </MudToolBar>
+
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12" md="6">
+                            <MudField Class="pa-3" Label="Переменные" Variant="Variant.Filled">
+                                
+
+                                @if (template.Variables.Count == 0)
+                                {
+                                    <MudAlert Severity="Severity.Info" Dense="true" Class="mt-2">
+                                        Добавьте переменные для использования в шаблоне
+                                    </MudAlert>
+                                }
+
+                                @foreach (var variable in template.Variables)
                                 {
                                     var index = template.Variables.IndexOf(variable);
-                                    <MudGrid Spacing="0" Class="ma-0 pa-0 align-center d-flex flex-row flex-nowrap">
-                                        <MudItem>
-                                            <MudTextField Margin="Margin.None"
-                                                          @bind-Text="variable.Name"
-                                                          Error="variable.HasError"
-                                                          ErrorText="@variable.Error"
-                                                          Placeholder="Имя"
-                                                          Variant="Variant.Text"
-                                                          Immediate="true"
-                                                          Class="pt-0"
-                                                          Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
-                                        </MudItem>
 
-                                        <MudItem Class="px-1">
-                                            <MudText Style="font-size: 18px; line-height: 1.2">:</MudText>
-                                        </MudItem>
+                                    <MudPaper Elevation="1" 
+                                              Class="@($"px-2 py-1 my-1 variable-card {(variable.HasError ? "has-error" : "")}")">
+                                        <MudGrid Spacing="1" Class="align-center">
+                                            <MudItem xs="6" sm="3">
+                                                <MudTooltip Text="@variable.Error"
+                                                            IsVisible="variable.HasError"
+                                                            Placement="Placement.Top">
+                                                    <MudTextField T="string"
+                                                                  Label="Имя"
+                                                                  @bind-Value="variable.Name"
+                                                                  Error="variable.HasError"
+                                                                  Variant="Variant.Text"
+                                                                  Margin="Margin.Dense"
+                                                                  Immediate="true"
+                                                                  Class="code-field" />
+                                                </MudTooltip>
+                                            </MudItem>
 
-                                        <MudItem Class="flex-grow-1 flex-shrink-1">
-                                            <MudTextField Margin="Margin.None"
-                                                          @bind-Text="variable.Expression"
-                                                          Placeholder="Значение"
-                                                          Variant="Variant.Text"
-                                                          Class="pt-0"
-                                                          Style="font-family: 'Roboto Mono', monospace; font-size: 12px;" />
-                                        </MudItem>
+                                            <MudItem xs="6" sm="8">
+                                                <MudTextField T="string"
+                                                              Label="Выражение"
+                                                              @bind-Value="variable.Expression"
+                                                              Variant="Variant.Text"
+                                                              Margin="Margin.Dense"
+                                                              Immediate="true"
+                                                              Class="code-field" />
+                                            </MudItem>
 
-                                        <MudItem Class="variable-buttons">
-                                            <MudIconButton Variant="Variant.Text"
-                                                           Size="Size.Small"
-                                                           Disabled="@(index == 0)"
-                                                           OnClick="() => MoveVariableUp(template, variable)"
-                                                           Icon="@Icons.Material.Outlined.ArrowDropUp" />
-                                            <MudIconButton Variant="Variant.Text"
-                                                           Size="Size.Small"
-                                                           Disabled="@(index == template.Variables.Count - 1)"
-                                                           OnClick="() => MoveVariableDown(template, variable)"
-                                                           Icon="@Icons.Material.Outlined.ArrowDropDown" />
-                                        </MudItem>
+                                            <MudItem xs="12" sm="1" Class="d-flex align-center justify-center">
+                                                <MudMenu Icon="@Icons.Material.Outlined.MoreVert"
+                                                         Size="Size.Small"
+                                                         Dense="true">
+                                                    <MudMenuItem Icon="@Icons.Material.Outlined.ArrowUpward"
+                                                                 OnClick="() => MoveVariableUp(template, variable)"
+                                                                 Disabled="@(index == 0)">
+                                                        Переместить вверх
+                                                    </MudMenuItem>
+                                                    <MudMenuItem Icon="@Icons.Material.Outlined.ArrowDownward"
+                                                                 OnClick="() => MoveVariableDown(template, variable)"
+                                                                 Disabled="@(index == template.Variables.Count - 1)">
+                                                        Переместить вниз
+                                                    </MudMenuItem>
+                                                    <MudDivider />
+                                                    <MudMenuItem Icon="@Icons.Material.Outlined.Delete"
+                                                                 OnClick="() => OpenDeleteDialogAsync(template, variable)"
+                                                                 IconColor="Color.Error">
+                                                        Удалить
+                                                    </MudMenuItem>
+                                                </MudMenu>
+                                            </MudItem>
 
-                                        <MudItem>
-                                            <MudIconButton Variant="Variant.Text"
-                                                           Size="Size.Small"
-                                                           Class="mt-1"
-                                                           OnClick="() => OpenDeleteDialogAsync(template, variable)"
-                                                           Icon="@Icons.Material.Outlined.Delete"
-                                                           Color="Color.Error" />
-                                        </MudItem>
-                                    </MudGrid>
+                                            @if (variable.HasError)
+                                            {
+                                                <MudItem xs="12">
+                                                    <MudAlert Severity="Severity.Error" Dense="true" Class="py-1">
+                                                        @variable.Error
+                                                    </MudAlert>
+                                                </MudItem>
+                                            }
+                                        </MudGrid>
+                                    </MudPaper>
                                 }
-                            </MudList>
-                        </MudField>
-                    </MudItem>
-                </MudGrid>
+                            </MudField>
+                        </MudItem>
+
+                        <MudItem xs="12" md="6">
+                            <MudTabs Elevation="2"
+                                     Rounded="true"
+                                     ApplyEffectsToContainer="true"
+                                     PanelClass="pa-3">
+                                <MudTabPanel Text="Заготовка" Icon="@Icons.Material.Outlined.Edit">
+                                    <MudTextField T="string"
+                                                  Variant="Variant.Filled"
+                                                  AutoGrow="true"
+                                                  @bind-Value="@template.Content"
+                                                  Immediate="true"
+                                                  Lines="@Math.Max(10, template.Content.Count(c => c == '\n') + 1)"
+                                                  Placeholder="Введите текст с переменными в формате {variable}"
+                                                  Class="code-field" />
+                                </MudTabPanel>
+
+                                <MudTabPanel Text="Результат" Icon="@Icons.Material.Outlined.CheckCircle">
+                                    <MudTextField T="string"
+                                                  Variant="Variant.Filled"
+                                                  AutoGrow="true"
+                                                  Immediate="true"
+                                                  Lines="@Math.Max(10, template.Result.Count(c => c == '\n') + 1)"
+                                                  Value="template.Result"
+                                                  ReadOnly="true"
+                                                  Placeholder="Результат появится после вычисления"
+                                                  Class="code-field" />
+                                </MudTabPanel>
+                            </MudTabs>
+                        </MudItem>
+                    </MudGrid>
+                </div>
             </ChildContent>
         </MudExpansionPanel>
     }
 </MudExpansionPanels>
 
+@if (templates.Count == 0)
+{
+    <MudPaper Class="pa-8 mt-4 text-center" Elevation="0">
+        <MudIcon Icon="@Icons.Material.Outlined.PostAdd" Size="Size.Large" Color="Color.Default" />
+        <MudText Typo="Typo.h6" Class="mt-2">Нет шаблонов</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">
+            Создайте новый шаблон или импортируйте существующий
+        </MudText>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   OnClick="AddTemplate"
+                   StartIcon="@Icons.Material.Outlined.Add"
+                   Class="mt-4">
+            Создать первый шаблон
+        </MudButton>
+    </MudPaper>
+}
+
 @code {
-    // =====================================
-    // ВНЕДРЕНИЕ ЗАВИСИМОСТЕЙ
-    // =====================================
     [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
-    // =====================================
-    // СОСТОЯНИЕ КОМПОНЕНТА И ПЕРЕМЕННЫЕ
-    // =====================================
     private const string RadianToDegreeFunction = "Deg";
     private const string DegreeToRadianFunction = "Rad";
-    private const string DefaultDragClass = "border-2 border-dashed align-start d-flex object-fill mud-theme-transparent ma-3";
-    private string _dragClass = DefaultDragClass;
-    private readonly List<string> _fileNames = new();
-    private MudFileUpload<IReadOnlyList<IBrowserFile>>? _fileUpload;
+
     private readonly SemaphoreSlim _persistSemaphore = new(1, 1);
+    private readonly Dictionary<TemplateDefinition, bool> _calculating = new();
+
     public List<TemplateDefinition> templates { get; set; } = new();
     public bool LocalStorageIsWorking { get; set; }
     public bool LocalStorageWorkCompleted { get; set; }
-    private readonly Dictionary<string, string> _variableMapping = new Dictionary<string, string>();
     public List<string> CalculationErrors { get; set; } = new();
 
-    // =====================================
-    // ИНИЦИАЛИЗАЦИЯ КОМПОНЕНТА
-    // =====================================
+    private DateTime? _lastSaveTime;
+    private readonly Dictionary<string, string> _variableMapping = new Dictionary<string, string>();
+
     protected override async Task OnInitializedAsync()
     {
         templates = await LocalStorage.GetItemAsync<List<TemplateDefinition>>(nameof(templates))
@@ -217,12 +355,23 @@
         StateHasChanged();
     }
 
-    // =====================================
-    // УПРАВЛЕНИЕ ШАБЛОНАМИ
-    // =====================================
+    private string GetTimeSinceLastSave()
+    {
+        if (!_lastSaveTime.HasValue) return "";
+
+        var diff = DateTime.Now - _lastSaveTime.Value;
+        if (diff.TotalSeconds < 60) return "только что";
+        if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes} мин назад";
+        return $"{(int)diff.TotalHours} ч назад";
+    }
+
     private void AddTemplate()
     {
-        templates.Add(new TemplateDefinition() { Name = $"Новый шаблон", Variables = new() { new VariableDefinition() } });
+        templates.Add(new TemplateDefinition()
+        {
+            Name = $"Новый шаблон {templates.Count + 1}",
+            Variables = new() { new VariableDefinition() }
+        });
         PersistAsync().AndForget();
     }
 
@@ -244,9 +393,6 @@
         PersistAsync().AndForget();
     }
 
-    // =====================================
-    // МЕТОДЫ ПЕРЕМЕЩЕНИЯ ПЕРЕМЕННЫХ ВНУТРИ ШАБЛОНА
-    // =====================================
     private void MoveVariableUp(TemplateDefinition template, VariableDefinition variable)
     {
         var index = template.Variables.IndexOf(variable);
@@ -271,9 +417,6 @@
         }
     }
 
-    // =====================================
-    // РАБОТА С ЛОКАЛЬНЫМ ХРАНИЛИЩЕМ
-    // =====================================
     private async Task PersistAsync()
     {
         await _persistSemaphore.WaitAsync();
@@ -284,13 +427,14 @@
             StateHasChanged();
 
             await LocalStorage.SetItemAsync(nameof(templates), templates);
+            _lastSaveTime = DateTime.Now;
 
             StateHasChanged();
             LocalStorageWorkCompleted = true;
             LocalStorageIsWorking = false;
             StateHasChanged();
 
-            await Task.Delay(1000);
+            await Task.Delay(1500);
             LocalStorageWorkCompleted = false;
             StateHasChanged();
         }
@@ -300,9 +444,6 @@
         }
     }
 
-    // =====================================
-    // ЭКСПОРТ ШАБЛОНОВ
-    // =====================================
     private async Task DownloadTemplatesAsync()
     {
         if (templates.Count < 1)
@@ -322,10 +463,6 @@
         await BlazorDownloadFileService.DownloadFile($"sunduk-dt-{template.Name}.json", bytes, "application/json");
     }
 
-    // =====================================
-    // ИМПОРТ ШАБЛОНОВ
-    // =====================================
-
     private async Task UploadTemplates(IBrowserFile file)
     {
         using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024);
@@ -338,8 +475,6 @@
         {
             PropertyNameCaseInsensitive = true
         };
-
-
 
         try
         {
@@ -361,16 +496,18 @@
         {
             var result = await DialogService.ShowMessageBox(
                 "Импорт шаблонов",
-                $"Добавить шаблоны: {loaded.Count} шт. к существующим или заменить всё?",
+                $"Добавить {loaded.Count} шаблон(ов) к существующим или заменить всё?",
                 yesText: "Добавить", noText: "Заменить", cancelText: "Отмена");
 
             switch (result)
             {
                 case true:
                     templates.AddRange(loaded);
+                    Snackbar.Add($"Добавлено шаблонов: {loaded.Count}", Severity.Success);
                     break;
                 case false:
                     templates = loaded;
+                    Snackbar.Add($"Загружено шаблонов: {loaded.Count}", Severity.Success);
                     break;
                 default:
                     return;
@@ -379,15 +516,37 @@
         else
         {
             templates = loaded;
+            Snackbar.Add($"Загружено шаблонов: {loaded.Count}", Severity.Success);
         }
 
         PersistAsync().AndForget();
         StateHasChanged();
     }
 
-    // =====================================
-    // ЛОГИКА ВЫЧИСЛЕНИЯ ШАБЛОНОВ
-    // =====================================
+    private async Task CalculateAsync(TemplateDefinition tpl)
+    {
+        _calculating[tpl] = true;
+        StateHasChanged();
+
+        await Task.Delay(100); // Небольшая задержка для визуального эффекта
+
+        try
+        {
+            Calculate(tpl);
+            Snackbar.Add("Вычисление завершено", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Ошибка: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _calculating[tpl] = false;
+            await PersistAsync();
+            StateHasChanged();
+        }
+    }
+
     private void Calculate(TemplateDefinition tpl)
     {
         try
@@ -476,7 +635,7 @@
 
                         values[v.Name] = d;
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         continue;
                     }
@@ -547,8 +706,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-            Snackbar.Add(ex.Message, Severity.Error);
+            throw;
         }
     }
 
@@ -590,9 +748,6 @@
         return text.Any(c => (c >= 'а' && c <= 'я') || (c >= 'А' && c <= 'Я') || c == 'ё' || c == 'Ё');
     }
 
-    // =====================================
-    // ДИАЛОГОВЫЕ ОКНА
-    // =====================================
     private async Task OpenRenameDialogAsync(TemplateDefinition template)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
@@ -616,6 +771,7 @@
         if (result != true) return;
 
         templates.Remove(template);
+        Snackbar.Add("Шаблон удалён", Severity.Info);
         PersistAsync().AndForget();
     }
 
@@ -637,31 +793,4 @@
         template.Variables.Remove(variable);
         PersistAsync().AndForget();
     }
-
-    // =====================================
-    // ОБРАБОТЧИКИ UI СОБЫТИЙ
-    // =====================================
-    private async Task ClearAsync()
-    {
-        await (_fileUpload?.ClearAsync() ?? Task.CompletedTask);
-        _fileNames.Clear();
-        ClearDragClass();
-    }
-
-    private Task OpenFilePickerAsync()
-        => _fileUpload?.OpenFilePickerAsync() ?? Task.CompletedTask;
-
-    private void OnInputFileChanged(InputFileChangeEventArgs e)
-    {
-        ClearDragClass();
-        var files = e.GetMultipleFiles();
-        UploadTemplates(files.FirstOrDefault());
-    }
-
-    private void SetDragClass()
-        => _dragClass = $"{DefaultDragClass.Replace("border-hidden ", "")} mud-border-primary";
-
-    private void ClearDragClass()
-        => _dragClass = DefaultDragClass;
-
 }

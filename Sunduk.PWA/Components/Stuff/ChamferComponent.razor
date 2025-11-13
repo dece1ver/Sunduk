@@ -7,10 +7,10 @@
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="6">
             <MudField Label="Параметры фаски" Variant="Variant.Filled" Underline="false" Class="mt-1"
-            @onfocusout="(() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamfer : Images.InternalChamfer)">
+                @onfocusout="(() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamfer : Images.InternalChamfer)">
                 <MudGrid Spacing="0">
                     <MudItem xs="12">
-                        <MudRadioGroup SelectedOptionChanged="OnChamferTypeChanged" T="Chamfer" Class="mb-n2 d-flex justify-center">
+                        <MudRadioGroup ValueChanged="OnChamferTypeChanged" T="Chamfer" Class="mb-n2 d-flex justify-center">
                             <MudRadio Value="@Chamfer.External" Color="Color.Primary">Наружная</MudRadio>
                             <MudRadio Value="@Chamfer.Internal" Color="Color.Primary">Внутренняя</MudRadio>
                         </MudRadioGroup>

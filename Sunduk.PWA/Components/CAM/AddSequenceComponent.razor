@@ -747,7 +747,7 @@
                         </MudItem>
                     }
                     <MudItem xs="12" md="3">
-                        <MudTextField Label="Конечная точка" @bind-Value="_GroovingCuttingPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                        <MudTextField Label="От торца до канавы" @bind-Value="_GroovingCuttingPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                     </MudItem>
                     <MudItem xs="12" md="3">
                         <MudTextField Label="Шаг" @bind-Value="_GroovingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
@@ -1426,10 +1426,9 @@
     private double BurnishingEnd => _BurnishingEnd.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     /// <summary>
-    ///     Тут сразу формируется переход, текст которого выводится в пример. Уже созданный тут переход сабмитится при нажатии
-    ///     на кнопку.
+    /// Тут сразу формируется переход, текст которого выводится в пример. Уже созданный тут переход сабмитится при нажатии
+    /// на кнопку.
     /// </summary>
-    //Пример
     public string ExampleText
     {
         get
