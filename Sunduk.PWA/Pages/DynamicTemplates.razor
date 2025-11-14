@@ -120,10 +120,10 @@
     }
 </MudToolBar>
 
-<MudExpansionPanels MultiExpansion="true" Square="true" Class="mt-2">
+<MudExpansionPanels MultiExpansion="true" Square="true" Class="mt-2 mx-0">
     @foreach (var template in templates)
     {
-        <MudExpansionPanel>
+        <MudExpansionPanel Class="mx-0">
             <TitleContent>
                 <div class="template-header">
                     <MudText Typo="Typo.subtitle1">@template.Name</MudText>
@@ -132,11 +132,26 @@
                     {
                         <MudProgressCircular Size="Size.Small" Indeterminate="true" />
                     }
+                    else if (template.HasError)
+                    {
+                        <MudTooltip Text="@template.Error">
+                            <MudChip T="string" Size="Size.Small" Color="Color.Error" Icon="@Icons.Material.Outlined.ErrorOutline" Variant="Variant.Outlined">
+                                Ошибка
+                            </MudChip>
+                        </MudTooltip>
+                    }
                     else if (!string.IsNullOrEmpty(template.Result))
                     {
-                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Icon="@Icons.Material.Outlined.CheckCircle">
+                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Icon="@Icons.Material.Outlined.CheckCircle" Variant="Variant.Outlined">
                             Вычислено
                         </MudChip>
+                    }
+
+
+
+                    @if (template.HasError)
+                    {
+                        
                     }
 
                     <MudSpacer />
@@ -175,7 +190,7 @@
                     }
 
                     <MudToolBar Dense="true" Class="gap-2 mb-3">
-                        <MudButton Variant="Variant.Filled"
+                        <MudButton Variant="Variant.Outlined"
                                    Color="Color.Primary"
                                    OnClick="() => CalculateAsync(template)"
                                    StartIcon="@Icons.Material.Outlined.Calculate"
@@ -198,7 +213,7 @@
 
                     <MudGrid Spacing="3">
                         <MudItem xs="12" md="6">
-                            <MudField Class="pa-3" Label="Переменные" Variant="Variant.Filled">
+                            <MudPaper Elevation="0" Class="pa-1 ma-0" Outlined="true">
                                 
 
                                 @if (template.Variables.Count == 0)
@@ -212,35 +227,33 @@
                                 {
                                     var index = template.Variables.IndexOf(variable);
 
-                                    <MudPaper Elevation="1" 
+                                    <MudPaper Elevation="0" Outlined="true" 
                                               Class="@($"px-2 py-1 my-1 variable-card {(variable.HasError ? "has-error" : "")}")">
                                         <MudGrid Spacing="1" Class="align-center">
-                                            <MudItem xs="6" sm="3">
-                                                <MudTooltip Text="@variable.Error"
-                                                            IsVisible="variable.HasError"
-                                                            Placement="Placement.Top">
-                                                    <MudTextField T="string"
-                                                                  Label="Имя"
-                                                                  @bind-Value="variable.Name"
-                                                                  Error="variable.HasError"
-                                                                  Variant="Variant.Text"
-                                                                  Margin="Margin.Dense"
-                                                                  Immediate="true"
-                                                                  Class="code-field" />
-                                                </MudTooltip>
-                                            </MudItem>
-
-                                            <MudItem xs="6" sm="8">
+                                            <MudItem xs="5" sm="3">
                                                 <MudTextField T="string"
-                                                              Label="Выражение"
-                                                              @bind-Value="variable.Expression"
+                                                              Label="Имя"
+                                                              Value="@variable.Name"
+                                                              ValueChanged="@(newValue => OnVariableNameChanged(template, variable, newValue))"
+                                                              Error="variable.HasError"
                                                               Variant="Variant.Text"
                                                               Margin="Margin.Dense"
                                                               Immediate="true"
                                                               Class="code-field" />
                                             </MudItem>
 
-                                            <MudItem xs="12" sm="1" Class="d-flex align-center justify-center">
+                                            <MudItem xs="6" sm="8">
+                                                <MudTextField T="string"
+                                                              Label="Выражение"
+                                                              Value="@variable.Expression"
+                                                              ValueChanged="@(newValue => OnVariableExpressionChanged(template, variable, newValue))"
+                                                              Variant="Variant.Text"
+                                                              Margin="Margin.Dense"
+                                                              Immediate="true"
+                                                              Class="code-field" />
+                                            </MudItem>
+
+                                            <MudItem xs="1" sm="1" Class="d-flex align-center justify-center">
                                                 <MudMenu Icon="@Icons.Material.Outlined.MoreVert"
                                                          Size="Size.Small"
                                                          Dense="true">
@@ -274,12 +287,12 @@
                                         </MudGrid>
                                     </MudPaper>
                                 }
-                            </MudField>
+                            </MudPaper>
                         </MudItem>
 
                         <MudItem xs="12" md="6">
-                            <MudTabs Elevation="2"
-                                     Rounded="true"
+                            <MudTabs Elevation="0" Outlined="true"
+                                     Rounded="true"  
                                      ApplyEffectsToContainer="true"
                                      PanelClass="pa-3">
                                 <MudTabPanel Text="Заготовка" Icon="@Icons.Material.Outlined.Edit">
@@ -332,7 +345,7 @@
 }
 
 @code {
-    [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+    [Inject] public IBlazorDownloadFileService? BlazorDownloadFileService { get; set; }
 
     private const string RadianToDegreeFunction = "Deg";
     private const string DegreeToRadianFunction = "Rad";
@@ -446,6 +459,7 @@
 
     private async Task DownloadTemplatesAsync()
     {
+        if (BlazorDownloadFileService == null) return;
         if (templates.Count < 1)
         {
             Snackbar.Add("Нечего скачивать", Severity.Warning);
@@ -458,6 +472,7 @@
 
     private async Task DownloadTemplateAsync(TemplateDefinition template)
     {
+        if (BlazorDownloadFileService == null) return;
         var json = JsonSerializer.Serialize(new List<TemplateDefinition>() { template }, new JsonSerializerOptions { WriteIndented = true });
         var bytes = Encoding.UTF8.GetBytes(json);
         await BlazorDownloadFileService.DownloadFile($"sunduk-dt-{template.Name}.json", bytes, "application/json");
@@ -528,15 +543,31 @@
         _calculating[tpl] = true;
         StateHasChanged();
 
-        await Task.Delay(100); // Небольшая задержка для визуального эффекта
-
         try
         {
+            tpl.ClearErrors();
+            foreach (var variable in tpl.Variables)
+            {
+                variable.ValidateName();
+            }
+
             Calculate(tpl);
-            Snackbar.Add("Вычисление завершено", Severity.Success);
+
+            bool hasVariableErrors = tpl.Variables.Any(v => v.HasError);
+            if (hasVariableErrors)
+            {
+                tpl.SetCalculationResult(string.Empty, true, "Есть ошибки в переменных");
+                Snackbar.Add("Обнаружены ошибки в переменных", Severity.Warning);
+            }
+            else
+            {
+                tpl.SetCalculationResult(tpl.Result, false, string.Empty);
+                Snackbar.Add("Вычисление завершено", Severity.Success);
+            }
         }
         catch (Exception ex)
         {
+            tpl.SetCalculationResult(string.Empty, true, $"Ошибка вычисления: {ex.Message}");
             Snackbar.Add($"Ошибка: {ex.Message}", Severity.Error);
         }
         finally
@@ -553,6 +584,11 @@
         {
             CalculationErrors.Clear();
             _variableMapping.Clear();
+
+            foreach (var variable in tpl.Variables)
+            {
+                variable.ClearError();
+            }
 
             var values = new Dictionary<string, double>();
             var maxIter = tpl.Variables.Count * 2;
@@ -622,7 +658,10 @@
                         }
 
                         if (expr.HasErrors())
+                        {
+                            v.SetCalculationError("Ошибка в выражении: неверный синтаксис");
                             continue;
+                        }
 
                         var raw = expr.Evaluate();
                         double d = raw switch
@@ -630,13 +669,16 @@
                             double dd => dd,
                             int ii => ii,
                             long ll => ll,
-                            _ => Util.ThrowLogged<ArgumentException>($"Неподдерживаемый тип: {raw?.GetType()}", CalculationErrors),
+                            string ss when double.TryParse(ss.Replace(',', '.'), out double parsed) => parsed,
+                            _ => throw new Exception($"Неподдерживаемый тип результата: {raw?.GetType()}")
                         };
 
                         values[v.Name] = d;
+                        v.ClearError();
                     }
                     catch (Exception ex)
                     {
+                        v.SetCalculationError($"Ошибка вычисления: {ex.Message}");
                         continue;
                     }
                 }
@@ -649,65 +691,74 @@
                     var validUnresolved = tpl.Variables
                         .Where(v => !string.IsNullOrWhiteSpace(v.Name) &&
                                    !string.IsNullOrWhiteSpace(v.Expression) &&
-                                   !values.ContainsKey(v.Name))
+                                   !values.ContainsKey(v.Name) &&
+                                   !v.HasError)
                         .ToList();
 
                     if (validUnresolved.Any())
                     {
-                        var unresolvedNames = string.Join(", ", validUnresolved.Select(v => $"{v.Name}: {v.Expression}"));
-                        throw new Exception($"Не удалось вычислить переменные (возможно, циклическая зависимость или неопределенные переменные): {unresolvedNames}");
+                        foreach (var unresolved in validUnresolved)
+                        {
+                            unresolved.SetCalculationError("Не удалось вычислить (возможно, циклическая зависимость)");
+                        }
                     }
                     break;
                 }
             }
             while (hasProgress && values.Count < tpl.Variables.Count(v => !string.IsNullOrWhiteSpace(v.Name) && !string.IsNullOrWhiteSpace(v.Expression)));
 
-            var validNotResolved = tpl.Variables
-                .Where(v => !string.IsNullOrWhiteSpace(v.Name) &&
-                           !string.IsNullOrWhiteSpace(v.Expression) &&
-                           !values.ContainsKey(v.Name))
-                .ToList();
-
-            if (validNotResolved.Any())
+            if (!tpl.Variables.Any(v => v.HasError))
             {
-                var notResolvedNames = string.Join(", ", validNotResolved.Select(v => $"{v.Name}: {v.Expression}"));
-                throw new Exception($"Не удалось вычислить переменные: {notResolvedNames}\n{string.Join("\n\n", CalculationErrors)}");
-            }
-
-            tpl.Result = System.Text.RegularExpressions.Regex
-                .Replace(tpl.Content, @"\{(.*?)\}", m =>
-                {
-                    try
+                tpl.Result = System.Text.RegularExpressions.Regex
+                    .Replace(tpl.Content, @"\{(.*?)\}", m =>
                     {
-                        string processedExpression = ProcessExpressionForNCalc(m.Groups[1].Value);
-
-                        var sub = new Expression(processedExpression.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions | ExpressionOptions.CaseInsensitiveStringComparer);
-
-                        foreach (var kv in values)
+                        try
                         {
-                            string paramName = GetMappedName(kv.Key);
-                            sub.Parameters[paramName] = kv.Value;
+                            string processedExpression = ProcessExpressionForNCalc(m.Groups[1].Value);
+
+                            var sub = new Expression(processedExpression.Replace(',', '.'),
+                                ExpressionOptions.IgnoreCaseAtBuiltInFunctions | ExpressionOptions.CaseInsensitiveStringComparer);
+
+                            foreach (var kv in values)
+                            {
+                                string paramName = GetMappedName(kv.Key);
+                                sub.Parameters[paramName] = kv.Value;
+                            }
+
+                            if (sub.HasErrors())
+                                return "[?]";
+
+                            var r = sub.Evaluate();
+                            return r is double d ? d.ToString("0.###").Replace(',', '.') :
+                                   r is int i ? i.ToString() :
+                                   r is long l ? l.ToString() :
+                                   r?.ToString() ?? "[?]";
                         }
-
-                        if (sub.HasErrors())
+                        catch
+                        {
                             return "[?]";
-
-                        var r = sub.Evaluate();
-                        return r is double d ? d.ToString("0.###").Replace(',', '.') :
-                               r is int i ? i.ToString() :
-                               r is long l ? l.ToString() :
-                               r?.ToString() ?? "[?]";
-                    }
-                    catch
-                    {
-                        return "[?]";
-                    }
-                });
+                        }
+                    });
+            }
         }
-        catch (Exception ex)
+        catch
         {
             throw;
         }
+    }
+
+    private void OnVariableNameChanged(TemplateDefinition template, VariableDefinition variable, string newValue)
+    {
+        variable.Name = newValue;
+        variable.ValidateName();
+        StateHasChanged();
+    }
+
+    private void OnVariableExpressionChanged(TemplateDefinition template, VariableDefinition variable, string newValue)
+    {
+        variable.Expression = newValue;
+        variable.ClearError();
+        StateHasChanged();
     }
 
     private string ProcessExpressionForNCalc(string expression)

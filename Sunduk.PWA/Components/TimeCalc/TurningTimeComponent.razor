@@ -748,9 +748,9 @@
             { nameof(okMessage), okMessage }
         };
         var options = new DialogOptions() { FullScreen = false, CloseButton = false };
-        var dialog = DialogService.Show<ConfirmDialog>("Подтверждение", parameters, options);
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Подтверждение", parameters, options);
         var result = await dialog.Result;
-        return !result.Canceled;
+        return result?.Canceled != true;
     }
 
     private async Task ClearSequences()

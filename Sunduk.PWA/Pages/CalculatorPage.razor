@@ -1,7 +1,7 @@
 ﻿@page "/calculator"
 @using NCalc
 @using Sunduk.PWA.Infrastructure.Extensions
-
+@inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
 
 <style>
@@ -15,22 +15,22 @@
         <MudField Variant="Variant.Filled" Label="Калькулятор режимов" Underline="false">
             <MudGrid>
                 <MudItem xs="6">
-                    <MudTextField @bind-Value="DiameterString" InputMode="inputMode" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                    <MudTextField @ref="diameterField" @bind-Value="DiameterString" InputId="calculator-diameter" InputMode="inputMode" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(diameterField)" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudTextField @bind-Value="EdgesString" InputMode="inputMode" T="string" Label="Зубья" Variant="Variant.Text" Immediate="true" />
+                    <MudTextField @ref="edgesField" @bind-Value="EdgesString" InputId="calculator-edges" InputMode="inputMode" T="string" Label="Зубья" Variant="Variant.Text" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(edgesField)" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudTextField @bind-Value="CutSpeedString" @onfocusin="@(() => CalcSpins = true)" InputMode="inputMode" T="string" Label="Скорость" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="м/мин" Immediate="true" />
+                    <MudTextField @ref="cutSpeedField" @bind-Value="CutSpeedString" InputId="calculator-cutSpeed" @onfocusin="@(() => CalcSpins = true)" InputMode="inputMode" T="string" Label="Скорость" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="м/мин" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(cutSpeedField)" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudTextField @bind-Value="FeedString" @onfocusin="@(() => CalcMinFeed = true)" InputMode="inputMode" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="@FeedUnits" Immediate="true" />
+                    <MudTextField @ref="feedField" @bind-Value="FeedString" InputId="calculator-feed" @onfocusin="@(() => CalcMinFeed = true)" InputMode="inputMode" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="@FeedUnits" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(feedField)" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudTextField @bind-Value="SpindleSpeedString" @onfocusin="@(() => CalcSpins = false)" InputMode="inputMode" T="string" Label="Обороты" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="об/мин" Immediate="true" />
+                    <MudTextField @ref="spindleSpeedField" @bind-Value="SpindleSpeedString" InputId="calculator-spindleSpeed" @onfocusin="@(() => CalcSpins = false)" InputMode="inputMode" T="string" Label="Обороты" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="об/мин" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(spindleSpeedField)" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudTextField @bind-Value="MinFeedString" @onfocusin="@(() => CalcMinFeed = false)" InputMode="inputMode" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" />
+                    <MudTextField @ref="minFeedField" @bind-Value="MinFeedString" InputId="calculator-minFeed" @onfocusin="@(() => CalcMinFeed = false)" InputMode="inputMode" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(minFeedField)" />
                 </MudItem>
             </MudGrid>
         </MudField>
@@ -41,17 +41,17 @@
                 <MudItem xs="12">
                     <MudGrid Spacing="0">
                         <MudItem xs="12">
-                            <MudTextField Margin="Margin.Dense" Label="Выражение" @bind-Value="UserExpression" InputMode="inputMode"/>
+                            <MudTextField @ref="exprField" InputId="calculator-expression" Margin="Margin.Dense" Label="Выражение" @bind-Value="UserExpression" InputMode="inputMode" @onfocus="() => UpdateCursorPositionOnFocus(exprField)" />
                         </MudItem>
                         <MudItem xs="12">
-                            <MudTextField Margin="Margin.Dense" Label="Результат" @bind-Value="Answer" ReadOnly="true"/>
+                            <MudTextField Margin="Margin.Dense" Label="Результат" @bind-Value="Answer" ReadOnly="true" />
                         </MudItem>
                     </MudGrid>
                 </MudItem>
 
                 <MudItem xs="12">
                     <MudGrid Spacing="1">
-                        
+
                         <MudItem xs="2">
                             <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Sin))">Sin</MudButton>
                         </MudItem>
@@ -70,7 +70,7 @@
                         <MudItem xs="2">
                             <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="EraseLeftExpr">⌫</MudButton>
                         </MudItem>
-                        
+
                         <MudItem xs="2">
                             <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Cos))">Cos</MudButton>
                         </MudItem>
@@ -142,7 +142,7 @@
                         </MudItem>
                         <MudItem xs="2">
                             <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="Calculate"
-                                ButtonType="ButtonType.Submit" Color="Color.Primary">=</MudButton>
+                                       ButtonType="ButtonType.Submit" Color="Color.Primary">=</MudButton>
                         </MudItem>
                     </MudGrid>
                 </MudItem>
@@ -159,6 +159,16 @@
 
     private const string RadianToDegreeFunction = "Deg";
     private const string DegreeToRadianFunction = "Rad";
+
+    // Ссылки на поля ввода
+    private MudTextField<string>? diameterField;
+    private MudTextField<string>? edgesField;
+    private MudTextField<string>? cutSpeedField;
+    private MudTextField<string>? feedField;
+    private MudTextField<string>? spindleSpeedField;
+    private MudTextField<string>? minFeedField;
+    private MudTextField<string>? exprField;
+    private MudTextField<string>? activeField;
 
     enum TrigonometricFunction
     {
@@ -178,7 +188,7 @@
         set
         {
             diameterString = value;
-            if(Diameter > 0)
+            if (Diameter > 0)
             {
                 if (CalcSpins)
                 {
@@ -233,7 +243,7 @@
         set
         {
             spingleSpeedString = value;
-            if(Diameter > 0)
+            if (Diameter > 0)
             {
                 if (!CalcSpins)
                 {
@@ -320,7 +330,9 @@
 
     #endregion
 
-    public string CalcInfo { get
+    public string CalcInfo
+    {
+        get
         {
             string text = string.Empty;
             if (CalcSpins && Diameter > 0 && CutSpeed > 0)
@@ -351,18 +363,165 @@
     public string Answer { get; set; } = "";
     public string UserExpression { get; set; } = "";
 
-    void AddToExpr(string text) => UserExpression += text;
-
-    void EraseLeftExpr()
+    async Task AddToExpr(string text)
     {
-        if (UserExpression.Length > 0) UserExpression = UserExpression[..^1];
+        if (activeField == null) return;
+
+        try
+        {
+            var inputRef = activeField.InputReference;
+            if (inputRef == null) return;
+
+            // Получаем текущее значение
+            var currentValue = activeField.Value ?? string.Empty;
+
+            // Используем JS interop для получения позиции курсора
+            var selectionStart = await JSRuntime.InvokeAsync<int>("eval",
+                $"document.getElementById('{GetInputId(activeField)}').selectionStart");
+            var selectionEnd = await JSRuntime.InvokeAsync<int>("eval",
+                $"document.getElementById('{GetInputId(activeField)}').selectionEnd");
+
+            // Вставляем текст в позицию курсора
+            var newValue = currentValue.Substring(0, selectionStart) + text + currentValue.Substring(selectionEnd);
+
+            // Обновляем значение соответствующего поля
+            UpdateFieldValue(activeField, newValue);
+
+            StateHasChanged();
+
+            // Устанавливаем курсор после вставленного текста
+            await Task.Delay(10);
+            var newCursorPos = selectionStart + text.Length;
+            await inputRef.SelectRangeAsync(newCursorPos, newCursorPos);
+        }
+        catch (Exception ex)
+        {
+            // Fallback - добавляем в конец
+            Console.WriteLine($"Ошибка при вставке: {ex.Message}");
+            FallbackAddToExpr(text);
+        }
+    }
+
+    async Task EraseLeftExpr()
+    {
+        if (activeField == null) return;
+
+        try
+        {
+            var inputRef = activeField.InputReference;
+            if (inputRef == null) return;
+
+            var currentValue = activeField.Value ?? string.Empty;
+
+            if (currentValue.Length == 0) return;
+
+            var selectionStart = await JSRuntime.InvokeAsync<int>("eval",
+                $"document.getElementById('{GetInputId(activeField)}').selectionStart");
+            var selectionEnd = await JSRuntime.InvokeAsync<int>("eval",
+                $"document.getElementById('{GetInputId(activeField)}').selectionEnd");
+
+            string newValue;
+            int newCursorPos;
+
+            if (selectionStart != selectionEnd)
+            {
+                newValue = currentValue.Substring(0, selectionStart) + currentValue.Substring(selectionEnd);
+                newCursorPos = selectionStart;
+            }
+            else if (selectionStart > 0)
+            {
+                newValue = currentValue.Substring(0, selectionStart - 1) + currentValue.Substring(selectionStart);
+                newCursorPos = selectionStart - 1;
+            }
+            else
+            {
+                return;
+            }
+
+            UpdateFieldValue(activeField, newValue);
+
+            StateHasChanged();
+
+            await Task.Delay(10);
+            await inputRef.SelectRangeAsync(newCursorPos, newCursorPos);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка при удалении: {ex.Message}");
+            FallbackEraseLeftExpr();
+        }
     }
 
     void ClearCalculator()
     {
-        UserExpression = string.Empty;
-        Answer = string.Empty;
+        if (activeField != null && activeField != exprField)
+        {
+            UpdateFieldValue(activeField, string.Empty);
+        }
+        else
+        {
+            UserExpression = string.Empty;
+            Answer = string.Empty;
+        }
     }
+
+    private string GetInputId(MudTextField<string> field)
+    {
+        if (field == diameterField) return "calculator-diameter";
+        if (field == edgesField) return "calculator-edges";
+        if (field == cutSpeedField) return "calculator-cutSpeed";
+        if (field == feedField) return "calculator-feed";
+        if (field == spindleSpeedField) return "calculator-spindleSpeed";
+        if (field == minFeedField) return "calculator-minFeed";
+        if (field == exprField) return "calculator-expression";
+        return "calculator-field";
+    }
+
+    private void UpdateFieldValue(MudTextField<string> field, string value)
+    {
+        if (field == diameterField) DiameterString = value;
+        else if (field == edgesField) EdgesString = value;
+        else if (field == cutSpeedField) CutSpeedString = value;
+        else if (field == feedField) FeedString = value;
+        else if (field == spindleSpeedField) SpindleSpeedString = value;
+        else if (field == minFeedField) MinFeedString = value;
+        else if (field == exprField) UserExpression = value;
+    }
+
+    private void FallbackAddToExpr(string text)
+    {
+        if (activeField == exprField)
+        {
+            UserExpression += text;
+        }
+        else if (activeField != null)
+        {
+            var currentValue = activeField.Value ?? string.Empty;
+            UpdateFieldValue(activeField, currentValue + text);
+        }
+    }
+
+    private void FallbackEraseLeftExpr()
+    {
+        if (activeField == exprField && UserExpression.Length > 0)
+        {
+            UserExpression = UserExpression[..^1];
+        }
+        else if (activeField != null)
+        {
+            var currentValue = activeField.Value ?? string.Empty;
+            if (currentValue.Length > 0)
+            {
+                UpdateFieldValue(activeField, currentValue[..^1]);
+            }
+        }
+    }
+
+    private void UpdateCursorPositionOnFocus(MudTextField<string>? field)
+    {
+        activeField = field;
+    }
+
 
     void CalculateTrigonometricFunction(TrigonometricFunction function)
     {
@@ -378,7 +537,8 @@
             Answer = "";
             return;
         }
-        switch (function) {
+        switch (function)
+        {
             case TrigonometricFunction.Sin:
                 UserExpression = $"Sin({userExpr})".Replace(',', '.');
                 Answer = Math.Sin(userExpr.Radians()).ToString("0.####").Replace(',', '.');
@@ -451,11 +611,33 @@
                          r?.ToString() ?? "[?]";
             UserExpression = result;
             Answer = result;
+            activeField = exprField;
+            StateHasChanged();
+            _ = SetCursorToEnd();
             return;
         }
         catch
         {
             Snackbar.Add($"Ошибки при вычислении: {string.Join(", ", calcErrors)}");
+        }
+    }
+
+    private async Task SetCursorToEnd()
+    {
+        if (exprField?.InputReference != null)
+        {
+            await Task.Delay(50);
+
+            try
+            {
+                await exprField.InputReference.FocusAsync();
+                var length = UserExpression?.Length ?? 0;
+                await exprField.InputReference.SelectRangeAsync(length, length);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при установке курсора: {ex.Message}");
+            }
         }
     }
 }
