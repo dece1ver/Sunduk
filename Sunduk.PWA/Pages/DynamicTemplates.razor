@@ -81,36 +81,73 @@
 </MudPopover>
 
 <MudToolBar Dense="true" Class="gap-2">
-    <MudButton Variant="Variant.Outlined"
-               OnClick="AddTemplate"
-               StartIcon="@Icons.Material.Outlined.PostAdd"
-               Size="Size.Small">
-        Добавить шаблон
-    </MudButton>
-
-    <MudFileUpload T="IBrowserFile"
-                   Accept=".json"
-                   FilesChanged="UploadTemplates"
-                   Class="flex-shrink-0">
-        <ActivatorContent>
-            <MudButton Variant="Variant.Text"
-                       StartIcon="@Icons.Material.Outlined.FileUpload"
+    <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+        <MudButtonGroup Variant="Variant.Outlined">
+            <MudIconButton Variant="Variant.Outlined"
+                       OnClick="AddTemplate"
+                       Icon="@Icons.Material.Outlined.PostAdd"
                        Size="Size.Small">
-                Импорт
+                Создать
+            </MudIconButton>
+            <MudFileUpload T="IBrowserFile"
+                           Accept=".json"
+                           FilesChanged="UploadTemplates"
+                           Class="flex-shrink-0">
+                <ActivatorContent>
+                    <MudIconButton Variant="Variant.Text"
+                               Icon="@Icons.Material.Outlined.FileUpload"
+                               Size="Size.Small">
+                        Импорт
+                    </MudIconButton>
+                </ActivatorContent>
+            </MudFileUpload>
+            <MudIconButton Variant="Variant.Text"
+                       OnClick="DownloadTemplatesAsync"
+                       Icon="@Icons.Material.Outlined.FileDownload"
+                       Size="Size.Small"
+                       Disabled="@(Templates.Count == 0)"/>
+            <MudIconButton OnClick="GetCloudTemplatesAsync"
+                       Icon="@Icons.Material.Outlined.CloudUpload"
+                       Size="Size.Small"/>
+        </MudButtonGroup>
+    </MudHidden>
+    <MudHidden Breakpoint="Breakpoint.Xs">
+        <MudButtonGroup Variant="Variant.Outlined">
+            <MudButton Variant="Variant.Outlined"
+                       OnClick="AddTemplate"
+                       StartIcon="@Icons.Material.Outlined.PostAdd"
+                       Size="Size.Small">
+                Создать
             </MudButton>
-        </ActivatorContent>
-    </MudFileUpload>
-
-    <MudButton Variant="Variant.Text"
-               OnClick="DownloadTemplatesAsync"
-               StartIcon="@Icons.Material.Outlined.FileDownload"
-               Size="Size.Small"
-               Disabled="@(templates.Count == 0)">
-        Экспорт всех
-    </MudButton>
+            <MudFileUpload T="IBrowserFile"
+                           Accept=".json"
+                           FilesChanged="UploadTemplates"
+                           Class="flex-shrink-0">
+                <ActivatorContent>
+                    <MudButton Variant="Variant.Text"
+                               StartIcon="@Icons.Material.Outlined.FileUpload"
+                               Size="Size.Small">
+                        Импорт
+                    </MudButton>
+                </ActivatorContent>
+            </MudFileUpload>
+            <MudButton Variant="Variant.Text"
+                       OnClick="DownloadTemplatesAsync"
+                       StartIcon="@Icons.Material.Outlined.FileDownload"
+                       Size="Size.Small"
+                       Disabled="@(Templates.Count == 0)">
+                Экспорт
+            </MudButton>
+            <MudButton OnClick="GetCloudTemplatesAsync"
+                       StartIcon="@Icons.Material.Outlined.CloudUpload"
+                       Size="Size.Small">
+                Библиотека
+            </MudButton>
+        </MudButtonGroup>
+    </MudHidden>
 
     <MudSpacer />
-
+    <MudButton OnClick="GetCloudTemplatesAsync" StartIcon="@Icons.Material.Outlined.Cloud" />
     @if (_lastSaveTime.HasValue)
     {
         <div class="save-indicator">
@@ -121,7 +158,7 @@
 </MudToolBar>
 
 <MudExpansionPanels MultiExpansion="true" Square="true" Class="mt-2 mx-0">
-    @foreach (var template in templates)
+    @foreach (var template in Templates)
     {
         <MudExpansionPanel Class="mx-0">
             <TitleContent>
@@ -151,19 +188,19 @@
 
                     @if (template.HasError)
                     {
-                        
+
                     }
 
                     <MudSpacer />
 
                     <MudButtonGroup Variant="Variant.Text" Size="Size.Small">
-                        @if (templates.IndexOf(template) > 0)
+                        @if (Templates.IndexOf(template) > 0)
                         {
                             <MudIconButton Icon="@Icons.Material.Outlined.ArrowUpward"
                                            OnClick="() => MoveUp(template)"
                                            Title="Переместить вверх" />
                         }
-                        @if (templates.IndexOf(template) < templates.Count - 1)
+                        @if (Templates.IndexOf(template) < Templates.Count - 1)
                         {
                             <MudIconButton Icon="@Icons.Material.Outlined.ArrowDownward"
                                            OnClick="() => MoveDown(template)"
@@ -201,10 +238,16 @@
                         <MudSpacer />
 
                         <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
-                            <MudButton StartIcon="@Icons.Material.Outlined.PlaylistAdd"
-                                       OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }">
-                                Добавить переменную
-                            </MudButton>
+                            <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+                                <MudIconButton Icon="@Icons.Material.Outlined.PlaylistAdd"
+                                           OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }"/>
+                            </MudHidden>
+                            <MudHidden Breakpoint="Breakpoint.Xs">
+                                <MudButton StartIcon="@Icons.Material.Outlined.PlaylistAdd"
+                                           OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }">
+                                    Добавить переменную
+                                </MudButton>
+                            </MudHidden>
                             <MudIconButton Icon="@Icons.Material.Outlined.Download"
                                            OnClick="() => DownloadTemplateAsync(template)"
                                            Title="Скачать шаблон" />
@@ -214,7 +257,7 @@
                     <MudGrid Spacing="3">
                         <MudItem xs="12" md="6">
                             <MudPaper Elevation="0" Class="pa-1 ma-0" Outlined="true">
-                                
+
 
                                 @if (template.Variables.Count == 0)
                                 {
@@ -227,7 +270,7 @@
                                 {
                                     var index = template.Variables.IndexOf(variable);
 
-                                    <MudPaper Elevation="0" Outlined="true" 
+                                    <MudPaper Elevation="0" Outlined="true"
                                               Class="@($"px-2 py-1 my-1 variable-card {(variable.HasError ? "has-error" : "")}")">
                                         <MudGrid Spacing="1" Class="align-center">
                                             <MudItem xs="5" sm="3">
@@ -292,7 +335,7 @@
 
                         <MudItem xs="12" md="6">
                             <MudTabs Elevation="0" Outlined="true"
-                                     Rounded="true"  
+                                     Rounded="true"
                                      ApplyEffectsToContainer="true"
                                      PanelClass="pa-3">
                                 <MudTabPanel Text="Заготовка" Icon="@Icons.Material.Outlined.Edit">
@@ -326,15 +369,15 @@
     }
 </MudExpansionPanels>
 
-@if (templates.Count == 0)
+@if (Templates.Count == 0)
 {
     <MudPaper Class="pa-8 mt-4 text-center" Elevation="0">
         <MudIcon Icon="@Icons.Material.Outlined.PostAdd" Size="Size.Large" Color="Color.Default" />
         <MudText Typo="Typo.h6" Class="mt-2">Нет шаблонов</MudText>
-        <MudText Typo="Typo.body2" Color="Color.Secondary">
+        <MudText Typo="Typo.body2">
             Создайте новый шаблон или импортируйте существующий
         </MudText>
-        <MudButton Variant="Variant.Filled"
+        <MudButton Variant="Variant.Outlined"
                    Color="Color.Primary"
                    OnClick="AddTemplate"
                    StartIcon="@Icons.Material.Outlined.Add"
@@ -353,18 +396,22 @@
     private readonly SemaphoreSlim _persistSemaphore = new(1, 1);
     private readonly Dictionary<TemplateDefinition, bool> _calculating = new();
 
-    public List<TemplateDefinition> templates { get; set; } = new();
+    private bool _loading;
+    private HttpClient _http = null!;
+    private DateTime? _lastSaveTime;
+    private readonly Dictionary<string, string> _variableMapping = new Dictionary<string, string>();
+
+    public List<TemplateDefinition> Templates { get; set; } = new();
+    public List<(string Name, string Url)> CloudTemplates { get; set; } = new();
     public bool LocalStorageIsWorking { get; set; }
     public bool LocalStorageWorkCompleted { get; set; }
     public List<string> CalculationErrors { get; set; } = new();
 
-    private DateTime? _lastSaveTime;
-    private readonly Dictionary<string, string> _variableMapping = new Dictionary<string, string>();
-
     protected override async Task OnInitializedAsync()
     {
-        templates = await LocalStorage.GetItemAsync<List<TemplateDefinition>>(nameof(templates))
+        Templates = await LocalStorage.GetItemAsync<List<TemplateDefinition>>(nameof(Templates))
                 ?? new List<TemplateDefinition>();
+        _http = new();
         StateHasChanged();
     }
 
@@ -380,9 +427,9 @@
 
     private void AddTemplate()
     {
-        templates.Add(new TemplateDefinition()
+        Templates.Add(new TemplateDefinition()
         {
-            Name = $"Новый шаблон {templates.Count + 1}",
+            Name = $"Новый шаблон {Templates.Count + 1}",
             Variables = new() { new VariableDefinition() }
         });
         PersistAsync().AndForget();
@@ -390,18 +437,18 @@
 
     private void MoveUp(TemplateDefinition template)
     {
-        var i = templates.IndexOf(template);
-        templates.Remove(template);
-        templates.Insert(i - 1, template);
+        var i = Templates.IndexOf(template);
+        Templates.Remove(template);
+        Templates.Insert(i - 1, template);
         StateHasChanged();
         PersistAsync().AndForget();
     }
 
     private void MoveDown(TemplateDefinition template)
     {
-        var i = templates.IndexOf(template);
-        templates.Remove(template);
-        templates.Insert(i + 1, template);
+        var i = Templates.IndexOf(template);
+        Templates.Remove(template);
+        Templates.Insert(i + 1, template);
         StateHasChanged();
         PersistAsync().AndForget();
     }
@@ -439,7 +486,7 @@
             LocalStorageIsWorking = true;
             StateHasChanged();
 
-            await LocalStorage.SetItemAsync(nameof(templates), templates);
+            await LocalStorage.SetItemAsync(nameof(Templates), Templates);
             _lastSaveTime = DateTime.Now;
 
             StateHasChanged();
@@ -457,15 +504,119 @@
         }
     }
 
+    private async Task GetCloudTemplatesAsync()
+    {
+        await LoadCloudTemplatesAsync();
+
+        if (CloudTemplates.Count == 0)
+        {
+            Snackbar.Add("Не найдено доступных шаблонов", Severity.Info);
+            return;
+        }
+
+        var parameters = new DialogParameters<CloudTemplatesDialog>
+        {
+            { x => x.CloudFiles, CloudTemplates },
+            { x => x.HttpClient, _http }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+
+        var dialog = await DialogService.ShowAsync<CloudTemplatesDialog>(
+            "Шаблоны из облака",
+            parameters,
+            options);
+
+        var result = await dialog.Result;
+
+        if (result != null && !result.Canceled && result.Data is List<TemplateDefinition> importedTemplates)
+        {
+            if (Templates.Any())
+            {
+                var addOrReplace = await DialogService.ShowMessageBox(
+                    "Импорт шаблонов",
+                    $"Добавить {importedTemplates.Count} шаблон(ов) к существующим или заменить всё?",
+                    yesText: "Добавить", noText: "Заменить", cancelText: "Отмена");
+
+                switch (addOrReplace)
+                {
+                    case true:
+                        Templates.AddRange(importedTemplates);
+                        Snackbar.Add($"Добавлено шаблонов: {importedTemplates.Count}", Severity.Success);
+                        break;
+                    case false:
+                        Templates = importedTemplates;
+                        Snackbar.Add($"Загружено шаблонов: {importedTemplates.Count}", Severity.Success);
+                        break;
+                    default:
+                        return;
+                }
+            }
+            else
+            {
+                Templates = importedTemplates;
+                Snackbar.Add($"Загружено шаблонов: {importedTemplates.Count}", Severity.Success);
+            }
+
+            await PersistAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadCloudTemplatesAsync()
+    {
+        _loading = true;
+        try
+        {
+            var url = "https://dt.sunduk.one/templates/";
+            var html = await _http.GetStringAsync(url);
+
+            var matches = System.Text.RegularExpressions.Regex.Matches(html, @"<a\s+href\s*=\s*[""']([^""']+)[""'][^>]*>([^<]+)</a>", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            var list = new List<(string Name, string Url)>();
+
+            foreach (System.Text.RegularExpressions.Match m in matches)
+            {
+                var href = m.Groups[1].Value.Trim();
+                var text = m.Groups[2].Value.Trim();
+
+                if (href == "../") continue;
+                if (href.StartsWith("http://") || href.StartsWith("https://") || href.StartsWith("//")) continue;
+
+                var fullUrl = new Uri(new Uri(url), href).ToString();
+
+                // Только JSON файлы
+                if (!href.EndsWith(".json", StringComparison.OrdinalIgnoreCase)) continue;
+
+                list.Add((text, fullUrl));
+            }
+
+            CloudTemplates = list;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Ошибка загрузки списка: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
     private async Task DownloadTemplatesAsync()
     {
         if (BlazorDownloadFileService == null) return;
-        if (templates.Count < 1)
+        if (Templates.Count < 1)
         {
             Snackbar.Add("Нечего скачивать", Severity.Warning);
             return;
         }
-        var json = JsonSerializer.Serialize(templates, new JsonSerializerOptions { WriteIndented = true });
+        var json = JsonSerializer.Serialize(Templates, new JsonSerializerOptions { WriteIndented = true });
         var bytes = Encoding.UTF8.GetBytes(json);
         await BlazorDownloadFileService.DownloadFile("sunduk-dt-all.json", bytes, "application/json");
     }
@@ -507,7 +658,7 @@
             return;
         }
 
-        if (templates.Any())
+        if (Templates.Any())
         {
             var result = await DialogService.ShowMessageBox(
                 "Импорт шаблонов",
@@ -517,11 +668,11 @@
             switch (result)
             {
                 case true:
-                    templates.AddRange(loaded);
+                    Templates.AddRange(loaded);
                     Snackbar.Add($"Добавлено шаблонов: {loaded.Count}", Severity.Success);
                     break;
                 case false:
-                    templates = loaded;
+                    Templates = loaded;
                     Snackbar.Add($"Загружено шаблонов: {loaded.Count}", Severity.Success);
                     break;
                 default:
@@ -530,7 +681,7 @@
         }
         else
         {
-            templates = loaded;
+            Templates = loaded;
             Snackbar.Add($"Загружено шаблонов: {loaded.Count}", Severity.Success);
         }
 
@@ -821,7 +972,7 @@
 
         if (result != true) return;
 
-        templates.Remove(template);
+        Templates.Remove(template);
         Snackbar.Add("Шаблон удалён", Severity.Info);
         PersistAsync().AndForget();
     }
