@@ -6,144 +6,298 @@
                 <MudAlert Severity="Severity.Warning">Некорректные значения угла!</MudAlert>
             </MudItem>
         }
+
         <MudItem xs="12" md="6">
-            <MudField Variant="Variant.Filled" Label="Градусы в десятичной системе" Underline="false">
-                <MudTextField @bind-Value="DecimalAngleString" @onfocusin="@(() => CalcDecimal = false)" DisableUnderLine="false"
-                              T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="°" Immediate="true" />
+            <MudField Label="Градусы в десятичной системе" Variant="Variant.Filled" Underline="false">
+                <MudTextField @bind-Value="DecimalAngleString"
+                              @onfocusin="@(() => _calcDecimal = false)"
+                              T="string"
+                              Variant="Variant.Text"
+                              Adornment="Adornment.End"
+                              AdornmentText="°"
+                              Immediate="true" />
             </MudField>
         </MudItem>
+
         <MudItem xs="12" md="6">
-            <MudField Variant="Variant.Filled" Label="Радианы" Underline="false">
-                <MudTextField @bind-Value="RadiansAngleString" @onfocusin="@(() => InputRadians = true)" @onfocusout="@(() => InputRadians = false)" DisableUnderLine="false" 
-                              T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="rad" Immediate="true" />
+            <MudField Label="Радианы" Variant="Variant.Filled" Underline="false">
+                <MudTextField @bind-Value="RadiansAngleString"
+                              @onfocusin="@(() => _inputRadians = true)"
+                              @onfocusout="@(() => _inputRadians = false)"
+                              T="string"
+                              Variant="Variant.Text"
+                              Adornment="Adornment.End"
+                              AdornmentText="rad"
+                              Immediate="true" />
             </MudField>
         </MudItem>
-        <MudItem xs="12" md="12">
-            <MudField Variant="Variant.Filled" Label="Градусная система" Underline="false">
+
+        <MudItem xs="12">
+            <MudField Label="Градусная система" Variant="Variant.Filled" Underline="false">
                 <MudGrid>
-                    <MudItem xs="4" sm="4" md="4" lg="4">
-                        <MudTextField @bind-Value="IntAngleString" @onfocusin="@(() => CalcDecimal = true)" DisableUnderLine="false"
-                                      T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="°" Immediate="true" />
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="IntAngleString"
+                                      @onfocusin="@(() => _calcDecimal = true)"
+                                      T="string"
+                                      Variant="Variant.Text"
+                                      Adornment="Adornment.End"
+                                      AdornmentText="°"
+                                      Immediate="true" />
                     </MudItem>
-                    <MudItem xs="4" sm="4" md="4" lg="4">
-                        <MudTextField @bind-Value="MinAngleString" @onfocusin="@(() => CalcDecimal = true)" DisableUnderLine="false" 
-                                      T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="′" Immediate="true" />
+
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="MinAngleString"
+                                      @onfocusin="@(() => _calcDecimal = true)"
+                                      T="string"
+                                      Variant="Variant.Text"
+                                      Adornment="Adornment.End"
+                                      AdornmentText="′"
+                                      Immediate="true" />
                     </MudItem>
-                    <MudItem xs="4" sm="4" md="4" lg="4">
-                        <MudTextField @bind-Value="SecAngleString" @onfocusin="@(() => CalcDecimal = true)" DisableUnderLine="false"
-                                      T="string" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="″" Immediate="true" />
+
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="SecAngleString"
+                                      @onfocusin="@(() => _calcDecimal = true)"
+                                      T="string"
+                                      Variant="Variant.Text"
+                                      Adornment="Adornment.End"
+                                      AdornmentText="″"
+                                      Immediate="true" />
                     </MudItem>
                 </MudGrid>
             </MudField>
         </MudItem>
 
     </MudGrid>
-    @*<MudText>
-            @CalcDecimal | @DecimalAngle | @IntAngle | @MinAngle | @SecAngle
-        </MudText>*@
 </MudContainer>
+
 
 @code
 {
-    public bool CalcDecimal { get; set; } = false;
-    public bool InputRadians { get; set; } = false;
+    private const decimal SecondThreshold = 59.9999m;
+    private const int MinutesInHour = 60;
+    private const int SecondsInMinute = 60;
+    private const int SecondsInDegree = 3600;
 
-    private string decimalAngleString;
+    private bool _calcDecimal;
+    private bool _inputRadians;
+
+    // =====================================
+    // ВСПОМОГАТЕЛЬНЫЕ ЧТЕНИЯ
+    // =====================================
+
+    private decimal _decimalAngle;
+    private decimal _radiansAngle;
+
+    private int _intAngle;
+    private int _minAngle;
+    private decimal _secAngle;
+
+    // =====================================
+    // ДЕСЯТИЧНЫЙ ВВОД
+    // =====================================
+
+    private string _decimalAngleString = string.Empty;
 
     public string DecimalAngleString
     {
-        get => decimalAngleString;
+        get => _decimalAngleString;
         set
         {
-            decimalAngleString = value;
-            if (!CalcDecimal)
+            _decimalAngleString = value ?? string.Empty;
+
+            if (decimal.TryParse(_decimalAngleString.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var dec))
             {
-                IntAngleString = Math.Truncate(DecimalAngle).ToString();
-
-                MinAngleString = Math.Truncate((DecimalAngle - IntAngle) * 60).ToString();
-
-                SecAngleString = Math.Truncate((((DecimalAngle - IntAngle) * 60) - MinAngle) * 60).ToString();
+                _decimalAngle = dec;
             }
-            if (!InputRadians) RadiansAngleString = DecimalAngle.Radians().ToPrettyString();
+            else
+            {
+                _decimalAngle = 0m;
+            }
+
+            if (!_calcDecimal)
+            {
+                ConvertDecimalToDms(_decimalAngle, out var d, out var m, out var s);
+                _intAngle = d;
+                _minAngle = m;
+                _secAngle = s;
+                _intAngleString = d.ToString(CultureInfo.InvariantCulture);
+                _minAngleString = m.ToString(CultureInfo.InvariantCulture);
+                _secAngleString = s.ToString("0.####", CultureInfo.InvariantCulture);
+            }
+
+            if (!_inputRadians)
+            {
+                _radiansAngle = _decimalAngle * (decimal)Math.PI / 180m;
+                _radiansAngleString = _radiansAngle.ToString("0.####", CultureInfo.InvariantCulture);
+            }
         }
     }
 
-    public double DecimalAngle => Util.GetDouble(DecimalAngleString);
+    // =====================================
+    // РАДИАНЫ
+    // =====================================
 
-    private string radiansAngleString;
+    private string _radiansAngleString = string.Empty;
 
-    public string RadiansAngleString
+    private string RadiansAngleString
     {
-        get => radiansAngleString;
+        get => _radiansAngleString;
         set
         {
-            radiansAngleString = value;
-            if (InputRadians)
+            _radiansAngleString = value ?? string.Empty;
+
+            if (decimal.TryParse(_radiansAngleString.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var rad))
             {
-                DecimalAngleString = RadiansAngle.Degrees().ToPrettyString();
+                _radiansAngle = rad;
             }
-            if (!CalcDecimal)
+            else
             {
-                IntAngleString = Math.Truncate(DecimalAngle).ToString();
+                _radiansAngle = 0m;
+            }
 
-                MinAngleString = Math.Truncate((DecimalAngle - IntAngle) * 60).ToString();
+            if (_inputRadians)
+            {
+                _decimalAngle = _radiansAngle * 180m / (decimal)Math.PI;
+                _decimalAngleString = _decimalAngle.ToString("0.####", CultureInfo.InvariantCulture);
+            }
 
-                SecAngleString = Math.Truncate((((DecimalAngle - IntAngle) * 60) - MinAngle) * 60).ToString();
+            if (!_calcDecimal)
+            {
+                ConvertDecimalToDms(_decimalAngle, out var d, out var m, out var s);
+                _intAngle = d;
+                _minAngle = m;
+                _secAngle = s;
+                _intAngleString = d.ToString(CultureInfo.InvariantCulture);
+                _minAngleString = m.ToString(CultureInfo.InvariantCulture);
+                _secAngleString = s.ToString("0.####", CultureInfo.InvariantCulture);
             }
         }
     }
 
-    public double RadiansAngle => Util.GetDouble(RadiansAngleString);
+    // =====================================
+    // ГРАДУСНАЯ СИСТЕМА (DMS)
+    // =====================================
 
-    private string intAngleString;
+    private string _intAngleString = string.Empty;
 
     public string IntAngleString
     {
-        get => intAngleString;
+        get => _intAngleString;
         set
         {
-            intAngleString = value;
-            if (ValidAngle() && CalcDecimal)
+            _intAngleString = value ?? string.Empty;
+
+            if (int.TryParse(_intAngleString, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intVal))
             {
-                DecimalAngleString = Util.ToPrettyString(IntAngle + (MinAngle / 60) + (SecAngle / 3600));
+                _intAngle = intVal;
             }
+            else
+            {
+                _intAngle = 0;
+            }
+
+            UpdateDecimalFromDms();
         }
     }
 
-    public double IntAngle => Util.GetDouble(IntAngleString);
-
-    private string minAngleString;
+    private string _minAngleString = string.Empty;
 
     public string MinAngleString
     {
-        get => minAngleString;
+        get => _minAngleString;
         set
         {
-            minAngleString = value;
-            if (ValidAngle() && CalcDecimal)
+            _minAngleString = value ?? string.Empty;
+
+            if (int.TryParse(_minAngleString, NumberStyles.Integer, CultureInfo.InvariantCulture, out var minVal))
             {
-                DecimalAngleString = Util.ToPrettyString(IntAngle + (MinAngle / 60) + (SecAngle / 3600));
+                _minAngle = minVal;
             }
+            else
+            {
+                _minAngle = 0;
+            }
+
+            UpdateDecimalFromDms();
         }
     }
-    public double MinAngle => Util.GetDouble(MinAngleString);
 
-    private string secAngleString;
+    private string _secAngleString = string.Empty;
 
     public string SecAngleString
     {
-        get => secAngleString;
+        get => _secAngleString;
         set
         {
-            secAngleString = value;
-            if (ValidAngle() && CalcDecimal)
+            _secAngleString = value ?? string.Empty;
+
+            if (decimal.TryParse(_secAngleString.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var secVal))
             {
-                DecimalAngleString = Util.ToPrettyString(IntAngle + (MinAngle / 60) + (SecAngle / 3600));
+                _secAngle = secVal;
             }
+            else
+            {
+                _secAngle = 0m;
+            }
+
+            UpdateDecimalFromDms();
         }
     }
 
-    public double SecAngle => Util.GetDouble(SecAngleString);
+    private void UpdateDecimalFromDms()
+    {
+        if (!_calcDecimal || !ValidAngle())
+        {
+            return;
+        }
 
-    bool ValidAngle() => (MinAngle >= 0 && MinAngle < 60 && SecAngle >= 0 && SecAngle < 60) ? true : false;
+        var dec = ConvertDmsToDecimal(_intAngle, _minAngle, _secAngle);
+        _decimalAngle = dec;
+        _decimalAngleString = dec.ToString("0.####", CultureInfo.InvariantCulture);
+
+        _radiansAngle = _decimalAngle * (decimal)Math.PI / 180m;
+        _radiansAngleString = _radiansAngle.ToString("0.####", CultureInfo.InvariantCulture);
+    }
+
+    private bool ValidAngle() =>
+        _minAngle >= 0 && _minAngle < MinutesInHour &&
+        _secAngle >= 0 && _secAngle < SecondsInMinute;
+
+    // =====================================
+    // ЛОГИКА КОНВЕРТАЦИИ
+    // =====================================
+
+    private static decimal ConvertDmsToDecimal(int d, int m, decimal s)
+        => d + (m / 60m) + (s / 3600m);
+
+    private static void ConvertDecimalToDms(decimal dec, out int deg, out int min, out decimal sec)
+    {
+        var total = dec * SecondsInDegree;
+
+        deg = (int)(total / SecondsInDegree);
+        total -= deg * SecondsInDegree;
+
+        min = (int)(total / SecondsInMinute);
+        total -= min * SecondsInMinute;
+
+        sec = total;
+
+        NormalizeDms(ref deg, ref min, ref sec);
+    }
+
+    private static void NormalizeDms(ref int deg, ref int min, ref decimal sec)
+    {
+        if (sec >= SecondThreshold)
+        {
+            sec = 0;
+            min++;
+        }
+
+        if (min == MinutesInHour)
+        {
+            min = 0;
+            deg++;
+        }
+    }
 }

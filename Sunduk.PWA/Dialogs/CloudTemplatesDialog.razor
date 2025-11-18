@@ -32,21 +32,16 @@
                                     <MudText Typo="Typo.body2" Color="Color.Secondary">@template.Description</MudText>
                                 }
                             </div>
-                            <MudButton Variant="Variant.Outlined"
-                                       Color="Color.Primary"
-                                       Size="Size.Small"
+                            <MudIconButton Variant="Variant.Outlined"
+                                       Size="Size.Medium"
                                        OnClick="() => ImportTemplate(template)"
                                        Disabled="@template.IsImporting"
-                                       StartIcon="@(template.IsImporting ? null : Icons.Material.Outlined.Download)">
+                                       Icon="@(template.IsImporting ? null : Icons.Material.Outlined.Download)">
                                 @if (template.IsImporting)
                                 {
                                     <MudProgressCircular Size="Size.Small" Indeterminate="true" />
                                 }
-                                else
-                                {
-                                    <text>Загрузить</text>
-                                }
-                            </MudButton>
+                            </MudIconButton>
                         </div>
                     </MudListItem>
                     @if (template != _templates.Last())
@@ -129,11 +124,12 @@
         StateHasChanged();
     }
 
-    private void ImportTemplate(CloudTemplateInfo template)
+    private async void ImportTemplate(CloudTemplateInfo template)
     {
         if (template.Templates == null) return;
 
         template.IsImporting = true;
+        await Task.Delay(3000);        
         StateHasChanged();
 
         try

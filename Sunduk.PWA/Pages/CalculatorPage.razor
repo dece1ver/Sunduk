@@ -3,10 +3,17 @@
 @using Sunduk.PWA.Infrastructure.Extensions
 @inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
 <style>
     .monofield {
         font-family: 'Roboto Mono', monospace;
+    }
+
+    .calculator-button {
+        flex: 1;
+        min-height: 0;
+        height: 100%;
     }
 </style>
 
@@ -15,22 +22,22 @@
         <MudField Variant="Variant.Filled" Label="Калькулятор режимов" Underline="false">
             <MudGrid>
                 <MudItem xs="6">
-                    <MudTextField @ref="diameterField" @bind-Value="DiameterString" InputId="calculator-diameter" InputMode="inputMode" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(diameterField)" />
+                    <MudTextField @ref="diameterField" @bind-Value="DiameterString" InputId="calculator-diameter" InputMode="InputMode" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(diameterField)" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudTextField @ref="edgesField" @bind-Value="EdgesString" InputId="calculator-edges" InputMode="inputMode" T="string" Label="Зубья" Variant="Variant.Text" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(edgesField)" />
+                    <MudTextField @ref="edgesField" @bind-Value="EdgesString" InputId="calculator-edges" InputMode="InputMode" T="string" Label="Зубья" Variant="Variant.Text" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(edgesField)" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudTextField @ref="cutSpeedField" @bind-Value="CutSpeedString" InputId="calculator-cutSpeed" @onfocusin="@(() => CalcSpins = true)" InputMode="inputMode" T="string" Label="Скорость" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="м/мин" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(cutSpeedField)" />
+                    <MudTextField @ref="cutSpeedField" @bind-Value="CutSpeedString" InputId="calculator-cutSpeed" @onfocusin="@(() => CalcSpins = true)" InputMode="InputMode" T="string" Label="Скорость" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="м/мин" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(cutSpeedField)" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudTextField @ref="feedField" @bind-Value="FeedString" InputId="calculator-feed" @onfocusin="@(() => CalcMinFeed = true)" InputMode="inputMode" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="@FeedUnits" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(feedField)" />
+                    <MudTextField @ref="feedField" @bind-Value="FeedString" InputId="calculator-feed" @onfocusin="@(() => CalcMinFeed = true)" InputMode="InputMode" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="@FeedUnits" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(feedField)" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudTextField @ref="spindleSpeedField" @bind-Value="SpindleSpeedString" InputId="calculator-spindleSpeed" @onfocusin="@(() => CalcSpins = false)" InputMode="inputMode" T="string" Label="Обороты" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="об/мин" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(spindleSpeedField)" />
+                    <MudTextField @ref="spindleSpeedField" @bind-Value="SpindleSpeedString" InputId="calculator-spindleSpeed" @onfocusin="@(() => CalcSpins = false)" InputMode="InputMode" T="string" Label="Обороты" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="об/мин" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(spindleSpeedField)" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudTextField @ref="minFeedField" @bind-Value="MinFeedString" InputId="calculator-minFeed" @onfocusin="@(() => CalcMinFeed = false)" InputMode="inputMode" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(minFeedField)" />
+                    <MudTextField @ref="minFeedField" @bind-Value="MinFeedString" InputId="calculator-minFeed" @onfocusin="@(() => CalcMinFeed = false)" InputMode="InputMode" T="string" Label="Подача" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм/мин" Immediate="true" @onfocus="() => UpdateCursorPositionOnFocus(minFeedField)" />
                 </MudItem>
             </MudGrid>
         </MudField>
@@ -41,7 +48,7 @@
                 <MudItem xs="12">
                     <MudGrid Spacing="0">
                         <MudItem xs="12">
-                            <MudTextField @ref="exprField" InputId="calculator-expression" Margin="Margin.Dense" Label="Выражение" @bind-Value="UserExpression" InputMode="inputMode" @onfocus="() => UpdateCursorPositionOnFocus(exprField)" />
+                            <MudTextField @ref="exprField" InputId="calculator-expression" Margin="Margin.Dense" Label="Выражение" @bind-Value="UserExpression" InputMode="InputMode" @onfocus="() => UpdateCursorPositionOnFocus(exprField)" />
                         </MudItem>
                         <MudItem xs="12">
                             <MudTextField Margin="Margin.Dense" Label="Результат" @bind-Value="Answer" ReadOnly="true" />
@@ -53,95 +60,111 @@
                     <MudGrid Spacing="1">
 
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Sin))">Sin</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Sin))">Sin</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("²"))">X²</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("²"))">X²</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("/"))">/</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("/"))">/</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("*"))">×</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("*"))">×</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(ClearCalculator)">C</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(ClearCalculator)">C</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="EraseLeftExpr">⌫</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="EraseLeftExpr">⌫</MudButton>
                         </MudItem>
 
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Cos))">Cos</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Cos))">Cos</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => { })">√X</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => { })">√X</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("7"))">7</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("7"))">7</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("8"))">8</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("8"))">8</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("9"))">9</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("9"))">9</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("-"))">−</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("-"))">−</MudButton>
                         </MudItem>
 
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Tan))">Tan</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Tan))">Tan</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("^"))">Xⁿ</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("^"))">Xⁿ</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("4"))">4</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("4"))">4</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("5"))">5</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("5"))">5</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("6"))">6</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("6"))">6</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("+"))">+</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("+"))">+</MudButton>
                         </MudItem>
 
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Atan))">ATAN</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => CalculateTrigonometricFunction(TrigonometricFunction.Atan))">ATAN</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("𝜋"))">𝜋</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("𝜋"))">𝜋</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("1"))">1</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("1"))">1</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("2"))">2</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("2"))">2</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("3"))">3</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("3"))">3</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("%"))">%</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("%"))">%</MudButton>
                         </MudItem>
 
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("("))">(</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr("("))">(</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr(")"))">)</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AddToExpr(")"))">)</MudButton>
                         </MudItem>
-                        <MudItem xs="4">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("0"))">0</MudButton>
+                        @if (InputMode == InputMode.@decimal)
+                        {
+                            <MudItem xs="2">
+                                <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => InputMode = InputMode.none)">
+                                    <MudIcon Icon="@Icons.Material.Filled.KeyboardHide" />
+                                </MudButton>
+                            </MudItem>
+                        }
+                        else
+                        {
+                            <MudItem xs="2">
+                                <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => InputMode = InputMode.@decimal)">
+                                    <MudIcon Icon="@Icons.Material.Filled.Keyboard" />
+                                </MudButton>
+                            </MudItem>
+                        }
+                        <MudItem xs="2">
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("0"))">0</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("."))">.</MudButton>
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" style="background-color: #323232;" FullWidth="true" OnClick="@(() => AddToExpr("."))">.</MudButton>
                         </MudItem>
                         <MudItem xs="2">
-                            <MudButton Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="Calculate"
+                            <MudButton Class="calculator-button" Size="Size.Large" Variant="Variant.Filled" FullWidth="true" OnClick="Calculate"
                                        ButtonType="ButtonType.Submit" Color="Color.Primary">=</MudButton>
                         </MudItem>
                     </MudGrid>
@@ -153,7 +176,24 @@
 
 @code
 {
-    InputMode inputMode = InputMode.@decimal;
+    protected override async Task OnInitializedAsync()
+    {
+        InputMode = await LocalStorage.GetItemAsync<InputMode>(nameof(InputMode)); 
+        StateHasChanged();
+    }
+
+    private InputMode _inputMode = InputMode.@decimal;
+
+    public InputMode InputMode
+    {
+        get { return _inputMode; }
+        set 
+        { 
+            _inputMode = value; 
+            _ = LocalStorage.SetItemAsync(nameof(InputMode), InputMode);
+        }
+    }
+    
     public bool CalcSpins { get; set; } = true;
     public bool CalcMinFeed { get; set; } = true;
 

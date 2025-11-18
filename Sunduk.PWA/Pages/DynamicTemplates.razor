@@ -80,35 +80,31 @@
     }
 </MudPopover>
 
-<MudToolBar Dense="true" Class="gap-2">
+<MudToolBar Dense="true" Class="pt-3">
     <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
         <MudButtonGroup Variant="Variant.Outlined">
             <MudIconButton Variant="Variant.Outlined"
                        OnClick="AddTemplate"
                        Icon="@Icons.Material.Outlined.PostAdd"
-                       Size="Size.Small">
-                Создать
-            </MudIconButton>
+                       Size="Size.Small"/>
             <MudFileUpload T="IBrowserFile"
                            Accept=".json"
                            FilesChanged="UploadTemplates"
                            Class="flex-shrink-0">
                 <ActivatorContent>
                     <MudIconButton Variant="Variant.Text"
-                               Icon="@Icons.Material.Outlined.FileUpload"
-                               Size="Size.Small">
-                        Импорт
-                    </MudIconButton>
+                                   Icon="@Icons.Material.Outlined.FileUpload"
+                                   Size="Size.Small" />
                 </ActivatorContent>
             </MudFileUpload>
             <MudIconButton Variant="Variant.Text"
                        OnClick="DownloadTemplatesAsync"
                        Icon="@Icons.Material.Outlined.FileDownload"
-                       Size="Size.Small"
+                           Size="Size.Small"
                        Disabled="@(Templates.Count == 0)"/>
             <MudIconButton OnClick="GetCloudTemplatesAsync"
-                       Icon="@Icons.Material.Outlined.CloudUpload"
-                       Size="Size.Small"/>
+                           Icon="@Icons.Material.Outlined.CloudUpload"
+                           Size="Size.Small" />
         </MudButtonGroup>
     </MudHidden>
     <MudHidden Breakpoint="Breakpoint.Xs">
@@ -116,7 +112,7 @@
             <MudButton Variant="Variant.Outlined"
                        OnClick="AddTemplate"
                        StartIcon="@Icons.Material.Outlined.PostAdd"
-                       Size="Size.Small">
+                       Size="Size.Medium">
                 Создать
             </MudButton>
             <MudFileUpload T="IBrowserFile"
@@ -126,7 +122,7 @@
                 <ActivatorContent>
                     <MudButton Variant="Variant.Text"
                                StartIcon="@Icons.Material.Outlined.FileUpload"
-                               Size="Size.Small">
+                               Size="Size.Medium">
                         Импорт
                     </MudButton>
                 </ActivatorContent>
@@ -134,20 +130,19 @@
             <MudButton Variant="Variant.Text"
                        OnClick="DownloadTemplatesAsync"
                        StartIcon="@Icons.Material.Outlined.FileDownload"
-                       Size="Size.Small"
+                       Size="Size.Medium"
                        Disabled="@(Templates.Count == 0)">
                 Экспорт
             </MudButton>
             <MudButton OnClick="GetCloudTemplatesAsync"
                        StartIcon="@Icons.Material.Outlined.CloudUpload"
-                       Size="Size.Small">
+                       Size="Size.Medium">
                 Библиотека
             </MudButton>
         </MudButtonGroup>
     </MudHidden>
 
     <MudSpacer />
-    <MudButton OnClick="GetCloudTemplatesAsync" StartIcon="@Icons.Material.Outlined.Cloud" />
     @if (_lastSaveTime.HasValue)
     {
         <div class="save-indicator">
@@ -240,17 +235,19 @@
                         <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
                             <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
                                 <MudIconButton Icon="@Icons.Material.Outlined.PlaylistAdd"
-                                           OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }"/>
+                                               Size="Size.Small"
+                                               OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }"/>
                             </MudHidden>
                             <MudHidden Breakpoint="Breakpoint.Xs">
                                 <MudButton StartIcon="@Icons.Material.Outlined.PlaylistAdd"
+                                           Size="Size.Small"
                                            OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }">
                                     Добавить переменную
                                 </MudButton>
                             </MudHidden>
                             <MudIconButton Icon="@Icons.Material.Outlined.Download"
-                                           OnClick="() => DownloadTemplateAsync(template)"
-                                           Title="Скачать шаблон" />
+                                           Size="Size.Small"
+                                           OnClick="() => DownloadTemplateAsync(template)"/>
                         </MudButtonGroup>
                     </MudToolBar>
 
