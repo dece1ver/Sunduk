@@ -1,0 +1,295 @@
+/* _content/Blazor.Common/Dialog/DialogDisplay.razor.rz.scp.css */
+.bcrl_dialog-display[b-tx4dika9u5] {
+    z-index: var(--bcrl_dialog-display-z-index);
+    color: var(--bcrl_secondary-foreground-color);
+    background-color: var(--bcrl_secondary-background-color);
+    box-shadow: 0 0 var(--bcrl_dialog-display-box-shadow-blur-radius) var(--bcrl_primary-box-shadow-color);
+}
+
+.bcrl_dialog-display-toolbar[b-tx4dika9u5] {
+    height: var(--bcrl_dialog-display-toolbar-height);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--bcrl_dialog-toolbar-foreground-color);
+    background-color: var(--bcrl_dialog-toolbar-background-color);
+    cursor: default;
+    padding: var(--bcrl_dialog-display-toolbar-padding);
+}
+
+.bcrl_dialog-display-title[b-tx4dika9u5] {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.bcrl_error .bcrl_dialog-display-toolbar[b-tx4dika9u5] {
+    background-color: var(--bcrl_error-background-color);
+}
+
+.bcrl_dialog-display-buttons[b-tx4dika9u5] {
+    display: flex;
+    align-items: center;
+}
+
+.bcrl_dialog-display-button-entry[b-tx4dika9u5] {
+    padding: var(--bcrl_dialog-display-button-entry-padding);
+    display: inline-flex;
+    height: fit-content;
+}
+
+.bcrl_dialog-display-button-entry:not(:last-of-type)[b-tx4dika9u5] {
+    margin-right: var(--bcrl_dialog-display-button-entry-margin-right);
+}
+
+.bcrl_dialog-display-body[b-tx4dika9u5] {
+    height: calc(100% - var(--bcrl_dialog-display-toolbar-height));
+    overflow: auto;
+    padding: var(--bcrl_dialog-display-body-padding);
+}
+/* _content/Blazor.Common/Drag/DragInitializer.razor.rz.scp.css */
+.bcrl_drag-initializer[b-ny23by0y69] {
+    z-index: var(--bcrl_drag-initializer-z-index);
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+/* _content/Blazor.Common/Dropdown/DropdownDisplay.razor.rz.scp.css */
+.bcrl_dropdown-display[b-t1ynh4ezap] {
+    z-index: var(--bcrl_dropdown-display-z-index);
+    position: absolute;
+    color: var(--bcrl_tertiary-foreground-color);
+    background-color: var(--bcrl_tertiary-background-color);
+    box-shadow: 0 0 var(--bcrl_dropdown-display-default-background-box-shadow-blur-radius) var(--bcrl_primary-box-shadow-color);
+}
+/* _content/Blazor.Common/Icons/IconLoading.razor.rz.scp.css */
+.lds-dual-ring[b-7sst2pys0s] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.lds-dual-ring[b-7sst2pys0s]:after {
+    content: " ";
+    display: block;
+    width: 1em;
+    height: 1em;
+    margin: .2em;
+    border-radius: 50%;
+    border: .15em solid var(--bcrl_primary-font-color);
+    border-color: var(--bcrl_primary-font-color) transparent var(--bcrl_primary-font-color) transparent;
+    animation: lds-dual-ring-b-7sst2pys0s 1.2s linear infinite;
+}
+
+@keyframes lds-dual-ring-b-7sst2pys0s {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+/* _content/Blazor.Common/Menu/MenuDisplay.razor.rz.scp.css */
+.bcrl_menu-display:focus[b-j6lmd6dwh4] {
+    outline: solid var(--bcrl_menu-display-focus-outline-size) var(--bcrl_outline-with-focus-color);
+}
+/* _content/Blazor.Common/Menu/MenuOptionDisplay.razor.rz.scp.css */
+.bcrl_menu-option-widget[b-7rclliceh0] {
+    padding-bottom: 10px;
+}
+
+.bcrl_menu-option-display[b-7rclliceh0] {
+    position: relative;
+    white-space: nowrap;
+    cursor: default;
+    padding: 0 var(--bcrl_menu-option-display-padding-width);
+}
+
+.bcrl_menu-option-display.bcrl_active[b-7rclliceh0] {
+    background-color: var(--bcrl_primary-hover-background-color);
+}
+
+.bcrl_menu-option-display:hover[b-7rclliceh0] {
+    background-color: var(--bcrl_primary-hover-background-color);
+}
+
+.bcrl_menu-option-display:focus[b-7rclliceh0] {
+    outline: solid var(--bcrl_menu-option-display-focus-outline-size) var(--bcrl_outline-with-focus-color);
+}
+/* _content/Blazor.Common/Notification/NotificationDisplay.razor.rz.scp.css */
+.bcrl_notification[b-1uha9uw2xb] {
+    position: fixed;
+    z-index: var(--bcrl_notification-display-z-index);
+    color: var(--bcrl_secondary-foreground-color);
+    background-color: var(--bcrl_notification-display-background-color);
+    box-shadow: 0 0 var(--bcrl_notification-display-box-shadow-blur-radius) var(--bcrl_primary-box-shadow-color);
+}
+
+.bcrl_notification-toolbar[b-1uha9uw2xb] {
+    height: var(--bcrl_notification-display-toolbar-height);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--bcrl_tertiary-foreground-color);
+    background-color: var(--bcrl_notification-display-toolbar-background-color);
+    cursor: default;
+    padding: var(--bcrl_notification-toolbar-padding);
+}
+
+.bcrl_notification-title[b-1uha9uw2xb] {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.bcrl_error .bcrl_notification-toolbar[b-1uha9uw2xb] {
+    background-color: var(--bcrl_error-background-color);
+}
+
+.bcrl_notification-control-buttons[b-1uha9uw2xb] {
+    display: flex;
+    align-items: center;
+}
+
+.bcrl_notification-button-entry[b-1uha9uw2xb] {
+    margin-right: var(--bcrl_notification-button-entry-margin-right);
+    padding: var(--bcrl_notification-button-entry-padding);
+    display: inline-flex;
+    height: fit-content;
+}
+
+.bcrl_notification-body[b-1uha9uw2xb] {
+    height: calc(100% - var(--bcrl_notification-display-toolbar-height));
+    overflow: auto;
+    padding: var(--bcrl_notification-body-padding);
+}
+/* _content/Blazor.Common/OutOfBoundsClick/OutOfBoundsClickDisplay.razor.rz.scp.css */
+.bcrl_out-of-bounds-click-display[b-4rk8iusosu] {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+/* _content/Blazor.Common/Resize/ResizableColumn.razor.rz.scp.css */
+.bcrl_resize-column[b-h2144lddhb] {
+    background-color: var(--bcrl_resize-column-background-color);
+    height: 100%;
+    cursor: e-resize;
+}
+/* _content/Blazor.Common/Resize/ResizableRow.razor.rz.scp.css */
+.bcrl_resize-row[b-wwjfr5wh27] {
+    background-color: var(--bcrl_resize-row-background-color);
+    width: 100%;
+    cursor: n-resize;
+}
+/* _content/Blazor.Common/TreeView/Displays/TreeViewDisplay.razor.rz.scp.css */
+.bcrl_tree-view-title[b-erb8klx8df] {
+    display: flex;
+    white-space: nowrap;
+    outline: none;
+}
+
+.bcrl_tree-view-title.bcrl_selected[b-erb8klx8df] {
+    background-color: var(--bcrl_active-no-focus-background-color);
+}
+
+.bcrl_tree-view-title.bcrl_active[b-erb8klx8df] {
+    background-color: var(--bcrl_active-no-focus-background-color);
+}
+
+.bcrl_tree-view-title.bcrl_active:focus[b-erb8klx8df] {
+    background-color: var(--bcrl_active-with-focus-background-color);
+}
+
+.bcrl_tree-view-children-border[b-erb8klx8df] {
+    border-left: 1.5px solid var(--bcrl_tree-view-children-border-color);
+    opacity: 0.5;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.bcrl_tree-view-children[b-erb8klx8df] {
+    position: relative;
+}
+
+.bcrl_tree-view-expansion-chevron[b-erb8klx8df] {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: var(--bcrl_tree-view-expansion-chevron-color);
+}
+
+.bcrl_tree-view-title-content[b-erb8klx8df] {
+    cursor: default;
+}
+
+.bcrl_tree-view-display-root[b-erb8klx8df] {
+    width: max-content;
+    min-width: 100%;
+}
+
+.bcrl_tree-view-display:focus[b-erb8klx8df] {
+    outline: solid var(--balc-primary-outline-color) var(--bcrl_tree-view-display-focus-outline-size);
+    outline-offset: var(--bcrl_tree-view-display-focus-outline-offset);
+}
+
+.bcrl_tree-view-display-title[b-erb8klx8df] {
+    position: relative;
+    white-space: nowrap;
+    display: flex;
+    cursor: default;
+    min-width: 100%;
+}
+
+.bcrl_tree-view-display-title:hover[b-erb8klx8df] {
+    background-color: var(--bcrl_primary-hover-background-color);
+}
+
+.bcrl_tree-view-display-title.bcrl_active[b-erb8klx8df] {
+    background-color: var(--bcrl_active-with-focus-background-color);
+}
+
+.bcrl_tree-view-display-title.bcrl_active:focus[b-erb8klx8df] {
+    background-color: var(--bcrl_active-with-focus-background-color);
+}
+
+.bcrl_tree-view-display-expansion:hover[b-erb8klx8df] {
+    background-color: var(--bcrl_primary-font-color);
+    color: var(--bcrl_primary-background-color);
+}
+
+.bcrl_tree-view-display-body[b-erb8klx8df] {
+    position: relative;
+}
+
+.bcrl_tree-view-display-body-border[b-erb8klx8df] {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-left: var(--bcrl_hr-height) solid var(--bcrl_hr-primary-background-color);
+    opacity: var(--bcrl_hr-opacity);
+}
+/* _content/Blazor.Common/TreeView/Displays/TreeViewStateDisplay.razor.rz.scp.css */
+.bcrl_tree-view-state[b-91vexymfn4] {
+    height: 200px;
+    overflow: auto;
+}
+
+.bcrl_tree-view-state:focus-within .bcrl_tree-view-title.bcrl_selected[b-91vexymfn4] {
+    background-color: var(--bcrl_active-with-focus-background-color);
+}
+
+.bcrl_tree-view-state:focus:not(.bcrl_active)[b-91vexymfn4] {
+    outline: var(--bcrl_outline-with-focus-color) inset;
+}
+
+.bcrl_tree-view-state:focus .bcrl_tree-view-title.bcrl_active[b-91vexymfn4] {
+    background-color: var(--bcrl_active-with-focus-background-color);
+}
