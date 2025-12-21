@@ -128,8 +128,7 @@
     {
         if (template.Templates == null) return;
 
-        template.IsImporting = true;
-        await Task.Delay(3000);        
+        template.IsImporting = true;  
         StateHasChanged();
 
         try

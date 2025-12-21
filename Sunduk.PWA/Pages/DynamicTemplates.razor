@@ -69,8 +69,8 @@
     }
 </style>
 
-<MudPopover Open="@(LocalStorageIsWorking || LocalStorageWorkCompleted)" AnchorOrigin="Origin.TopCenter">
-    @if (LocalStorageIsWorking)
+<MudPopover Open="@(LocalStorageIsWorking || LocalStorageWorkCompleted || _loading)" AnchorOrigin="Origin.TopCenter">
+    @if (LocalStorageIsWorking || _loading)
     {
         <MudProgressCircular Color="Color.Primary" Style="height:30px;width:30px;" Indeterminate="true" Class="mx-2 mt-2 mb-n0" />
     }
@@ -503,71 +503,82 @@
 
     private async Task GetCloudTemplatesAsync()
     {
-        await LoadCloudTemplatesAsync();
-
-        if (CloudTemplates.Count == 0)
+        try
         {
-            Snackbar.Add("Не найдено доступных шаблонов", Severity.Info);
-            return;
-        }
+            _loading = true;
+            StateHasChanged();
+            await LoadCloudTemplatesAsync();
+            _loading = false;
+            StateHasChanged();
+            if (CloudTemplates.Count == 0)
+            {
+                Snackbar.Add("Не найдено доступных шаблонов", Severity.Info);
+                return;
+            }
 
-        var parameters = new DialogParameters<CloudTemplatesDialog>
+            var parameters = new DialogParameters<CloudTemplatesDialog>
         {
             { x => x.CloudFiles, CloudTemplates },
             { x => x.HttpClient, _http }
         };
 
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            MaxWidth = MaxWidth.Medium,
-            FullWidth = true
-        };
-
-        var dialog = await DialogService.ShowAsync<CloudTemplatesDialog>(
-            "Шаблоны из облака",
-            parameters,
-            options);
-
-        var result = await dialog.Result;
-
-        if (result != null && !result.Canceled && result.Data is List<TemplateDefinition> importedTemplates)
-        {
-            if (Templates.Any())
+            var options = new DialogOptions
             {
-                var addOrReplace = await DialogService.ShowMessageBox(
-                    "Импорт шаблонов",
-                    $"Добавить {importedTemplates.Count} шаблон(ов) к существующим или заменить всё?",
-                    yesText: "Добавить", noText: "Заменить", cancelText: "Отмена");
+                CloseOnEscapeKey = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
 
-                switch (addOrReplace)
+            var dialog = await DialogService.ShowAsync<CloudTemplatesDialog>(
+                "Шаблоны из облака",
+                parameters,
+                options);
+
+            var result = await dialog.Result;
+
+            if (result != null && !result.Canceled && result.Data is List<TemplateDefinition> importedTemplates)
+            {
+                if (Templates.Any())
                 {
-                    case true:
-                        Templates.AddRange(importedTemplates);
-                        Snackbar.Add($"Добавлено шаблонов: {importedTemplates.Count}", Severity.Success);
-                        break;
-                    case false:
-                        Templates = importedTemplates;
-                        Snackbar.Add($"Загружено шаблонов: {importedTemplates.Count}", Severity.Success);
-                        break;
-                    default:
-                        return;
-                }
-            }
-            else
-            {
-                Templates = importedTemplates;
-                Snackbar.Add($"Загружено шаблонов: {importedTemplates.Count}", Severity.Success);
-            }
+                    var addOrReplace = await DialogService.ShowMessageBox(
+                        "Импорт шаблонов",
+                        $"Добавить {importedTemplates.Count} шаблон(ов) к существующим или заменить всё?",
+                        yesText: "Добавить", noText: "Заменить", cancelText: "Отмена");
 
-            await PersistAsync();
+                    switch (addOrReplace)
+                    {
+                        case true:
+                            Templates.AddRange(importedTemplates);
+                            Snackbar.Add($"Добавлено шаблонов: {importedTemplates.Count}", Severity.Success);
+                            break;
+                        case false:
+                            Templates = importedTemplates;
+                            Snackbar.Add($"Загружено шаблонов: {importedTemplates.Count}", Severity.Success);
+                            break;
+                        default:
+                            return;
+                    }
+                }
+                else
+                {
+                    Templates = importedTemplates;
+                    Snackbar.Add($"Загружено шаблонов: {importedTemplates.Count}", Severity.Success);
+                }
+
+                await PersistAsync();
+                StateHasChanged();
+            }
+        }
+        finally
+        {
+            _loading = false;
             StateHasChanged();
         }
     }
 
     private async Task LoadCloudTemplatesAsync()
     {
-        _loading = true;
+        
         try
         {
             var url = "https://dt.sunduk.one/templates/";
@@ -597,11 +608,6 @@
         catch (Exception ex)
         {
             Snackbar.Add($"Ошибка загрузки списка: {ex.Message}", Severity.Error);
-        }
-        finally
-        {
-            _loading = false;
-            StateHasChanged();
         }
     }
 
