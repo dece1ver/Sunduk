@@ -45,7 +45,7 @@
 </MudDialog>
 @code 
 {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
 
     public string Name { get; set; }
     public string Message { get; set; }

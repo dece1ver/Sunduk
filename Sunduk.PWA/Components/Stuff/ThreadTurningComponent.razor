@@ -7,6 +7,7 @@
         font-family: 'Roboto Mono', monospace;
     }
 </style>
+
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="6">
@@ -22,28 +23,36 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="6">
-            <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" ValueChanged="OnTemplateChanged">
+            <MudAutocomplete T="string"
+                             Variant="Variant.Filled"
+                             SearchFunc="Search"
+                             ShowProgressIndicator="true" MaxItems="null"
+                             ValueChanged="OnTemplateChanged" 
+                             Clearable="true"
+                             Label="Шаблон" 
+                             Modal="true"/>
+            @* <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" ValueChanged="OnTemplateChanged">
                 @foreach (string item in ThreadTemplates)
                 {
                     <MudSelectItem Value="@(item)">
                         <MudText>@item</MudText>
                     </MudSelectItem>
                 }
-            </MudSelect>
+            </MudSelect> *@
         </MudItem>
 
         <MudItem xs="12">
-            <MudField Label="Параметры резьбы" Variant="Variant.Filled" DisableUnderLine="true">
+            <MudField Label="Параметры резьбы" Variant="Variant.Filled" Underline="false">
                 <MudGrid Spacing="0">
                     <MudHidden Breakpoint="Breakpoint.Xs">
                         <MudItem xs="12" sm="3" md="2">
-                            <MudRadioGroup @bind-SelectedOption="@ThreadType" Class="mt-2 mb-n2 ml-0 d-flex justify-center">
+                            <MudRadioGroup @bind-Value="@ThreadType" Class="ml-0 d-flex justify-center">
                                 <div>
                                     <div class="d-block">
-                                        <MudRadio Option="@(CuttingType.External)" Color="Color.Primary">Наружная</MudRadio>
+                                        <MudRadio Value="@(CuttingType.External)" Color="Color.Primary">Наружная</MudRadio>
                                     </div>
                                     <div class="d-block">
-                                        <MudRadio Option="@(CuttingType.Internal)" Color="Color.Primary">Внутренняя</MudRadio>
+                                        <MudRadio Value="@(CuttingType.Internal)" Color="Color.Primary">Внутренняя</MudRadio>
                                     </div>
                                 </div>
                             </MudRadioGroup>
@@ -55,9 +64,9 @@
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
                         <MudItem xs="12" sm="4" md="3">
-                            <MudRadioGroup @bind-SelectedOption="@ThreadType" Class="mt-2 mb-n2 d-flex justify-center">
-                                <MudRadio Option="@(CuttingType.External)" Color="Color.Primary">Наружная</MudRadio>
-                                <MudRadio Option="@(CuttingType.Internal)" Color="Color.Primary">Внутренняя</MudRadio>
+                            <MudRadioGroup @bind-Value="ThreadType" Class="mt-2 mb-n2 d-flex justify-center">
+                                <MudRadio Value="@(CuttingType.External)" Color="Color.Primary">Наружная</MudRadio>
+                                <MudRadio Value="@(CuttingType.Internal)" Color="Color.Primary">Внутренняя</MudRadio>
                             </MudRadioGroup>
                         </MudItem>
                         <MudItem xs="12" sm="8" md="9">
@@ -71,7 +80,7 @@
 
     </MudGrid>
         @*<MudDivider Class="my-4"/>*@
-        @if (Thread.Valid(ThreadDiameter, ThreadPitch))
+        @if (Sunduk.PWA.Infrastructure.Templates.Thread.Valid(ThreadDiameter, ThreadPitch))
         {
             @if (ThreadStandard is ThreadStandard.NPT or ThreadStandard.BSPT)
             {
@@ -105,7 +114,7 @@
                 </MudItem>
             }
             <MudItem Class="mt-4" xs="12">
-                <MudField Label="Информация" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n1">
+                <MudField Label="Информация" Variant="Variant.Filled" Underline="false" Class="mt-n1">
                     <table>
                         <tr>
                             <td class="tl"><MudText Typo="Typo.caption">Верхний диаметр:</MudText></td>
@@ -113,6 +122,10 @@
                         </tr>
                         <tr>
                             <td class="tl"><MudText Typo="Typo.caption">Нижний диаметр:</MudText></td>
+                            <td><MudText Typo="Typo.caption">@((ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)).ToPrettyString(3)) мм</MudText></td>
+                        </tr>
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">Отверстие под резьбу:</MudText></td>
                             <td><MudText Typo="Typo.caption">@((ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)).ToPrettyString(3)) мм</MudText></td>
                         </tr>
                         <tr>
@@ -175,34 +188,34 @@
                     <MudField Label="Параметры" Variant="Variant.Outlined" InnerPadding="false">
                         <MudGrid Spacing="1">
                             <MudItem xs="Blunted ? 6 : 12" sm="Blunted ? 3 : 4">
-                                <MudSwitch Class="mb-1 mt-3 ml-1" @bind-Checked="Blunted" Color="Color.Primary">Скруглить</MudSwitch>
+                                <MudSwitch Class="mb-1 mt-3 ml-1" @bind-Value="@Blunted" Color="Color.Primary">Скруглить</MudSwitch>
                             </MudItem>
                             <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
                                 @if (Blunted)
                                 {
                                     <MudItem xs="6" sm="Blunted ? 3 : 4">
-                                        <MudTextField Class="mb-n2 mt-0" T="double" @bind-Value="BluntSize" Label="Скругление" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
+                                        <MudTextField Class="mb-n2 mt-0" T="double" @bind-Value="BluntSize" Label="Скругление" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Underline="false" />
                                     </MudItem>
                                 }
                                 <MudItem Class="mb-2" xs="6" sm="Blunted ? 3 : 4">
-                                    <MudTextField T="double" @bind-Value="ThreadChamfer" Label="Фаска" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
+                                    <MudTextField T="double" @bind-Value="ThreadChamfer" Label="Фаска" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Underline="false" />
                                 </MudItem>
                                 <MudItem Class="mb-2" xs="6" sm="Blunted ? 3 : 4">
-                                    <MudTextField T="double" @bind-Value="InsertRadius" Label="Радиус пластины" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
+                                    <MudTextField T="double" @bind-Value="InsertRadius" Label="Радиус пластины" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Underline="false" />
                                 </MudItem>
                             </MudHidden>
                             <MudHidden Breakpoint="Breakpoint.Xs">
                                 @if (Blunted)
                                 {
                                     <MudItem xs="6" sm="Blunted ? 3 : 4" Class="mb-2">
-                                        <MudTextField T="double" @bind-Value="BluntSize" Label="Скругление" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
+                                        <MudTextField T="double" @bind-Value="BluntSize" Label="Скругление" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Underline="false" />
                                     </MudItem>
                                 }
                                 <MudItem Class="mb-2" xs="6" sm="Blunted ? 3 : 4">
-                                    <MudTextField T="double" @bind-Value="ThreadChamfer" Label="Фаска" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
+                                    <MudTextField T="double" @bind-Value="ThreadChamfer" Label="Фаска" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Underline="false" />
                                 </MudItem>
                                 <MudItem Class="mb-2" xs="6" sm="Blunted ? 3 : 4">
-                                    <MudTextField T="double" @bind-Value="InsertRadius" Label="Радиус пластины" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" DisableUnderLine="true" />
+                                    <MudTextField T="double" @bind-Value="InsertRadius" Label="Радиус пластины" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Converter="Util.DoubleConverter" Underline="false" />
                                 </MudItem>
                             </MudHidden>
                         </MudGrid>
@@ -214,12 +227,31 @@
             </MudGrid>
         </MudExpansionPanel>
     }
-
 </MudContainer>
 
 
 @code
 {
+    System.Threading.CancellationTokenSource _cts = new();
+
+    private async Task<IEnumerable<string>> Search(string value, System.Threading.CancellationToken token)
+    {
+        var delay = Task.Delay(1000, token);
+
+        var data = Task.Run(() =>
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return ThreadTemplates.ToList();
+
+            return ThreadTemplates
+                .Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase))
+                .ToList();
+        }, token);
+
+        await Task.WhenAll(delay, data);
+        return data.Result; 
+    }
+
     public ICollection<string> ThreadTemplates
     {
         get

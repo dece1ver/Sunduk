@@ -1,4 +1,4 @@
-﻿<MudSwipeArea OnSwipe="@OnSwipe">
+﻿<MudSwipeArea OnSwipeEnd="@(e => OnSwipe(e.SwipeDirection))">
     <MudTabs Elevation="2" @ref="tabs" Style="font-size: small">
         <MudTabPanel Text="Скругление">
             <RadiusComponent />
@@ -16,7 +16,7 @@
 {
     MudTabs tabs;
 
-    public void OnSwipe(SwipeDirection direction)
+    private void OnSwipe(SwipeDirection direction)
     {
         if (direction == SwipeDirection.LeftToRight)
         {

@@ -1,5 +1,5 @@
-﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid>
+﻿<MudContainer Class="mt-3">
+    <MudGrid Spacing="1">
         <MudItem xs="6">
             <MudTextField @bind-Value="_DrillDiameter" T="string" Label="Диаметр" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" 
                           @onfocus="() => CurrentImage = Images.DrillDiameter"
@@ -11,16 +11,16 @@
                           @onfocusout="() => CurrentImage = Images.Drill"/>
         </MudItem>
         <MudItem xs="12">
-            <MudField Label="Углы" Variant="Variant.Filled">
-                <MudGrid>
+            <MudField Label="Углы" Variant="Variant.Filled" Underline="false">
+                <MudGrid Spacing="2" Class="mt-1">
                     <MudItem xs="4">
-                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@(() => _DrillAngle = "118")">118°</MudButton>
+                        <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="@(() => _DrillAngle = "118")">118°</MudButton>
                     </MudItem>
                     <MudItem xs="4">
-                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@(() => _DrillAngle = "140")">140°</MudButton>
+                        <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="@(() => _DrillAngle = "140")">140°</MudButton>
                     </MudItem>
                     <MudItem xs="4">
-                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@(() => _DrillAngle = "152")">152°</MudButton>
+                        <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="@(() => _DrillAngle = "152")">152°</MudButton>
                     </MudItem>
                 </MudGrid>
             </MudField>

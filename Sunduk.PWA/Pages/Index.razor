@@ -1,30 +1,27 @@
 ﻿@page "/"
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-
-    <MudGrid Spacing="1" Class="d-flex pa-1" Justify="Justify.FlexStart">
-        <MudItem xs="6" md="4" lg="4" xl="2">
-            <SectionButton Label="Калькулятор режимов" Link="/calculator" Icon="@Icons.Material.Filled.Calculate" />
-        </MudItem>
-        <MudItem xs="6" md="4" lg="4" xl="2">
-            <SectionButton Label="Всякая хрень" Link="/stuff" Icon="@Icons.Material.Filled.RoundedCorner" />
-        </MudItem>
-
-        <MudItem xs="6" md="4" lg="4" xl="2">
-            <SectionButton Label="Конвертеры" Link="/converters" Icon="@Icons.Material.Filled.Transform" />
-        </MudItem>
-
-        <MudItem xs="6" md="4" lg="4" xl="2">
-            <SectionButton Label="База знаний" Link="/knowledge/center-length" Icon="@Icons.Material.Filled.MenuBook" />
-        </MudItem>
-        <MudItem xs="6" md="4" lg="4" xl="2">
-            <SectionButton Label="Расчеты времени" Link="/timecalc" Icon="@Icons.Material.Filled.Timer" />
-        </MudItem>
-        <MudItem xs="6" md="4" lg="4" xl="2">
-            <SectionButton Label="SunduCAM" Link="/sunducam" Icon="@Icons.Material.Outlined.FeaturedPlayList" />
-        </MudItem>
-        
-    </MudGrid>
-</MudContainer>
+<MudGrid Spacing="1" Class="d-flex pa-2" Justify="Justify.FlexStart">
+    <MudItem xs="6" md="4" lg="4" xl="2">
+        <SectionButton Label="Калькуляторы" Link="/calculator" Icon="@Icons.Material.Filled.Calculate" />
+    </MudItem>
+    <MudItem xs="6" md="4" lg="4" xl="2">
+        <SectionButton Label="Всякая хрень" Link="/stuff" Icon="@Icons.Material.Filled.RoundedCorner" />
+    </MudItem>
+    <MudItem xs="6" md="4" lg="4" xl="2">
+        <SectionButton Label="Конвертеры" Link="/converters" Icon="@Icons.Material.Filled.Transform" />
+    </MudItem>
+    <MudItem xs="6" md="4" lg="4" xl="2">
+        <SectionButton Label="База знаний" Link="/knowledge/center-length" Icon="@Icons.Material.Filled.MenuBook" />
+    </MudItem>
+    <MudItem xs="6" md="4" lg="4" xl="2">
+        <SectionButton Label="Расчеты времени" Link="/timecalc" Icon="@Icons.Material.Filled.Timer" />
+    </MudItem>
+    <MudItem xs="6" md="4" lg="4" xl="2">
+        <SectionButton Label="SunduCAM" Link="/sunducam" Icon="@Icons.Material.Outlined.FeaturedPlayList" />
+    </MudItem>
+    <MudItem xs="6" md="4" lg="4" xl="2">
+        <SectionButton Label="Шаблонник" Link="/dynamic-templates" Icon="@Icons.Material.Outlined.Code" />
+    </MudItem>
+</MudGrid>
 
 @code {
     [CascadingParameter(Name = "ExperimantalMode")]

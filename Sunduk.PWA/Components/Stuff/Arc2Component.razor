@@ -1,8 +1,8 @@
 ﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="6">
-            <MudField Label="Параметры" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1"
-            @onfocusout="(() => CurrentImage = Images.Base)">
+            <MudField Label="Параметры" Variant="Variant.Filled" Underline="false" Class="mt-1"
+                      @onfocusout="(() => CurrentImage = Images.Base)">
                 <MudGrid Spacing="0">
                     <MudItem xs="12">
                         <MudTextField @bind-Value="_PartDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
@@ -14,7 +14,7 @@
                     </MudItem>
                     <MudItem xs="12">
                         <MudTextField @bind-Value="_StartDiameter" T="string" Label="Начальный диаметр" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
-                                      @onfocus="() => CurrentImage = Images.PartDiameter" Margin="Margin.Dense"/>
+                                      @onfocus="() => CurrentImage = Images.StartDiameter" Margin="Margin.Dense"/>
                     </MudItem>
                     <MudItem xs="12">
                         <MudTextField @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
@@ -43,7 +43,7 @@
                     @if (CurrentImage == Images.StartDiameter)
                     {
                         <center>
-                            <img src="/img/stuffimages/arc2/arc2_start_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
+                                <img src="/img/stuffimages/arc2/arc2_start_diam.svg" asp-append-version="true" width="@_imgWidth" height="@_imgHeigth" />
                         </center>
                     }
                     @if (CurrentImage == Images.ArcRadius)
@@ -67,11 +67,10 @@
                 <img src="/img/stuffimages/arc2/arc2_start_diam.svg" asp-append-version="true" width="0" height="0" />
                 <img src="/img/stuffimages/arc2/arc2_radius.svg" asp-append-version="true" width="0" height="0" />
                 <img src="/img/stuffimages/arc2/arc2_tool_radius.svg" asp-append-version="true" width="0" height="0" />
-
             </div>
         </MudHidden>
         <MudItem xs="12">
-            <MudField Label="Результат" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n1">
+            <MudField Label="Результат" Variant="Variant.Filled" Underline="false" Class="mt-n1">
                 <MudGrid Spacing="1">
                     <MudItem xs="12" Class="mt-2">
                         @if (Math.Abs(PartDiameter - StartDiameter) > 0.001)
@@ -118,12 +117,12 @@
                 <MudExpansionPanel Class="rounded-0" Text="Пример программы для Fanuc">
                     <MudGrid Class="mb-1 pa-n3">
                         <MudItem xs="6" md="4">
-                            <MudSwitch @bind-Checked="@RoundCorner" Label="Скруглить углы" Color="Color.Primary" Class="ma-n3"/>
+                            <MudSwitch T="bool" @bind-Checked="@RoundCorner" Label="Скруглить углы" Color="Color.Primary" Class="ma-n3"/>
                         </MudItem>
                         <MudItem xs="6" md="4">
                             @if (RoundCorner)
                             {
-                                <MudTextField @bind-Value="_Blunt" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"  Class="ma-n4" DisableUnderLine="true"/>
+                                <MudTextField @bind-Value="_Blunt" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"  Class="ma-n4" Underline="false"/>
                             }
                         </MudItem>
                     </MudGrid>
@@ -140,7 +139,7 @@
 
 @code 
 {
-    readonly int _imgHeigth = 196;
+    readonly int _imgHeigth = 210;
     readonly int _imgWidth = 250;
 
     public bool RoundCorner { get; set; } = false;

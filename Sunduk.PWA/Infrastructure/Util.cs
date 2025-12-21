@@ -646,5 +646,59 @@ namespace Sunduk.PWA.Infrastructure
             }
             return path;
         }
+        /// <summary>
+        /// Преобразует переданное значение в число с плавающей запятой типа <see cref="double"/>.
+        /// </summary>
+        /// <param name="raw">
+        /// Объект для преобразования. Поддерживаются типы:
+        /// <see cref="int"/>, <see cref="long"/>, <see cref="double"/>.
+        /// </param>
+        /// <returns>
+        /// Значение, приведённое к типу <see cref="double"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Выбрасывается, если тип аргумента не поддерживается.
+        /// </exception>
+        public static double ToDouble(object raw)
+        {
+            return raw switch
+            {
+                int i => i,
+                long l => l,
+                double d => d,
+                _ => throw new ArgumentException($"Неподдерживаемый тип аргумента: {raw.GetType()}")
+            };
+        }
+
+        /// <summary>
+        /// Добавляет сообщение об ошибке в указанный список и выбрасывает исключение заданного типа.
+        /// </summary>
+        /// <typeparam name="T">
+        /// Тип исключения, который необходимо выбросить. Должен иметь конструктор, принимающий один параметр <see cref="string"/>.
+        /// </typeparam>
+        /// <param name="message">
+        /// Сообщение об ошибке, которое будет добавлено в список и передано в исключение.
+        /// </param>
+        /// <param name="errors">
+        /// Список сообщений об ошибках, в который будет добавлено <paramref name="message"/>.
+        /// </param>
+        /// <returns>
+        /// Данный метод никогда не возвращает значение, так как всегда выбрасывает исключение.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">
+        /// Выбрасывается, если у указанного типа исключения отсутствует конструктор с параметром <see cref="string"/>.
+        /// </exception>
+        /// <exception cref="T">
+        /// Всегда выбрасывается после добавления сообщения в список ошибок.
+        /// </exception>
+        public static double ThrowLogged<T>(string message, List<string> errors) where T : Exception
+        {
+            errors.Add(message);
+
+            var ctor = typeof(T).GetConstructor([typeof(string)])
+                ?? throw new InvalidOperationException($"У исключения {typeof(T).Name} отсутствует конструктор с параметром string.");
+            throw (T)ctor.Invoke([message]);
+        }
+
     }
 }

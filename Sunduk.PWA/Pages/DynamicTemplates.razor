@@ -1,0 +1,1001 @@
+﻿@page "/dynamic-templates"
+@using NCalc
+@using Sunduk.PWA.Infrastructure.DynamicTemplatesData
+@using BlazorDownloadFile
+@using System.Text.Json
+@using System.Text
+@using Sunduk.PWA.Infrastructure.Extensions
+@using System.Threading
+@using System.IO
+@using BlazorTextEditor
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<style>
+    .file-upload-input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 10;
+        opacity: 0;
+    }
+
+    .variable-card {
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+
+        .variable-card:hover {
+            border-left-color: var(--mud-palette-primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .variable-card.has-error {
+            border-left-color: var(--mud-palette-error);
+        }
+
+    .calculating-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255,255,255,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+    }
+
+    .code-field .mud-input {
+        font-family: 'Roboto Mono', monospace;
+        font-size: 12px;
+    }
+
+    .template-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .save-indicator {
+        font-size: 0.75rem;
+        color: var(--mud-palette-text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+</style>
+
+<MudPopover Open="@(LocalStorageIsWorking || LocalStorageWorkCompleted || _loading)" AnchorOrigin="Origin.TopCenter">
+    @if (LocalStorageIsWorking || _loading)
+    {
+        <MudProgressCircular Color="Color.Primary" Style="height:30px;width:30px;" Indeterminate="true" Class="mx-2 mt-2 mb-n0" />
+    }
+    @if (LocalStorageWorkCompleted)
+    {
+        <MudIcon Color="Color.Success" Style="height:30px;width:30px;" Icon="@Icons.Material.Outlined.CloudDone" Class="mx-2 mt-2 mb-n0" />
+    }
+</MudPopover>
+
+<MudToolBar Dense="true" Class="pt-3">
+    <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+        <MudButtonGroup Variant="Variant.Outlined">
+            <MudIconButton Variant="Variant.Outlined"
+                       OnClick="AddTemplate"
+                       Icon="@Icons.Material.Outlined.PostAdd"
+                       Size="Size.Small"/>
+            <MudFileUpload T="IBrowserFile"
+                           Accept=".json"
+                           FilesChanged="UploadTemplates"
+                           Class="flex-shrink-0">
+                <ActivatorContent>
+                    <MudIconButton Variant="Variant.Text"
+                                   Icon="@Icons.Material.Outlined.FileUpload"
+                                   Size="Size.Small" />
+                </ActivatorContent>
+            </MudFileUpload>
+            <MudIconButton Variant="Variant.Text"
+                       OnClick="DownloadTemplatesAsync"
+                       Icon="@Icons.Material.Outlined.FileDownload"
+                           Size="Size.Small"
+                       Disabled="@(Templates.Count == 0)"/>
+            <MudIconButton OnClick="GetCloudTemplatesAsync"
+                           Icon="@Icons.Material.Outlined.CloudUpload"
+                           Size="Size.Small" />
+        </MudButtonGroup>
+    </MudHidden>
+    <MudHidden Breakpoint="Breakpoint.Xs">
+        <MudButtonGroup Variant="Variant.Outlined">
+            <MudButton Variant="Variant.Outlined"
+                       OnClick="AddTemplate"
+                       StartIcon="@Icons.Material.Outlined.PostAdd"
+                       Size="Size.Medium">
+                Создать
+            </MudButton>
+            <MudFileUpload T="IBrowserFile"
+                           Accept=".json"
+                           FilesChanged="UploadTemplates"
+                           Class="flex-shrink-0">
+                <ActivatorContent>
+                    <MudButton Variant="Variant.Text"
+                               StartIcon="@Icons.Material.Outlined.FileUpload"
+                               Size="Size.Medium">
+                        Импорт
+                    </MudButton>
+                </ActivatorContent>
+            </MudFileUpload>
+            <MudButton Variant="Variant.Text"
+                       OnClick="DownloadTemplatesAsync"
+                       StartIcon="@Icons.Material.Outlined.FileDownload"
+                       Size="Size.Medium"
+                       Disabled="@(Templates.Count == 0)">
+                Экспорт
+            </MudButton>
+            <MudButton OnClick="GetCloudTemplatesAsync"
+                       StartIcon="@Icons.Material.Outlined.CloudUpload"
+                       Size="Size.Medium">
+                Библиотека
+            </MudButton>
+        </MudButtonGroup>
+    </MudHidden>
+
+    <MudSpacer />
+    @if (_lastSaveTime.HasValue)
+    {
+        <div class="save-indicator">
+            <MudIcon Icon="@Icons.Material.Outlined.CloudDone" Size="Size.Small" />
+            <span>Сохранено @GetTimeSinceLastSave()</span>
+        </div>
+    }
+</MudToolBar>
+
+<MudExpansionPanels MultiExpansion="true" Square="true" Class="mt-2 mx-0">
+    @foreach (var template in Templates)
+    {
+        <MudExpansionPanel Class="mx-0">
+            <TitleContent>
+                <div class="template-header">
+                    <MudText Typo="Typo.subtitle1">@template.Name</MudText>
+
+                    @if (_calculating.ContainsKey(template) && _calculating[template])
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                    }
+                    else if (template.HasError)
+                    {
+                        <MudTooltip Text="@template.Error">
+                            <MudChip T="string" Size="Size.Small" Color="Color.Error" Icon="@Icons.Material.Outlined.ErrorOutline" Variant="Variant.Outlined">
+                                Ошибка
+                            </MudChip>
+                        </MudTooltip>
+                    }
+                    else if (!string.IsNullOrEmpty(template.Result))
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Icon="@Icons.Material.Outlined.CheckCircle" Variant="Variant.Outlined">
+                            Вычислено
+                        </MudChip>
+                    }
+
+
+
+                    @if (template.HasError)
+                    {
+
+                    }
+
+                    <MudSpacer />
+
+                    <MudButtonGroup Variant="Variant.Text" Size="Size.Small">
+                        @if (Templates.IndexOf(template) > 0)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Outlined.ArrowUpward"
+                                           OnClick="() => MoveUp(template)"
+                                           Title="Переместить вверх" />
+                        }
+                        @if (Templates.IndexOf(template) < Templates.Count - 1)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Outlined.ArrowDownward"
+                                           OnClick="() => MoveDown(template)"
+                                           Title="Переместить вниз" />
+                        }
+                        <MudIconButton Icon="@Icons.Material.Outlined.DriveFileRenameOutline"
+                                       OnClick="() => OpenRenameDialogAsync(template)"
+                                       Title="Переименовать" />
+                        <MudIconButton Icon="@Icons.Material.Outlined.Delete"
+                                       OnClick="() => OpenDeleteDialogAsync(template)"
+                                       Color="Color.Error"
+                                       Title="Удалить" />
+                    </MudButtonGroup>
+                </div>
+            </TitleContent>
+
+            <ChildContent>
+                <div style="position: relative;">
+                    @if (_calculating.ContainsKey(template) && _calculating[template])
+                    {
+                        <div class="calculating-overlay">
+                            <MudProgressCircular Indeterminate="true" />
+                        </div>
+                    }
+
+                    <MudToolBar Dense="true" Class="gap-2 mb-3">
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   OnClick="() => CalculateAsync(template)"
+                                   StartIcon="@Icons.Material.Outlined.Calculate"
+                                   Size="Size.Small">
+                            Вычислить
+                        </MudButton>
+
+                        <MudSpacer />
+
+                        <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
+                            <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+                                <MudIconButton Icon="@Icons.Material.Outlined.PlaylistAdd"
+                                               Size="Size.Small"
+                                               OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }"/>
+                            </MudHidden>
+                            <MudHidden Breakpoint="Breakpoint.Xs">
+                                <MudButton StartIcon="@Icons.Material.Outlined.PlaylistAdd"
+                                           Size="Size.Small"
+                                           OnClick="() => { template.Variables.Add(new VariableDefinition()); PersistAsync().AndForget(); }">
+                                    Добавить переменную
+                                </MudButton>
+                            </MudHidden>
+                            <MudIconButton Icon="@Icons.Material.Outlined.Download"
+                                           Size="Size.Small"
+                                           OnClick="() => DownloadTemplateAsync(template)"/>
+                        </MudButtonGroup>
+                    </MudToolBar>
+
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12" md="6">
+                            <MudPaper Elevation="0" Class="pa-1 ma-0" Outlined="true">
+
+
+                                @if (template.Variables.Count == 0)
+                                {
+                                    <MudAlert Severity="Severity.Info" Dense="true" Class="mt-2">
+                                        Добавьте переменные для использования в шаблоне
+                                    </MudAlert>
+                                }
+
+                                @foreach (var variable in template.Variables)
+                                {
+                                    var index = template.Variables.IndexOf(variable);
+
+                                    <MudPaper Elevation="0" Outlined="true"
+                                              Class="@($"px-2 py-1 my-1 variable-card {(variable.HasError ? "has-error" : "")}")">
+                                        <MudGrid Spacing="1" Class="align-center">
+                                            <MudItem xs="5" sm="3">
+                                                <MudTextField T="string"
+                                                              Label="Имя"
+                                                              Value="@variable.Name"
+                                                              ValueChanged="@(newValue => OnVariableNameChanged(template, variable, newValue))"
+                                                              Error="variable.HasError"
+                                                              Variant="Variant.Text"
+                                                              Margin="Margin.Dense"
+                                                              Immediate="true"
+                                                              Class="code-field" />
+                                            </MudItem>
+
+                                            <MudItem xs="6" sm="8">
+                                                <MudTextField T="string"
+                                                              Label="Выражение"
+                                                              Value="@variable.Expression"
+                                                              ValueChanged="@(newValue => OnVariableExpressionChanged(template, variable, newValue))"
+                                                              Variant="Variant.Text"
+                                                              Margin="Margin.Dense"
+                                                              Immediate="true"
+                                                              Class="code-field" />
+                                            </MudItem>
+
+                                            <MudItem xs="1" sm="1" Class="d-flex align-center justify-center">
+                                                <MudMenu Icon="@Icons.Material.Outlined.MoreVert"
+                                                         Size="Size.Small"
+                                                         Dense="true">
+                                                    <MudMenuItem Icon="@Icons.Material.Outlined.ArrowUpward"
+                                                                 OnClick="() => MoveVariableUp(template, variable)"
+                                                                 Disabled="@(index == 0)">
+                                                        Переместить вверх
+                                                    </MudMenuItem>
+                                                    <MudMenuItem Icon="@Icons.Material.Outlined.ArrowDownward"
+                                                                 OnClick="() => MoveVariableDown(template, variable)"
+                                                                 Disabled="@(index == template.Variables.Count - 1)">
+                                                        Переместить вниз
+                                                    </MudMenuItem>
+                                                    <MudDivider />
+                                                    <MudMenuItem Icon="@Icons.Material.Outlined.Delete"
+                                                                 OnClick="() => OpenDeleteDialogAsync(template, variable)"
+                                                                 IconColor="Color.Error">
+                                                        Удалить
+                                                    </MudMenuItem>
+                                                </MudMenu>
+                                            </MudItem>
+
+                                            @if (variable.HasError)
+                                            {
+                                                <MudItem xs="12">
+                                                    <MudAlert Severity="Severity.Error" Dense="true" Class="py-1">
+                                                        @variable.Error
+                                                    </MudAlert>
+                                                </MudItem>
+                                            }
+                                        </MudGrid>
+                                    </MudPaper>
+                                }
+                            </MudPaper>
+                        </MudItem>
+
+                        <MudItem xs="12" md="6">
+                            <MudTabs Elevation="0" Outlined="true"
+                                     Rounded="true"
+                                     ApplyEffectsToContainer="true"
+                                     PanelClass="pa-3">
+                                <MudTabPanel Text="Заготовка" Icon="@Icons.Material.Outlined.Edit">
+                                    <MudTextField T="string"
+                                                  Variant="Variant.Filled"
+                                                  AutoGrow="true"
+                                                  @bind-Value="@template.Content"
+                                                  Immediate="true"
+                                                  Lines="@Math.Max(10, template.Content.Count(c => c == '\n') + 1)"
+                                                  Placeholder="Введите текст с переменными в формате {variable}"
+                                                  Class="code-field" />
+                                </MudTabPanel>
+
+                                <MudTabPanel Text="Результат" Icon="@Icons.Material.Outlined.CheckCircle">
+                                    <MudTextField T="string"
+                                                  Variant="Variant.Filled"
+                                                  AutoGrow="true"
+                                                  Immediate="true"
+                                                  Lines="@Math.Max(10, template.Result.Count(c => c == '\n') + 1)"
+                                                  Value="template.Result"
+                                                  ReadOnly="true"
+                                                  Placeholder="Результат появится после вычисления"
+                                                  Class="code-field" />
+                                </MudTabPanel>
+                            </MudTabs>
+                        </MudItem>
+                    </MudGrid>
+                </div>
+            </ChildContent>
+        </MudExpansionPanel>
+    }
+</MudExpansionPanels>
+
+@if (Templates.Count == 0)
+{
+    <MudPaper Class="pa-8 mt-4 text-center" Elevation="0">
+        <MudIcon Icon="@Icons.Material.Outlined.PostAdd" Size="Size.Large" Color="Color.Default" />
+        <MudText Typo="Typo.h6" Class="mt-2">Нет шаблонов</MudText>
+        <MudText Typo="Typo.body2">
+            Создайте новый шаблон или импортируйте существующий
+        </MudText>
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Primary"
+                   OnClick="AddTemplate"
+                   StartIcon="@Icons.Material.Outlined.Add"
+                   Class="mt-4">
+            Создать первый шаблон
+        </MudButton>
+    </MudPaper>
+}
+
+@code {
+    [Inject] public IBlazorDownloadFileService? BlazorDownloadFileService { get; set; }
+
+    private const string RadianToDegreeFunction = "Deg";
+    private const string DegreeToRadianFunction = "Rad";
+
+    private readonly SemaphoreSlim _persistSemaphore = new(1, 1);
+    private readonly Dictionary<TemplateDefinition, bool> _calculating = new();
+
+    private bool _loading;
+    private HttpClient _http = null!;
+    private DateTime? _lastSaveTime;
+    private readonly Dictionary<string, string> _variableMapping = new Dictionary<string, string>();
+
+    public List<TemplateDefinition> Templates { get; set; } = new();
+    public List<(string Name, string Url)> CloudTemplates { get; set; } = new();
+    public bool LocalStorageIsWorking { get; set; }
+    public bool LocalStorageWorkCompleted { get; set; }
+    public List<string> CalculationErrors { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Templates = await LocalStorage.GetItemAsync<List<TemplateDefinition>>(nameof(Templates))
+                ?? new List<TemplateDefinition>();
+        _http = new();
+        StateHasChanged();
+    }
+
+    private string GetTimeSinceLastSave()
+    {
+        if (!_lastSaveTime.HasValue) return "";
+
+        var diff = DateTime.Now - _lastSaveTime.Value;
+        if (diff.TotalSeconds < 60) return "только что";
+        if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes} мин назад";
+        return $"{(int)diff.TotalHours} ч назад";
+    }
+
+    private void AddTemplate()
+    {
+        Templates.Add(new TemplateDefinition()
+        {
+            Name = $"Новый шаблон {Templates.Count + 1}",
+            Variables = new() { new VariableDefinition() }
+        });
+        PersistAsync().AndForget();
+    }
+
+    private void MoveUp(TemplateDefinition template)
+    {
+        var i = Templates.IndexOf(template);
+        Templates.Remove(template);
+        Templates.Insert(i - 1, template);
+        StateHasChanged();
+        PersistAsync().AndForget();
+    }
+
+    private void MoveDown(TemplateDefinition template)
+    {
+        var i = Templates.IndexOf(template);
+        Templates.Remove(template);
+        Templates.Insert(i + 1, template);
+        StateHasChanged();
+        PersistAsync().AndForget();
+    }
+
+    private void MoveVariableUp(TemplateDefinition template, VariableDefinition variable)
+    {
+        var index = template.Variables.IndexOf(variable);
+        if (index > 0)
+        {
+            template.Variables.RemoveAt(index);
+            template.Variables.Insert(index - 1, variable);
+            PersistAsync().AndForget();
+            StateHasChanged();
+        }
+    }
+
+    private void MoveVariableDown(TemplateDefinition template, VariableDefinition variable)
+    {
+        var index = template.Variables.IndexOf(variable);
+        if (index < template.Variables.Count - 1)
+        {
+            template.Variables.RemoveAt(index);
+            template.Variables.Insert(index + 1, variable);
+            PersistAsync().AndForget();
+            StateHasChanged();
+        }
+    }
+
+    private async Task PersistAsync()
+    {
+        await _persistSemaphore.WaitAsync();
+        try
+        {
+            LocalStorageWorkCompleted = false;
+            LocalStorageIsWorking = true;
+            StateHasChanged();
+
+            await LocalStorage.SetItemAsync(nameof(Templates), Templates);
+            _lastSaveTime = DateTime.Now;
+
+            StateHasChanged();
+            LocalStorageWorkCompleted = true;
+            LocalStorageIsWorking = false;
+            StateHasChanged();
+
+            await Task.Delay(1500);
+            LocalStorageWorkCompleted = false;
+            StateHasChanged();
+        }
+        finally
+        {
+            _persistSemaphore.Release();
+        }
+    }
+
+    private async Task GetCloudTemplatesAsync()
+    {
+        try
+        {
+            _loading = true;
+            StateHasChanged();
+            await LoadCloudTemplatesAsync();
+            _loading = false;
+            StateHasChanged();
+            if (CloudTemplates.Count == 0)
+            {
+                Snackbar.Add("Не найдено доступных шаблонов", Severity.Info);
+                return;
+            }
+
+            var parameters = new DialogParameters<CloudTemplatesDialog>
+        {
+            { x => x.CloudFiles, CloudTemplates },
+            { x => x.HttpClient, _http }
+        };
+
+            var options = new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+            var dialog = await DialogService.ShowAsync<CloudTemplatesDialog>(
+                "Шаблоны из облака",
+                parameters,
+                options);
+
+            var result = await dialog.Result;
+
+            if (result != null && !result.Canceled && result.Data is List<TemplateDefinition> importedTemplates)
+            {
+                if (Templates.Any())
+                {
+                    var addOrReplace = await DialogService.ShowMessageBox(
+                        "Импорт шаблонов",
+                        $"Добавить {importedTemplates.Count} шаблон(ов) к существующим или заменить всё?",
+                        yesText: "Добавить", noText: "Заменить", cancelText: "Отмена");
+
+                    switch (addOrReplace)
+                    {
+                        case true:
+                            Templates.AddRange(importedTemplates);
+                            Snackbar.Add($"Добавлено шаблонов: {importedTemplates.Count}", Severity.Success);
+                            break;
+                        case false:
+                            Templates = importedTemplates;
+                            Snackbar.Add($"Загружено шаблонов: {importedTemplates.Count}", Severity.Success);
+                            break;
+                        default:
+                            return;
+                    }
+                }
+                else
+                {
+                    Templates = importedTemplates;
+                    Snackbar.Add($"Загружено шаблонов: {importedTemplates.Count}", Severity.Success);
+                }
+
+                await PersistAsync();
+                StateHasChanged();
+            }
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadCloudTemplatesAsync()
+    {
+        
+        try
+        {
+            var url = "https://dt.sunduk.one/templates/";
+            var html = await _http.GetStringAsync(url);
+
+            var matches = System.Text.RegularExpressions.Regex.Matches(html, @"<a\s+href\s*=\s*[""']([^""']+)[""'][^>]*>([^<]+)</a>", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            var list = new List<(string Name, string Url)>();
+
+            foreach (System.Text.RegularExpressions.Match m in matches)
+            {
+                var href = m.Groups[1].Value.Trim();
+                var text = m.Groups[2].Value.Trim();
+
+                if (href == "../") continue;
+                if (href.StartsWith("http://") || href.StartsWith("https://") || href.StartsWith("//")) continue;
+
+                var fullUrl = new Uri(new Uri(url), href).ToString();
+
+                // Только JSON файлы
+                if (!href.EndsWith(".json", StringComparison.OrdinalIgnoreCase)) continue;
+
+                list.Add((text, fullUrl));
+            }
+
+            CloudTemplates = list;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Ошибка загрузки списка: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task DownloadTemplatesAsync()
+    {
+        if (BlazorDownloadFileService == null) return;
+        if (Templates.Count < 1)
+        {
+            Snackbar.Add("Нечего скачивать", Severity.Warning);
+            return;
+        }
+        var json = JsonSerializer.Serialize(Templates, new JsonSerializerOptions { WriteIndented = true });
+        var bytes = Encoding.UTF8.GetBytes(json);
+        await BlazorDownloadFileService.DownloadFile("sunduk-dt-all.json", bytes, "application/json");
+    }
+
+    private async Task DownloadTemplateAsync(TemplateDefinition template)
+    {
+        if (BlazorDownloadFileService == null) return;
+        var json = JsonSerializer.Serialize(new List<TemplateDefinition>() { template }, new JsonSerializerOptions { WriteIndented = true });
+        var bytes = Encoding.UTF8.GetBytes(json);
+        await BlazorDownloadFileService.DownloadFile($"sunduk-dt-{template.Name}.json", bytes, "application/json");
+    }
+
+    private async Task UploadTemplates(IBrowserFile file)
+    {
+        using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024);
+        using var reader = new StreamReader(stream);
+        var json = await reader.ReadToEndAsync();
+
+        List<TemplateDefinition>? loaded = null;
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        try
+        {
+            loaded = JsonSerializer.Deserialize<List<TemplateDefinition>>(json, options);
+        }
+        catch (JsonException ex)
+        {
+            Snackbar.Add($"Ошибка чтения JSON: {ex.Message}", Severity.Error);
+            return;
+        }
+
+        if (loaded == null || loaded.Count == 0)
+        {
+            Snackbar.Add("Ошибка: не удалось загрузить ни одного шаблона из файла", Severity.Error);
+            return;
+        }
+
+        if (Templates.Any())
+        {
+            var result = await DialogService.ShowMessageBox(
+                "Импорт шаблонов",
+                $"Добавить {loaded.Count} шаблон(ов) к существующим или заменить всё?",
+                yesText: "Добавить", noText: "Заменить", cancelText: "Отмена");
+
+            switch (result)
+            {
+                case true:
+                    Templates.AddRange(loaded);
+                    Snackbar.Add($"Добавлено шаблонов: {loaded.Count}", Severity.Success);
+                    break;
+                case false:
+                    Templates = loaded;
+                    Snackbar.Add($"Загружено шаблонов: {loaded.Count}", Severity.Success);
+                    break;
+                default:
+                    return;
+            }
+        }
+        else
+        {
+            Templates = loaded;
+            Snackbar.Add($"Загружено шаблонов: {loaded.Count}", Severity.Success);
+        }
+
+        PersistAsync().AndForget();
+        StateHasChanged();
+    }
+
+    private async Task CalculateAsync(TemplateDefinition tpl)
+    {
+        _calculating[tpl] = true;
+        StateHasChanged();
+
+        try
+        {
+            tpl.ClearErrors();
+            foreach (var variable in tpl.Variables)
+            {
+                variable.ValidateName();
+            }
+
+            Calculate(tpl);
+
+            bool hasVariableErrors = tpl.Variables.Any(v => v.HasError);
+            if (hasVariableErrors)
+            {
+                tpl.SetCalculationResult(string.Empty, true, "Есть ошибки в переменных");
+                Snackbar.Add("Обнаружены ошибки в переменных", Severity.Warning);
+            }
+            else
+            {
+                tpl.SetCalculationResult(tpl.Result, false, string.Empty);
+                Snackbar.Add("Вычисление завершено", Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            tpl.SetCalculationResult(string.Empty, true, $"Ошибка вычисления: {ex.Message}");
+            Snackbar.Add($"Ошибка: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _calculating[tpl] = false;
+            await PersistAsync();
+            StateHasChanged();
+        }
+    }
+
+    private void Calculate(TemplateDefinition tpl)
+    {
+        try
+        {
+            CalculationErrors.Clear();
+            _variableMapping.Clear();
+
+            foreach (var variable in tpl.Variables)
+            {
+                variable.ClearError();
+            }
+
+            var values = new Dictionary<string, double>();
+            var maxIter = tpl.Variables.Count * 2;
+            var currentIter = 0;
+            bool hasProgress;
+
+            int mappingCounter = 0;
+            foreach (var v in tpl.Variables.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
+            {
+                if (ContainsCyrillic(v.Name) && !_variableMapping.ContainsKey(v.Name))
+                {
+                    _variableMapping[v.Name] = $"var_{mappingCounter++}";
+                }
+            }
+
+            do
+            {
+                hasProgress = false;
+                var initialCount = values.Count;
+
+                foreach (var v in tpl.Variables)
+                {
+                    if (string.IsNullOrWhiteSpace(v.Name) || string.IsNullOrWhiteSpace(v.Expression))
+                        continue;
+
+                    if (values.ContainsKey(v.Name))
+                        continue;
+
+                    try
+                    {
+                        string processedExpression = ProcessExpressionForNCalc(v.Expression);
+
+                        var expr = new Expression(processedExpression.Replace(',', '.'), ExpressionOptions.IgnoreCaseAtBuiltInFunctions | ExpressionOptions.CaseInsensitiveStringComparer);
+
+                        expr.Functions[DegreeToRadianFunction] = (args) =>
+                        {
+                            if (args.Count() > 1) Util.ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {DegreeToRadianFunction}", CalculationErrors);
+                            double d = args[0].Evaluate() switch
+                            {
+                                double dd => dd,
+                                int ii => ii,
+                                long ll => ll,
+                                string ss => Util.ToDouble(ss.Replace(',', '.')),
+                                _ => throw new ArgumentException($"Неподдерживаемый тип: {args?.GetType()}")
+                            };
+                            return d * Math.PI / 180;
+                        };
+
+                        expr.Functions[RadianToDegreeFunction] = (args) =>
+                        {
+                            if (args.Count() > 1) Util.ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {RadianToDegreeFunction}", CalculationErrors);
+                            double d = args[0].Evaluate() switch
+                            {
+                                double dd => dd,
+                                int ii => ii,
+                                long ll => ll,
+                                string ss => Util.ToDouble(ss.Replace(',', '.')),
+                                _ => Util.ThrowLogged<ArgumentException>($"Неподдерживаемый тип: {args?.GetType()}", CalculationErrors),
+                            };
+                            return d * 180 / Math.PI;
+                        };
+
+                        foreach (var kv in values)
+                        {
+                            string paramName = GetMappedName(kv.Key);
+                            expr.Parameters[paramName] = kv.Value;
+                        }
+
+                        if (expr.HasErrors())
+                        {
+                            v.SetCalculationError("Ошибка в выражении: неверный синтаксис");
+                            continue;
+                        }
+
+                        var raw = expr.Evaluate();
+                        double d = raw switch
+                        {
+                            double dd => dd,
+                            int ii => ii,
+                            long ll => ll,
+                            string ss when double.TryParse(ss.Replace(',', '.'), out double parsed) => parsed,
+                            _ => throw new Exception($"Неподдерживаемый тип результата: {raw?.GetType()}")
+                        };
+
+                        values[v.Name] = d;
+                        v.ClearError();
+                    }
+                    catch (Exception ex)
+                    {
+                        v.SetCalculationError($"Ошибка вычисления: {ex.Message}");
+                        continue;
+                    }
+                }
+
+                hasProgress = values.Count > initialCount;
+                currentIter++;
+
+                if (currentIter >= maxIter)
+                {
+                    var validUnresolved = tpl.Variables
+                        .Where(v => !string.IsNullOrWhiteSpace(v.Name) &&
+                                   !string.IsNullOrWhiteSpace(v.Expression) &&
+                                   !values.ContainsKey(v.Name) &&
+                                   !v.HasError)
+                        .ToList();
+
+                    if (validUnresolved.Any())
+                    {
+                        foreach (var unresolved in validUnresolved)
+                        {
+                            unresolved.SetCalculationError("Не удалось вычислить (возможно, циклическая зависимость)");
+                        }
+                    }
+                    break;
+                }
+            }
+            while (hasProgress && values.Count < tpl.Variables.Count(v => !string.IsNullOrWhiteSpace(v.Name) && !string.IsNullOrWhiteSpace(v.Expression)));
+
+            if (!tpl.Variables.Any(v => v.HasError))
+            {
+                tpl.Result = System.Text.RegularExpressions.Regex
+                    .Replace(tpl.Content, @"\{(.*?)\}", m =>
+                    {
+                        try
+                        {
+                            string processedExpression = ProcessExpressionForNCalc(m.Groups[1].Value);
+
+                            var sub = new Expression(processedExpression.Replace(',', '.'),
+                                ExpressionOptions.IgnoreCaseAtBuiltInFunctions | ExpressionOptions.CaseInsensitiveStringComparer);
+
+                            foreach (var kv in values)
+                            {
+                                string paramName = GetMappedName(kv.Key);
+                                sub.Parameters[paramName] = kv.Value;
+                            }
+
+                            if (sub.HasErrors())
+                                return "[?]";
+
+                            var r = sub.Evaluate();
+                            return r is double d ? d.ToString("0.###").Replace(',', '.') :
+                                   r is int i ? i.ToString() :
+                                   r is long l ? l.ToString() :
+                                   r?.ToString() ?? "[?]";
+                        }
+                        catch
+                        {
+                            return "[?]";
+                        }
+                    });
+            }
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    private void OnVariableNameChanged(TemplateDefinition template, VariableDefinition variable, string newValue)
+    {
+        variable.Name = newValue;
+        variable.ValidateName();
+        StateHasChanged();
+    }
+
+    private void OnVariableExpressionChanged(TemplateDefinition template, VariableDefinition variable, string newValue)
+    {
+        variable.Expression = newValue;
+        variable.ClearError();
+        StateHasChanged();
+    }
+
+    private string ProcessExpressionForNCalc(string expression)
+    {
+        if (string.IsNullOrWhiteSpace(expression))
+            return expression;
+
+        string result = expression;
+
+        var cyrillicVariables = _variableMapping.Keys
+            .OrderByDescending(name => name.Length)
+            .ToList();
+
+        foreach (var originalName in cyrillicVariables)
+        {
+            var asciiName = _variableMapping[originalName];
+
+            string pattern = @"(?<![а-яА-ЯёЁa-zA-Z0-9_])" +
+                            System.Text.RegularExpressions.Regex.Escape(originalName) +
+                            @"(?![а-яА-ЯёЁa-zA-Z0-9_])";
+
+            result = System.Text.RegularExpressions.Regex.Replace(result, pattern, asciiName);
+        }
+
+        return result;
+    }
+
+    private string GetMappedName(string originalName)
+    {
+        return _variableMapping.ContainsKey(originalName) ? _variableMapping[originalName] : originalName;
+    }
+
+    private bool ContainsCyrillic(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return false;
+
+        return text.Any(c => (c >= 'а' && c <= 'я') || (c >= 'А' && c <= 'Я') || c == 'ё' || c == 'Ё');
+    }
+
+    private async Task OpenRenameDialogAsync(TemplateDefinition template)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<UserInputDialog> { { x => x.Input, template.Name } };
+        var dialog = await DialogService.ShowAsync<UserInputDialog>("Переименовать", parameters, options);
+        var result = await dialog.Result;
+        if (result == null || result.Canceled) return;
+        template.Name = $"{result.Data}";
+        PersistAsync().AndForget();
+    }
+
+    private async Task OpenDeleteDialogAsync(TemplateDefinition template)
+    {
+        var namePart = !string.IsNullOrWhiteSpace(template.Name) ? $" \"{template.Name}\"" : "";
+        var message = $"Вы точно хотите удалить шаблон{namePart}?";
+
+        var result = await DialogService.ShowMessageBox(
+            "Удаление шаблона", message,
+            yesText: "Удалить", cancelText: "Отмена");
+
+        if (result != true) return;
+
+        Templates.Remove(template);
+        Snackbar.Add("Шаблон удалён", Severity.Info);
+        PersistAsync().AndForget();
+    }
+
+    private async Task OpenDeleteDialogAsync(TemplateDefinition template, VariableDefinition variable)
+    {
+        if (!string.IsNullOrWhiteSpace(variable.Name) || !string.IsNullOrWhiteSpace(variable.Expression))
+        {
+            var namePart = string.IsNullOrWhiteSpace(variable.Name) ? "" : $" {variable.Name}";
+            var exprPart = string.IsNullOrWhiteSpace(variable.Expression) ? "" : $": {variable.Expression}";
+            var message = $"Вы точно хотите удалить переменную{namePart}{exprPart}?";
+
+            var result = await DialogService.ShowMessageBox(
+                "Удаление", message,
+                yesText: "Удалить", cancelText: "Отмена");
+
+            if (result != true) return;
+        }
+
+        template.Variables.Remove(variable);
+        PersistAsync().AndForget();
+    }
+}

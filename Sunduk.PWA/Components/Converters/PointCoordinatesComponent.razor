@@ -1,7 +1,7 @@
 ﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="12" md="12">
-            <MudField Variant="Variant.Filled" Label="Декартова СК" DisableUnderLine="true">
+            <MudField Variant="Variant.Filled" Label="Декартова СК" Underline="false">
                 <MudGrid>
                     <MudItem xs="6">
                         <MudTextField @bind-Value="X" @onfocusin="@(() => CalcPolar = true)" DisableUnderLine="false" Label="X" Converter="Util.NullableDoubleConverterWithZero"
@@ -15,7 +15,7 @@
             </MudField>
         </MudItem>
         <MudItem xs="12" md="12">
-            <MudField Variant="Variant.Filled" Label="Полярная СК" DisableUnderLine="true">
+            <MudField Variant="Variant.Filled" Label="Полярная СК" Underline="false">
                 <MudGrid>
                     <MudItem xs="6">
                         <MudTextField @bind-Value="Radius" @onfocusin="@(() => CalcPolar = false)" DisableUnderLine="false" Label="Радиус" Converter="Util.NullableDoubleConverterWithZero"

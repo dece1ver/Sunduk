@@ -265,19 +265,19 @@
                 break;
         }
         <MudItem Class="mt-4" xs="12">
-            <MudTextField Style="font-size: 14px" T="string" DisableUnderLine="true" Label="Предпросмотр" ReadOnly="true" Variant="Variant.Filled" Text="@ExampleText" Lines="@(ExampleText.Count(x => x == '\n') + 1)"/>
+            <MudTextField Style="font-size: 14px" T="string" Underline="false" Label="Предпросмотр" ReadOnly="true" Variant="Variant.Filled" Text="@ExampleText" Lines="@(ExampleText.Count(x => x == '\n') + 1)"/>
         </MudItem>
     </MudGrid>
 
     <MudItem Class="d-flex flex-row-reverse py-0 px-0 mt-4">
         <MudButton Variant="Variant.Outlined" Size="Size.Large" 
-                   EndIcon="@Icons.TwoTone.PlaylistAdd" Color="Color.Primary" 
+                   EndIcon="@Icons.Material.TwoTone.PlaylistAdd" Color="Color.Primary" 
                    OnClick="(() => Sequences.Add(CurrentSequence))" Disabled="@(string.IsNullOrEmpty(ExampleText))">Добавить</MudButton>
     </MudItem>
     @if (Sequences.Count > 0)
     {
         <MudItem Class="mt-4" xs="12">
-            <MudField DisableUnderLine="true" Label="Список операций" Variant="Variant.Filled">
+            <MudField Underline="false" Label="Список операций" Variant="Variant.Filled">
             @foreach (var sequence in Sequences)
                 {
                     <MudPaper Outlined="true" Class="ma-1">
@@ -318,7 +318,7 @@
 </MudContainer>
 
 @code {
-    public Variant ButtonsVariant => Variant.Filled;
+    public Variant ButtonsVariant => Variant.Text;
     public bool FirstFieldsUnderline => false;
     public int ButtonSize => 35;
 
@@ -748,9 +748,9 @@
             { nameof(okMessage), okMessage }
         };
         var options = new DialogOptions() { FullScreen = false, CloseButton = false };
-        var dialog = DialogService.Show<ConfirmDialog>("Подтверждение", parameters, options);
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Подтверждение", parameters, options);
         var result = await dialog.Result;
-        return !result.Canceled;
+        return result?.Canceled != true;
     }
 
     private async Task ClearSequences()

@@ -1,16 +1,14 @@
 ﻿<MudLink Href="@Link" Underline="Underline.None">
-    <MudPaper Class="px-6 flex-grow-1 flex-shrink-0 py-10">
-        <MudGrid Justify="Justify.Center">
-            <MudIcon Size="Size.Large" Icon="@Icon" />
-        </MudGrid>
-        <MudGrid Justify="Justify.Center">
+    <MudPaper Class="px-4 flex-grow-1 flex-shrink-0 py-6">
+        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="0">
+            <MudIcon Size="Size.Large" Icon="@Icon"/>
             <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
-                <MudText Typo="Typo.caption" Class="mt-4">@Label</MudText>
+                <MudText Typo="Typo.caption">@Label</MudText>
             </MudHidden>
             <MudHidden Breakpoint="Breakpoint.Xs">
-                <MudText Typo="Typo.body2" Class="mt-4">@Label</MudText>
+                <MudText Typo="Typo.body2">@Label</MudText>
             </MudHidden>
-        </MudGrid>
+        </MudStack>
     </MudPaper>
 </MudLink>
 

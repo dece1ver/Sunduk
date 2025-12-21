@@ -3,16 +3,16 @@
         font-family: 'Roboto Mono', monospace;
     }
 </style>
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-2">
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="6">
-            <MudField Label="Параметры фаски" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1"
-            @onfocusout="(() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamfer : Images.InternalChamfer)">
+            <MudField Label="Параметры фаски" Variant="Variant.Filled" Underline="false" Class="mt-1"
+                @onfocusout="(() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamfer : Images.InternalChamfer)">
                 <MudGrid Spacing="0">
                     <MudItem xs="12">
-                        <MudRadioGroup SelectedOptionChanged="OnChamferTypeChanged" T="Chamfer" Class="mb-n2 d-flex justify-center">
-                            <MudRadio Option="@Chamfer.External" Color="Color.Primary">Наружная</MudRadio>
-                            <MudRadio Option="@Chamfer.Internal" Color="Color.Primary">Внутренняя</MudRadio>
+                        <MudRadioGroup ValueChanged="OnChamferTypeChanged" T="Chamfer" Class="mb-n2 d-flex justify-center">
+                            <MudRadio Value="@Chamfer.External" Color="Color.Primary">Наружная</MudRadio>
+                            <MudRadio Value="@Chamfer.Internal" Color="Color.Primary">Внутренняя</MudRadio>
                         </MudRadioGroup>
                     </MudItem>
                     <MudItem xs="12">
@@ -36,7 +36,7 @@
         </MudItem>
         <MudHidden Breakpoint="Breakpoint.Xs">
             <MudItem xs="12" sm="6">
-                <MudCard Elevation="0" Outlined="true" Class="mt-1 rounded-0">
+                <MudCard Elevation="0" Outlined="true" Class="mt-1 mb-2 rounded-0">
                     <MudCardContent>
                         @if (CurrentImage == Images.ExternalChamfer)
                         {
@@ -129,7 +129,7 @@
             </div>
         </MudHidden>
         <MudItem xs="12" sm="12">
-            <MudField Label="Расчет" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-n1"
+            <MudField Label="Расчет" Variant="Variant.Filled" Underline="false" Class="mt-n1"
             @onfocusout="(() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamfer : Images.InternalChamfer)">
                 <MudGrid Spacing="1">
                     <MudHidden Breakpoint="Breakpoint.Xs">
@@ -147,22 +147,22 @@
                         </MudItem>
                     </MudHidden>
                     <MudItem xs="12" sm="6">
-                        <MudRadioGroup SelectedOption="CalculationType" SelectedOptionChanged="OnCalculationChanged" T="Calculation" Class="d-flex justify-center">
-                            <MudRadio Option="@Calculation.Simplified" Color="Color.Primary">Упрощенный</MudRadio>
-                            <MudRadio Option="@Calculation.Precise" Color="Color.Primary">Точный</MudRadio>
+                        <MudRadioGroup ValueChanged="OnCalculationChanged" T="Calculation" Class="d-flex justify-center">
+                            <MudRadio Value="@Calculation.Simplified" Color="Color.Primary">Упрощенный</MudRadio>
+                            <MudRadio Value="@Calculation.Precise" Color="Color.Primary">Точный</MudRadio>
                         </MudRadioGroup>
                     </MudItem>
                     @if (Angle != 45 && Angle != 0 && CalculationType == Calculation.Simplified)
                     {
                     <MudItem xs="12">
-                        <MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="@Icons.Filled.WarningAmber">Не рекомендуется использовать упрощенный расчет для углов отличных от 45°</MudAlert>
+                            <MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="@Icons.Material.Filled.WarningAmber">Не рекомендуется использовать упрощенный расчет для углов отличных от 45°</MudAlert>
                     </MudItem>
                     }
                 </MudGrid>
             </MudField>
         </MudItem>
         <MudItem xs="12">
-            <MudField Label="Результат" Variant="Variant.Filled" DisableUnderLine="true">
+            <MudField Label="Результат" Variant="Variant.Filled" Underline="false">
                 <MudGrid Spacing="1">
                     
                     <MudItem xs="12" Class="mt-2">
@@ -191,26 +191,26 @@
         @if (ValidResult())
         {
             <MudItem xs="12">
-                <MudExpansionPanel Class="rounded-0" Text="Пример программы для Fanuc">
+                <MudExpansionPanel Class="rounded-0" Text="Пример программы для Fanuc" ExpandedChanged="CalculateAll">
                     <MudGrid>
                         <MudItem xs="12" md="4">
-                            <MudRadioGroup T="bool" @bind-SelectedOption="showClassicChamfer" Class="ma-n3">
-                                <MudRadio Option="true" Color="Color.Primary">Обычная</MudRadio>
-                                <MudRadio Option="false" Color="Color.Primary">Обратная</MudRadio>
+                            <MudRadioGroup T="bool" @bind-Value="showClassicChamfer" Class="ma-n1">
+                                <MudRadio Value="true" Color="Color.Primary">Обычная</MudRadio>
+                                <MudRadio Value="false" Color="Color.Primary">Обратная</MudRadio>
                             </MudRadioGroup>
                         </MudItem>
                         <MudItem xs="6" md="4">
-                            <MudSwitch @bind-Checked="@RoundCorners" Label="Скруглить углы" Color="Color.Primary" Class="ma-n3"/>
+                            <MudSwitch @bind-Value="@RoundCorners" Label="Скруглить углы" Color="Color.Primary" Class="ma-0"/>
                         </MudItem>
                         <MudItem xs="6" md="4">
                             @if (RoundCorners)
                             {
-                                <MudTextField @bind-Value="_RoundCorner" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" Class="ma-n3" DisableUnderLine="true"/>
+                                <MudTextField @bind-Value="_RoundCorner" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" Class="ma-0" Underline="false"/>
                             }
                         </MudItem>
                     </MudGrid>
                     <MudItem xs="12">
-                        <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@ChamferExample" />
+                        <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace;" AutoGrow="true" Value="@ChamferExample" ReadOnly="true"  />
                     </MudItem>
                 </MudExpansionPanel>
             </MudItem>
@@ -220,8 +220,8 @@
 
 @code
 {
-    readonly int _imgHeigth = 237;
-    readonly int _imgWidth = 250;
+    readonly int _imgHeigth = 249;
+    readonly int _imgWidth = 270;
 
     bool calcStartDiam = true;
     bool showClassicChamfer = true;

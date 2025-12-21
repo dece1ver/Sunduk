@@ -342,7 +342,7 @@
                         {
                             <MudItem xs="6" sm="4" md="3" lg="2">
                                 @* ReSharper disable once UnknownCssClass *@
-                                <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" Underline="false" Class="mt-1">
                                     <MudGrid>
                                         <MudItem xs=12>
                                             <MudTextField Label="Угол" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
@@ -357,7 +357,7 @@
                         {
                             <MudItem xs="6" sm="4" md="3" lg="2">
                                 @* ReSharper disable once UnknownCssClass *@
-                                <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" Underline="false" Class="mt-1">
                                     <MudGrid>
                                         <MudItem xs=6>
                                             <MudTextField Label="X" @bind-Value="Holes[Holes.IndexOf(hole)].X" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
@@ -526,7 +526,7 @@
                                 @foreach (var hole in Holes)
                                 {
                                     <MudItem xs="6" sm="4" md="3" lg="2">
-                                        <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                        <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" Underline="false" Class="mt-1">
                                             <MudGrid>
                                                 <MudItem xs=6>
                                                     <MudTextField Label="X" @bind-Value="Holes[Holes.IndexOf(hole)].X" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
@@ -546,7 +546,7 @@
                                 @foreach (var hole in Holes)
                                 {
                                     <MudItem xs="6" sm="4" md="3" lg="2">
-                                        <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                        <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" Underline="false" Class="mt-1">
                                             <MudGrid>
                                                 <MudItem xs=12>
                                                     <MudTextField Label="Угол" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
@@ -632,7 +632,7 @@
                                 @foreach (var hole in Holes)
                                 {
                                     <MudItem xs="6" sm="4" md="3" lg="2">
-                                        <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                        <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" Underline="false" Class="mt-1">
                                             <MudGrid>
                                                 <MudItem xs=6>
                                                     <MudTextField Label="X" @bind-Value="Holes[Holes.IndexOf(hole)].X" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
@@ -652,7 +652,7 @@
                                 @foreach (var hole in Holes)
                                 {
                                     <MudItem xs="6" sm="4" md="3" lg="2">
-                                        <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" DisableUnderLine="true" Class="mt-1">
+                                        <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" Underline="false" Class="mt-1">
                                             <MudGrid>
                                                 <MudItem xs=12>
                                                     <MudTextField Label="Угол" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
@@ -747,7 +747,7 @@
                         </MudItem>
                     }
                     <MudItem xs="12" md="3">
-                        <MudTextField Label="Конечная точка" @bind-Value="_GroovingCuttingPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+                        <MudTextField Label="От торца до канавы" @bind-Value="_GroovingCuttingPoint" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
                     </MudItem>
                     <MudItem xs="12" md="3">
                         <MudTextField Label="Шаг" @bind-Value="_GroovingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
@@ -873,12 +873,12 @@
     }
 </MudGrid>
 <MudItem Class="mt-4" xs="12" sm="12" md="12">
-    <MudTextField T="string" DisableUnderLine="true" Label="Предпросмотр" Style="font-family: 'Roboto Mono', monospace; font-size: medium;"
+    <MudTextField T="string" Underline="false" Label="Предпросмотр" Style="font-family: 'Roboto Mono', monospace; font-size: medium;"
                   ReadOnly="true" Variant="Variant.Filled" Text="@("\n" + ExampleText.Trim('\n'))" Lines="@(ExampleText.Trim('\n').Count(x => x == '\n') + 3)" />
 </MudItem>
 <MudItem Class="d-flex flex-row-reverse py-0 px-0 mt-4">
     <MudButton Variant="Variant.Outlined" Size="Size.Large"
-               EndIcon="@Icons.TwoTone.PlaylistAdd" Color="Color.Primary"
+               EndIcon="@Icons.Material.TwoTone.PlaylistAdd" Color="Color.Primary"
                OnClick="Submit" Disabled="@(string.IsNullOrEmpty(ExampleText))">
         Добавить
     </MudButton>
@@ -1389,7 +1389,7 @@
     private double GroovingWidth => _GroovingWidth.GetDouble();
 
     private string _GroovingStartPoint { get; set; }
-    private double GroovingStartPoint => _GroovingStartPoint.GetDouble();
+    private double GroovingStartPoint => _GroovingStartPoint.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     private string _GroovingCuttingPoint { get; set; } = "-";
     private double GroovingCuttingPoint => _GroovingCuttingPoint.GetDouble(numberOption: Util.GetNumberOption.Any);
@@ -1426,10 +1426,9 @@
     private double BurnishingEnd => _BurnishingEnd.GetDouble(numberOption: Util.GetNumberOption.Any);
 
     /// <summary>
-    ///     Тут сразу формируется переход, текст которого выводится в пример. Уже созданный тут переход сабмитится при нажатии
-    ///     на кнопку.
+    /// Тут сразу формируется переход, текст которого выводится в пример. Уже созданный тут переход сабмитится при нажатии
+    /// на кнопку.
     /// </summary>
-    //Пример
     public string ExampleText
     {
         get

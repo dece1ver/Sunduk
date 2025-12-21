@@ -1,0 +1,149 @@
+﻿@using System.Text.Json
+@using System.Text
+@using Sunduk.PWA.Infrastructure.DynamicTemplatesData
+@inject IDialogService DialogService
+
+<MudDialog>
+    <DialogContent>
+        @if (_loading)
+        {
+            <div class="d-flex justify-center align-center pa-8">
+                <MudProgressCircular Indeterminate="true" />
+                <MudText Class="ml-4">Загрузка списка шаблонов...</MudText>
+            </div>
+        }
+        else if (_templates.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info">
+                Не найдено доступных шаблонов
+            </MudAlert>
+        }
+        else
+        {
+            <MudList T="CloudTemplateInfo">
+                @foreach (var template in _templates)
+                {
+                    <MudListItem>
+                        <div class="d-flex align-center justify-space-between" style="width: 100%;">
+                            <div class="flex-grow-1">
+                                <MudText Typo="Typo.body1">@template.DisplayName</MudText>
+                                @if (!string.IsNullOrEmpty(template.Description))
+                                {
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@template.Description</MudText>
+                                }
+                            </div>
+                            <MudIconButton Variant="Variant.Outlined"
+                                       Size="Size.Medium"
+                                       OnClick="() => ImportTemplate(template)"
+                                       Disabled="@template.IsImporting"
+                                       Icon="@(template.IsImporting ? null : Icons.Material.Outlined.Download)">
+                                @if (template.IsImporting)
+                                {
+                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                                }
+                            </MudIconButton>
+                        </div>
+                    </MudListItem>
+                    @if (template != _templates.Last())
+                    {
+                        <MudDivider />
+                    }
+                }
+            </MudList>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Закрыть</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
+    [Parameter] public List<(string Name, string Url)> CloudFiles { get; set; } = new();
+    [Parameter] public HttpClient HttpClient { get; set; } = null!;
+
+    private class CloudTemplateInfo
+    {
+        public string DisplayName { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string Url { get; set; } = "";
+        public bool IsImporting { get; set; }
+        public List<TemplateDefinition>? Templates { get; set; }
+    }
+
+    private List<CloudTemplateInfo> _templates = new();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTemplatesInfo();
+    }
+
+    private async Task LoadTemplatesInfo()
+    {
+        _loading = true;
+        StateHasChanged();
+
+        var tasks = CloudFiles.Select(async file =>
+        {
+            try
+            {
+                var bytes = await HttpClient.GetByteArrayAsync(file.Url);
+                var json = Encoding.UTF8.GetString(bytes);
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var templates = JsonSerializer.Deserialize<List<TemplateDefinition>>(json, options);
+
+                if (templates != null && templates.Count > 0)
+                {
+                    var firstTemplate = templates[0];
+                    return new CloudTemplateInfo
+                    {
+                        DisplayName = firstTemplate.Name ?? file.Name,
+                        Description = templates.Count > 1 ? $"Содержит {templates.Count} шаблон(ов)" : "",
+                        Url = file.Url,
+                        Templates = templates
+                    };
+                }
+            }
+            catch
+            {
+            }
+
+            return null;
+        });
+
+        var results = await Task.WhenAll(tasks);
+        _templates = results.Where(t => t != null).ToList()!;
+
+        _loading = false;
+        StateHasChanged();
+    }
+
+    private async void ImportTemplate(CloudTemplateInfo template)
+    {
+        if (template.Templates == null) return;
+
+        template.IsImporting = true;  
+        StateHasChanged();
+
+        try
+        {
+            MudDialog.Close(DialogResult.Ok(template.Templates));
+        }
+        catch
+        {
+            template.IsImporting = false;
+            StateHasChanged();
+        }
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}

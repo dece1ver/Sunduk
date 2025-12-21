@@ -2,29 +2,29 @@
 @using Sunduk.PWA.Infrastructure.Sequences.Turning.Base
 @inject IDialogService DialogService
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pa-1 ma-0">
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pa-0 ma-0">
     <MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="fas fa-crutch">Раздел в разработке</MudAlert>
     <MudGrid Spacing="1">
         <MudItem xs="12" Class="@(Mode is not Mode.General ? "mb-n3" : "mb-0")">
             <MudPaper Outlined="true" Class="pa-4 rounded-0">
                 <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false">
-                    <MudIconButton Icon="@Icons.Material.TwoTone.SaveAs" Title="Скачать программу" Variant="Variant.Outlined"
-                                    OnClick="DownloadProgram" />
+                    <MudIconButton Icon="@Icons.Material.TwoTone.SaveAs" Variant="Variant.Outlined"
+                                   OnClick="DownloadProgram">"Скачать программу"</MudIconButton>
                     <MudHidden Breakpoint="Breakpoint.SmAndDown">
                         <MudButton EndIcon="@Icons.Material.TwoTone.Settings" OnClick="OpenSetupMode" Variant="Variant.Outlined"
                                     Color="(Mode == Mode.Setup ? Color.Primary : Color.Default)" Class="ml-1">Наладка</MudButton>
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true">
-                        <MudIconButton Icon="@Icons.Material.TwoTone.Settings" Title="Наладка" OnClick="OpenSetupMode" Variant="Variant.Outlined"
-                                        Color="(Mode == Mode.Setup ? Color.Primary : Color.Default)" Class="ml-1" />
+                        <MudIconButton Icon="@Icons.Material.TwoTone.Settings" OnClick="OpenSetupMode" Variant="Variant.Outlined"
+                                       Color="(Mode == Mode.Setup ? Color.Primary : Color.Default)" Class="ml-1">"Наладка"</MudIconButton>
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.SmAndDown">
                         <MudButton EndIcon="@Icons.Material.TwoTone.TableView" OnClick="OpenToolDialog" Variant="Variant.Outlined"
                                     Color="(Mode == Mode.ToolTable ? Color.Primary : Color.Default)" Class="ml-1">Инструмент</MudButton>
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true">
-                        <MudIconButton Icon="@Icons.Material.TwoTone.TableView" Title="Инструмент" OnClick="OpenToolDialog" Variant="Variant.Outlined"
-                                    Color="(Mode == Mode.ToolTable ? Color.Primary : Color.Default)" Class="ml-1" />
+                        <MudIconButton Icon="@Icons.Material.TwoTone.TableView" OnClick="OpenToolDialog" Variant="Variant.Outlined"
+                                       Color="(Mode == Mode.ToolTable ? Color.Primary : Color.Default)" Class="ml-1">"Инструмент"</MudIconButton>
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.Xs">
                         <MudButton OnClick="OpenSequenceDialog" EndIcon="@Icons.Material.Outlined.PlaylistAdd" Disabled="@(!ValidWorkpiece)" Variant="Variant.Outlined"
@@ -43,7 +43,7 @@
                 <MudItem xs="12" sm="6">
                     <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
                         @* onfocusout=DropSelection, но он дропает даже при нажатии кнопок, поэтому убрал пока *@
-                        <MudList Clickable="true" @bind-SelectedItem="SelectedSequence" @bind-SelectedValue="SelectedSequenceIndex" Dense="true" DisableGutters=true>
+                        <MudList T="int" @bind-SelectedValue="SelectedSequenceIndex" Dense="true" Gutters="false">
                             @if (Program != null)
                             {
                                 foreach (var seq in Program)
@@ -51,15 +51,13 @@
                                     if (Program.IndexOf(seq) == 0)
                                     {
                                         <MudListItem Text="@($"1. {seq.Name}")" Value="1">
-                                            <MudGrid>
-                                                <MudText Class="ma-3" Typo=Typo.body2>@($"1. {seq.Name}")</MudText>
-                                            </MudGrid>
+                                            <MudText Class="ma-0" Typo=Typo.body2>@($"1. {seq.Name}")</MudText>
                                         </MudListItem>
                                     }
                                     if (Program.IndexOf(seq) > 1)
                                     {
-                                        <MudListItem Text="@($"{Program.IndexOf(seq)}. {seq.Name}")" Value="Program.IndexOf(seq)">
-                                            <MudGrid>
+                                        <MudListItem Value="Program.IndexOf(seq)" >
+                                            <MudGrid Class="align-start d-flex my-0 mr-1 pa-0" Spacing="0">
                                                 @if (seq.MachineType != MachineType.Any && seq.MachineType != MachineType)
                                                 {
                                                     <MudTooltip Placement="Placement.Right" Text="Этот переход будет игнорирован, т.к. его тип не совпадает с типом станка.">
@@ -68,32 +66,31 @@
                                                     </MudTooltip>
 
                                                 }
-                                                <MudText Class="ma-3 mr-auto" Typo=Typo.body2>@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
-                                                <div Class="d-inline-flex justify-end py-2 px-3">
-                                                    @if (SelectedSequenceIndex != null && (int)SelectedSequenceIndex == Program.IndexOf(seq))
-                                                    {
-                                                        <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="mr-2" Style="margin-top: -3px; margin-bottom: -3px">
-                                                            @if (Program.IndexOf(seq) != Program.Count - 1)
-                                                            {
-                                                                <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                               OnClick="(() => MoveDownSequence(seq))" />
-                                                            }
-                                                            @if (Program.IndexOf(seq) != 2)
-                                                            {
-                                                                <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                               OnClick="(() => MoveUpSequence(seq))" />
-                                                            }
-                                                            @if (seq.MachineType == MachineType)
-                                                            {
+                                                <MudText Class="ma-0" Typo=Typo.body2>@($"{Program.IndexOf(seq)}. {seq.Name}")</MudText>
+                                                <MudSpacer />
+                                                @if (SelectedSequenceIndex == Program.IndexOf(seq))
+                                                {
+                                                    <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Class="my-n2 mr-2">
+                                                        @if (Program.IndexOf(seq) != Program.Count - 1)
+                                                        {
+                                                            <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowDown" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                           OnClick="(() => MoveDownSequence(seq))" />
+                                                        }
+                                                        @if (Program.IndexOf(seq) != 2)
+                                                        {
+                                                            <MudIconButton Icon="@Icons.Material.TwoTone.KeyboardArrowUp" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                           OnClick="(() => MoveUpSequence(seq))" />
+                                                        }
+                                                        @if (seq.MachineType == MachineType)
+                                                        {
 
-                                                                <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                                               OnClick="(() => OpenEditSequenceDialog(seq))" />
-                                                            }
-                                                            <MudIconButton Icon="@Icons.Material.TwoTone.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
-                                                                           OnClick="(() => Program.Remove(seq))" />
-                                                        </MudButtonGroup>
-                                                    }
-                                                </div>
+                                                            <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                                           OnClick="(() => OpenEditSequenceDialog(seq))" />
+                                                        }
+                                                        <MudIconButton Icon="@Icons.Material.TwoTone.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
+                                                                       OnClick="(() => Program.Remove(seq))" />
+                                                    </MudButtonGroup>
+                                                }
                                             </MudGrid>
                                         </MudListItem>
                                     }
@@ -104,7 +101,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudField Label="Программа" Variant="Variant.Filled" Margin="Margin.Dense">
-                        <MudTextField T="string" DisableUnderLine="true"
+                        <MudTextField T="string" Underline="false"
                                       Style="font-family: 'Roboto Mono', monospace; font-size: medium;"
                                       Variant="Variant.Text" @bind-Text="@ProgramText"
                                       ReadOnly="true" Immediate="true" Lines="@(ProgramText.Count(x => x == '\n') + 2)" />
@@ -251,10 +248,9 @@
 
     public Mode Mode { get; set; } = Mode.General;
 
-    public string HighLight => SelectedSequence is null ? string.Empty : Program[(int)SelectedSequenceIndex].Operation.Split('\n')[0];
+    public string HighLight => CurrentSelectedSequence is null ? string.Empty : Program[(int)SelectedSequenceIndex].Operation.Split('\n')[0];
 
-    public MudListItem SelectedSequence;
-    public object SelectedSequenceIndex = 0;
+    public int SelectedSequenceIndex = 0;
     public Sequence CurrentSelectedSequence { get; set; }
 
     public int CyclesCount => Program
@@ -621,9 +617,9 @@
             { nameof(okMessage), okMessage }
         };
         var options = new DialogOptions() { FullScreen = false, CloseButton = false };
-        var dialog = DialogService.Show<ConfirmDialog>("Подтверждение", parameters, options);
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Подтверждение", parameters, options);
         var result = await dialog.Result;
-        return !result.Cancelled;
+        return !result.Canceled;
     }
 
     private void RemoveSequence(Sequence seq)
@@ -635,20 +631,20 @@
     {
         int index = Program.IndexOf(seq) - 1;
         Program.Swap(Program.IndexOf(seq), Program.IndexOf(seq) - 1);
-        SelectedSequenceIndex = (object)index;
+        SelectedSequenceIndex = index;
     }
 
     private void MoveDownSequence(Sequence seq)
     {
         int index = Program.IndexOf(seq) + 1;
         Program.Swap(Program.IndexOf(seq), Program.IndexOf(seq) + 1);
-        SelectedSequenceIndex = (object)index;
+        SelectedSequenceIndex = index;
     }
 
     private void DropSelection()
     {
-        SelectedSequence = null;
-        SelectedSequenceIndex = null;
+        CurrentSelectedSequence = null;
+        SelectedSequenceIndex = -1;
     }
 
     private async Task DownloadProgram()
