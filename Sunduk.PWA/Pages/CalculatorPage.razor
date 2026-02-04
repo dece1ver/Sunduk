@@ -48,7 +48,9 @@
                 <MudItem xs="12">
                     <MudGrid Spacing="0">
                         <MudItem xs="12">
-                            <MudTextField @ref="exprField" InputId="calculator-expression" Margin="Margin.Dense" Label="Выражение" @bind-Value="UserExpression" InputMode="InputMode" @onfocus="() => UpdateCursorPositionOnFocus(exprField)" />
+                            <MudTextField @ref="exprField" InputId="calculator-expression" Margin="Margin.Dense" Label="Выражение" 
+                            @bind-Value="UserExpression" InputMode="InputMode" @onfocus="() => UpdateCursorPositionOnFocus(exprField)" 
+                            OnKeyDown="HandleKeyDown" KeyDownPreventDefault="@_preventDefault" Immediate="true"/>
                         </MudItem>
                         <MudItem xs="12">
                             <MudTextField Margin="Margin.Dense" Label="Результат" @bind-Value="Answer" ReadOnly="true" />
@@ -169,6 +171,11 @@
                         </MudItem>
                     </MudGrid>
                 </MudItem>
+                <MudItem xs="12">
+                    <MudChipSet T="bool" CheckMark SelectionMode="@SelectionMode.ToggleSelection" @bind-SelectedValue="SetResultToExpression">
+                        <MudChip Value="true" Text="Перенос результата в выражение" />
+                    </MudChipSet>
+                </MudItem>
             </MudGrid>
         </MudField>
     </MudItem>
@@ -178,7 +185,11 @@
 {
     protected override async Task OnInitializedAsync()
     {
-        InputMode = await LocalStorage.GetItemAsync<InputMode>(nameof(InputMode)); 
+        var inputModeTask = LocalStorage.GetItemAsync<InputMode>(nameof(InputMode)).AsTask();
+        var setResultTask = LocalStorage.GetItemAsync<bool>(nameof(SetResultToExpression)).AsTask();
+        await Task.WhenAll(inputModeTask, setResultTask);
+        (InputMode, SetResultToExpression) = (inputModeTask.Result, setResultTask.Result);
+
         StateHasChanged();
     }
 
@@ -193,9 +204,23 @@
             _ = LocalStorage.SetItemAsync(nameof(InputMode), InputMode);
         }
     }
-    
+
+    private bool _setResultToExpression;
+
+    public bool SetResultToExpression
+    {
+        get { return _setResultToExpression; }
+        set 
+        { 
+            _setResultToExpression = value; 
+            _ = LocalStorage.SetItemAsync(nameof(SetResultToExpression), SetResultToExpression);
+        }
+    }
+
     public bool CalcSpins { get; set; } = true;
     public bool CalcMinFeed { get; set; } = true;
+
+
 
     private const string RadianToDegreeFunction = "Deg";
     private const string DegreeToRadianFunction = "Rad";
@@ -209,6 +234,8 @@
     private MudTextField<string>? minFeedField;
     private MudTextField<string>? exprField;
     private MudTextField<string>? activeField;
+
+    private bool _preventDefault;
 
     enum TrigonometricFunction
     {
@@ -492,6 +519,19 @@
         }
     }
 
+    void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            _preventDefault = true;
+            Calculate();
+        }
+        else
+        {
+            _preventDefault = false;
+        }
+    }
+
     void ClearCalculator()
     {
         if (activeField != null && activeField != exprField)
@@ -605,7 +645,7 @@
         List<string> calcErrors = new();
         try
         {
-            var userExpr = UserExpression.Replace("𝜋", Math.PI.ToString()).Replace("²", "**2").Replace("^", "**").Replace(',', '.');
+            var userExpr = UserExpression.Trim().Replace("𝜋", Math.PI.ToString()).Replace("²", "**2").Replace("^", "**").Replace(',', '.');
             var expr = new Expression(userExpr, ExpressionOptions.IgnoreCaseAtBuiltInFunctions | ExpressionOptions.CaseInsensitiveStringComparer);
             expr.Functions[DegreeToRadianFunction] = (args) =>
                 {
@@ -649,7 +689,10 @@
                          r is int i ? i.ToString() :
                          r is long l ? l.ToString() :
                          r?.ToString() ?? "[?]";
-            UserExpression = result;
+            if (SetResultToExpression)
+            {
+                UserExpression = result;
+            }
             Answer = result;
             activeField = exprField;
             StateHasChanged();
