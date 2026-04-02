@@ -1,4 +1,5 @@
-﻿<MudSwipeArea OnSwipeEnd="@(e => OnSwipe(e.SwipeDirection))">
+﻿@using MudBlazor.Extensions
+<MudSwipeArea OnSwipeEnd="@(e => OnSwipe(e.SwipeDirection))">
     <MudTabs Elevation="2" @ref="tabs" Style="font-size: small">
         <MudTabPanel Text="Скругление">
             <RadiusComponent />
@@ -14,27 +15,23 @@
 
 @code
 {
-    MudTabs tabs;
+    MudTabs tabs = default!;
 
     private void OnSwipe(SwipeDirection direction)
     {
         if (direction == SwipeDirection.LeftToRight)
         {
-            if (tabs.ActivePanelIndex > 0)
+            if (tabs.GetState(x => x.ActivePanelIndex) > 0)
             {
-                tabs.ActivatePanel(tabs.ActivePanelIndex - 1);
+                tabs.ActivatePanelAsync(tabs.GetState(x => x.ActivePanelIndex) - 1);
             }
         }
         else if (direction == SwipeDirection.RightToLeft)
         {
-            if (tabs.ActivePanelIndex < 2)
+            if (tabs.GetState(x => x.ActivePanelIndex) < 2)
             {
-                tabs.ActivatePanel(tabs.ActivePanelIndex + 1);
+                tabs.ActivatePanelAsync(tabs.GetState(x => x.ActivePanelIndex) + 1);
             }
         }
     }
-}
-
-@code {
-
 }

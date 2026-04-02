@@ -1,6 +1,7 @@
-﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+﻿@using MudBlazor.Extensions
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
-<MudSwipeArea OnSwipe="@OnSwipe">
+<MudSwipeArea OnSwipeEnd="OnSwipe">
     <MudTabs @ref="_toolTabs" Elevation="0">
         @if (MachineType == MachineType.Milling)
         {
@@ -116,7 +117,7 @@
 @code {
 
     [Parameter]
-    public List<Tool> Tools { get; set; }
+    public List<Tool> Tools { get; set; } = new();
 
     [Parameter]
     public MachineType MachineType { get; set; }
@@ -125,25 +126,25 @@
 
     private static double[] _chamferAngleTemplates = { 30, 45, 60, };
 
-    MudTabs _toolTabs;
+    MudTabs _toolTabs = default!;
 
-    public void OnSwipe(SwipeDirection direction)
+    public void OnSwipe(SwipeEventArgs args)
     {
-        switch (direction)
+        switch (args.SwipeDirection)
         {
             case SwipeDirection.LeftToRight:
                 {
-                    if (_toolTabs.ActivePanelIndex > 0)
+                    if (_toolTabs.GetState(x => x.ActivePanelIndex) > 0)
                     {
-                        _toolTabs.ActivatePanel(_toolTabs.ActivePanelIndex - 1);
+                        _toolTabs.ActivatePanelAsync(_toolTabs.GetState(x => x.ActivePanelIndex) - 1);
                     }
                     break;
                 }
             case SwipeDirection.RightToLeft:
                 {
-                    if (_toolTabs.ActivePanelIndex < Tabs)
+                    if (_toolTabs.GetState(x => x.ActivePanelIndex) < Tabs)
                     {
-                        _toolTabs.ActivatePanel(_toolTabs.ActivePanelIndex + 1);
+                        _toolTabs.ActivatePanelAsync(_toolTabs.GetState(x => x.ActivePanelIndex) + 1);
                     }
                     break;
                 }

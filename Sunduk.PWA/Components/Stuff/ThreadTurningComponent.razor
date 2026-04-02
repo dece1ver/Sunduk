@@ -23,14 +23,18 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="6">
-            <MudAutocomplete T="string"
-                             Variant="Variant.Filled"
-                             SearchFunc="Search"
-                             ShowProgressIndicator="true" MaxItems="null"
-                             ValueChanged="OnTemplateChanged" 
-                             Clearable="true"
-                             Label="Шаблон" 
-                             Modal="true"/>
+            <MudSelectExtended T="string"
+                               Label="Шаблон"
+                               Variant="Variant.Filled"
+                               ItemCollection="@ThreadTemplates"
+                               Value="@CurrentThreadTemplate"
+                               ValueChanged="OnTemplateChanged"
+                               SearchBox="true"
+                               SearchBoxClearable="true"
+                               SearchBoxPlaceholder="Поиск..."
+                               Virtualize="true"
+                               Clearable="true"
+                               AnchorOrigin="Origin.BottomCenter" />
             @* <MudSelect Label="Шаблон" T="string" Value="CurrentThreadTemplate" Variant="Variant.Filled" ValueChanged="OnTemplateChanged">
                 @foreach (string item in ThreadTemplates)
                 {
@@ -236,20 +240,17 @@
 
     private async Task<IEnumerable<string>> Search(string value, System.Threading.CancellationToken token)
     {
-        var delay = Task.Delay(1000, token);
+        if (string.IsNullOrWhiteSpace(value))
+            return ThreadTemplates;
 
-        var data = Task.Run(() =>
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return ThreadTemplates.ToList();
+        await Task.Delay(200, token);
+        if (token.IsCancellationRequested) return [];
 
-            return ThreadTemplates
+        return await Task.Run(() =>
+            ThreadTemplates
                 .Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase))
-                .ToList();
-        }, token);
-
-        await Task.WhenAll(delay, data);
-        return data.Result; 
+                .ToList()
+        , token);
     }
 
     public ICollection<string> ThreadTemplates
@@ -270,17 +271,17 @@
             };
         }
     }
-    public string CurrentThreadTemplate { get; set; }
+    public string CurrentThreadTemplate { get; set; } = "";
 
     public ThreadStandard ThreadStandard { get; set; } = ThreadStandard.Metric;
     public CuttingType ThreadType { get; set; } = CuttingType.External;
 
     public double ThreadChamfer { get; set; }
 
-    public string ThreadDiameterString { get; set; }
+    public string ThreadDiameterString { get; set; } = "";
     public double ThreadDiameter => Util.GetDouble(ThreadDiameterString);
 
-    public string ThreadPitchString { get; set; }
+    public string ThreadPitchString { get; set; } = "";
     public double ThreadPitch => Util.GetDouble(ThreadPitchString);
 
     public bool Blunted { get; set; } = false;

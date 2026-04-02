@@ -627,6 +627,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
         #region Чтение шаблонов
         public static void GetMetricValues(string template, out string diameter, out string pitch)
         {
+            if (string.IsNullOrWhiteSpace(template))
+            {
+                diameter = "";
+                pitch = "";
+            }
             diameter = template.Split("M")[1].Split('x')[0];
             pitch = template.Split("M")[1].Split('x')[1].Split()[0];
         }

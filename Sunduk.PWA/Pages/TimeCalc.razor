@@ -1,5 +1,6 @@
 ﻿@page "/timecalc"
-<MudSwipeArea OnSwipe="@OnSwipe">
+@using MudBlazor.Extensions
+<MudSwipeArea OnSwipe="OnSwipe">
     <MudTabs Elevation="2" @ref="tabs">
         <MudTabPanel Text="Распиловка">
             <SawingTimeComponent/>
@@ -13,22 +14,22 @@
 
 @code
 {
-    MudTabs tabs;
+    MudTabs tabs = default!;
 
     public void OnSwipe(SwipeDirection direction)
     {
         if (direction == SwipeDirection.LeftToRight)
         {
-            if (tabs.ActivePanelIndex > 0)
+            if (tabs.GetState(x => tabs.ActivePanelIndex) > 0)
             {
-                tabs.ActivatePanel(tabs.ActivePanelIndex - 1);
+                tabs.ActivatePanelAsync(tabs.GetState(x => tabs.ActivePanelIndex) - 1);
             }
         }
         else if (direction == SwipeDirection.RightToLeft)
         {
-            if (tabs.ActivePanelIndex < 1)
+            if (tabs.GetState(x => tabs.ActivePanelIndex) < 1)
             {
-                tabs.ActivatePanel(tabs.ActivePanelIndex + 1);
+                tabs.ActivatePanelAsync(tabs.GetState(x => tabs.ActivePanelIndex) + 1);
             }
         }
     }

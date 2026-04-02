@@ -1,5 +1,5 @@
 ﻿<style>
-    .monofield {
+    .monofield textarea {
         font-family: 'Roboto Mono', monospace;
     }
 </style>
@@ -127,15 +127,15 @@
         @if (RadiusDiameter > 0 && RadiusSize > 0)
         {
         <MudItem xs="12">
-            <MudExpansionPanel Class="mt-2" Text="Пример программы для Fanuc">
+            <MudExpansionPanel Text="Пример программы для Fanuc" ExpandedChanged="OnPanelExpanded">
                 <MudItem xs="12" md="4">
-                            <MudRadioGroup T="bool" @bind-SelectedOption="showClassicRadius" Class="ma-n3">
-                                <MudRadio Value="true" Color="Color.Primary">Обычное</MudRadio>
-                                <MudRadio Value="false" Color="Color.Primary">Обратное</MudRadio>
-                            </MudRadioGroup>
-                        </MudItem>
+                    <MudRadioGroup T="bool" @bind-Value="showClassicRadius" Class="ma-n1">
+                        <MudRadio Value="true" Color="Color.Primary">Обычное</MudRadio>
+                        <MudRadio Value="false" Color="Color.Primary">Обратное</MudRadio>
+                    </MudRadioGroup>
+                </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@RadiusExample" />
+                        <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace;" Lines="@ExampleLines" ReadOnly="true" AutoGrow="true" Value="@RadiusExample" />
                 </MudItem>
             </MudExpansionPanel>
         </MudItem>
@@ -147,6 +147,8 @@
 
 @code 
 {
+    [Inject] IJSRuntime JS { get; set; } = default!;
+
     readonly int _imgHeigth = 197;
     readonly int _imgWidth = 250;
 
@@ -221,7 +223,7 @@
 
     public double RadiusDepth => RadiusSize + InsertRadius;
 
-    public int ExampleLines => RadiusExample.Count(f => f == '\n') + 1;
+    public int ExampleLines => RadiusExample.Count(f => f == '\n') + 2;
 
 
     //private void SetInternalType()
@@ -245,4 +247,8 @@
         if (RadiusType == Radius.Internal) CurrentImage = Images.InternalRadius;
     }
 
+    private async Task OnPanelExpanded(bool expanded)
+    {
+        if (expanded) await JS.TriggerAutoGrow();
+    }
 }
