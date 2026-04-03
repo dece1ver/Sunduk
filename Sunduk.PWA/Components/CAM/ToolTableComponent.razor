@@ -1,7 +1,7 @@
 ﻿@using MudBlazor.Extensions
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
-<MudSwipeArea OnSwipeEnd="OnSwipe">
+<MudSwipeArea OnSwipeEnd="OnSwipe" Style="touch-action: pan-y;">
     <MudTabs @ref="_toolTabs" Elevation="0">
         @if (MachineType == MachineType.Milling)
         {

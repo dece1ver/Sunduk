@@ -1,7 +1,7 @@
 ﻿@page "/stuff"
 @using MudBlazor.Extensions
 
-<MudSwipeArea OnSwipeEnd="OnSwipe">
+<MudSwipeArea OnSwipeEnd="OnSwipe" Style="touch-action: pan-y;">
     <MudTabs Elevation="2" @ref="tabs" Style="font-size: small">
         <MudTabPanel Text="Резьба">
             <ThreadTurningComponent />

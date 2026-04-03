@@ -123,7 +123,7 @@ https://github.com/dece1ver/Sunduk
     public List<ChangelogInfo> Info = new();
 
     [CascadingParameter]
-    private IMudDialogInstance MudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; } = default!;
 
     void Submit()
     {
