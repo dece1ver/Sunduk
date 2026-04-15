@@ -2073,6 +2073,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     $"Поле {position} предназначено для наружной резьбы. " +
                     "Используйте H, G, F или E для отверстия.", nameof(position));
             var (a_min, a_max) = ThreadRise19257(pitch);
+            //a_min = 0.05 * pitch;
+            //a_max = 0.05 * pitch;
             double ei = InternalFundamentalDeviation(position, pitch);
             double? tD1 = TD1(pitch, grade);
             double? tD2 = TD2(diameter, pitch, grade);

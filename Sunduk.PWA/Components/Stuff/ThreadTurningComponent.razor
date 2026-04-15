@@ -10,7 +10,7 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
-        <MudItem xs="12" sm="5">
+        <MudItem xs="12" sm="4">
             <MudSelect Label="Стандарт" T="ThreadStandard" Value="ThreadStandard" Variant="Variant.Filled" ValueChanged="OnStandardChanged">
                 <MudSelectItem Value="@(ThreadStandard.Metric)">@(ThreadStandard.Metric.Description())</MudSelectItem>
                 <MudSelectItem Value="@(ThreadStandard.BSPP)">@(ThreadStandard.BSPP.Description())</MudSelectItem>
@@ -22,7 +22,7 @@
                 <MudSelectItem Value="@(ThreadStandard.UNEF)">@(ThreadStandard.UNEF.Description())</MudSelectItem>
             </MudSelect>
         </MudItem>
-        <MudItem xs="10" sm="5">
+        <MudItem xs="10" sm="4">
             <MudSelectExtended T="string"
                                Label="Шаблон"
                                Variant="Variant.Filled"
@@ -36,7 +36,7 @@
                                Clearable="true"
                                AnchorOrigin="Origin.BottomCenter" />
         </MudItem>
-        <MudItem xs="1">
+        <MudItem xs="3" sm="2">
             <MudSelect T="int?"
                        Value="Grade"
                        ValueChanged="@(v => Grade = v)"
@@ -49,7 +49,7 @@
             </MudSelect>
         </MudItem>
 
-        <MudItem xs="1">
+        <MudItem xs="3" sm="2">
             <MudSelect T="Thread.ThreadPosition?"
                        Value="ThreadPosition"
                        ValueChanged="@(v => ThreadPosition = v)"
@@ -190,45 +190,21 @@
                         </tr>
                         <tr>
                             <td class="tl"><MudText Typo="Typo.caption" Color="Color.Primary">Поле допуска:</MudText></td>
-                            <td><MudText Typo="Typo.caption" Color="Color.Primary">@GostFieldLabel</MudText></td>
+                            <td><MudText Typo="Typo.caption">@GostFieldLabel</MudText></td>
                         </tr>
 
                         @if (ThreadType == CuttingType.Internal && GostResult is Thread.Gost19257Result hole)
                         {
                             <tr>
-                                <td class="tl"><MudText Typo="Typo.caption">D1 min / max:</MudText></td>
-                                <td><MudText Typo="Typo.caption" Class="monofield">@hole.D1min.ToPrettyString(3) / @(double.IsNaN(hole.D1max) ? "—" : hole.D1max.ToPrettyString(3)) мм</MudText></td>
-                            </tr>
-                            <tr>
-                                <td class="tl"><MudText Typo="Typo.caption">EI (осн. откл.):</MudText></td>
-                                <td><MudText Typo="Typo.caption" Class="monofield">@(hole.EI >= 0 ? "+" : "")@hole.EI.ToPrettyString(3) мм</MudText></td>
-                            </tr>
-                            <tr>
-                                <td class="tl"><MudText Typo="Typo.caption">TD1:</MudText></td>
-                                <td><MudText Typo="Typo.caption" Class="monofield">@(hole.TD1.HasValue? hole.TD1.Value.ToPrettyString(3) + " мм" : "—")</MudText></td>
-                            </tr>
-                            <tr>
-                                <td class="tl"><MudText Typo="Typo.caption">TD2:</MudText></td>
-                                <td><MudText Typo="Typo.caption" Class="monofield">@(hole.TD2.HasValue? hole.TD2.Value.ToPrettyString(3) + " мм" : "—")</MudText></td>
+                                <td class="tl"><MudText Typo="Typo.caption">Диаметр отверстия</MudText></td>
+                                <td><MudText Typo="Typo.caption">@hole.D1min.ToPrettyString(3) (@(hole.D1max - hole.D1min > 0 ? "+" : "") @((hole.D1max - hole.D1min).ToPrettyString(3)))</MudText></td>
                             </tr>
                         }
                         else if (ThreadType == CuttingType.External && GostResult is Thread.Gost19258Result rod)
                         {
                             <tr>
-                                <td class="tl"><MudText Typo="Typo.caption">d max / min:</MudText></td>
-                                <td><MudText Typo="Typo.caption" Class="monofield">@rod.dmax.ToPrettyString(3) / @(double.IsNaN(rod.dmin) ? "—" : rod.dmin.ToPrettyString(3)) мм</MudText></td>
-                            </tr>
-                            <tr>
-                                <td class="tl"><MudText Typo="Typo.caption">es (осн. откл.):</MudText></td>
-                                <td><MudText Typo="Typo.caption" Class="monofield">@(rod.es >= 0 ? "+" : "")@rod.es.ToPrettyString(3) мм</MudText></td>
-                            </tr>
-                            <tr>
-                                <td class="tl"><MudText Typo="Typo.caption">Td:</MudText></td>
-                                <td><MudText Typo="Typo.caption" Class="monofield">@(rod.Td.HasValue? rod.Td.Value.ToPrettyString(3) + " мм" : "—")</MudText></td>
-                            </tr>
-                            <tr>
-                                <td class="tl"><MudText Typo="Typo.caption">Td2:</MudText></td>
-                                <td><MudText Typo="Typo.caption" Class="monofield">@(rod.Td2.HasValue? rod.Td2.Value.ToPrettyString(3) + " мм" : "—")</MudText></td>
+                                <td class="tl"><MudText Typo="Typo.caption">Диаметр стержня</MudText></td>
+                                <td><MudText Typo="Typo.caption">@rod.dmax.ToPrettyString(3) (@(rod.dmin - rod.dmax > 0 ? "+" : "") @((rod.dmin - rod.dmax).ToPrettyString(3)))</MudText></td>
                             </tr>
                         }
                     }
@@ -367,11 +343,9 @@
     public bool Blunted { get; set; } = false;
     public double BluntSize { get; set; } = 0.3;
 
-    // ── nullable, чтобы MudSelect мог иметь «не выбрано» ─────────────────
     public Thread.ThreadPosition? ThreadPosition { get; set; }
     public int? Grade { get; set; }
 
-    // ── Расчёт допусков ГОСТ ──────────────────────────────────────────────
     /// <summary>
     /// Возвращает результат расчёта (Gost19257Result | Gost19258Result) или null,
     /// если поле/степень не выбраны либо стандарт не метрический.
@@ -402,8 +376,6 @@
         Grade.HasValue && ThreadPosition.HasValue
             ? $"{Grade}{ThreadPosition}"
             : string.Empty;
-
-    // ─────────────────────────────────────────────────────────────────────
 
     public double PlaneLength { get; set; } = 0;
 
