@@ -10,7 +10,7 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
-        <MudItem xs="12" sm="4">
+        <MudItem xs="6" sm="4">
             <MudSelect Label="Стандарт" T="ThreadStandard" Value="ThreadStandard" Variant="Variant.Filled" ValueChanged="OnStandardChanged">
                 <MudSelectItem Value="@(ThreadStandard.Metric)">@(ThreadStandard.Metric.Description())</MudSelectItem>
                 <MudSelectItem Value="@(ThreadStandard.BSPP)">@(ThreadStandard.BSPP.Description())</MudSelectItem>
@@ -36,43 +36,47 @@
                                Clearable="true"
                                AnchorOrigin="Origin.BottomCenter" />
         </MudItem>
-        <MudItem xs="3" sm="2">
-            <MudSelect T="int?"
-                       Value="Grade"
-                       ValueChanged="@(v => Grade = v)"
-                       Variant="Variant.Filled"
-                       Clearable="true">
-                @foreach (var val in Enumerable.Range(3, 8))
-                {
-                    <MudSelectItem T="int?" Value="@((int?)val)">@val</MudSelectItem>
-                }
-            </MudSelect>
-        </MudItem>
+        @if (ThreadStandard == ThreadStandard.Metric)
+        {
+            <MudItem xs="6" sm="2">
+                <MudSelect T="int?"
+                           Value="Grade"
+                           Label="Допуск"
+                           ValueChanged="@(v => Grade = v)"
+                           Variant="Variant.Filled"
+                           Clearable="true">
+                    @foreach (var val in Enumerable.Range(3, 8))
+                    {
+                        <MudSelectItem T="int?" Value="@((int?)val)">@val</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
 
-        <MudItem xs="3" sm="2">
-            <MudSelect T="Thread.ThreadPosition?"
-                       Value="ThreadPosition"
-                       ValueChanged="@(v => ThreadPosition = v)"
-                       Label="Поле"
-                       Variant="Variant.Filled"
-                       Clearable="true">
-                @if (ThreadType == CuttingType.External)
-                {
-                    <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.d)">d</MudSelectItem>
-                    <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.e)">e</MudSelectItem>
-                    <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.f)">f</MudSelectItem>
-                    <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.g)">g</MudSelectItem>
-                    <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.h)">h</MudSelectItem>
-                }
-                else
-                {
-                    <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.E)">E</MudSelectItem>
-                    <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.F)">F</MudSelectItem>
-                    <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.G)">G</MudSelectItem>
-                    <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.H)">H</MudSelectItem>
-                }
-            </MudSelect>
-        </MudItem>
+            <MudItem xs="6" sm="2">
+                <MudSelect T="Thread.ThreadPosition?"
+                           Value="ThreadPosition"
+                           ValueChanged="@(v => ThreadPosition = v)"
+                           Label="Поле"
+                           Variant="Variant.Filled"
+                           Clearable="true">
+                    @if (ThreadType == CuttingType.External)
+                    {
+                        <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.d)">d</MudSelectItem>
+                        <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.e)">e</MudSelectItem>
+                        <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.f)">f</MudSelectItem>
+                        <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.g)">g</MudSelectItem>
+                        <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.h)">h</MudSelectItem>
+                    }
+                    else
+                    {
+                        <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.E)">E</MudSelectItem>
+                        <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.F)">F</MudSelectItem>
+                        <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.G)">G</MudSelectItem>
+                        <MudSelectItem T="Thread.ThreadPosition?" Value="@((Thread.ThreadPosition?)Thread.ThreadPosition.H)">H</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+        }
 
         <MudItem xs="12">
             <MudField Label="Параметры резьбы" Variant="Variant.Filled" Underline="false">
