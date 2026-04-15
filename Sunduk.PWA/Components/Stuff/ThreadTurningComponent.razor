@@ -22,7 +22,7 @@
                 <MudSelectItem Value="@(ThreadStandard.UNEF)">@(ThreadStandard.UNEF.Description())</MudSelectItem>
             </MudSelect>
         </MudItem>
-        <MudItem xs="10" sm="4">
+        <MudItem xs="8" sm="4">
             <MudSelectExtended T="string"
                                Label="Шаблон"
                                Variant="Variant.Filled"
@@ -197,14 +197,14 @@
                         {
                             <tr>
                                 <td class="tl"><MudText Typo="Typo.caption">Диаметр отверстия</MudText></td>
-                                <td><MudText Typo="Typo.caption">@hole.D1min.ToPrettyString(3) (@(hole.D1max - hole.D1min > 0 ? "+" : "") @((hole.D1max - hole.D1min).ToPrettyString(3)))</MudText></td>
+                                <td><MudText Typo="Typo.caption">@hole.D1min.ToPrettyString(3) (@(hole.D1max - hole.D1min > 0 ? "+" : "")@((hole.D1max - hole.D1min).ToPrettyString(3)))</MudText></td>
                             </tr>
                         }
                         else if (ThreadType == CuttingType.External && GostResult is Thread.Gost19258Result rod)
                         {
                             <tr>
                                 <td class="tl"><MudText Typo="Typo.caption">Диаметр стержня</MudText></td>
-                                <td><MudText Typo="Typo.caption">@rod.dmax.ToPrettyString(3) (@(rod.dmin - rod.dmax > 0 ? "+" : "") @((rod.dmin - rod.dmax).ToPrettyString(3)))</MudText></td>
+                                <td><MudText Typo="Typo.caption">@rod.dmax.ToPrettyString(3) (@(rod.dmin - rod.dmax > 0 ? "+" : "")@((rod.dmin - rod.dmax).ToPrettyString(3)))</MudText></td>
                             </tr>
                         }
                     }
