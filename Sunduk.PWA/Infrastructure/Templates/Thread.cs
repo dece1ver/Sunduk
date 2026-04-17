@@ -3425,5 +3425,132 @@ namespace Sunduk.PWA.Infrastructure.Templates
         };
 
         #endregion
+
+        // ─────────────────────────────────────────────────────────────────────
+        //  ГОСТ 19257 / 19258 — номинальные диаметры из табличных данных.
+        //  Поправки зависят только от шага P, не от d → достаточно двух словарей.
+        //  Ключ: (int)(P × 100), чтобы избежать сравнения double.
+        // ─────────────────────────────────────────────────────────────────────
+
+        public readonly record struct HoleNominal(
+            double H,           // 4H5H; 5H; 5H6H; 6H; 7H — номинал
+            double G,           // 6G; 7G                   — номинал
+            double Dev4H5H,     // пред. откл. 4H5H; 5H      (+)
+            double Dev5H6H6G,   // пред. откл. 5H6H; 6H; 6G (+)
+            double? Dev7H7G     // пред. откл. 7H; 7G        (+), null = н/а
+        );
+
+        public readonly record struct RodNominal(
+            double Nom,         // 4h и 6h — общий номинал
+            double Dev4h,       // откл. 4h  (−)
+            double Nom6g,       // 6g номинал
+            double? Nom6e,      // 6e номинал, null = н/а
+            double? Nom6d,      // 6d номинал, null = н/а
+            double Dev6hGroup,  // откл. 6h; 6g; 6e; 6d  (−)
+            double? Nom8h,      // = Nom, null если поля нет
+            double? Nom8g,      // = Nom6g, null если поля нет
+            double? Dev8hGroup  // откл. 8h; 8g  (−), null = н/а
+        );
+
+        private readonly record struct HoleEntry(
+            double HCorr, double HGOff,
+            double Dev4H5H, double Dev5H6H6G, double? Dev7H7G);
+
+        private readonly record struct RodEntry(
+            double RCorr, double Dev4h, double RGOff,
+            double? REOff, double? RDOff,
+            double Dev6hGroup, double? Dev8hGroup);
+
+        private static readonly Dictionary<int, HoleEntry> _holeTable = new()
+{
+    //  P×100  HCorr  hG+   4H5H  5H6H   7H
+    {  20, new(0.20, 0.02, 0.04, 0.05,  null) },
+    {  25, new(0.25, 0.02, 0.04, 0.06,  null) },
+    {  30, new(0.30, 0.02, 0.04, 0.06,  null) },
+    {  35, new(0.35, 0.02, 0.05, 0.07,  null) },
+    {  40, new(0.40, 0.02, 0.06, 0.08,  null) },
+    {  45, new(0.45, 0.02, 0.07, 0.09,  null) },
+    {  50, new(0.50, 0.02, 0.08, 0.10, 0.14)  },
+    {  60, new(0.60, 0.03, 0.08, 0.11, 0.15)  },
+    {  70, new(0.70, 0.03, 0.08, 0.12, 0.16)  },
+    {  75, new(0.80, 0.03, 0.09, 0.13, 0.18)  }, // HCorr ≠ P — округление ГОСТ
+    {  80, new(0.80, 0.03, 0.11, 0.17, 0.22)  },
+    { 100, new(1.05, 0.05, 0.17, 0.20, 0.26)  },
+    { 125, new(1.30, 0.05, 0.19, 0.22, 0.30)  },
+    { 150, new(1.57, 0.07, 0.19, 0.22, 0.30)  }, // HGOff=0.07 — уникально
+    { 175, new(1.80, 0.05, 0.21, 0.27, 0.36)  },
+    { 200, new(2.10, 0.05, 0.24, 0.30, 0.40)  },
+    { 250, new(2.65, 0.05, 0.30, 0.40, 0.53)  },
+    { 300, new(3.15, 0.05, 0.30, 0.40, 0.53)  },
+    { 350, new(3.70, 0.05, 0.36, 0.48, 0.62)  },
+    { 400, new(4.20, 0.05, 0.36, 0.48, 0.62)  },
+    { 450, new(4.75, 0.05, 0.41, 0.55, 0.73)  },
+    { 500, new(5.30, 0.10, 0.45, 0.60, 0.80)  },
+    { 550, new(5.80, 0.10, 0.45, 0.60, 0.80)  },
+    { 600, new(6.30, 0.10, 0.45, 0.60, 0.80)  },
+};
+
+        private static readonly Dictionary<int, RodEntry> _rodTable = new()
+{
+    //  P×100  RCorr  4h-dev  g     e       d       6h-группа  8h-группа
+    {  20, new(0.02, -0.03, 0.02,  null,   null,  -0.04,  null)  },
+    {  25, new(0.03, -0.03, 0.02,  null,   null,  -0.04,  null)  },
+    {  30, new(0.04, -0.03, 0.02,  null,   null,  -0.04,  null)  },
+    {  35, new(0.05, -0.03, 0.02,  null,   null,  -0.04,  null)  },
+    {  40, new(0.05, -0.04, 0.02,  null,   null,  -0.05,  null)  },
+    {  45, new(0.05, -0.04, 0.02,  null,   null,  -0.06,  null)  },
+    {  50, new(0.06, -0.04, 0.02,  0.05,   null,  -0.06,  null)  },
+    {  60, new(0.06, -0.05, 0.02,  0.05,   null,  -0.07,  null)  },
+    {  70, new(0.06, -0.06, 0.02,  0.05,   null,  -0.08,  null)  },
+    {  75, new(0.06, -0.06, 0.06,  0.06,   null,  -0.09,  null)  },
+    {  80, new(0.06, -0.07, 0.02,  0.06,   null,  -0.10, -0.18)  },
+    { 100, new(0.08, -0.07, 0.03,  0.06,   0.09,  -0.10, -0.20)  },
+    { 125, new(0.10, -0.08, 0.03,  0.06,   0.10,  -0.11, -0.24)  },
+    { 150, new(0.12, -0.09, 0.03,  0.07,   0.10,  -0.12, -0.26)  },
+    { 175, new(0.14, -0.10, 0.03,  0.06,   0.10,  -0.13, -0.29)  },
+    { 200, new(0.16, -0.10, 0.04,  0.07,   0.10,  -0.13, -0.29)  },
+    { 250, new(0.16, -0.13, 0.04,  0.08,   0.11,  -0.18, -0.37)  },
+    { 300, new(0.16, -0.16, 0.05,  0.09,   0.11,  -0.22, -0.44)  },
+    { 350, new(0.16, -0.18, 0.05,  0.09,   0.12,  -0.27, -0.51)  },
+    { 400, new(0.16, -0.22, 0.06,  0.10,   0.13,  -0.32, -0.59)  },
+    { 450, new(0.16, -0.24, 0.06,  0.10,   0.13,  -0.34, -0.64)  },
+    { 500, new(0.16, -0.26, 0.07,  0.11,   0.13,  -0.37, -0.69)  },
+    { 550, new(0.16, -0.28, 0.08,  0.11,   0.14,  -0.40, -0.74)  },
+    { 600, new(0.16, -0.30, 0.08,  0.12,   0.15,  -0.44, -0.79)  },
+};
+
+        /// <summary>
+        /// ГОСТ 19257 — номинальные диаметры отверстия под резьбу.
+        /// </summary>
+        public static HoleNominal? GetHoleNominal(double d, double pitch)
+        {
+            if (!_holeTable.TryGetValue((int)Math.Round(pitch * 100), out var e))
+                return null;
+            double h = Math.Round(d - e.HCorr, 2, MidpointRounding.AwayFromZero);
+            double g = Math.Round(h + e.HGOff, 2, MidpointRounding.AwayFromZero);
+            return new(h, g, e.Dev4H5H, e.Dev5H6H6G, e.Dev7H7G);
+        }
+
+        /// <summary>
+        /// ГОСТ 19258 — номинальные диаметры стержня под резьбу.
+        /// </summary>
+        public static RodNominal? GetRodNominal(double d, double pitch)
+        {
+            if (!_rodTable.TryGetValue((int)Math.Round(pitch * 100), out var e))
+                return null;
+            double nom = Math.Round(d - e.RCorr, 2, MidpointRounding.AwayFromZero);
+            double nom6g = Math.Round(nom - e.RGOff, 2, MidpointRounding.AwayFromZero);
+            return new(
+                Nom: nom,
+                Dev4h: e.Dev4h,
+                Nom6g: nom6g,
+                Nom6e: e.REOff.HasValue ? Math.Round(nom - e.REOff!.Value, 2, MidpointRounding.AwayFromZero) : null,
+                Nom6d: e.RDOff.HasValue ? Math.Round(nom - e.RDOff!.Value, 2, MidpointRounding.AwayFromZero) : null,
+                Dev6hGroup: e.Dev6hGroup,
+                Nom8h: e.Dev8hGroup.HasValue ? nom : null,
+                Nom8g: e.Dev8hGroup.HasValue ? nom6g : null,
+                Dev8hGroup: e.Dev8hGroup
+            );
+        }
     }
 }

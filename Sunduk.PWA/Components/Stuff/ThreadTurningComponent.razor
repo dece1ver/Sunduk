@@ -196,18 +196,52 @@
                             <td class="tl"><MudText Typo="Typo.caption" Color="Color.Primary">Поле допуска:</MudText></td>
                             <td><MudText Typo="Typo.caption">@GostFieldLabel</MudText></td>
                         </tr>
+                        @if (ThreadType == CuttingType.Internal)
+                        {
+                            var hn = Thread.GetHoleNominal(ThreadDiameter, ThreadPitch);
+                            if (hn is { } hole19257)
+                            {
+                                <tr>
+                                    <td class="tl"><MudText Typo="Typo.caption">Отверстие под резьбу (ГОСТ 19257):</MudText></td>
+                                    <td>
+                                        <MudText Typo="Typo.caption">
+                                            6H: @hole19257.H.ToPrettyString(2) (+@hole19257.Dev5H6H6G.ToPrettyString(2))
+                                            &nbsp;&nbsp;
+                                            6G: @hole19257.G.ToPrettyString(2) (+@hole19257.Dev5H6H6G.ToPrettyString(2))
+                                        </MudText>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            var rn = Thread.GetRodNominal(ThreadDiameter, ThreadPitch);
+                            if (rn is { } rod19258)
+                            {
+                                <tr>
+                                    <td class="tl"><MudText Typo="Typo.caption">Стержень под резьбу (ГОСТ 19258):</MudText></td>
+                                    <td>
+                                        <MudText Typo="Typo.caption">
+                                            6h: @rod19258.Nom.ToPrettyString(2) (@rod19258.Dev6hGroup.ToPrettyString(2))
+                                            &nbsp;&nbsp;
+                                            6g: @rod19258.Nom6g.ToPrettyString(2) (@rod19258.Dev6hGroup.ToPrettyString(2))
+                                        </MudText>
+                                    </td>
+                                </tr>
+                            }
+                        }
 
                         @if (ThreadType == CuttingType.Internal && GostResult is Thread.Gost19257Result hole)
                         {
                             <tr>
-                                <td class="tl"><MudText Typo="Typo.caption">Диаметр отверстия</MudText></td>
+                                <td class="tl"><MudText Typo="Typo.caption">Диаметр отверстия (вязкие материалы)</MudText></td>
                                 <td><MudText Typo="Typo.caption">@hole.D1min.ToPrettyString(3) (@(hole.D1max - hole.D1min > 0 ? "+" : "")@((hole.D1max - hole.D1min).ToPrettyString(3)))</MudText></td>
                             </tr>
                         }
                         else if (ThreadType == CuttingType.External && GostResult is Thread.Gost19258Result rod)
                         {
                             <tr>
-                                <td class="tl"><MudText Typo="Typo.caption">Диаметр стержня</MudText></td>
+                                <td class="tl"><MudText Typo="Typo.caption">Диаметр стержня (вязкие материалы)</MudText></td>
                                 <td><MudText Typo="Typo.caption">@rod.dmax.ToPrettyString(3) (@(rod.dmin - rod.dmax > 0 ? "+" : "")@((rod.dmin - rod.dmax).ToPrettyString(3)))</MudText></td>
                             </tr>
                         }
