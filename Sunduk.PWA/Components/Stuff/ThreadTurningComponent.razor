@@ -1,4 +1,5 @@
-﻿<style>
+﻿@inject IDialogService DialogService
+<style>
     .tl {
         padding: 0px 15px 0px 0px;
     }
@@ -10,7 +11,7 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
-        <MudItem xs="6" sm="4">
+        <MudItem xs="12" sm="4">
             <MudSelect Label="Стандарт" T="ThreadStandard" Value="ThreadStandard" Variant="Variant.Filled" ValueChanged="OnStandardChanged">
                 <MudSelectItem Value="@(ThreadStandard.Metric)">@(ThreadStandard.Metric.Description())</MudSelectItem>
                 <MudSelectItem Value="@(ThreadStandard.BSPP)">@(ThreadStandard.BSPP.Description())</MudSelectItem>
@@ -38,7 +39,7 @@
         </MudItem>
         @if (ThreadStandard == ThreadStandard.Metric)
         {
-            <MudItem xs="6" sm="2">
+            <MudItem xs="12" sm="2">
                 <MudSelect T="int?"
                            Value="Grade"
                            Label="Допуск"
@@ -189,6 +190,52 @@
 
                     @if (ThreadStandard == ThreadStandard.Metric && GostResult is not null)
                     {
+                        bool _isInternal = ThreadType == CuttingType.Internal;
+                        string _gostLabel = _isInternal ? "Диаметр отверстия (ГОСТ 19257)" : "Диаметр стержня (ГОСТ 19258)";
+                        string _viscousLabel = _isInternal ? "Диаметр отверстия (вязкие)" : "Диаметр стержня (вязкие)";
+
+                        string _gostTooltip = _isInternal
+                            ? "Серый чугун ГОСТ 1412-85; стали ГОСТ 380-94, ГОСТ 1050-88, ГОСТ 4543-71, " +
+                              "ГОСТ 5632-72 (кроме сплавов на никелевой основе), ГОСТ 20072-74; " +
+                              "алюминиевые литейные сплавы ГОСТ 1583-93; медь ГОСТ 859-78"
+                            : "Стали ГОСТ 380-71, ГОСТ 4543-71, ГОСТ 1050-88, ГОСТ 10702-78, " +
+                              "ГОСТ 5632-72 и ГОСТ 20072-74 (кроме сплавов на никелевой основе); медь ГОСТ 859-78";
+
+                        string _viscousTooltip = _isInternal
+                            ? "Сплавы магния ГОСТ 804-93; сплавы алюминиевые ГОСТ 4784-97; " +
+                              "латуни ГОСТ 15527-70; титановые сплавы; стали и сплавы высоколегированные, " +
+                              "коррозионностойкие, жаростойкие, жаропрочные (на никелевой основе) " +
+                              "ГОСТ 5632-72, ГОСТ 20072-74"
+                            : "Латуни ГОСТ 15527-70; титановые сплавы; стали и сплавы высоколегированные, " +
+                              "коррозионностойкие, жаростойкие, жаропрочные (на никелевой основе) " +
+                              "ГОСТ 5632-72, ГОСТ 20072-74";
+
+                        string? _gostValue = null;
+                        if (_isInternal)
+                        {
+                            var _n = Thread.GetHoleNominalForField(ThreadDiameter, ThreadPitch, ThreadPosition!.Value, Grade!.Value);
+                            if (_n is { } _hn)
+                                _gostValue = $"{_hn.Nominal.ToPrettyString(2)}  (+{_hn.Dev.ToPrettyString(2)})";
+                        }
+                        else
+                        {
+                            var _n = Thread.GetRodNominalForField(ThreadDiameter, ThreadPitch, ThreadPosition!.Value, Grade!.Value);
+                            if (_n is { } _rn)
+                                _gostValue = $"{_rn.Nominal.ToPrettyString(2)}  ({_rn.Dev.ToPrettyString(2)})";
+                        }
+
+                        string? _viscousValue = null;
+                        if (_isInternal && GostResult is Thread.Gost19257Result _hole)
+                        {
+                            double _tol = _hole.D1max - _hole.D1min;
+                            _viscousValue = $"{_hole.D1min.ToPrettyString(3)}  ({(_tol >= 0 ? "+" : "")}{_tol.ToPrettyString(3)})";
+                        }
+                        else if (!_isInternal && GostResult is Thread.Gost19258Result _rod)
+                        {
+                            double _tol = _rod.dmin - _rod.dmax;
+                            _viscousValue = $"{_rod.dmax.ToPrettyString(3)}  ({(_tol >= 0 ? "+" : "")}{_tol.ToPrettyString(3)})";
+                        }
+
                         <tr>
                             <td colspan="2"><MudDivider Class="my-1" /></td>
                         </tr>
@@ -196,53 +243,32 @@
                             <td class="tl"><MudText Typo="Typo.caption" Color="Color.Primary">Поле допуска:</MudText></td>
                             <td><MudText Typo="Typo.caption">@GostFieldLabel</MudText></td>
                         </tr>
-                        @if (ThreadType == CuttingType.Internal)
-                        {
-                            var hn = Thread.GetHoleNominal(ThreadDiameter, ThreadPitch);
-                            if (hn is { } hole19257)
-                            {
-                                <tr>
-                                    <td class="tl"><MudText Typo="Typo.caption">Отверстие под резьбу (ГОСТ 19257):</MudText></td>
-                                    <td>
-                                        <MudText Typo="Typo.caption">
-                                            6H: @hole19257.H.ToPrettyString(2) (+@hole19257.Dev5H6H6G.ToPrettyString(2))
-                                            &nbsp;&nbsp;
-                                            6G: @hole19257.G.ToPrettyString(2) (+@hole19257.Dev5H6H6G.ToPrettyString(2))
-                                        </MudText>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            var rn = Thread.GetRodNominal(ThreadDiameter, ThreadPitch);
-                            if (rn is { } rod19258)
-                            {
-                                <tr>
-                                    <td class="tl"><MudText Typo="Typo.caption">Стержень под резьбу (ГОСТ 19258):</MudText></td>
-                                    <td>
-                                        <MudText Typo="Typo.caption">
-                                            6h: @rod19258.Nom.ToPrettyString(2) (@rod19258.Dev6hGroup.ToPrettyString(2))
-                                            &nbsp;&nbsp;
-                                            6g: @rod19258.Nom6g.ToPrettyString(2) (@rod19258.Dev6hGroup.ToPrettyString(2))
-                                        </MudText>
-                                    </td>
-                                </tr>
-                            }
-                        }
 
-                        @if (ThreadType == CuttingType.Internal && GostResult is Thread.Gost19257Result hole)
+                        if (_gostValue is not null)
                         {
                             <tr>
-                                <td class="tl"><MudText Typo="Typo.caption">Диаметр отверстия (вязкие материалы)</MudText></td>
-                                <td><MudText Typo="Typo.caption">@hole.D1min.ToPrettyString(3) (@(hole.D1max - hole.D1min > 0 ? "+" : "")@((hole.D1max - hole.D1min).ToPrettyString(3)))</MudText></td>
+                                <td class="tl">
+                                    <MudText Typo="Typo.caption"
+                                             Style="cursor: pointer; text-decoration: underline dotted;"
+                                             @onclick="@(async () => await OpenMaterialsDialog(_gostLabel, GostMaterials(_isInternal)))">
+                                        @_gostLabel:
+                                    </MudText>
+                                </td>
+                                <td><MudText Typo="Typo.caption">@_gostValue</MudText></td>
                             </tr>
                         }
-                        else if (ThreadType == CuttingType.External && GostResult is Thread.Gost19258Result rod)
+
+                        if (_viscousValue is not null)
                         {
                             <tr>
-                                <td class="tl"><MudText Typo="Typo.caption">Диаметр стержня (вязкие материалы)</MudText></td>
-                                <td><MudText Typo="Typo.caption">@rod.dmax.ToPrettyString(3) (@(rod.dmin - rod.dmax > 0 ? "+" : "")@((rod.dmin - rod.dmax).ToPrettyString(3)))</MudText></td>
+                                <td class="tl">
+                                    <MudText Typo="Typo.caption"
+                                             Style="cursor: pointer; text-decoration: underline dotted;"
+                                             @onclick="@(async () => await OpenMaterialsDialog(_viscousLabel, ViscousMaterials(_isInternal)))">
+                                        @_viscousLabel:
+                                    </MudText>
+                                </td>
+                                <td><MudText Typo="Typo.caption">@_viscousValue</MudText></td>
                             </tr>
                         }
                     }
@@ -324,12 +350,77 @@
             </MudGrid>
         </MudExpansionPanel>
     }
+    <MudDialog @bind-IsVisible="_materialsDialogOpen">
+        <TitleContent>
+            <MudText Typo="Typo.h6">@_materialsDialogTitle</MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudList T="string" Dense="true">
+                @foreach (var item in _materialsDialogItems)
+                {
+                    <MudListItem T="string" Icon="@Icons.Material.Filled.Circle" IconSize="Size.Small">
+                        @item
+                    </MudListItem>
+                }
+            </MudList>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="@(() => _materialsDialogOpen = false)" Color="Color.Primary">Закрыть</MudButton>
+        </DialogActions>
+    </MudDialog>
 </MudContainer>
 
 
 @code
 {
     System.Threading.CancellationTokenSource _cts = new();
+    private bool _materialsDialogOpen = false;
+    private string _materialsDialogTitle = "";
+    private List<string> _materialsDialogItems = new();
+
+    private async Task OpenMaterialsDialog(string title, IEnumerable<string> items)
+    {
+        var parameters = new DialogParameters<MaterialsDialog>
+        {
+            { x => x.Items, items.ToList() }
+        };
+        var options = new DialogOptions { CloseButton = true, CloseOnEscapeKey = true };
+        await DialogService.ShowAsync<MaterialsDialog>(title, parameters, options);
+    }
+
+    private IEnumerable<string> GostMaterials(bool isInternal) => isInternal
+        ? new[]
+        {
+        "Серый чугун — ГОСТ 1412-85",
+        "Стали — ГОСТ 380-94, ГОСТ 1050-88, ГОСТ 4543-71",
+        "Стали — ГОСТ 5632-72 (кроме сплавов на никелевой основе)",
+        "Стали — ГОСТ 20072-74",
+        "Алюминиевые литейные сплавы — ГОСТ 1583-93",
+        "Медь — ГОСТ 859-78",
+        }
+        : new[]
+        {
+        "Стали — ГОСТ 380-71, ГОСТ 4543-71, ГОСТ 1050-88, ГОСТ 10702-78",
+        "Стали — ГОСТ 5632-72 (кроме сплавов на никелевой основе)",
+        "Стали — ГОСТ 20072-74",
+        "Медь — ГОСТ 859-78",
+        };
+
+    private IEnumerable<string> ViscousMaterials(bool isInternal) => isInternal
+        ? new[]
+        {
+        "Сплавы магния — ГОСТ 804-93",
+        "Сплавы алюминиевые — ГОСТ 4784-97",
+        "Латуни — ГОСТ 15527-70",
+        "Титановые сплавы",
+        "Стали и сплавы высоколегированные, коррозионностойкие, жаростойкие, жаропрочные (на никелевой основе) — ГОСТ 5632-72, ГОСТ 20072-74",
+        }
+        : new[]
+        {
+        "Латуни — ГОСТ 15527-70",
+        "Титановые сплавы",
+        "Стали и сплавы высоколегированные, коррозионностойкие, жаростойкие, жаропрочные (на никелевой основе) — ГОСТ 5632-72, ГОСТ 20072-74",
+        };
 
     private async Task<IEnumerable<string>> Search(string value, System.Threading.CancellationToken token)
     {

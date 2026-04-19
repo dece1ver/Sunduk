@@ -1,0 +1,20 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudList T="string" Dense="true">
+            @foreach (var item in Items)
+            {
+                <MudListItem T="string">
+                    <MudText Typo="Typo.body2">@item</MudText>
+                </MudListItem>
+            }
+        </MudList>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="@(() => Dialog.Close())">Закрыть</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] IMudDialogInstance Dialog { get; set; } = null!;
+    [Parameter] public List<string> Items { get; set; } = new();
+}
