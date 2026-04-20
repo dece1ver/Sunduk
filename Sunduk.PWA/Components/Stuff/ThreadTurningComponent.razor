@@ -23,7 +23,7 @@
                 <MudSelectItem Value="@(ThreadStandard.UNEF)">@(ThreadStandard.UNEF.Description())</MudSelectItem>
             </MudSelect>
         </MudItem>
-        <MudItem xs="6" sm="4">
+        <MudItem xs="12" sm="4">
             <MudSelectExtended T="string"
                                Label="Шаблон"
                                Variant="Variant.Filled"
@@ -39,7 +39,7 @@
         </MudItem>
         @if (ThreadStandard == ThreadStandard.Metric)
         {
-            <MudItem xs="12" sm="2">
+            <MudItem xs="6" sm="2">
                 <MudSelect T="int?"
                            Value="Grade"
                            Label="Допуск"
