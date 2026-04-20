@@ -1,6 +1,7 @@
 ﻿@page "/stuff"
+@using MudBlazor.Extensions
 
-<MudSwipeArea OnSwipe="@OnSwipe">
+<MudSwipeArea OnSwipeEnd="OnSwipe" Style="touch-action: pan-y;">
     <MudTabs Elevation="2" @ref="tabs" Style="font-size: small">
         <MudTabPanel Text="Резьба">
             <ThreadTurningComponent />
@@ -23,22 +24,22 @@
 
 @code 
 {
-    MudTabs tabs;
+    MudTabs tabs = default!;
 
-    public void OnSwipe(SwipeDirection direction)
+    public void OnSwipe(SwipeEventArgs args)
     {
-        if (direction == SwipeDirection.LeftToRight)
+        if (args.SwipeDirection == SwipeDirection.LeftToRight)
         {
-            if (tabs.ActivePanelIndex > 0)
+            if (tabs.GetState(x => x.ActivePanelIndex) > 0)
             {
-                tabs.ActivatePanel(tabs.ActivePanelIndex - 1);
+                tabs.ActivatePanelAsync(tabs.GetState(x => x.ActivePanelIndex) - 1);
             }
         }
-        else if (direction == SwipeDirection.RightToLeft)
+        else if (args.SwipeDirection == SwipeDirection.RightToLeft)
         {
-            if(tabs.ActivePanelIndex < 4)
+            if (tabs.GetState(x => x.ActivePanelIndex) < 4)
             {
-                tabs.ActivatePanel(tabs.ActivePanelIndex + 1);
+                tabs.ActivatePanelAsync(tabs.GetState(x => x.ActivePanelIndex) + 1);
             }
         }
     }

@@ -91,11 +91,12 @@
                            Accept=".json"
                            FilesChanged="UploadTemplates"
                            Class="flex-shrink-0">
-                <ActivatorContent>
+                <CustomContent Context="fileUpload">
                     <MudIconButton Variant="Variant.Text"
                                    Icon="@Icons.Material.Outlined.FileUpload"
-                                   Size="Size.Small" />
-                </ActivatorContent>
+                                   Size="Size.Small"
+                                   OnClick="@fileUpload.OpenFilePickerAsync" />
+                </CustomContent>
             </MudFileUpload>
             <MudIconButton Variant="Variant.Text"
                        OnClick="DownloadTemplatesAsync"
@@ -119,14 +120,16 @@
                            Accept=".json"
                            FilesChanged="UploadTemplates"
                            Class="flex-shrink-0">
-                <ActivatorContent>
+                <CustomContent Context="fileUpload">
                     <MudButton Variant="Variant.Text"
                                StartIcon="@Icons.Material.Outlined.FileUpload"
-                               Size="Size.Medium">
+                               Size="Size.Medium"
+                               OnClick="@fileUpload.OpenFilePickerAsync">
                         Импорт
                     </MudButton>
-                </ActivatorContent>
+                </CustomContent>
             </MudFileUpload>
+
             <MudButton Variant="Variant.Text"
                        OnClick="DownloadTemplatesAsync"
                        StartIcon="@Icons.Material.Outlined.FileDownload"
@@ -540,7 +543,7 @@
             {
                 if (Templates.Any())
                 {
-                    var addOrReplace = await DialogService.ShowMessageBox(
+                    var addOrReplace = await DialogService.ShowMessageBoxAsync(
                         "Импорт шаблонов",
                         $"Добавить {importedTemplates.Count} шаблон(ов) к существующим или заменить всё?",
                         yesText: "Добавить", noText: "Заменить", cancelText: "Отмена");
@@ -663,7 +666,7 @@
 
         if (Templates.Any())
         {
-            var result = await DialogService.ShowMessageBox(
+            var result = await DialogService.ShowMessageBoxAsync(
                 "Импорт шаблонов",
                 $"Добавить {loaded.Count} шаблон(ов) к существующим или заменить всё?",
                 yesText: "Добавить", noText: "Заменить", cancelText: "Отмена");
@@ -969,7 +972,7 @@
         var namePart = !string.IsNullOrWhiteSpace(template.Name) ? $" \"{template.Name}\"" : "";
         var message = $"Вы точно хотите удалить шаблон{namePart}?";
 
-        var result = await DialogService.ShowMessageBox(
+        var result = await DialogService.ShowMessageBoxAsync(
             "Удаление шаблона", message,
             yesText: "Удалить", cancelText: "Отмена");
 
@@ -988,7 +991,7 @@
             var exprPart = string.IsNullOrWhiteSpace(variable.Expression) ? "" : $": {variable.Expression}";
             var message = $"Вы точно хотите удалить переменную{namePart}{exprPart}?";
 
-            var result = await DialogService.ShowMessageBox(
+            var result = await DialogService.ShowMessageBoxAsync(
                 "Удаление", message,
                 yesText: "Удалить", cancelText: "Отмена");
 

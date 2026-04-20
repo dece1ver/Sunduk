@@ -13,6 +13,7 @@ using MudBlazor.Services;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using MudExtensions.Services;
 
 namespace Sunduk.PWA
 {
@@ -61,6 +62,8 @@ namespace Sunduk.PWA
             builder.Services.AddSingleton<IBackgroundTaskMonitor, BackgroundTaskMonitor>();
             builder.Services.AddHostedService<QueuedHostedService>();
             builder.Services.AddBlazorTextEditor();
+
+            builder.Services.AddMudExtensions();
 
             await builder.Build().RunAsync();
         }

@@ -525,69 +525,55 @@ namespace Sunduk.PWA.Infrastructure
         /// <summary>
         /// Конвертер Int
         /// </summary>
-        public static Converter<int> IntConverter = new()
-        {
-            SetFunc = value => value.ToString(),
-            GetFunc = text => text.GetInt(0, GetNumberOption.OnlyPositive),
-        };
+        public static IConverter<int, string?> IntConverter = Conversions
+            .From(
+                (int value) => value.ToString(),
+                text => text.GetInt(0, GetNumberOption.OnlyPositive)
+            );
 
         /// <summary>
         /// Конвертер Int с дефолтным значением 1
         /// </summary>
-        public static Converter<int> IntConverterFromOne = new()
-        {
-            SetFunc = value => value.ToString(),
-            GetFunc = text => text.GetInt(1, GetNumberOption.OnlyPositive),
-        };
+        public static IConverter<int, string> IntConverterFromOne = Conversions
+            .From(
+                (int value) => value.ToString(),
+                text => text.GetInt(1, GetNumberOption.OnlyPositive)
+        );
 
         /// <summary>
         /// Конвертер Double
         /// </summary>
-        public static Converter<double> DoubleConverter = new()
-        {
-            SetFunc = value => value.ToPrettyString(),
-            GetFunc = text => text.GetDouble(0, GetNumberOption.Any),
-        };
+        public static IConverter<double, string?> DoubleConverter = Conversions.From(
+            (double value) => value.ToPrettyString(),
+            text => text.GetDouble(0, GetNumberOption.Any));
 
         /// <summary>
         /// Конвертер углов 0-180 Double
         /// </summary>
-        public static Converter<double> HalfAngleDoubleConverter = new()
-        {
-            SetFunc = value => 
-            { 
-                if (value is > 0 and <= 180) return value.ToPrettyString();
-                return "0";
-            },
-            GetFunc = text => text.GetDouble(0, GetNumberOption.Any),
-        };
+        public static IConverter<double, string?> HalfAngleDoubleConverter = Conversions.From(
+            (double value) => value is > 0 and <= 180 ? value.ToPrettyString() : "0",
+            text => text.GetDouble(0, GetNumberOption.Any));
 
         /// <summary>
         /// Конвертер Double с нулем
         /// </summary>
-        public static Converter<double?> NullableDoubleConverterWithZero = new()
-        {
-            SetFunc = value => value?.ToPrettyString(stringOption: PrettyStringOption.AsIs),
-            GetFunc = text => (string.IsNullOrEmpty(text) || text is "-") ? null : text.GetDouble(0, GetNumberOption.Any),
-        };
+        public static IConverter<double?, string?> NullableDoubleConverterWithZero = Conversions.From(
+            (double? value) => value?.ToPrettyString(stringOption: PrettyStringOption.AsIs),
+            text => string.IsNullOrEmpty(text) || text is "-" ? null : (double?)text.GetDouble(0, GetNumberOption.Any));
 
         /// <summary>
         /// Конвертер отверстий для фрезерной сверловки
         /// </summary>
-        public static Converter<int> HolesConverter = new()
-        {
-            SetFunc = value => value.ToString(),
-            GetFunc = text => text.GetInt(1, GetNumberOption.OnlyPositive),
-        };
+        public static IConverter<int, string?> HolesConverter = Conversions.From(
+            (int value) => value.ToString(),
+            text => text.GetInt(1, GetNumberOption.OnlyPositive));
 
         /// <summary>
-        /// Конвертер Double
+        /// Конвертер Int
         /// </summary>
-        public static Converter<int> EdgesConverter = new()
-        {
-            SetFunc = value => value.ToString(),
-            GetFunc = text => text.GetInt(1, GetNumberOption.OnlyPositive),
-        };
+        public static IConverter<int, string?> EdgesConverter = Conversions.From(
+            (int value) => value.ToString(),
+            text => text.GetInt(1, GetNumberOption.OnlyPositive));
 
         /// <summary>
         /// Получает номера строк для циклов УП в зависимости от количества таких переходов
@@ -619,27 +605,27 @@ namespace Sunduk.PWA.Infrastructure
                 switch (element)
                 {
                     case Point point:
-                        path += $"M {(point.Z * 4).ToString().Replace(",", ".")},{(-point.X / 2 * 4).ToString().Replace(",", ".")} ";
+                        path += $"M {(point.Z * 4)?.ToString().Replace(",", ".")},{(-point.X / 2 * 4)?.ToString().Replace(",", ".")} ";
                         if (point.Blunt > 0 && contour.Count > contour.IndexOf(point) + 1)
                         {
-                            path += $"A{(point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},0,0{(point.Z > (contour[contour.IndexOf(point) + 1].Z) ? 0 : 1)},{(point.Z > (contour[contour.IndexOf(point) + 1].Z) ? -point.Blunt * 4 : point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(-contour[contour.IndexOf(point) + 1].X / 2 * 4).ToString().Replace(",", ".")} ";
+                            path += $"A{(point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},0,0{(point.Z > (contour[contour.IndexOf(point) + 1].Z) ? 0 : 1)},{(point.Z > (contour[contour.IndexOf(point) + 1].Z) ? -point.Blunt * 4 : point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(-contour[contour.IndexOf(point) + 1].X / 2 * 4)?.ToString().Replace(",", ".")} ";
                         }
                         break;
                     case Line line:
                         double? tempLineX = line.X ?? contour[contour.IndexOf(line) - 1].X;
                         double? tempLineZ = line.Z ?? contour[contour.IndexOf(line) - 1].Z;
-                        path += $"L {(tempLineZ * 4).ToString().Replace(",", ".")},{(-tempLineX / 2 * 4).ToString().Replace(",", ".")} ";
+                        path += $"L {(tempLineZ * 4)?.ToString().Replace(",", ".")},{(-tempLineX / 2 * 4)?.ToString().Replace(",", ".")} ";
                         break;
                     case Arc arc:
                         double? tempArcX = arc.X ?? contour[contour.IndexOf(arc) - 1].X;
                         double? tempArcZ = arc.Z ?? contour[contour.IndexOf(arc) - 1].Z;
                         if (ValidArc(contour.IndexOf(arc)))
                         {
-                            path += $"A{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},0,0{(arc.Direction is Infrastructure.Direction.CCW ? 0 : 1)},{(tempArcZ * 4).ToString().Replace(",", ".")},{(-tempArcX / 2 * 4).ToString().Replace(",", ".")} ";
+                            path += $"A{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},0,0{(arc.Direction is Infrastructure.Direction.CCW ? 0 : 1)},{(tempArcZ * 4)?.ToString().Replace(",", ".")},{(-tempArcX / 2 * 4)?.ToString().Replace(",", ".")} ";
                         }
                         else
                         {
-                            path += $"L {(tempArcZ * 4).ToString().Replace(",", ".")},{(-tempArcX / 2 * 4).ToString().Replace(",", ".")} ";
+                            path += $"L {(tempArcZ * 4)?.ToString().Replace(",", ".")},{(-tempArcX / 2 * 4)?.ToString().Replace(",", ".")} ";
                         }
                         break;
                 }

@@ -1,4 +1,5 @@
-﻿<style>
+﻿@using System.Threading.Tasks
+<style>
     .monofield {
         font-family: 'Roboto Mono', monospace;
     }
@@ -191,7 +192,7 @@
         @if (ValidResult())
         {
             <MudItem xs="12">
-                <MudExpansionPanel Class="rounded-0" Text="Пример программы для Fanuc" ExpandedChanged="CalculateAll">
+                <MudExpansionPanel Class="rounded-0" Text="Пример программы для Fanuc" ExpandedChanged="OnPanelExpanded">
                     <MudGrid>
                         <MudItem xs="12" md="4">
                             <MudRadioGroup T="bool" @bind-Value="showClassicChamfer" Class="ma-n1">
@@ -210,7 +211,7 @@
                         </MudItem>
                     </MudGrid>
                     <MudItem xs="12">
-                        <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace;" AutoGrow="true" Value="@ChamferExample" ReadOnly="true"  />
+                        <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace;" Lines="ExampleLines" AutoGrow="true" Value="@ChamferExample" ReadOnly="true"  />
                     </MudItem>
                 </MudExpansionPanel>
             </MudItem>
@@ -220,6 +221,8 @@
 
 @code
 {
+    [Inject] IJSRuntime JS { get; set; } = default!;
+
     readonly int _imgHeigth = 249;
     readonly int _imgWidth = 270;
 
@@ -329,7 +332,7 @@
     //public enum ImageType { Diameter, ToolRadius, ChamferAngle, ChamferSize };
     public Images CurrentImage { get; set; } = Images.ExternalChamfer;
 
-    private string _chamferEndDiameter;
+    private string _chamferEndDiameter = "";
     public string _ChamferEndDiameter
     {
         get => _chamferEndDiameter;
@@ -341,7 +344,7 @@
     }
     public double ChamferEndDiameter => Util.GetDouble(_ChamferEndDiameter);
 
-    private string _chamferStartDiameter;
+    private string _chamferStartDiameter = "";
     public string _ChamferStartDiameter
     {
         get => _chamferStartDiameter;
@@ -353,7 +356,7 @@
     }
     public double ChamferStartDiameter => Util.GetDouble(_ChamferStartDiameter);
 
-    private string _angle;
+    private string _angle = "";
     public string _Angle
     {
         get => _angle;
@@ -367,7 +370,7 @@
     }
     public double Angle => Util.GetDouble(_Angle);
 
-    private string _chamferSize;
+    private string _chamferSize = "";
     public string _ChamferSize
     {
         get => _chamferSize;
@@ -379,7 +382,7 @@
     }
     public double ChamferSize => Util.GetDouble(_ChamferSize);
 
-    private string _chamferInsertRadius;
+    private string _chamferInsertRadius = "";
     public string _ChamferInsertRadius
     {
         get => _chamferInsertRadius;
@@ -491,6 +494,15 @@
     //    //if (CurrentImage == Images.InternalToolRadius) CurrentImage = Images.ExternalToolRadius;
     //    CalculateAll();
     //}
+
+    private async Task OnPanelExpanded(bool expanded)
+    {
+        if (expanded)
+        {
+            CalculateAll();
+            await JS.TriggerAutoGrow();
+        }
+    }
 
     private void CalculateAll()
     {

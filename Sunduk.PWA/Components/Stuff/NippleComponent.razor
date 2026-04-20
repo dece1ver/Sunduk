@@ -121,10 +121,10 @@
         @if (NippleDiameter > 0 && RadiusSize > 0)
         {
             <MudItem xs="12">
-                <MudExpansionPanel Class="rounded-0" Text="Пример программы для Fanuc">
-                    <MudGrid Class="mb-1 pa-n3">
+                <MudExpansionPanel Class="rounded-0" Text="Пример программы для Fanuc" ExpandedChanged="OnPanelExpanded">
+                    <MudGrid >
                         <MudItem xs="6" md="4">
-                            <MudSwitch @bind-Value="@RoundCorner" Label="Скруглить углы" Color="Color.Primary" Class="ma-n3" />
+                            <MudSwitch @bind-Value="@RoundCorner" Label="Скруглить углы" Color="Color.Primary" Class="ma-n1" />
                         </MudItem>
                         <MudItem xs="6" md="4">
                             @if (RoundCorner)
@@ -133,8 +133,8 @@
                             }
                         </MudItem>
                     </MudGrid>
-                    <MudItem xs="12" Class="mt-1">
-                        <MudTextField Variant="Variant.Outlined" Class="monofield" ReadOnly="true" Lines="ExampleLines" Value="@RadiusExample" />
+                    <MudItem xs="12">
+                        <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace;" ReadOnly="true" Lines="ExampleLines" AutoGrow="true" Value="@RadiusExample" />
                     </MudItem>
                 </MudExpansionPanel>
             </MudItem>
@@ -146,6 +146,8 @@
 
 @code 
 {
+    [Inject] IJSRuntime JS { get; set; } = default!;
+
     readonly int _imgHeigth = 157;
     readonly int _imgWidth = 250;
 
@@ -175,7 +177,7 @@
                 return
                     $"G0 X{StartDiamWithShift.NC()} Z1. S200 M3\n" +
                     $"G1 Z0. F0.1\n" +
-                    $"G3 X{NippleDiameter.NC()} Z-{RadiusDepth.NC()} R{FullRadius.NC()}\n";
+                    $"G3 X{NippleDiameter.NC()} Z-{RadiusDepth.NC()} R{FullRadius.NC()}";
             }
             return string.Empty;
         }
@@ -232,7 +234,11 @@
         return $"G0 X{(startX*2).NC()} Z1. S200 M3\n" +
         $"G1 Z0. F0.1\n" +
         $"G3 X{(endX*2).NC()} Z-{endZ.NC()} R{NippleBluntRadius.NC()}\n" +
-        $"X{NippleDiameter.NC()} Z-{RadiusDepth.NC()} R{FullRadius.NC()}\n" +
-        $"";
+        $"X{NippleDiameter.NC()} Z-{RadiusDepth.NC()} R{FullRadius.NC()}";
+    }
+
+    private async Task OnPanelExpanded(bool expanded)
+    {
+        if (expanded) await JS.TriggerAutoGrow();
     }
 }
