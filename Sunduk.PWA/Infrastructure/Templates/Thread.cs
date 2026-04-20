@@ -554,6 +554,19 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public static bool Valid(double threadDiameter, double threadPitch)
             => threadDiameter > 0 && threadPitch > 0;
 
+        /// <summary>
+        /// Диаметр сверла под метрическую резьбу (нормальные материалы, ГОСТ 19257).
+        /// Формула: d − P с поправкой для шагов, где d − P не является стандартным размером сверла:
+        /// P=1.25 → d−1.2 (X.75 мм → X.8 мм), P=1.75 → d−1.8 (X.25 мм → X.2 мм).
+        /// </summary>
+        public static double DrillDiameter(double d, double pitch) =>
+            Math.Round(pitch switch
+            {
+                1.25 => d - 1.2,
+                1.75 => d - 1.8,
+                _ => d - pitch,
+            }, 2, MidpointRounding.AwayFromZero);
+
         public static double NominalHeight(ThreadStandard threadStandard, double threadPitch) => threadStandard switch
         {
             ThreadStandard.Metric or ThreadStandard.UNC or ThreadStandard.UNF or ThreadStandard.UNEF

@@ -159,10 +159,13 @@
                         <td class="tl"><MudText Typo="Typo.caption">Нижний диаметр:</MudText></td>
                         <td><MudText Typo="Typo.caption">@((ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)).ToPrettyString(3)) мм</MudText></td>
                     </tr>
-                    <tr>
-                        <td class="tl"><MudText Typo="Typo.caption">Отверстие под резьбу:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@((ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)).ToPrettyString(3)) мм</MudText></td>
-                    </tr>
+                    @if (ThreadType == CuttingType.Internal && ThreadStandard == ThreadStandard.Metric)
+                    {
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">Сверло под резьбу:</MudText></td>
+                            <td><MudText Typo="Typo.caption">@DrillDiameterDisplay</MudText></td>
+                        </tr>
+                    }
                     <tr>
                         <td class="tl"><MudText Typo="Typo.caption">Шаг:</MudText></td>
                         <td><MudText Typo="Typo.caption">@(ThreadPitch.ToPrettyString() + (ThreadStandard is ThreadStandard.BSPP or ThreadStandard.BSPT or ThreadStandard.NPT or ThreadStandard.UNC or ThreadStandard.UNF or ThreadStandard.UNEF ? $" ({ThreadPitch.ToTpi()} TPI)" : ""))</MudText></td>
@@ -421,6 +424,24 @@
         "Титановые сплавы",
         "Стали и сплавы высоколегированные, коррозионностойкие, жаростойкие, жаропрочные (на никелевой основе) — ГОСТ 5632-72, ГОСТ 20072-74",
         };
+
+    private string DrillDiameterDisplay
+    {
+        get
+        {
+            if (ThreadType != CuttingType.Internal) return string.Empty;
+            return ThreadStandard switch
+            {
+                ThreadStandard.Metric
+                    => $"{Thread.DrillDiameter(ThreadDiameter, ThreadPitch).ToPrettyString(2)} мм",
+                ThreadStandard.BSPP when Thread.BsppHoleDiameter(CurrentThreadTemplate) > 0
+                    => $"{Thread.BsppHoleDiameter(CurrentThreadTemplate).ToPrettyString(2)} мм",
+                ThreadStandard.NPT when Thread.NptHoleDiameter(CurrentThreadTemplate) > 0
+                    => $"{Thread.NptHoleDiameter(CurrentThreadTemplate).ToPrettyString(2)} мм",
+                _ => "—",
+            };
+        }
+    }
 
     private async Task<IEnumerable<string>> Search(string value, System.Threading.CancellationToken token)
     {
