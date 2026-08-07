@@ -650,7 +650,7 @@
             expr.Functions[DegreeToRadianFunction] = (args) =>
                 {
                     if (args.Count() > 1) Util.ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {DegreeToRadianFunction}", calcErrors);
-                    double d = args[0].Evaluate() switch
+                    double d = args.Evaluate(0) switch
                     {
                         double dd => dd,
                         int ii => ii,
@@ -664,7 +664,7 @@
             expr.Functions[RadianToDegreeFunction] = (args) =>
             {
                 if (args.Count() > 1) Util.ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {RadianToDegreeFunction}", calcErrors);
-                double d = args[0].Evaluate() switch
+                double d = args.Evaluate(0) switch
                 {
                     double dd => dd,
                     int ii => ii,

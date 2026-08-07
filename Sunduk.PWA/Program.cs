@@ -14,6 +14,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using MudExtensions.Services;
+using Sunduk.PWA.Infrastructure.State;
 
 namespace Sunduk.PWA
 {
@@ -64,6 +65,8 @@ namespace Sunduk.PWA
             builder.Services.AddBlazorTextEditor();
 
             builder.Services.AddMudExtensions();
+
+            builder.Services.AddSingleton<SunducamState>();
 
             await builder.Build().RunAsync();
         }

@@ -23,6 +23,13 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
             };
 
         public override MachineType MachineType => MachineType.Milling;
+        public override string Description(Util.ToolDescriptionOption option) => option switch
+        {
+            Util.ToolDescriptionOption.General => $"T{Position:D2} ({Name} D{Diameter.NC(option: Util.NcDecimalPointOption.Without)} L{CuttingLength} Z{Edges})",
+            Util.ToolDescriptionOption.MillingToolChange => $"T{Position} M6 ({Name} D{Diameter.NC(option: Util.NcDecimalPointOption.Without)} L{CuttingLength} Z{Edges})",
+            Util.ToolDescriptionOption.ToolTable => Description(Util.ToolDescriptionOption.General).Split('(')[1].TrimEnd(')'),
+            _ => string.Empty,
+        };
 
 
         public MillingTool(int position, Types type, double diameter, int edges = 4, double cuttingLength = 0, double cornerRadius = 0, ToolHand hand = ToolHand.Right)

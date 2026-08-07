@@ -4,11 +4,11 @@ using Sunduk.PWA.Infrastructure.Time;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Base
 {
-    public class Sequence
+    public abstract class Sequence
     {
-        public virtual string Name { get; set; }
-        public virtual string Operation { get; set; }
-        public virtual OperationTime MachineTime { get; set; }
-        public virtual MachineType MachineType { get; set; }
+        public abstract string Name { get; }
+        public abstract string Operation { get; }
+        public abstract OperationTime MachineTime { get; }
+        public abstract MachineType MachineType { get; }
     }
 }

@@ -27,6 +27,13 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
         public ThreadStandard ThreadStandard { get; set; }
         public string StandardTemplate { get; set; }
         public double Pitch { get; set; }
+        public override string Description(Util.ToolDescriptionOption option) => option switch
+        {
+            Util.ToolDescriptionOption.General => $"T{Position:D2} ({Name})",
+            Util.ToolDescriptionOption.MillingToolChange => $"T{Position} M6 ({Name})",
+            Util.ToolDescriptionOption.ToolTable => Description(Util.ToolDescriptionOption.General).Split('(')[1].TrimEnd(')'),
+            _ => string.Empty,
+        };
 
         public MillingThreadCuttingTool(int position, double diameter, ThreadStandard threadStandard, double pitch, string standardTemplate = "")
         {

@@ -1,0 +1,423 @@
+<MudItem xs="12" md="4">
+    <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" ValueChanged="OnTurningSequenceChanged">
+        <MudSelectItem Value="@(TurningSequences.RoughFacing)">@("Черновое торцевание (G72)")</MudSelectItem>
+        <MudSelectItem Value="@(TurningSequences.FinishFacing)">@("Чистовое торцевание")</MudSelectItem>
+        <MudSelectItem Value="@(TurningSequences.RoughFacingCycle)">@("Черновое торцевание (G72 под G70)")</MudSelectItem>
+        <MudSelectItem Value="@(TurningSequences.FinishFacingCycle)">@("Чистовое торцевание (G70)")</MudSelectItem>
+        <MudSelectItem Value="@(TurningSequences.Facing)">@("Торцевание (черновое + чистовое)")</MudSelectItem>
+    </MudSelect>
+</MudItem>
+<MudItem xs="12" md="4">
+    <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+        @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
+        {
+            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+        }
+    </MudSelect>
+</MudItem>
+@switch (TurningSequence)
+{
+    case TurningSequences.RoughFacing:
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Общий припуск" @bind-Value="_FacingRoughStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        break;
+    case TurningSequences.RoughFacingCycle:
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Общий припуск" @bind-Value="_FacingRoughStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        break;
+    case TurningSequences.FinishFacing:
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        break;
+    case TurningSequences.FinishFacingCycle:
+        <MudItem xs="12">
+            <MudSelect @bind-Value="RepeatableRoughFacingSequence" Variant="Variant.Filled" Margin="Margin.Dense" Label="Черновая торцовка" T="Sequence">
+                @foreach (var seq in Program.Where(x => x is RoughFacingSequence || x is FacingSequence || x is RoughFacingCycleSequence))
+                {
+                    switch (seq)
+                    {
+                        case RoughFacingSequence:
+                        case FacingSequence:
+                        case RoughFacingCycleSequence:
+                            <MudSelectItem Value="@seq">@($"{Program.IndexOf(seq)}. {seq.Description()}")</MudSelectItem>
+                            break;
+                    }
+                }
+            </MudSelect>
+        </MudItem>
+        break;
+    case TurningSequences.Facing:
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Общий припуск" @bind-Value="_FacingRoughStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Чистовой припуск по Z" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        break;
+}
+@if (TurningSequence is not TurningSequences.FinishFacingCycle)
+{
+    <MudItem xs="12" md="@(_MediumBluntFieldSize)">
+        <MudTextField Label="@Util.BluntLabel(FacingBluntType)" @bind-Value="_FacingCornerBlunt" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true"
+        @onfocusin="@(() => _calcFacingChamferDiameter = true)" />
+    </MudItem>
+    <MudItem xs="12" md="@(_MediumBluntFieldSize)">
+        <MudSelect Label="Тип" T="Blunt" Variant="Variant.Filled" @bind-Value="FacingBluntType" Margin="Margin.Dense">
+            <MudSelectItem Value="@(Blunt.SimpleChamfer)">Простая фаска</MudSelectItem>
+            <MudSelectItem Value="@(Blunt.Radius)">Радиус</MudSelectItem>
+            <MudSelectItem Value="@(Blunt.CustomChamfer)">Настраиваемая фаска</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+    @if (FacingBluntType == Blunt.CustomChamfer)
+    {
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Угол фаски" @bind-Value="_FacingCustomChamferAngle" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="°" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Конечный диаметр фаски" @bind-Value="_FacingCustomChamferDiameter" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true"
+            @onfocusin="@(() => _calcFacingChamferDiameter = false)" />
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Скругление на фаске" @bind-Value="_FacingCustomChamferBlunt" Variant="Variant.Filled" Margin="Margin.Dense" AdornmentText="мм" Immediate="true" />
+        </MudItem>
+    }
+}
+@if (TurningSequence is TurningSequences.RoughFacing or TurningSequences.RoughFacingCycle)
+{
+    <MudItem xs="6" md="6">
+        <MudTextField Label="Черновая Vc" @bind-Value="SpeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+    </MudItem>
+    <MudItem xs="6" md="6">
+        <MudTextField Label="Черновая F" @bind-Value="_FeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+    </MudItem>
+}
+else if (TurningSequence is TurningSequences.FinishFacingCycle or TurningSequences.FinishFacing)
+{
+    <MudItem xs="6" md="6">
+        <MudTextField Label="Чистовая Vc" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+    </MudItem>
+    <MudItem xs="6" md="6">
+        <MudTextField Label="Чистовая F" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+    </MudItem>
+}
+else
+{
+    <MudItem xs="6" md="3">
+        <MudTextField Label="Черновая Vc" @bind-Value="SpeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+    </MudItem>
+    <MudItem xs="6" md="3">
+        <MudTextField Label="Черновая F" @bind-Value="_FeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+    </MudItem>
+    <MudItem xs="6" md="3">
+        <MudTextField Label="Чистовая Vc" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+    </MudItem>
+    <MudItem xs="6" md="3">
+        <MudTextField Label="Чистовая F" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+    </MudItem>
+}
+<MudItem Class="mt-4" xs="12" sm="12" md="12">
+    <MudTextField T="string" Underline="false" Label="Предпросмотр" Style="font-family: 'Roboto Mono', monospace; font-size: medium;"
+                  ReadOnly="true" Variant="Variant.Filled" Text="@("\n" + ExampleText.Trim('\n'))" Lines="@(ExampleText.Trim('\n').Count(x => x == '\n') + 3)" />
+</MudItem>
+<MudItem Class="d-flex flex-row-reverse py-0 px-0 mt-4">
+    <MudButton Variant="Variant.Outlined" Size="Size.Large"
+               EndIcon="@Icons.Material.TwoTone.PlaylistAdd" Color="Color.Primary"
+               OnClick="Submit" Disabled="@(string.IsNullOrEmpty(ExampleText))">
+        @(SequenceToEdit is null ? "Добавить" : "Подтвердить")
+    </MudButton>
+</MudItem>
+
+@code {
+    [Parameter] public Machine Machine { get; set; }
+    [Parameter] public MachineType MachineType { get; set; }
+    [Parameter] public Material WorkpieceMaterial { get; set; }
+    [Parameter] public double WorkpieceExternalDiameter { get; set; }
+    [Parameter] public double WorkpieceInternalDiameter { get; set; }
+    [Parameter] public double WorkpieceCurrentInternalDiameter { get; set; }
+    [Parameter] public int CyclesCount { get; set; }
+    [Parameter] public List<Tool> Tools { get; set; }
+    [Parameter] public List<Sequence> Program { get; set; }
+    [Parameter] public Sequence SequenceToEdit { get; set; }
+    [Parameter] public EventCallback<Sequence> OnSubmit { get; set; }
+
+    private TurningSequences TurningSequence { get; set; }
+    private Tool Tool { get; set; }
+    private Sequence RepeatableRoughFacingSequence { get; set; }
+
+    public int SpeedRough { get; set; }
+    public int SpeedFinish { get; set; }
+    private string _FeedRough { get; set; } = "";
+    private double FeedRough => _FeedRough.GetDouble();
+    private string _FeedFinish { get; set; } = "";
+    private double FeedFinish => _FeedFinish.GetDouble();
+
+    bool _calcFacingChamferDiameter = true;
+    int _MediumBluntFieldSize => TurningSequence == TurningSequences.FinishFacing ? 4 : 6;
+
+    private string _FacingStepOver { get; set; } = "1";
+    private double FacingStepOver => _FacingStepOver.GetDouble();
+    private string _FacingRoughStockAllow { get; set; } = "2";
+    private double FacingRoughStockAllow => _FacingRoughStockAllow.GetDouble();
+    private string _FacingProfStockAllow { get; set; } = "0.2";
+    private double FacingProfStockAllow => _FacingProfStockAllow.GetDouble();
+
+    private string _facingCornerBlunt;
+    private string _FacingCornerBlunt
+    {
+        get => _facingCornerBlunt;
+        set
+        {
+            _facingCornerBlunt = value;
+            if (_calcFacingChamferDiameter)
+            {
+                _FacingCustomChamferDiameter = (WorkpieceExternalDiameter - 2 * FacingCornerBlunt * Math.Tan(FacingCustomChamferAngle.Radians())).ToPrettyString();
+            }
+        }
+    }
+    private double FacingCornerBlunt => _FacingCornerBlunt.GetDouble();
+
+    private Blunt FacingBluntType { get; set; }
+
+    private string _facingCustomChamferAngle;
+    private string _FacingCustomChamferAngle
+    {
+        get => _facingCustomChamferAngle;
+        set
+        {
+            _facingCustomChamferAngle = value;
+            if (_calcFacingChamferDiameter)
+            {
+                _FacingCustomChamferDiameter = (WorkpieceExternalDiameter - 2 * FacingCornerBlunt * Math.Tan(FacingCustomChamferAngle.Radians())).ToPrettyString();
+            }
+            else
+            {
+                _FacingCornerBlunt = ((WorkpieceExternalDiameter - FacingCustomChamferDiameter) / 2 * Math.Tan((90 - FacingCustomChamferAngle).Radians())).ToPrettyString();
+            }
+        }
+    }
+    private double FacingCustomChamferAngle => _FacingCustomChamferAngle.GetDouble();
+
+    private string _FacingCustomChamferBlunt { get; set; }
+    private double FacingCustomChamferBlunt => _FacingCustomChamferBlunt.GetDouble();
+
+    private string _facingCustomChamferDiameter;
+    private string _FacingCustomChamferDiameter
+    {
+        get => _facingCustomChamferDiameter;
+        set
+        {
+            _facingCustomChamferDiameter = value;
+            if (_calcFacingChamferDiameter) return;
+            _FacingCornerBlunt = ((WorkpieceExternalDiameter - FacingCustomChamferDiameter) / 2 * Math.Tan((90 - FacingCustomChamferAngle).Radians())).ToPrettyString();
+        }
+    }
+    private double FacingCustomChamferDiameter => _FacingCustomChamferDiameter.GetDouble();
+
+    private Sequence CurrentSequence { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _FacingCustomChamferAngle = "45";
+        if (SequenceToEdit is not null) LoadFromSequence(SequenceToEdit);
+    }
+
+    private void LoadFromSequence(Sequence sequence)
+    {
+        switch (sequence)
+        {
+            case FacingSequence facing:
+                TurningSequence = TurningSequences.Facing;
+                Tool = facing.Tool;
+                _FacingRoughStockAllow = facing.RoughStockAllow.ToPrettyString();
+                _FacingProfStockAllow = facing.ProfStockAllow.ToPrettyString();
+                _FacingStepOver = facing.StepOver.ToPrettyString();
+                FacingBluntType = facing.BluntType;
+                _facingCornerBlunt = facing.CornerBlunt.ToPrettyString();
+                _facingCustomChamferAngle = facing.BluntCustomAngle.ToPrettyString();
+                _FacingCustomChamferBlunt = facing.BluntCustomRadius.ToPrettyString();
+                _facingCustomChamferDiameter = (facing.ExternalDiameter - 2 * facing.CornerBlunt * Math.Tan(facing.BluntCustomAngle.Radians())).ToPrettyString();
+                SpeedRough = facing.SpeedRough;
+                SpeedFinish = facing.SpeedFinish;
+                _FeedRough = facing.FeedRough.ToPrettyString();
+                _FeedFinish = facing.FeedFinish.ToPrettyString();
+                break;
+            case RoughFacingSequence roughFacing:
+                TurningSequence = TurningSequences.RoughFacing;
+                Tool = roughFacing.Tool;
+                _FacingRoughStockAllow = roughFacing.RoughStockAllow.ToPrettyString();
+                _FacingProfStockAllow = roughFacing.ProfStockAllow.ToPrettyString();
+                _FacingStepOver = roughFacing.StepOver.ToPrettyString();
+                FacingBluntType = roughFacing.BluntType;
+                _facingCornerBlunt = roughFacing.CornerBlunt.ToPrettyString();
+                _facingCustomChamferAngle = roughFacing.BluntCustomAngle.ToPrettyString();
+                _FacingCustomChamferBlunt = roughFacing.BluntCustomRadius.ToPrettyString();
+                _facingCustomChamferDiameter = (roughFacing.ExternalDiameter - 2 * roughFacing.CornerBlunt * Math.Tan(roughFacing.BluntCustomAngle.Radians())).ToPrettyString();
+                SpeedRough = roughFacing.SpeedRough;
+                _FeedRough = roughFacing.FeedRough.ToPrettyString();
+                break;
+            case RoughFacingCycleSequence roughCycle:
+                TurningSequence = TurningSequences.RoughFacingCycle;
+                Tool = roughCycle.Tool;
+                _FacingRoughStockAllow = roughCycle.RoughStockAllow.ToPrettyString();
+                _FacingProfStockAllow = roughCycle.ProfStockAllow.ToPrettyString();
+                _FacingStepOver = roughCycle.StepOver.ToPrettyString();
+                FacingBluntType = roughCycle.BluntType;
+                _facingCornerBlunt = roughCycle.CornerBlunt.ToPrettyString();
+                _facingCustomChamferAngle = roughCycle.BluntCustomAngle.ToPrettyString();
+                _FacingCustomChamferBlunt = roughCycle.BluntCustomRadius.ToPrettyString();
+                _facingCustomChamferDiameter = (roughCycle.ExternalDiameter - 2 * roughCycle.CornerBlunt * Math.Tan(roughCycle.BluntCustomAngle.Radians())).ToPrettyString();
+                SpeedRough = roughCycle.SpeedRough;
+                _FeedRough = roughCycle.FeedRough.ToPrettyString();
+                break;
+            case FinishFacingSequence finishFacing:
+                TurningSequence = TurningSequences.FinishFacing;
+                Tool = finishFacing.Tool;
+                _FacingProfStockAllow = finishFacing.ProfStockAllow.ToPrettyString();
+                FacingBluntType = finishFacing.BluntType;
+                _facingCornerBlunt = finishFacing.CornerBlunt.ToPrettyString();
+                _facingCustomChamferAngle = finishFacing.BluntCustomAngle.ToPrettyString();
+                _FacingCustomChamferBlunt = finishFacing.BluntCustomRadius.ToPrettyString();
+                _facingCustomChamferDiameter = (finishFacing.ExternalDiameter - 2 * finishFacing.CornerBlunt * Math.Tan(finishFacing.BluntCustomAngle.Radians())).ToPrettyString();
+                SpeedFinish = finishFacing.SpeedFinish;
+                _FeedFinish = finishFacing.FeedFinish.ToPrettyString();
+                break;
+            case FinishFacingCycleSequence finishCycle:
+                TurningSequence = TurningSequences.FinishFacingCycle;
+                Tool = finishCycle.Tool;
+                RepeatableRoughFacingSequence = finishCycle.RoughSequence;
+                SpeedFinish = finishCycle.SpeedFinish;
+                _FeedFinish = finishCycle.FeedFinish.ToPrettyString();
+                break;
+        }
+    }
+
+    private void OnToolChanged(Tool value)
+    {
+        Tool = value;
+    }
+
+    private void OnTurningSequenceChanged(TurningSequences value)
+    {
+        TurningSequence = value;
+        switch (TurningSequence)
+        {
+            case TurningSequences.FinishFacing:
+                _FacingProfStockAllow = string.Empty;
+                break;
+        }
+    }
+
+    public string ExampleText
+    {
+        get
+        {
+            switch (TurningSequence)
+            {
+                case TurningSequences.Facing:
+                    if (SpeedRough <= 0 || FeedRough <= 0 || (FacingRoughStockAllow > 0 && SpeedFinish <= 0 || FeedFinish <= 0)) return string.Empty;
+                    CurrentSequence = FacingSequenceFactory.CreateFacing(
+                        machine: Machine,
+                        material: WorkpieceMaterial,
+                        tool: Tool as TurningExternalTool,
+                        externalDiameter: WorkpieceExternalDiameter,
+                        internalDiameter: WorkpieceInternalDiameter,
+                        roughStockAllow: FacingRoughStockAllow,
+                        profStockAllow: FacingProfStockAllow,
+                        stepOver: FacingStepOver,
+                        seqNumbers: CyclesCount.GetCycleRange(),
+                        bluntType: FacingBluntType,
+                        bluntCustomAngle: FacingCustomChamferAngle,
+                        bluntCustomRadius: FacingCustomChamferBlunt,
+                        cornerBlunt: FacingCornerBlunt,
+                        speedRough: SpeedRough,
+                        speedFinish: SpeedFinish,
+                        feedRough: FeedRough,
+                        feedFinish: FeedFinish);
+                    return CurrentSequence.Operation;
+                case TurningSequences.RoughFacingCycle:
+                    if (SpeedRough <= 0 || FeedRough <= 0) return string.Empty;
+                    CurrentSequence = FacingSequenceFactory.CreateRoughFacingCycle(
+                        machine: Machine,
+                        material: WorkpieceMaterial,
+                        tool: Tool as TurningExternalTool,
+                        externalDiameter: WorkpieceExternalDiameter,
+                        internalDiameter: WorkpieceCurrentInternalDiameter,
+                        roughStockAllow: FacingRoughStockAllow,
+                        profStockAllow: FacingProfStockAllow,
+                        stepOver: FacingStepOver,
+                        seqNumbers: CyclesCount.GetCycleRange(),
+                        bluntType: FacingBluntType,
+                        bluntCustomAngle: FacingCustomChamferAngle,
+                        bluntCustomRadius: FacingCustomChamferBlunt,
+                        cornerBlunt: FacingCornerBlunt,
+                        speedRough: SpeedRough,
+                        feedRough: FeedRough);
+                    return CurrentSequence.Operation;
+                case TurningSequences.RoughFacing:
+                    if (SpeedRough <= 0 || FeedRough <= 0) return string.Empty;
+                    CurrentSequence = FacingSequenceFactory.CreateRoughFacing(
+                        machine: Machine,
+                        material: WorkpieceMaterial,
+                        tool: Tool as TurningExternalTool,
+                        externalDiameter: WorkpieceExternalDiameter,
+                        internalDiameter: WorkpieceCurrentInternalDiameter,
+                        roughStockAllow: FacingRoughStockAllow,
+                        profStockAllow: FacingProfStockAllow,
+                        stepOver: FacingStepOver,
+                        seqNumbers: CyclesCount.GetCycleRange(),
+                        bluntType: FacingBluntType,
+                        bluntCustomAngle: FacingCustomChamferAngle,
+                        bluntCustomRadius: FacingCustomChamferBlunt,
+                        cornerBlunt: FacingCornerBlunt,
+                        speedRough: SpeedRough,
+                        feedRough: FeedRough);
+                    return CurrentSequence.Operation;
+                case TurningSequences.FinishFacingCycle:
+                    if (SpeedFinish <= 0 || FeedFinish <= 0) return string.Empty;
+                    CurrentSequence = FacingSequenceFactory.CreateFinishFacingCycle(tool: Tool as TurningExternalTool, roughSequence: RepeatableRoughFacingSequence, speedFinish: SpeedFinish, feedFinish: FeedFinish);
+                    return CurrentSequence.Operation;
+                case TurningSequences.FinishFacing:
+                    if (SpeedFinish <= 0 || FeedFinish <= 0) return string.Empty;
+                    CurrentSequence = FacingSequenceFactory.CreateFinishFacing(
+                        machine: Machine,
+                        material: WorkpieceMaterial,
+                        tool: Tool as TurningExternalTool,
+                        externalDiameter: WorkpieceExternalDiameter,
+                        internalDiameter: WorkpieceCurrentInternalDiameter,
+                        profStockAllow: FacingProfStockAllow,
+                        bluntType: FacingBluntType,
+                        bluntCustomAngle: FacingCustomChamferAngle,
+                        bluntCustomRadius: FacingCustomChamferBlunt,
+                        cornerBlunt: FacingCornerBlunt,
+                        speedFinish: SpeedFinish,
+                        feedFinish: FeedFinish);
+                    return CurrentSequence.Operation;
+            }
+            return string.Empty;
+        }
+    }
+
+    private async Task Submit()
+    {
+        if (CurrentSequence is null) return;
+        await OnSubmit.InvokeAsync(CurrentSequence);
+    }
+}

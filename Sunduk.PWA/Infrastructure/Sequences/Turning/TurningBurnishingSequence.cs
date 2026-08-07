@@ -2,6 +2,7 @@
 using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 using Sunduk.PWA.Infrastructure.Tools.Turning.Base;
+using System;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
@@ -35,7 +36,25 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             }
         }
         public override string Operation => Templates.Operation.BurnishingOperation(Machine, Tool, Diameter, StartZ, EndZ);
-        public override OperationTime MachineTime => this.OperationTime();
+        public override OperationTime MachineTime
+        {
+            get
+            {
+                double cuttingTime = 0;
+                double rapidTime = 5;
+                var fullLength = (Math.Abs(StartZ) + Math.Abs(EndZ));
+                var additionalRapidMove = Tool is TurningExternalBurnishingTool ? 1 : 1 + fullLength;
+                var speed = SpeedFinish;
+                var feed = FeedFinish;
+                var spins = (speed * 1000) / (Math.PI * Diameter);
+                if (spins > 1000) spins = 1000;
+                cuttingTime += (fullLength + 1).AxialTurningTime(spins, feed);
+                cuttingTime += Templates.Operation.Escaping().AxialTurningTime(spins, feed);
+                rapidTime += fullLength.AxialRapidTime();
+                rapidTime += additionalRapidMove.AxialRapidTime();
+                return new OperationTime(cuttingTime, rapidTime);
+            }
+        }
         public override MachineType MachineType => MachineType.Turning;
 
         public TurningBurnishingSequence(Machine machine, TurningBurnishingTool tool, double diameter, double startZ, double endZ, int speedFinish, double feedFinish)

@@ -8,7 +8,6 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     {
         public override string Operation => Templates.Operation.TurningCustomOperation(Machine, Tool, CustomOperation);
         public override MachineType MachineType => MachineType.Turning;
-        public override OperationTime MachineTime => this.OperationTime();
 
         public TurningCustomSequence(Machine machine, Tool tool, string customOperation)
             : base(machine, tool, customOperation) { }

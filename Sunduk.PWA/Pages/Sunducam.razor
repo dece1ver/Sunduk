@@ -2,6 +2,7 @@
 @using Sunduk.PWA.Infrastructure.Sequences.Turning.Base
 @inject IDialogService DialogService
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject SunducamState State
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pa-0 ma-0">
     <MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="fas fa-crutch">Раздел в разработке</MudAlert>
     <MudGrid Spacing="1">
@@ -213,28 +214,25 @@
                 </MudItem>
                 break;
             case Mode.AddSequence:
-                <MudItem xs=12>
-                    <MudPaper Class="pa-4 rounded-0" Elevation="0" Outlined="false">
-                        <AddSequenceComponent Tools="Tools"
-                                              Machine="Machine"
-                                              CoordinateSystem="CoordinateSystem"
-                                              MachineType="MachineType"
-                                              Program="Program"
-                                              @bind-Mode="Mode"
-                                              WorkpieceMaterial="WorkpieceMaterial"
-                                              WorkpieceExternalDiameter="WorkpieceExternalDiameter"
-                                              WorkpieceInternalDiameter="WorkpieceInternalDiameter"
-                                              WorkpieceCurrentInternalDiameter="WorkpieceCurrentInternalDiameter"
-                                              WorkpieceLength="WorkpieceLength"
-                                              CyclesCount="CyclesCount"
-                                              SafePlane="SafePlane"
-                                              />
-                    </MudPaper>
-                </MudItem>
-                break;
             case Mode.EditSequence:
                 <MudItem xs=12>
-                    <EditSequenceComponent Tools="Tools" Program="Program" Sequence="CurrentSelectedSequence" @bind-Mode="Mode"/>
+                    <MudPaper Class="pa-4 rounded-0" Elevation="0" Outlined="false">
+                        <SequenceEditorComponent Tools="Tools"
+                                                 Machine="Machine"
+                                                 CoordinateSystem="CoordinateSystem"
+                                                 MachineType="MachineType"
+                                                 Program="Program"
+                                                 Sequence="@(Mode == Mode.EditSequence ? CurrentSelectedSequence : null)"
+                                                 @bind-Mode="Mode"
+                                                 WorkpieceMaterial="WorkpieceMaterial"
+                                                 WorkpieceExternalDiameter="WorkpieceExternalDiameter"
+                                                 WorkpieceInternalDiameter="WorkpieceInternalDiameter"
+                                                 WorkpieceCurrentInternalDiameter="WorkpieceCurrentInternalDiameter"
+                                                 WorkpieceLength="WorkpieceLength"
+                                                 CyclesCount="CyclesCount"
+                                                 SafePlane="SafePlane"
+                                                 />
+                    </MudPaper>
                 </MudItem>
                 break;
         }
@@ -246,22 +244,22 @@
     [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
 
-    public Mode Mode { get; set; } = Mode.General;
+    public Mode Mode { get => State.Mode; set => State.Mode = value; }
 
     public string HighLight => CurrentSelectedSequence is null ? string.Empty : Program[(int)SelectedSequenceIndex].Operation.Split('\n')[0];
 
-    public int SelectedSequenceIndex = 0;
-    public Sequence CurrentSelectedSequence { get; set; }
+    public int SelectedSequenceIndex { get => State.SelectedSequenceIndex; set => State.SelectedSequenceIndex = value; }
+    public Sequence CurrentSelectedSequence { get => State.CurrentSelectedSequence; set => State.CurrentSelectedSequence = value; }
 
     public int CyclesCount => Program
         .Count(x => x is RoughFacingSequence or FacingSequence or RoughFacingCycleSequence) + 1;
 
-    public CoordinateSystem CoordinateSystem { get; set; } = CoordinateSystem.G54;
+    public CoordinateSystem CoordinateSystem { get => State.CoordinateSystem; set => State.CoordinateSystem = value; }
 
-    public string _SafePlane { get; set; } = "300";
+    public string _SafePlane { get => State.SafePlane; set => State.SafePlane = value; }
     public double SafePlane => _SafePlane.GetDouble();
 
-    public List<Tool> Tools { get; set; } = new();
+    public List<Tool> Tools { get => State.Tools; set => State.Tools = value; }
 
     #region Фрезерный инструмент
 
@@ -290,16 +288,16 @@
     #endregion
 
 
-    public Material WorkpieceMaterial { get; set; }
+    public Material WorkpieceMaterial { get => State.WorkpieceMaterial; set => State.WorkpieceMaterial = value; }
 
-    public Machine Machine { get; set; }
+    public Machine Machine { get => State.Machine; set => State.Machine = value; }
 
     public MachineType MachineType => Machine.GetMachineType();
 
-    public string _WorkpieceExternalDiameter { get; set; } = "50";
+    public string _WorkpieceExternalDiameter { get => State.WorkpieceExternalDiameter; set => State.WorkpieceExternalDiameter = value; }
     public double WorkpieceExternalDiameter => _WorkpieceExternalDiameter.GetDouble();
 
-    public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
+    public string _WorkpieceInternalDiameter { get => State.WorkpieceInternalDiameter; set => State.WorkpieceInternalDiameter = value; }
     public double WorkpieceInternalDiameter => _WorkpieceInternalDiameter.GetDouble();
 
     public double WorkpieceCurrentExternalDiameter { get; set; }
@@ -328,24 +326,24 @@
         return diam;
     }
 
-    public string DetailNumber { get; set; }
+    public string DetailNumber { get => State.DetailNumber; set => State.DetailNumber = value; }
 
     public string NcDetailNumber => $"{(!string.IsNullOrEmpty(DetailNumber) ? DetailNumber.Translate() : "AR000-00-000")}{(OperationNumber > 0 ? $".{ OperationNumber.ToString("D1").Replace(",", ".")}S" : string.Empty)}";
 
-    public string DetailName { get; set; }
+    public string DetailName { get => State.DetailName; set => State.DetailName = value; }
     public string NcDetailName => !string.IsNullOrEmpty(DetailName) ? $"{DetailName.Translate()}" : "DETAIL";
 
-    public string Author { get; set; }
+    public string Author { get => State.Author; set => State.Author = value; }
     public string NcAuthor => !string.IsNullOrEmpty(Author) ? $"{Author.Translate()}" : "AUTHOR";
 
-    public int OperationNumber { get; set; } = 0;
+    public int OperationNumber { get => State.OperationNumber; set => State.OperationNumber = value; }
 
-    public string DrawingVersion { get; set; }
+    public string DrawingVersion { get => State.DrawingVersion; set => State.DrawingVersion = value; }
     public string NcDrawingVersion => !string.IsNullOrEmpty(DrawingVersion) ? DrawingVersion.Translate() : "0.0";
 
-    public int? SpindleLimit { get; set; }
+    public int? SpindleLimit { get => State.SpindleLimit; set => State.SpindleLimit = value; }
 
-    public string _WorkpieceLength { get; set; } = "50";
+    public string _WorkpieceLength { get => State.WorkpieceLength; set => State.WorkpieceLength = value; }
     public double WorkpieceLength => _WorkpieceLength.GetDouble();
 
 
@@ -356,7 +354,7 @@
 
     public bool ValidWorkpiece => WorkpieceExternalDiameter > 0 && WorkpieceInternalDiameter < WorkpieceExternalDiameter && WorkpieceLength > 0;
 
-    public List<Sequence> Program { get; set; }
+    public List<Sequence> Program { get => State.Program; set => State.Program = value; }
 
     public string ProgramEnd { get
         {
@@ -370,6 +368,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Состояние живёт в SunducamState (singleton), поэтому при возврате на страницу
+        // (после ухода на другую и обратно) программа и настройки не должны сбрасываться.
+        if (State.Initialized) return;
+        State.Initialized = true;
+
         Machine = await LocalStorage.GetItemAsync<Machine>(nameof(Machine));
         OnMachineChanged(Machine);
 
@@ -529,8 +532,8 @@
 
         Program = new List<Sequence>
         {
-            new HeaderSequence(Machine, DetailNumber, DetailName, Author, DrawingVersion, string.Empty) { Name = $"Шапка" },
-            new SafetyStringSequence(Machine, 3000, CoordinateSystem) { Name = $"Строка безопасности" }
+            new HeaderSequence(Machine, DetailNumber, DetailName, Author, DrawingVersion, string.Empty, "Шапка"),
+            new SafetyStringSequence(Machine, 3000, CoordinateSystem, "Строка безопасности")
         };
     }
 

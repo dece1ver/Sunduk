@@ -377,7 +377,7 @@
                         _speed = Operation.CuttingSpeedFinish(Material);
                         break;
                     case SequenceType.Drilling:
-                        _speed = Operation.DrillCuttingSpeed(Material, new DrillingTool(0, DrillingToolType, EndX, 180));
+                        _speed = Operation.DrillCuttingSpeed(Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180));
                         break;
                     case SequenceType.Tapping:
                         _speed = 5;
@@ -418,7 +418,7 @@
                         _feed = Operation.FeedFinish(ToolRadius());
                         break;
                     case SequenceType.Drilling:
-                        _feed = Operation.DrillFeed(Machine.L230A, Material, new DrillingTool(0, DrillingToolType, EndX, 180));
+                        _feed = Operation.DrillFeed(Machine.L230A, Material, new TurningDrillingTool(0, DrillingToolType, EndX, 180));
                         break;
                     case SequenceType.Grooving:
                         _feed = Operation.GroovingFeedRough();
@@ -508,7 +508,7 @@
                 case SequenceType.General:
                     CurrentSequence = GeneralSequence switch
                     {
-                        GeneralSequences.Limiter => new LimiterSequence(Machine.L230A, new Tool(), 0),
+                        GeneralSequences.Limiter => new LimiterSequence(Machine.L230A, new TurningSpecialTool(0, string.Empty), 0),
                         GeneralSequences.Stop => new StopSequence(false, string.Empty),
                         GeneralSequences.TailStockOn => new TailstockOnSequence(Machine.L230A),
                         GeneralSequences.TailStockOff => new TailstockOffSequence(Machine.L230A),
@@ -537,10 +537,10 @@
                 case SequenceType.RoughTurning:
                     if (StartX <= 0 || EndX <= 0 || EndZ is 0) return string.Empty;
                     var roughDifference = StartX - EndX;
-                    var roughTurningTool = Math.Abs(roughDifference) switch {
+                    TurningTool roughTurningTool = Math.Abs(roughDifference) switch {
                         > 0.001 when roughDifference > 0 => new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
                         > 0.001 when roughDifference < 0 => new TurningInternalTool(0, 20, 80, ToolRadius()),
-                        _ => new TurningTool() { Position = 0, Angle = 80, Radius = ToolRadius() },
+                        _ => new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
                     };
                     CurrentSequence = new RoughTurningSequence(
                         Machine.L230A,
@@ -556,11 +556,11 @@
                 case SequenceType.FinishTurning:
                     if (StartX <= 0 || EndX <= 0 || EndZ is 0) return string.Empty;
                     double finishDifference = StartX - EndX;
-                    var finishTurningTool = Math.Abs(finishDifference) switch
+                    TurningTool finishTurningTool = Math.Abs(finishDifference) switch
                     {
                         > 0.001 when finishDifference > 0 => new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
                         > 0.001 when finishDifference < 0 => new TurningInternalTool(0, 20, 80, ToolRadius()),
-                        _ => new TurningTool() { Position = 0, Angle = 80, Radius = ToolRadius() },
+                        _ => new TurningExternalTool(0, TurningExternalTool.Types.Bar, 80, ToolRadius()),
                     };
                     CurrentSequence = new FinishTurningSequence(
                         Machine.L230A,
@@ -619,7 +619,7 @@
                     CurrentSequence = Tapping switch
                     {
                         true => new TurningTappingSequence(Machine.L230A, new TurningTappingTool(0, TappingTool.Types.Cutting, StartX, Pitch, ThreadStandard, CurrentThreadTemplate), Speed, StartZ, EndZ),
-                        false => new ThreadCuttingSequence(Machine.L230A, new ThreadingTool(1, Pitch, ThreadStandard.Profile().GetDouble()), ThreadStandard, CuttingType.External, StartX, Pitch, StartZ, EndZ, PlaneLength, Speed, CurrentThreadTemplate)
+                        false => new ThreadCuttingSequence(Machine.L230A, new ThreadingExternalTool(1, Pitch, ThreadStandard.Profile().GetDouble()), ThreadStandard, CuttingType.External, StartX, Pitch, StartZ, EndZ, PlaneLength, Speed, CurrentThreadTemplate)
                     };
                     break;
                 case SequenceType.Burnishing:
@@ -774,7 +774,7 @@
                 Feed = Operation.FeedFinish(ToolRadius());
                 break;
             case SequenceType.Drilling:
-                var tool = new DrillingTool(0, DrillingToolType, EndX, 180);
+                var tool = new TurningDrillingTool(0, DrillingToolType, EndX, 180);
                 Speed = Operation.DrillCuttingSpeed(Material, tool);
                 Feed = Operation.DrillFeed(Machine.L230A, Material, tool);
                 break;

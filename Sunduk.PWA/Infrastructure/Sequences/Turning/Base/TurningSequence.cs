@@ -6,7 +6,7 @@ using Sunduk.PWA.Infrastructure.Tools.Turning;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning.Base
 {
-    public class TurningSequence : Sequence
+    public abstract class TurningSequence : Sequence
     {
         public TurningSequence(Machine machine, Material material, TurningTool tool, List<Element> contour, double stepOver, double roughStockAllow, double profStockAllow)
         {

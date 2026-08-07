@@ -1,0 +1,149 @@
+<MudGrid Spacing="1">
+    <MudItem xs="12" md="4">
+        <MudSelect Label="Тип" T="SequenceType" Variant="Variant.Filled" Margin="Margin.Dense" Value="@Type" ValueChanged="OnSequenceChanged" Disabled="@(Sequence is not null)">
+            <MudSelectItem Value="@SequenceType.General">Общие</MudSelectItem>
+            @if (MachineType == MachineType.Turning)
+            {
+                <MudSelectItem Value="@SequenceType.Facing">Обработка торца</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.ExternalTurning">Наружное точение</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.Grooving">Обработка канавок и отрезка</MudSelectItem>
+                <MudSelectItem Value="@SequenceType.Burnishing">Накатка</MudSelectItem>
+            }
+            <MudSelectItem Value="@SequenceType.Drilling">Сверление</MudSelectItem>
+            <MudSelectItem Value="@SequenceType.Threading">Нарезание резьбы</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+
+    @switch (Type)
+    {
+        case SequenceType.General:
+            <GeneralSequenceEditor Machine="Machine" MachineType="MachineType" CoordinateSystem="CoordinateSystem" SafePlane="SafePlane"
+                                    WorkpieceExternalDiameter="WorkpieceExternalDiameter" Tools="Tools" SequenceToEdit="Sequence" OnSubmit="Submit" />
+            break;
+        case SequenceType.Facing:
+            <FacingSequenceEditor Machine="Machine" MachineType="MachineType" WorkpieceMaterial="WorkpieceMaterial"
+                                   WorkpieceExternalDiameter="WorkpieceExternalDiameter" WorkpieceInternalDiameter="WorkpieceInternalDiameter"
+                                   WorkpieceCurrentInternalDiameter="WorkpieceCurrentInternalDiameter" CyclesCount="CyclesCount"
+                                   Tools="Tools" Program="Program" SequenceToEdit="Sequence" OnSubmit="Submit" />
+            break;
+        case SequenceType.ExternalTurning:
+            <ExternalTurningSequenceEditor Machine="Machine" MachineType="MachineType" WorkpieceMaterial="WorkpieceMaterial"
+                                            Tools="Tools" SequenceToEdit="Sequence" OnSubmit="Submit" />
+            break;
+        case SequenceType.Drilling:
+            <DrillingSequenceEditor Machine="Machine" MachineType="MachineType" WorkpieceMaterial="WorkpieceMaterial" CoordinateSystem="CoordinateSystem"
+                                     SafePlane="SafePlane" Tools="Tools" SequenceToEdit="Sequence" OnSubmit="Submit" />
+            break;
+        case SequenceType.Threading:
+            <ThreadingSequenceEditor Machine="Machine" MachineType="MachineType" CoordinateSystem="CoordinateSystem" SafePlane="SafePlane"
+                                      Tools="Tools" SequenceToEdit="Sequence" OnSubmit="Submit" />
+            break;
+        case SequenceType.Grooving:
+            <GroovingSequenceEditor Machine="Machine" MachineType="MachineType" WorkpieceMaterial="WorkpieceMaterial"
+                                     WorkpieceExternalDiameter="WorkpieceExternalDiameter" Tools="Tools" SequenceToEdit="Sequence" OnSubmit="Submit" />
+            break;
+        case SequenceType.Burnishing:
+            <BurnishingSequenceEditor Machine="Machine" Tools="Tools" SequenceToEdit="Sequence" OnSubmit="Submit" />
+            break;
+    }
+</MudGrid>
+
+@code {
+
+    [Parameter]
+    public List<Tool> Tools { get; set; }
+
+    [Parameter]
+    public List<Sequence> Program { get; set; }
+
+    [Parameter]
+    public Mode Mode { get; set; }
+
+    [Parameter]
+    public Material WorkpieceMaterial { get; set; }
+
+    [Parameter]
+    public Machine Machine { get; set; }
+
+    [Parameter]
+    public CoordinateSystem CoordinateSystem { get; set; }
+
+    [Parameter]
+    public MachineType MachineType { get; set; }
+
+    [Parameter]
+    public double WorkpieceLength { get; set; }
+
+    [Parameter]
+    public double WorkpieceExternalDiameter { get; set; }
+
+    [Parameter]
+    public double WorkpieceInternalDiameter { get; set; }
+
+    [Parameter]
+    public double WorkpieceCurrentInternalDiameter { get; set; }
+
+    [Parameter]
+    public int CyclesCount { get; set; }
+
+    [Parameter]
+    public double SafePlane { get; set; }
+
+    [Parameter]
+    public EventCallback<Mode> ModeChanged { get; set; }
+
+    /// <summary>
+    /// Если null — режим добавления; иначе — режим редактирования заданного перехода.
+    /// </summary>
+    [Parameter]
+    public Sequence Sequence { get; set; }
+
+    private SequenceType Type { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (Sequence is not null)
+        {
+            Type = DetermineType(Sequence);
+        }
+    }
+
+    private void OnSequenceChanged(SequenceType value)
+    {
+        Type = value;
+    }
+
+    /// <summary>
+    /// По конкретному классу перехода определяет семейство (<see cref="SequenceType"/>), чтобы отрисовать
+    /// нужный дочерний редактор в режиме правки.
+    /// </summary>
+    private static SequenceType DetermineType(Sequence sequence) => sequence switch
+    {
+        StopSequence or TurningCustomSequence or MillingCustomSequence or LimiterSequence or TailstockOnSequence or TailstockOffSequence => SequenceType.General,
+        FacingSequence or RoughFacingSequence or RoughFacingCycleSequence or FinishFacingSequence or FinishFacingCycleSequence => SequenceType.Facing,
+        RoughTurningSequence or FinishTurningSequence => SequenceType.ExternalTurning,
+        TurningHighSpeedDrillingSequence or MillingHighSpeedDrillingSequence or TurningPeckDrillingSequence or MillingPeckDrillingSequence or TurningPeckDeepDrillingSequence or MillingPeckDeepDrillingSequence => SequenceType.Drilling,
+        ThreadCuttingSequence or TurningTappingSequence or MillingTappingSequence or ThreadMillingCustomSequence or ThreadMillingSequence => SequenceType.Threading,
+        TurningCutOffSequence or TurningExternalGroovingSequence or TurningInternalGroovingSequence or TurningFaceGroovingSequence or TurningExternalRoughGroovingSequence or TurningInternalRoughGroovingSequence or TurningFaceRoughGroovingSequence => SequenceType.Grooving,
+        TurningBurnishingSequence => SequenceType.Burnishing,
+        _ => SequenceType.General
+    };
+
+    // добавление / подтверждение перехода
+    private async Task Submit(Sequence currentSequence)
+    {
+        if (currentSequence is null) return;
+        if (Sequence is null)
+        {
+            Program.Add(currentSequence);
+        }
+        else
+        {
+            var idx = Program.IndexOf(Sequence);
+            if (idx >= 0) Program[idx] = currentSequence;
+            else Program.Add(currentSequence);
+        }
+        Mode = Mode.General;
+        await ModeChanged.InvokeAsync(Mode);
+    }
+}

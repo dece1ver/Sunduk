@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Sunduk.PWA.Infrastructure.Tools.Base
 {
-    public class DrillingTool : Tool
+    public abstract class DrillingTool : Tool
     {
         public enum Types { Insert, Solid, Tip, Center, Rapid }
 

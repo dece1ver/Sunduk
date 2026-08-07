@@ -2,6 +2,7 @@
 using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
+using System;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
@@ -22,7 +23,30 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double CornerBlunt { get; set; }
         public int SpeedRough { get; set; }
         public double FeedRough { get; set; }
-        public override OperationTime MachineTime => this.OperationTime();
+        public override OperationTime MachineTime
+        {
+            get
+            {
+                double cuttingTime = 0;
+                double rapidTime = 5;
+
+                var startX = ExternalDiameter;
+                var endX = InternalDiameter;
+                var startZ = RoughStockAllow;
+                var endZ = ProfStockAllow;
+                var speedRough = SpeedRough;
+                var feedRough = FeedRough;
+                var fullLength = startZ - endZ;
+                var steps = (int)Math.Round(fullLength / StepOver, MidpointRounding.ToPositiveInfinity);
+                var spins = (speedRough * 1000) / (Math.PI * ((startX - endX) / 2));
+                if (spins > 3000) spins = 3000;
+                cuttingTime += steps * Calc.CrossTurningTime(startX, endX, spins, feedRough);
+
+                rapidTime += steps * Calc.CrossRapidTime(startX, endX);
+
+                return new OperationTime(cuttingTime, rapidTime);
+            }
+        }
         public override string Operation => Templates.FacingOperation.Facing(
             Machine, 
             Material, 

@@ -2,7 +2,7 @@
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning.Base
 {
-    public class TurningGroovingSequence : Sequence
+    public abstract class TurningGroovingSequence : Sequence
     {
         public Machine Machine { get; set; }
         public Material Material { get; set; }

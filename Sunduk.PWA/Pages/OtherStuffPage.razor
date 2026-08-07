@@ -28,6 +28,11 @@
 
     public void OnSwipe(SwipeEventArgs args)
     {
+        // MudSwipeArea реагирует на любые pointer-события, включая мышь: без этой проверки
+        // выделение текста мышью (например, в примере УП) интерпретируется как свайп и
+        // переключает вкладку.
+        if (args.TouchEventArgs.PointerType != "touch") return;
+
         if (args.SwipeDirection == SwipeDirection.LeftToRight)
         {
             if (tabs.GetState(x => x.ActivePanelIndex) > 0)

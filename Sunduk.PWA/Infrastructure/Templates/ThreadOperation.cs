@@ -27,25 +27,27 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 : $"G0 Z{SafeApproachDistance.NC()}\n";
             return machine switch
             {
-                Machine.GS1500 =>
-                TurningReferentPoint +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                approach +
-                $"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}\n" +
-                $"G80\n" +
-                exit +
-                $"G96 {CoolantOff(machine)}\n" +
-                TurningReferentPoint,
+                Machine.GS1500 => new GCodeBuilder()
+                    .Raw(TurningReferentPoint)
+                    .Line(tool.Description(ToolDescriptionOption.GoodwayLeft))
+                    .Raw(approach)
+                    .Line($"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}")
+                    .Line("G80")
+                    .Raw(exit)
+                    .Line($"G96 {CoolantOff(machine)}")
+                    .Raw(TurningReferentPoint)
+                    .ToString(),
 
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                approach +
-                $"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}\n" +
-                $"G80\n" +
-                exit +
-                $"G96 {CoolantOff(machine)}\n" +
-                TurningReferentPoint,
+                Machine.L230A => new GCodeBuilder()
+                    .Line(tool.Description(ToolDescriptionOption.L230))
+                    .Line(CoolantOn(machine))
+                    .Raw(approach)
+                    .Line($"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}")
+                    .Line("G80")
+                    .Raw(exit)
+                    .Line($"G96 {CoolantOff(machine)}")
+                    .Raw(TurningReferentPoint)
+                    .ToString(),
                 _ => string.Empty
             };
         }
@@ -187,7 +189,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             var firstPass = Thread.Passes(threadStandard, type, threadPitch)[0].Microns();
             var profile = Thread.ProfileHeight(threadStandard, type, threadPitch).Microns();
             var threadShift = string.Empty;
-            if (threadStandard == ThreadStandard.NPT)
+            if (threadStandard is ThreadStandard.NPT or ThreadStandard.BSPT)
             {
                 threadShift = type switch
                 {
@@ -199,23 +201,25 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
             return machine switch
             {
-                Machine.GS1500 =>
-                TurningReferentPoint +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{approachDiameter} Z{startZ.NC()} S{speed.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97\n" +
-                $"G76 P0201{threadStandard.Profile()} Q{minStep} R{lastPass.NC()}\n" +
-                $"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}\n" +
-                $"G96 {CoolantOff(machine)}\n" +
-                TurningReferentPoint,
+                Machine.GS1500 => new GCodeBuilder()
+                    .Raw(TurningReferentPoint)
+                    .Line(tool.Description(ToolDescriptionOption.GoodwayLeft))
+                    .Line($"G0 X{approachDiameter} Z{startZ.NC()} S{speed.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97")
+                    .Line($"G76 P0201{threadStandard.Profile()} Q{minStep} R{lastPass.NC()}")
+                    .Line($"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}")
+                    .Line($"G96 {CoolantOff(machine)}")
+                    .Raw(TurningReferentPoint)
+                    .ToString(),
 
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{approachDiameter} Z{startZ.NC()} S{speed.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97\n" +
-                $"G76 P0201{threadStandard.Profile()} Q{minStep} R{lastPass.NC()}\n" +
-                $"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}\n" +
-                $"G96 {CoolantOff(machine)}\n" +
-                TurningReferentPoint,
+                Machine.L230A => new GCodeBuilder()
+                    .Line(tool.Description(ToolDescriptionOption.L230))
+                    .Line(CoolantOn(machine))
+                    .Line($"G0 X{approachDiameter} Z{startZ.NC()} S{speed.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97")
+                    .Line($"G76 P0201{threadStandard.Profile()} Q{minStep} R{lastPass.NC()}")
+                    .Line($"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}")
+                    .Line($"G96 {CoolantOff(machine)}")
+                    .Raw(TurningReferentPoint)
+                    .ToString(),
 
                 _ => string.Empty,
             };

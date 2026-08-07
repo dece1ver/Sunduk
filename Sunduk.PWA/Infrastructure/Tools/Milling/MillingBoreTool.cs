@@ -14,6 +14,13 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
         public override string Name => $"RAST D{Diameter.ToPrettyString()} R{Radius.ToPrettyString()}";
 
         public override MachineType MachineType => MachineType.Milling;
+        public override string Description(Util.ToolDescriptionOption option) => option switch
+        {
+            Util.ToolDescriptionOption.General => $"T{Position:D2} ({Name} D{Diameter.NC(option: Util.NcDecimalPointOption.Without)})",
+            Util.ToolDescriptionOption.MillingToolChange => $"T{Position} M6 ({Name} D{Diameter.NC(option: Util.NcDecimalPointOption.Without)})",
+            Util.ToolDescriptionOption.ToolTable => Description(Util.ToolDescriptionOption.General).Split('(')[1].TrimEnd(')'),
+            _ => string.Empty,
+        };
 
 
         public MillingBoreTool(int position, double diameter, double cuttingLength = 0, double radius = -1, ToolHand hand = ToolHand.Right)

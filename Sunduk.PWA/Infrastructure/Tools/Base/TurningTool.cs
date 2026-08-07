@@ -2,7 +2,7 @@
 
 namespace Sunduk.PWA.Infrastructure.Tools.Base
 {
-    public class TurningTool : Tool
+    public abstract class TurningTool : Tool
     {
         public double Radius { get; set; }
         public double Angle { get; set; }

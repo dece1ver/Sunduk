@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <AssemblyName>Sunduk</AssemblyName>
     <ApplicationIcon>wwwroot\favicon.ico</ApplicationIcon>
@@ -28,12 +28,11 @@
     <PackageReference Include="Blazor.Text.Editor" Version="7.1.0" />
     <PackageReference Include="BlazorDownloadFile" Version="2.4.0.2" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
-    <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="9.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.7" PrivateAssets="all" />
-    <PackageReference Include="MudBlazor" Version="9.2.0" />
-    <PackageReference Include="NCalcSync" Version="5.5.0" />
-    <PackageReference Include="System.Net.Http.Json" Version="9.0.7" />
+    <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="9.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.10" PrivateAssets="all" />
+    <PackageReference Include="MudBlazor" Version="9.8.0" />
+    <PackageReference Include="NCalcSync" Version="7.1.0" />
   </ItemGroup>
 
   <ItemGroup>

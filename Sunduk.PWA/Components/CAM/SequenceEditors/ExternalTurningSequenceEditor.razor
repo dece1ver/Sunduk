@@ -1,0 +1,164 @@
+<MudItem xs="12" md="4">
+    <MudSelect Label="Переход" T="TurningSequences" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="TurningSequence">
+        <MudSelectItem Value="@(TurningSequences.RoughTurning)">Черновое точение</MudSelectItem>
+        <MudSelectItem Value="@(TurningSequences.FinishTurning)">Чистовое точение</MudSelectItem>
+    </MudSelect>
+</MudItem>
+<MudItem xs="12" md="4">
+    <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+        @foreach (var tool in Tools.Where(x => x is TurningExternalTool && (x as TurningExternalTool).Type == TurningExternalTool.Types.Bar))
+        {
+            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+        }
+    </MudSelect>
+</MudItem>
+<MudItem xs="12" md="4">
+    <MudTextField Label="Съем" @bind-Value="_FacingStepOver" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+</MudItem>
+<MudItem xs="12" md="4">
+    <MudTextField Label="Черный припуск" @bind-Value="_FacingRoughStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+</MudItem>
+<MudItem xs="12" md="4">
+    <MudTextField Label="Чистовой припуск" @bind-Value="_FacingProfStockAllow" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+</MudItem>
+@if (TurningSequence is TurningSequences.RoughTurning)
+{
+    <MudItem xs="6" md="6">
+        <MudTextField Label="Черновая Vc" @bind-Value="SpeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+    </MudItem>
+    <MudItem xs="6" md="6">
+        <MudTextField Label="Черновая F" @bind-Value="_FeedRough" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+    </MudItem>
+}
+else
+{
+    <MudItem xs="6" md="6">
+        <MudTextField Label="Чистовая Vc" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+    </MudItem>
+    <MudItem xs="6" md="6">
+        <MudTextField Label="Чистовая F" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+    </MudItem>
+}
+<MudItem xs="12">
+    <ContourComponent @bind-Contour="Contour"></ContourComponent>
+</MudItem>
+<MudItem Class="mt-4" xs="12" sm="12" md="12">
+    <MudTextField T="string" Underline="false" Label="Предпросмотр" Style="font-family: 'Roboto Mono', monospace; font-size: medium;"
+                  ReadOnly="true" Variant="Variant.Filled" Text="@("\n" + ExampleText.Trim('\n'))" Lines="@(ExampleText.Trim('\n').Count(x => x == '\n') + 3)" />
+</MudItem>
+<MudItem Class="d-flex flex-row-reverse py-0 px-0 mt-4">
+    <MudButton Variant="Variant.Outlined" Size="Size.Large"
+               EndIcon="@Icons.Material.TwoTone.PlaylistAdd" Color="Color.Primary"
+               OnClick="Submit" Disabled="@(string.IsNullOrEmpty(ExampleText))">
+        @(SequenceToEdit is null ? "Добавить" : "Подтвердить")
+    </MudButton>
+</MudItem>
+
+@code {
+    [Parameter] public Machine Machine { get; set; }
+    [Parameter] public MachineType MachineType { get; set; }
+    [Parameter] public Material WorkpieceMaterial { get; set; }
+    [Parameter] public List<Tool> Tools { get; set; }
+    [Parameter] public Sequence SequenceToEdit { get; set; }
+    [Parameter] public EventCallback<Sequence> OnSubmit { get; set; }
+
+    private TurningSequences TurningSequence { get; set; }
+    private Tool Tool { get; set; }
+    private List<Element> Contour { get; set; } = new() { new Point(null, null) };
+
+    public int SpeedRough { get; set; }
+    public int SpeedFinish { get; set; }
+    private string _FeedRough { get; set; } = "";
+    private double FeedRough => _FeedRough.GetDouble();
+    private string _FeedFinish { get; set; } = "";
+    private double FeedFinish => _FeedFinish.GetDouble();
+
+    private string _FacingStepOver { get; set; } = "1";
+    private double FacingStepOver => _FacingStepOver.GetDouble();
+    private string _FacingRoughStockAllow { get; set; } = "2";
+    private double FacingRoughStockAllow => _FacingRoughStockAllow.GetDouble();
+    private string _FacingProfStockAllow { get; set; } = "0.2";
+    private double FacingProfStockAllow => _FacingProfStockAllow.GetDouble();
+
+    private Sequence CurrentSequence { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (SequenceToEdit is not null) LoadFromSequence(SequenceToEdit);
+    }
+
+    private void LoadFromSequence(Sequence sequence)
+    {
+        switch (sequence)
+        {
+            case RoughTurningSequence roughTurning:
+                TurningSequence = TurningSequences.RoughTurning;
+                Tool = roughTurning.Tool;
+                Contour = roughTurning.Contour ?? new() { new Point(null, null) };
+                _FacingStepOver = roughTurning.StepOver.ToPrettyString();
+                _FacingRoughStockAllow = roughTurning.RoughStockAllow.ToPrettyString();
+                _FacingProfStockAllow = roughTurning.ProfStockAllow.ToPrettyString();
+                SpeedRough = roughTurning.SpeedRough;
+                _FeedRough = roughTurning.FeedRough.ToPrettyString();
+                break;
+            case FinishTurningSequence finishTurning:
+                TurningSequence = TurningSequences.FinishTurning;
+                Tool = finishTurning.Tool;
+                Contour = finishTurning.Contour ?? new() { new Point(null, null) };
+                _FacingStepOver = finishTurning.StepOver.ToPrettyString();
+                _FacingRoughStockAllow = finishTurning.RoughStockAllow.ToPrettyString();
+                _FacingProfStockAllow = finishTurning.ProfStockAllow.ToPrettyString();
+                SpeedFinish = finishTurning.SpeedFinish;
+                _FeedFinish = finishTurning.FeedFinish.ToPrettyString();
+                break;
+        }
+    }
+
+    private void OnToolChanged(Tool value)
+    {
+        Tool = value;
+    }
+
+    public string ExampleText
+    {
+        get
+        {
+            switch (TurningSequence)
+            {
+                case TurningSequences.RoughTurning:
+                    if (SpeedRough <= 0 || FeedRough <= 0) return string.Empty;
+                    CurrentSequence = TurningSequenceFactory.CreateRoughTurning(
+                        machine: Machine,
+                        material: WorkpieceMaterial,
+                        tool: Tool as TurningTool,
+                        contour: Contour,
+                        stepOver: FacingStepOver,
+                        roughStockAllow: FacingRoughStockAllow,
+                        profStockAllow: FacingProfStockAllow,
+                        speedRough: SpeedRough,
+                        feedRough: FeedRough);
+                    return CurrentSequence.Operation;
+                case TurningSequences.FinishTurning:
+                    if (SpeedFinish <= 0 || FeedFinish <= 0) return string.Empty;
+                    CurrentSequence = TurningSequenceFactory.CreateFinishTurning(
+                        machine: Machine,
+                        material: WorkpieceMaterial,
+                        tool: Tool as TurningTool,
+                        contour: Contour,
+                        stepOver: FacingStepOver,
+                        roughStockAllow: FacingRoughStockAllow,
+                        profStockAllow: FacingProfStockAllow,
+                        speedFinish: SpeedFinish,
+                        feedFinish: FeedFinish);
+                    return CurrentSequence.Operation;
+            }
+            return string.Empty;
+        }
+    }
+
+    private async Task Submit()
+    {
+        if (CurrentSequence is null) return;
+        await OnSubmit.InvokeAsync(CurrentSequence);
+    }
+}

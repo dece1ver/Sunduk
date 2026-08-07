@@ -2,6 +2,7 @@
 using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
+using System;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
@@ -19,7 +20,25 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double CornerBlunt { get; set; }
         public int SpeedFinish { get; set; }
         public double FeedFinish { get; set; }
-        public override OperationTime MachineTime => this.OperationTime();
+        public override OperationTime MachineTime
+        {
+            get
+            {
+                double cuttingTime = 0;
+                double rapidTime = 5;
+
+                var startX = ExternalDiameter;
+                var endX = InternalDiameter;
+
+                var feedFinish = FeedFinish;
+                var speedFinish = SpeedFinish;
+                var spinsFinish = (speedFinish * 1000) / (Math.PI * ((startX - endX) / 2));
+                cuttingTime += Calc.CrossTurningTime(startX, endX, spinsFinish, feedFinish);
+                rapidTime += Calc.CrossRapidTime(startX, endX);
+
+                return new OperationTime(cuttingTime, rapidTime);
+            }
+        }
         public override string Operation => Templates.FacingOperation.FinishFacing(
             Machine, 
             Material, 

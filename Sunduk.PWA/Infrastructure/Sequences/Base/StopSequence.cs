@@ -14,6 +14,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
         public string Comment { get; set; }
         public override string Operation => Templates.Operation.Stop(Optional, Comment);
         public override string Name => Optional ? "Опциональная остановка" : "Остановка";
-        public override OperationTime MachineTime => this.OperationTime();
+        public override MachineType MachineType => MachineType.Any;
+        public override OperationTime MachineTime => new(0, 30);
     }
 }

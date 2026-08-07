@@ -2,6 +2,7 @@
 using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
+using System;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
@@ -9,7 +10,34 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     {
         public Machine Machine { get; set; }
         public Material Material { get; set; }
-        public override OperationTime MachineTime => this.OperationTime();
+        public override OperationTime MachineTime
+        {
+            get
+            {
+                double cuttingTime = 0;
+                double rapidTime = 5;
+
+                var startX = ExternalDiameter;
+                var endX = InternalDiameter;
+                var startZ = RoughStockAllow;
+                var endZ = ProfStockAllow;
+                var speedRough = SpeedRough;
+                var speedFinish = SpeedFinish;
+                var feedRough = FeedRough;
+                var feedFinish = FeedFinish;
+                var fullLength = startZ - endZ;
+                var steps = (int)Math.Round(fullLength / StepOver, MidpointRounding.ToPositiveInfinity);
+                var spinsRough = (speedRough * 1000) / (Math.PI * ((startX - endX) / 2));
+                var spinsFinish = (speedFinish * 1000) / (Math.PI * ((startX - endX) / 2));
+                if (spinsRough > 3000) spinsRough = 3000;
+                if (spinsFinish > 3000) spinsFinish = 3000;
+                cuttingTime += steps * Calc.CrossTurningTime(startX, endX, spinsRough, feedRough);
+                cuttingTime += Calc.CrossTurningTime(startX, endX, spinsFinish, feedFinish);
+                rapidTime += steps + 1 * Calc.CrossRapidTime(startX, endX);
+
+                return new OperationTime(cuttingTime, rapidTime);
+            }
+        }
         public TurningExternalTool Tool { get; set; }
         public double ExternalDiameter { get; set; }
         public double InternalDiameter { get; set; }

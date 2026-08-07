@@ -2,6 +2,7 @@
 using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning.Base;
+using System;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
@@ -36,7 +37,23 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
                 return name;
             }
         }
-        public override OperationTime MachineTime => this.OperationTime();
+        public override OperationTime MachineTime
+        {
+            get
+            {
+                double cuttingTime = 0;
+                double rapidTime = 5;
+                var fullLength = Math.Abs(EndZ) + Math.Abs(StartZ) + Templates.Thread.ThreadRunout(ThreadStandard, ThreadPitch, CuttingType.External);
+                var feed = ThreadPitch;
+                var spins = Speed.ToSpindleSpeed(ThreadDiameter);
+                if (spins > 2000) spins = 2000;
+                var passes = Templates.Thread.PassesCount(ThreadStandard, ThreadPitch) + 3;
+                cuttingTime += passes * fullLength.AxialTurningTime(spins, feed);
+                rapidTime += passes * fullLength.AxialRapidTime();
+                rapidTime += passes * 2 * (2.0.AxialRapidTime()); // 2 мм подъемы и опускания между проходами
+                return new OperationTime(cuttingTime, rapidTime);
+            }
+        }
 
         public ThreadCuttingSequence(Machine machine, ThreadingTool tool, ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNptPlane, int speed, string standardTemplate = "")
         {

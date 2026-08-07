@@ -201,6 +201,30 @@ namespace Sunduk.PWA.Infrastructure
             return value.ToString($"D4");
         }
 
+        /// <summary>
+        /// Равномерно или вручную распределённые отверстия по окружности (для сверления/резьбофрезерования по цилиндру)
+        /// </summary>
+        public static List<Hole> PolarHoles(int holesCount, double radius, double startAngle, bool evenly, List<Hole> manualHoles)
+        {
+            List<Hole> result = new();
+            var angleStep = 360.0 / holesCount;
+            while (startAngle >= 360) startAngle -= 360;
+            while (startAngle <= -360) startAngle += 360;
+            for (var i = 0; i < holesCount; i++)
+            {
+                result.Add(evenly ? new Hole(radius, angleStep * i + startAngle) : new Hole(radius, manualHoles[i].Y));
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Подпись поля притупления/фаски в зависимости от выбранного типа
+        /// </summary>
+        public static string BluntLabel(Blunt bluntType)
+        {
+            return bluntType == Blunt.CustomChamfer ? "Размер фаски" : "Величина притупления";
+        }
+
 
         /// <summary>
         /// Описание инструмента в УП
@@ -210,168 +234,7 @@ namespace Sunduk.PWA.Infrastructure
         /// <returns></returns>
         public static string Description(this Tool tool, ToolDescriptionOption option = ToolDescriptionOption.General)
         {
-            return tool switch
-            {
-                MillingBoreTool millingBoreTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{millingBoreTool.Position:D2} ({millingBoreTool.Name} D{millingBoreTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
-                    ToolDescriptionOption.MillingToolChange => $"T{millingBoreTool.Position} M6 ({millingBoreTool.Name} D{millingBoreTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
-                    ToolDescriptionOption.ToolTable => millingBoreTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                MillingChamferTool millingChamferTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{millingChamferTool.Position:D2} ({millingChamferTool.Name} D{millingChamferTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingChamferTool.Angle.NC(option: NcDecimalPointOption.Without)})",
-                    ToolDescriptionOption.MillingToolChange => $"T{millingChamferTool.Position} M6 ({millingChamferTool.Name} D{millingChamferTool.Diameter.NC(option: NcDecimalPointOption.Without)}x{millingChamferTool.Angle.NC(option: NcDecimalPointOption.Without)})",
-                    ToolDescriptionOption.ToolTable => millingChamferTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                MillingDrillingTool millingDrillingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{millingDrillingTool.Position:D2} ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
-                    ToolDescriptionOption.MillingToolChange => $"T{millingDrillingTool.Position} M6 ({millingDrillingTool.Name} D{millingDrillingTool.Diameter.NC(option: NcDecimalPointOption.Without)})",
-                    ToolDescriptionOption.ToolTable => millingDrillingTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                MillingSpecialTool millingSpecialTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{millingSpecialTool.Position:D2} ({millingSpecialTool.Name})",
-                    ToolDescriptionOption.MillingToolChange => $"T{millingSpecialTool.Position} M6 ({millingSpecialTool.Name})",
-                    ToolDescriptionOption.ToolTable => millingSpecialTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                MillingTappingTool millingTappingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{millingTappingTool.Position:D2} ({millingTappingTool.Name})",
-                    ToolDescriptionOption.MillingToolChange => $"T{millingTappingTool.Position} M6 ({millingTappingTool.Name})",
-                    ToolDescriptionOption.ToolTable => millingTappingTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                MillingThreadCuttingTool millingThreadCuttingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{millingThreadCuttingTool.Position:D2} ({millingThreadCuttingTool.Name})",
-                    ToolDescriptionOption.MillingToolChange => $"T{millingThreadCuttingTool.Position} M6 ({millingThreadCuttingTool.Name})",
-                    ToolDescriptionOption.ToolTable => millingThreadCuttingTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                MillingTool millingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{millingTool.Position:D2} ({millingTool.Name} D{millingTool.Diameter.NC(option: NcDecimalPointOption.Without)} L{millingTool.CuttingLength} Z{millingTool.Edges})",
-                    ToolDescriptionOption.MillingToolChange => $"T{millingTool.Position} M6 ({millingTool.Name} D{millingTool.Diameter.NC(option: NcDecimalPointOption.Without)} L{millingTool.CuttingLength} Z{millingTool.Edges})",
-                    ToolDescriptionOption.ToolTable => millingTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-
-                GroovingExternalTool groovingExternalTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{groovingExternalTool.Position.ToolNumber()} ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{groovingExternalTool.Position.ToolNumber()} ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{groovingExternalTool.Position.ToolNumber()} G54 M58 ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{groovingExternalTool.Position.ToolNumber()} G55 M58 ({groovingExternalTool.Name} {groovingExternalTool.Width}MM {(groovingExternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK PROHOD" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => groovingExternalTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                GroovingFaceTool groovingFaceTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{groovingFaceTool.Position.ToolNumber()} ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == TurningGroovingTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{groovingFaceTool.Position.ToolNumber()} ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == TurningGroovingTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{groovingFaceTool.Position.ToolNumber()} G54 M58 ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == TurningGroovingTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{groovingFaceTool.Position.ToolNumber()} G55 M58 ({groovingFaceTool.Name} {groovingFaceTool.Width}MM {(groovingFaceTool.ZeroPoint == TurningGroovingTool.Point.Bottom ? "KAK PROHOD" : "KAK RAST")})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => groovingFaceTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                GroovingInternalTool groovingInternalTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{groovingInternalTool.Position.ToolNumber()} ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK RAST" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{groovingInternalTool.Position.ToolNumber()} ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK RAST" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{groovingInternalTool.Position.ToolNumber()} G54 M58 ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK RAST" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{groovingInternalTool.Position.ToolNumber()} G55 M58 ({groovingInternalTool.Name} D{groovingInternalTool.Diameter.ToPrettyString()} {groovingInternalTool.Width}MM {(groovingInternalTool.ZeroPoint == TurningGroovingTool.Point.Left ? "KAK RAST" : "KAK OTR")})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => groovingInternalTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                TurningSpecialTool specialTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{specialTool.Position.ToolNumber()} ({specialTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{specialTool.Position.ToolNumber()} ({specialTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{specialTool.Position.ToolNumber()} G54 M58 ({specialTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{specialTool.Position.ToolNumber()} G55 M58 ({specialTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => specialTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                ThreadingExternalTool threadingExternalTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{threadingExternalTool.Position.ToolNumber()} ({threadingExternalTool.Name} {threadingExternalTool.Pitch} {threadingExternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{threadingExternalTool.Position.ToolNumber()} ({threadingExternalTool.Name} {threadingExternalTool.Pitch} {threadingExternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{threadingExternalTool.Position.ToolNumber()} G54 M58 ({threadingExternalTool.Name} {threadingExternalTool.Pitch} {threadingExternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{threadingExternalTool.Position.ToolNumber()} G55 M58 ({threadingExternalTool.Name} {threadingExternalTool.Pitch} {threadingExternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => threadingExternalTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                ThreadingInternalTool threadingInternalTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{threadingInternalTool.Position.ToolNumber()} ({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{threadingInternalTool.Position.ToolNumber()} ({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{threadingInternalTool.Position.ToolNumber()} G54 M58 ({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{threadingInternalTool.Position.ToolNumber()} G55 M58 ({threadingInternalTool.Name} D{threadingInternalTool.Diameter} {threadingInternalTool.Pitch} {threadingInternalTool.Angle})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => threadingInternalTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                TurningExternalBurnishingTool turningExternalBurnishingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{turningExternalBurnishingTool.Position.ToolNumber()} ({turningExternalBurnishingTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{turningExternalBurnishingTool.Position.ToolNumber()} ({turningExternalBurnishingTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{turningExternalBurnishingTool.Position.ToolNumber()} G54 M58 ({turningExternalBurnishingTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{turningExternalBurnishingTool.Position.ToolNumber()} G55 M58 ({turningExternalBurnishingTool.Name})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => turningExternalBurnishingTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                TurningInternalBurnishingTool turningInternalBurnishingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{turningInternalBurnishingTool.Position.ToolNumber()} ({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{turningInternalBurnishingTool.Position.ToolNumber()} ({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{turningInternalBurnishingTool.Position.ToolNumber()} G54 M58 ({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{turningInternalBurnishingTool.Position.ToolNumber()} G55 M58 ({turningInternalBurnishingTool.Name} D{turningInternalBurnishingTool.Diameter.NC(option: NcDecimalPointOption.Without)})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => turningInternalBurnishingTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                TurningDrillingTool turningDrillingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{turningDrillingTool.Position.ToolNumber()} ({turningDrillingTool.Name} D{turningDrillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{turningDrillingTool.Position.ToolNumber()} ({turningDrillingTool.Name} D{turningDrillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{turningDrillingTool.Position.ToolNumber()} G54 M58 ({turningDrillingTool.Name} D{turningDrillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{turningDrillingTool.Position.ToolNumber()} G55 M58 ({turningDrillingTool.Name} D{turningDrillingTool.Diameter})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => turningDrillingTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                TurningExternalTool turningExternalTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{turningExternalTool.Position.ToolNumber()} ({turningExternalTool.Name} {turningExternalTool.Angle} R{turningExternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{turningExternalTool.Position.ToolNumber()} ({turningExternalTool.Name} {turningExternalTool.Angle} R{turningExternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{turningExternalTool.Position.ToolNumber()} G54 M58 ({turningExternalTool.Name} {turningExternalTool.Angle} R{turningExternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{turningExternalTool.Position.ToolNumber()} G55 M58 ({turningExternalTool.Name} {turningExternalTool.Angle} R{turningExternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => turningExternalTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                TurningInternalTool turningInternalTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{turningInternalTool.Position.ToolNumber()} ({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.L230 => $"T{turningInternalTool.Position.ToolNumber()} ({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayLeft => $"T{turningInternalTool.Position.ToolNumber()} G54 M58 ({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.GoodwayRight => $"T{turningInternalTool.Position.ToolNumber()} G55 M58 ({turningInternalTool.Name} D{turningInternalTool.Diameter} {turningInternalTool.Angle} R{turningInternalTool.Radius})".Replace(',', '.'),
-                    ToolDescriptionOption.ToolTable => turningInternalTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                TurningTappingTool turningTappingTool => option switch
-                {
-                    ToolDescriptionOption.General => $"T{turningTappingTool.Position.ToolNumber()} ({turningTappingTool.Name})",
-                    ToolDescriptionOption.L230 => $"T{turningTappingTool.Position.ToolNumber()} ({turningTappingTool.Name})",
-                    ToolDescriptionOption.GoodwayLeft => $"T{turningTappingTool.Position.ToolNumber()} G54 M58 ({turningTappingTool.Name})",
-                    ToolDescriptionOption.GoodwayRight => $"T{turningTappingTool.Position.ToolNumber()} G55 M58 ({turningTappingTool.Name})",
-                    ToolDescriptionOption.ToolTable => turningTappingTool.Description().Split('(')[1].TrimEnd(')'),
-                    _ => string.Empty,
-                },
-                _ => string.Empty,
-            };
+            return tool.Description(option);
         }
 
         /// <summary>

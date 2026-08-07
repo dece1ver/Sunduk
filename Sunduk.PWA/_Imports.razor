@@ -19,6 +19,7 @@
 @using Sunduk.PWA.Components.CAM.ToolTableTools
 @using Sunduk.PWA.Components.CAM.ToolTableTools.Milling
 @using Sunduk.PWA.Components.CAM.ToolTableTools.Turning
+@using Sunduk.PWA.Components.CAM.SequenceEditors
 @using Sunduk.PWA.Components.Stuff
 @using Sunduk.PWA.Components.Converters
 @using Sunduk.PWA.Components.Knowledge
@@ -33,12 +34,14 @@
 @using Sunduk.PWA.Infrastructure.Sequences.Milling
 @using Sunduk.PWA.Infrastructure.Sequences.ContourElements
 @using Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base
+@using Sunduk.PWA.Infrastructure.Sequences.Factories
 @using Sunduk.PWA.Infrastructure.Tools
 @using Sunduk.PWA.Infrastructure.Tools.Base
 @using Sunduk.PWA.Infrastructure.Tools.Turning
 @using Sunduk.PWA.Infrastructure.Tools.Turning.Base
 @using Sunduk.PWA.Infrastructure.Tools.Milling
 @using Sunduk.PWA.Infrastructure.CAM
+@using Sunduk.PWA.Infrastructure.State
 @using MudBlazor
 @using BlazorDownloadFile
 @using MudExtensions
