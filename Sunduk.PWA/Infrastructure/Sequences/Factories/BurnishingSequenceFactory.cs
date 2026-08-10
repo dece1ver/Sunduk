@@ -5,7 +5,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Factories
 {
     public static class BurnishingSequenceFactory
     {
-        public static TurningBurnishingSequence CreateTurningBurnishing(Machine machine, TurningBurnishingTool tool, double diameter, double startZ, double endZ, int speedFinish, double feedFinish)
-            => new(machine, tool, diameter, startZ, endZ, speedFinish, feedFinish);
+        public static TurningBurnishingSequence CreateTurningBurnishing(Machine machine, CoordinateSystem coordinateSystem, TurningBurnishingTool tool, double diameter, double startZ, double endZ, int speedFinish, double feedFinish, Coolant coolant = Coolant.General)
+            => new(machine, coordinateSystem, tool, diameter, startZ, endZ, speedFinish, feedFinish) { Coolant = coolant };
     }
 }

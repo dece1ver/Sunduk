@@ -40,6 +40,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         }
         public override string Operation => Templates.GroovingOperation.FaceGroovingSequence(
             Machine,
+            CoordinateSystem,
             Material,
             Tool,
             Width, // используется как startPoint
@@ -52,13 +53,15 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             InnerCornerBlunt,
             OuterBluntType,
             InnerBluntType,
-            false, 
-            SpeedRough, 0, 
-            FeedRough, 0);
+            false,
+            SpeedRough, 0,
+            FeedRough, 0,
+            Coolant);
         public override string Name => $"Канавка торцевая {Width.ToPrettyString()}мм на Ø{InternalDiameter.ToPrettyString()}-{ExternalDiameter.ToPrettyString()}";
 
         public TurningFaceRoughGroovingSequence(
             Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
             GroovingFaceTool tool,
             double cuttingPoint,
@@ -70,21 +73,21 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double outerCornerBlunt,
             double innerCornerBlunt,
             Blunt outerBluntType,
-            Blunt innerBluntType, 
-            int speedRough, 
+            Blunt innerBluntType,
+            int speedRough,
             double feedRough)
-            : base(machine, material,
+            : base(machine, coordinateSystem, material,
                 cuttingPoint,
                 externalDiameter,
                 internalDiameter,
                 width,
                 stepOver,
-                profStockAllow, 
+                profStockAllow,
                 outerCornerBlunt,
                 innerCornerBlunt,
-                outerBluntType, 
-                innerBluntType, 
-                speedRough, 0, 
+                outerBluntType,
+                innerBluntType,
+                speedRough, 0,
                 feedRough, 0)
         {
             Tool = tool;

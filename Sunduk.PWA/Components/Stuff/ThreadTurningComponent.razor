@@ -1,4 +1,5 @@
 ﻿@inject IDialogService DialogService
+@inject ThreadTurningState State
 <style>
     .tl {
         padding: 0px 15px 0px 0px;
@@ -477,24 +478,24 @@
         }
     }
 
-    public string CurrentThreadTemplate { get; set; } = "";
+    public string CurrentThreadTemplate { get => State.CurrentThreadTemplate; set => State.CurrentThreadTemplate = value; }
 
-    public ThreadStandard ThreadStandard { get; set; } = ThreadStandard.Metric;
-    public CuttingType ThreadType { get; set; } = CuttingType.External;
+    public ThreadStandard ThreadStandard { get => State.ThreadStandard; set => State.ThreadStandard = value; }
+    public CuttingType ThreadType { get => State.ThreadType; set => State.ThreadType = value; }
 
-    public double ThreadChamfer { get; set; }
+    public double ThreadChamfer { get => State.ThreadChamfer; set => State.ThreadChamfer = value; }
 
-    public string ThreadDiameterString { get; set; } = "";
+    public string ThreadDiameterString { get => State.ThreadDiameterString; set => State.ThreadDiameterString = value; }
     public double ThreadDiameter => Util.GetDouble(ThreadDiameterString);
 
-    public string ThreadPitchString { get; set; } = "";
+    public string ThreadPitchString { get => State.ThreadPitchString; set => State.ThreadPitchString = value; }
     public double ThreadPitch => Util.GetDouble(ThreadPitchString);
 
-    public bool Blunted { get; set; } = false;
-    public double BluntSize { get; set; } = 0.3;
+    public bool Blunted { get => State.Blunted; set => State.Blunted = value; }
+    public double BluntSize { get => State.BluntSize; set => State.BluntSize = value; }
 
-    public Thread.ThreadPosition? ThreadPosition { get; set; }
-    public int? Grade { get; set; }
+    public Thread.ThreadPosition? ThreadPosition { get => State.ThreadPosition; set => State.ThreadPosition = value; }
+    public int? Grade { get => State.Grade; set => State.Grade = value; }
 
     /// <summary>
     /// Возвращает результат расчёта (Gost19257Result | Gost19258Result) или null,
@@ -527,7 +528,7 @@
             ? $"{Grade}{ThreadPosition}"
             : string.Empty;
 
-    public double PlaneLength { get; set; } = 0;
+    public double PlaneLength { get => State.PlaneLength; set => State.PlaneLength = value; }
 
     public string ThreadShift
     {
@@ -734,9 +735,9 @@
         ? Thread.EndDiameter(ThreadStandard, ThreadType, ThreadDiameter, ThreadPitch, EndPointZ, StartPointZ, PlaneLength).NC(2)
         : string.Empty;
 
-    public double StartPointZ { get; set; } = 2;
-    public double EndPointZ { get; set; } = -20;
-    public double InsertRadius { get; set; } = 0.4;
+    public double StartPointZ { get => State.StartPointZ; set => State.StartPointZ = value; }
+    public double EndPointZ { get => State.EndPointZ; set => State.EndPointZ = value; }
+    public double InsertRadius { get => State.InsertRadius; set => State.InsertRadius = value; }
 
     private void OnStandardChanged(ThreadStandard value)
     {

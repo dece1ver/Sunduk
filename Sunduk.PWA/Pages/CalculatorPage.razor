@@ -4,6 +4,7 @@
 @inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject CalculatorPageState State
 
 <style>
     .monofield {
@@ -217,8 +218,8 @@
         }
     }
 
-    public bool CalcSpins { get; set; } = true;
-    public bool CalcMinFeed { get; set; } = true;
+    public bool CalcSpins { get => State.CalcSpins; set => State.CalcSpins = value; }
+    public bool CalcMinFeed { get => State.CalcMinFeed; set => State.CalcMinFeed = value; }
 
 
 
@@ -247,14 +248,12 @@
 
     #region Диаметр
 
-    private string diameterString = String.Empty;
-
     public string DiameterString
     {
-        get => diameterString;
+        get => State.DiameterString;
         set
         {
-            diameterString = value;
+            State.DiameterString = value;
             if (Diameter > 0)
             {
                 if (CalcSpins)
@@ -274,14 +273,12 @@
     #endregion
 
     #region Скрость резания
-    private string cutSpeedstring = String.Empty;
-
     public string CutSpeedString
     {
-        get => cutSpeedstring;
+        get => State.CutSpeedString;
         set
         {
-            cutSpeedstring = value;
+            State.CutSpeedString = value;
             if (CalcSpins)
             {
                 SpindleSpeedString = Util.ToPrettyString((CutSpeed * 1000) / (Diameter * Math.PI), 0);
@@ -302,14 +299,12 @@
     #endregion
 
     #region Обороты
-    private string spingleSpeedString = String.Empty;
-
     public string SpindleSpeedString
     {
-        get => spingleSpeedString;
+        get => State.SpindleSpeedString;
         set
         {
-            spingleSpeedString = value;
+            State.SpindleSpeedString = value;
             if (Diameter > 0)
             {
                 if (!CalcSpins)
@@ -333,14 +328,12 @@
     #endregion
 
     #region Зубья
-    private string egdesString = String.Empty;
-
     public string EdgesString
     {
-        get => egdesString;
+        get => State.EdgesString;
         set
         {
-            egdesString = value;
+            State.EdgesString = value;
             if (CalcMinFeed)
             {
                 MinFeedString = Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0);
@@ -359,14 +352,12 @@
     public string FeedUnits => Edges > 1 ? "мм/зуб" : "мм/об";
 
     #region Подача
-    private string feedString = String.Empty;
-
     public string FeedString
     {
-        get => feedString;
+        get => State.FeedString;
         set
         {
-            feedString = value;
+            State.FeedString = value;
             if (CalcMinFeed)
             {
                 MinFeedString = Util.ToPrettyString(Feed * SpindleSpeed * Edges, 0);
@@ -378,14 +369,12 @@
     #endregion
 
     #region Минутная подача
-    private string minFeedString = String.Empty;
-
     public string MinFeedString
     {
-        get => minFeedString;
+        get => State.MinFeedString;
         set
         {
-            minFeedString = value;
+            State.MinFeedString = value;
             if (!CalcMinFeed)
             {
                 FeedString = Util.ToPrettyString(MinFeed / (SpindleSpeed * Edges), 3);
@@ -427,8 +416,8 @@
         set { }
     }
 
-    public string Answer { get; set; } = "";
-    public string UserExpression { get; set; } = "";
+    public string Answer { get => State.Answer; set => State.Answer = value; }
+    public string UserExpression { get => State.UserExpression; set => State.UserExpression = value; }
 
     async Task AddToExpr(string text)
     {

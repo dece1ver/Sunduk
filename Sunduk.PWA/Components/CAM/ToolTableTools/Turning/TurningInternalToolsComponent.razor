@@ -1,4 +1,4 @@
-﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+﻿@inject MachineRegistry MachineRegistry
 
 <MudTable Items="TurningInternalTools" ReadOnly="ReadOnly" Hover="true" CanCancelEdit="false" Elevation="0">
     <HeaderContent>
@@ -64,13 +64,13 @@
     private async Task AddTurningInternalTool()
     {
         Tools.Add(new TurningInternalTool(0101, 25, 80, 0.8));
-        await LocalStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
+        await MachineRegistry.SaveAsync();
         await ToolsChanged.InvokeAsync(Tools);
     }
     private async Task RemoveTurningInternalTool(TurningInternalTool tool)
     {
         Tools.Remove(tool);
-        await LocalStorage.SetItemAsync(nameof(TurningInternalTools), TurningInternalTools);
+        await MachineRegistry.SaveAsync();
         await ToolsChanged.InvokeAsync(Tools);
     }
 }

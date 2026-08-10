@@ -10,11 +10,11 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Factories
 {
     public static class ThreadingSequenceFactory
     {
-        public static ThreadCuttingSequence CreateThreadCutting(Machine machine, ThreadingTool tool, ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNptPlane, int speed)
-            => new(machine, tool, threadStandard, type, threadDiameter, threadPitch, startZ, endZ, threadNptPlane, speed);
+        public static ThreadCuttingSequence CreateThreadCutting(Machine machine, CoordinateSystem coordinateSystem, ThreadingTool tool, ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNptPlane, int speed, Coolant coolant = Coolant.General)
+            => new(machine, coordinateSystem, tool, threadStandard, type, threadDiameter, threadPitch, startZ, endZ, threadNptPlane, speed) { Coolant = coolant };
 
-        public static TurningTappingSequence CreateTurningTapping(Machine machine, TurningTappingTool tool, double cutSpeed, double startZ, double endZ)
-            => new(machine, tool, cutSpeed, startZ, endZ);
+        public static TurningTappingSequence CreateTurningTapping(Machine machine, CoordinateSystem coordinateSystem, TurningTappingTool tool, double cutSpeed, double startZ, double endZ, Coolant coolant = Coolant.General)
+            => new(machine, coordinateSystem, tool, cutSpeed, startZ, endZ) { Coolant = coolant };
 
         public static MillingTappingSequence CreateMillingTapping(Machine machine, CoordinateSystem coordinateSystem, MillingTappingTool tool, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
             => new(machine, coordinateSystem, tool, cutSpeed, startZ, endZ, holes, polar, safePlane);

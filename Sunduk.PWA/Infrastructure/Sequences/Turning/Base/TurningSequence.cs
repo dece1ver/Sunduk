@@ -20,6 +20,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning.Base
         }
 
         public Machine Machine { get; set; }
+        public CoordinateSystem CoordinateSystem { get; set; }
         public Material Material { get; set; }
         public TurningTool Tool { get; set; }
         public List<Element> Contour { get; set; }

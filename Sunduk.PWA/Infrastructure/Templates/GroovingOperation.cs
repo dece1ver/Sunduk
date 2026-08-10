@@ -13,10 +13,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
 {
     public class GroovingOperation : Operation
     {
-        public static string CutOffSequence(Machine machine, GroovingExternalTool tool, double cuttingPoint, 
-            double externalDiameter, double internalDiameter, double cornerBlunt, double stepOver, int speedRough, double feedRough, Blunt bluntType, double bluntCustomAngle = 0, double bluntCustomRadius = 0)
+        public static string CutOffSequence(Machine machine, CoordinateSystem coordinateSystem, GroovingExternalTool tool, double cuttingPoint,
+            double externalDiameter, double internalDiameter, double cornerBlunt, double stepOver, int speedRough, double feedRough, Blunt bluntType, double bluntCustomAngle = 0, double bluntCustomRadius = 0, Coolant coolant = Coolant.General)
         {
             if (tool is null) return string.Empty;
+            if (machine.MachineType != MachineType.Turning) return string.Empty;
             var zPoint = tool.ZeroPoint == TurningGroovingTool.Point.Right ? cuttingPoint : cuttingPoint - tool.Width;
             var simpleChamferSize = cornerBlunt + tool.CornerRadius / 2;
             var (fullChamferSizeX, fullChamferSizeZ) = Calc.ChamferShifts(bluntCustomAngle, tool.CornerRadius);
@@ -65,34 +66,22 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 cutting = $"G1 X{(externalDiameter - 2 * (fullChamferSizeX * Math.Tan(bluntCustomAngle.Radians())) + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X).NC()}\n" +
                     cutting;
             }
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TurningReferentPoint +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{(externalDiameter + 2).NC(0)} Z{zPoint.NC()} S{speedRough} {Direction(tool)}\n" +
-                blunt +
-                cutting +
-                $"G0 X{(externalDiameter + 2).NC(0)}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TurningReferentPoint,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{(externalDiameter + 2).NC(0)} Z{zPoint.NC()} S{speedRough} {Direction(tool)}\n" +
-                blunt +
-                cutting +
-                $"G0 X{(externalDiameter + 2).NC(0)}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TurningReferentPoint,
-
-                _ => string.Empty,
-            };
+            return new GCodeBuilder()
+                .ReferentPoint(machine, leading: true)
+                .ToolCall(tool, machine, coordinateSystem, coolant)
+                .CoordinateSystemFallback(machine, coordinateSystem)
+                .CoolantOn(machine, coolant)
+                .Line($"G0 X{(externalDiameter + 2).NC(0)} Z{zPoint.NC()} S{speedRough} {Direction(tool)}")
+                .Raw(blunt)
+                .Raw(cutting)
+                .Line($"G0 X{(externalDiameter + 2).NC(0)}")
+                .CoolantOff(machine, coolant)
+                .ReferentPoint(machine, leading: false)
+                .ToString();
         }
 
         public static string GroovingSequence(Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
             TurningGroovingTool tool,
             double cuttingPoint,
@@ -105,10 +94,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
             double innerCornerBlunt,
             Blunt outerBluntType,
             Blunt innerBluntType,
-            bool doFinish, int speedRough, int speedFinish, double feedRough, double feedFinish)
+            bool doFinish, int speedRough, int speedFinish, double feedRough, double feedFinish, Coolant coolant = Coolant.General)
         {
             if (!Enum.IsDefined(material))
                 throw new InvalidEnumArgumentException(nameof(material), (int)material, typeof(Material));
+            if (machine.MachineType != MachineType.Turning) return string.Empty;
             var external = tool is GroovingExternalTool;
             var clearance = external ? 1 : -1;
 
@@ -226,39 +216,22 @@ namespace Sunduk.PWA.Infrastructure.Templates
             }
 
             if (!doFinish)
-                return machine switch
-                {
-                    Machine.GS1500 =>
-                        TurningReferentPoint +
-                        tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                        $"{CoolantOn(machine)}\n" +
-                        (external
-                            ? $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z{centerPoint.NC()} S{speedRough} {Direction(tool)}\n"
-                            : $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z2. S{speedRough} {Direction(tool)}\n" +
-                              $"Z{centerPoint.NC()}\n") +
-                        roughCutting +
-                        cutting +
-                        $"G0 X{(externalDiameter + clearance * 2).NC(0)}\n" +
-                        (external ? string.Empty : "Z2.\n") +
-                        $"{CoolantOff(machine)}\n" +
-                        TurningReferentPoint,
-
-                    Machine.L230A =>
-                        tool.Description(ToolDescriptionOption.L230) + "\n" +
-                        $"{CoolantOn(machine)}\n" +
-                        (external
-                            ? $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z{centerPoint.NC()} S{speedRough} {Direction(tool)}\n"
-                            : $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z2. S{speedRough} {Direction(tool)}\n" +
-                              $"Z{centerPoint.NC()}\n") +
-                        roughCutting +
-                        cutting +
-                        $"G0 X{(externalDiameter + clearance * 2).NC(0)}\n" +
-                        (external ? string.Empty : "Z2.\n") +
-                        $"{CoolantOff(machine)}\n" +
-                        TurningReferentPoint,
-
-                    _ => string.Empty,
-                };
+                return new GCodeBuilder()
+                    .ReferentPoint(machine, leading: true)
+                    .ToolCall(tool, machine, coordinateSystem, coolant)
+                    .CoordinateSystemFallback(machine, coordinateSystem)
+                    .CoolantOn(machine, coolant)
+                    .Raw(external
+                        ? $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z{centerPoint.NC()} S{speedRough} {Direction(tool)}\n"
+                        : $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z2. S{speedRough} {Direction(tool)}\n" +
+                          $"Z{centerPoint.NC()}\n")
+                    .Raw(roughCutting)
+                    .Raw(cutting)
+                    .Line($"G0 X{(externalDiameter + clearance * 2).NC(0)}")
+                    .RawIf(!external, "Z2.\n")
+                    .CoolantOff(machine, coolant)
+                    .ReferentPoint(machine, leading: false)
+                    .ToString();
 
             switch (Math.Abs(tool.Width - width))
             {
@@ -293,42 +266,26 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 }
             }
 
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TurningReferentPoint +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                (external
-                ? $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z{centerPoint.NC()} S{speedRough} {Direction(tool)}\n"
-                : $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z2. S{speedRough} {Direction(tool)}\n" +
-                $"Z{centerPoint.NC()}\n") +
-                roughCutting +
-                cutting +
-                $"G0 X{(externalDiameter + clearance * 2).NC(0)}\n" +
-                (external ? string.Empty : "Z2.\n") +
-                $"{CoolantOff(machine)}\n" +
-                TurningReferentPoint,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                (external 
-                ? $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z{centerPoint.NC()} S{speedRough} {Direction(tool)}\n"
-                : $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z2. S{speedRough} {Direction(tool)}\n" +
-                $"Z{centerPoint.NC()}\n") +
-                roughCutting +
-                cutting +
-                $"G0 X{(externalDiameter + clearance * 2).NC(0)}\n" +
-                (external ? string.Empty : "Z2.\n") + 
-                $"{CoolantOff(machine)}\n" +
-                TurningReferentPoint,
-
-                _ => string.Empty,
-            };
+            return new GCodeBuilder()
+                .ReferentPoint(machine, leading: true)
+                .ToolCall(tool, machine, coordinateSystem, coolant)
+                .CoordinateSystemFallback(machine, coordinateSystem)
+                .CoolantOn(machine, coolant)
+                .Raw(external
+                    ? $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z{centerPoint.NC()} S{speedRough} {Direction(tool)}\n"
+                    : $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z2. S{speedRough} {Direction(tool)}\n" +
+                      $"Z{centerPoint.NC()}\n")
+                .Raw(roughCutting)
+                .Raw(cutting)
+                .Line($"G0 X{(externalDiameter + clearance * 2).NC(0)}")
+                .RawIf(!external, "Z2.\n")
+                .CoolantOff(machine, coolant)
+                .ReferentPoint(machine, leading: false)
+                .ToString();
         }
 
         public static string FaceGroovingSequence(Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
             GroovingFaceTool tool,
             double startPoint,
@@ -341,12 +298,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
             double innerCornerBlunt,
             Blunt outerBluntType,
             Blunt innerBluntType,
-            bool doFinish, 
-            int speedRough, 
-            int speedFinish, 
-            double feedRough, 
-            double feedFinish)
+            bool doFinish,
+            int speedRough,
+            int speedFinish,
+            double feedRough,
+            double feedFinish,
+            Coolant coolant = Coolant.General)
         {
+            if (machine.MachineType != MachineType.Turning) return string.Empty;
             var width = (externalDiameter - internalDiameter) / 2;
             const int clearance = 1;
             if (innerCornerBlunt < tool.CornerRadius) innerCornerBlunt = tool.CornerRadius;
@@ -461,31 +420,18 @@ namespace Sunduk.PWA.Infrastructure.Templates
             }
 
             if (!doFinish)
-                return machine switch
-                {
-                    Machine.GS1500 =>
-                        TurningReferentPoint +
-                        tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                        $"{CoolantOn(machine)}\n" +
-                        $"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedRough} {Direction(tool)}\n" +
-                        roughCutting +
-                        cutting +
-                        $"G0 Z{(startPoint + clearance * 2).NC(0)}\n" +
-                        $"{CoolantOff(machine)}\n" +
-                        TurningReferentPoint,
-
-                    Machine.L230A =>
-                        tool.Description(ToolDescriptionOption.L230) + "\n" +
-                        $"{CoolantOn(machine)}\n" +
-                        $"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedRough} {Direction(tool)}\n" +
-                        roughCutting +
-                        cutting +
-                        $"G0 Z{(startPoint + clearance * 2).NC(0)}\n" +
-                        $"{CoolantOff(machine)}\n" +
-                        TurningReferentPoint,
-
-                    _ => string.Empty,
-                };
+                return new GCodeBuilder()
+                    .ReferentPoint(machine, leading: true)
+                    .ToolCall(tool, machine, coordinateSystem, coolant)
+                    .CoordinateSystemFallback(machine, coordinateSystem)
+                    .CoolantOn(machine, coolant)
+                    .Line($"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedRough} {Direction(tool)}")
+                    .Raw(roughCutting)
+                    .Raw(cutting)
+                    .Line($"G0 Z{(startPoint + clearance * 2).NC(0)}")
+                    .CoolantOff(machine, coolant)
+                    .ReferentPoint(machine, leading: false)
+                    .ToString();
 
             switch (Math.Abs(tool.Width - width))
             {
@@ -521,31 +467,18 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 }
             }
 
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TurningReferentPoint +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedRough} {Direction(tool)}\n" +
-                roughCutting +
-                cutting +
-                $"G0 Z{(startPoint + clearance * 2).NC(0)}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TurningReferentPoint,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedRough} {Direction(tool)}\n" +
-                roughCutting +
-                cutting +
-                $"G0 Z{(startPoint + clearance * 2).NC(0)}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TurningReferentPoint,
-
-                _ => string.Empty,
-            };
+            return new GCodeBuilder()
+                .ReferentPoint(machine, leading: true)
+                .ToolCall(tool, machine, coordinateSystem, coolant)
+                .CoordinateSystemFallback(machine, coordinateSystem)
+                .CoolantOn(machine, coolant)
+                .Line($"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedRough} {Direction(tool)}")
+                .Raw(roughCutting)
+                .Raw(cutting)
+                .Line($"G0 Z{(startPoint + clearance * 2).NC(0)}")
+                .CoolantOff(machine, coolant)
+                .ReferentPoint(machine, leading: false)
+                .ToString();
         }
     }
 }

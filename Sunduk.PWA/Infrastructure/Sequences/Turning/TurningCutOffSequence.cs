@@ -8,6 +8,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class TurningCutOffSequence : Sequence
     {
         public Machine Machine { get; set; }
+        public CoordinateSystem CoordinateSystem { get; set; }
         public Material Material { get; set; }
         public GroovingExternalTool Tool { get; set; }
         public double CuttingPoint { get; set; }
@@ -22,7 +23,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double FeedRough { get; set; }
 
         public override MachineType MachineType => MachineType.Turning;
-        public override string Operation => Templates.GroovingOperation.CutOffSequence(Machine, Tool, CuttingPoint, ExternalDiameter, InternalDiameter, CornerBlunt, StepOver, SpeedRough, FeedRough, BluntType, BluntCustomAngle, BluntCustomRadius);
+        public override string Operation => Templates.GroovingOperation.CutOffSequence(Machine, CoordinateSystem, Tool, CuttingPoint, ExternalDiameter, InternalDiameter, CornerBlunt, StepOver, SpeedRough, FeedRough, BluntType, BluntCustomAngle, BluntCustomRadius, Coolant);
         public override OperationTime MachineTime
         {
             get
@@ -48,21 +49,23 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public override string Name => $"Отрезка";
 
         public TurningCutOffSequence(
-            Machine machine, 
-            Material material, 
-            GroovingExternalTool tool, 
-            double cuttingPoint, 
-            double externalDiameter, 
-            double internalDiameter, 
-            double cornerBlunt, 
-            double stepOver, 
-            Blunt bluntType , 
-            double bluntCustomAngle, 
+            Machine machine,
+            CoordinateSystem coordinateSystem,
+            Material material,
+            GroovingExternalTool tool,
+            double cuttingPoint,
+            double externalDiameter,
+            double internalDiameter,
+            double cornerBlunt,
+            double stepOver,
+            Blunt bluntType ,
+            double bluntCustomAngle,
             double bluntCustomRadius,
             int speedRough,
             double feedRough)
         {
             Machine = machine;
+            CoordinateSystem = coordinateSystem;
             Material = material;
             Tool = tool;
             CuttingPoint = cuttingPoint;

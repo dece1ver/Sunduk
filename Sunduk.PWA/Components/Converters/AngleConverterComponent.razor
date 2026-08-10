@@ -1,4 +1,5 @@
-﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+﻿@inject AngleConverterState State
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         @if (!ValidAngle())
         {
@@ -79,25 +80,25 @@
     private const int SecondsInMinute = 60;
     private const int SecondsInDegree = 3600;
 
-    private bool _calcDecimal;
-    private bool _inputRadians;
+    private bool _calcDecimal { get => State.CalcDecimal; set => State.CalcDecimal = value; }
+    private bool _inputRadians { get => State.InputRadians; set => State.InputRadians = value; }
 
     // =====================================
     // ВСПОМОГАТЕЛЬНЫЕ ЧТЕНИЯ
     // =====================================
 
-    private decimal _decimalAngle;
-    private decimal _radiansAngle;
+    private decimal _decimalAngle { get => State.DecimalAngle; set => State.DecimalAngle = value; }
+    private decimal _radiansAngle { get => State.RadiansAngle; set => State.RadiansAngle = value; }
 
-    private int _intAngle;
-    private int _minAngle;
-    private decimal _secAngle;
+    private int _intAngle { get => State.IntAngle; set => State.IntAngle = value; }
+    private int _minAngle { get => State.MinAngle; set => State.MinAngle = value; }
+    private decimal _secAngle { get => State.SecAngle; set => State.SecAngle = value; }
 
     // =====================================
     // ДЕСЯТИЧНЫЙ ВВОД
     // =====================================
 
-    private string _decimalAngleString = string.Empty;
+    private string _decimalAngleString { get => State.DecimalAngleString; set => State.DecimalAngleString = value; }
 
     public string DecimalAngleString
     {
@@ -138,7 +139,7 @@
     // РАДИАНЫ
     // =====================================
 
-    private string _radiansAngleString = string.Empty;
+    private string _radiansAngleString { get => State.RadiansAngleString; set => State.RadiansAngleString = value; }
 
     private string RadiansAngleString
     {
@@ -179,7 +180,7 @@
     // ГРАДУСНАЯ СИСТЕМА (DMS)
     // =====================================
 
-    private string _intAngleString = string.Empty;
+    private string _intAngleString { get => State.IntAngleString; set => State.IntAngleString = value; }
 
     public string IntAngleString
     {
@@ -201,7 +202,7 @@
         }
     }
 
-    private string _minAngleString = string.Empty;
+    private string _minAngleString { get => State.MinAngleString; set => State.MinAngleString = value; }
 
     public string MinAngleString
     {
@@ -223,7 +224,7 @@
         }
     }
 
-    private string _secAngleString = string.Empty;
+    private string _secAngleString { get => State.SecAngleString; set => State.SecAngleString = value; }
 
     public string SecAngleString
     {

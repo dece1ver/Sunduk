@@ -1,4 +1,5 @@
-﻿<style>
+﻿@inject HoleCapacityState State
+<style>
     .monofield {
         font-family: 'Roboto Mono', monospace;
     }
@@ -73,29 +74,27 @@
     readonly int _imgHeigth = 155;
     readonly int _imgWidth = 250;
 
-    bool calcToolSize = false;
+    bool calcToolSize { get => State.CalcToolSize; set => State.CalcToolSize = value; }
 
     public enum Images { Base, HoleDiameter, ToolSize, MinimalDiameter };
-    public Images CurrentImage { get; set; } = Images.Base;
+    public Images CurrentImage { get => State.CurrentImage; set => State.CurrentImage = value; }
 
     public enum Radius { External, Internal };
-    public Radius RadiusType { get; set; } = Radius.External;
+    public Radius RadiusType { get => State.RadiusType; set => State.RadiusType = value; }
 
-    public string _HoleDiameter { get; set; } = string.Empty;
+    public string _HoleDiameter { get => State.HoleDiameter; set => State.HoleDiameter = value; }
     public double HoleDiameter => Util.GetDouble(_HoleDiameter);
 
-    public string _ShankDiameter { get; set; } = string.Empty;
+    public string _ShankDiameter { get => State.ShankDiameter; set => State.ShankDiameter = value; }
     public double ShankDiameter => Util.GetDouble(_ShankDiameter);
 
 
-    private string _toolSize;
-
     public string _ToolSize
     {
-        get => _toolSize;
+        get => State.ToolSize;
         set
         {
-            _toolSize = value;
+            State.ToolSize = value;
             if (!calcToolSize)
             {
                 _MinimalDiameter = (HoleDiameter - (HoleDiameter - ToolSize) * 2).ToPrettyString(3);
@@ -104,13 +103,12 @@
     }
     public double ToolSize => Util.GetDouble(_ToolSize);
 
-    private string _minimalDiameter;
     public string _MinimalDiameter
     {
-        get => _minimalDiameter;
+        get => State.MinimalDiameter;
         set
         {
-            _minimalDiameter = value;
+            State.MinimalDiameter = value;
             if (calcToolSize)
             {
                 _ToolSize = ((HoleDiameter + MinimalDiameter) / 2).ToPrettyString();

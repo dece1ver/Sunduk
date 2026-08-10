@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using MudBlazor;
 using Sunduk.PWA.Infrastructure.Sequences;
 using Sunduk.PWA.Infrastructure.Sequences.Base;
@@ -23,7 +24,6 @@ namespace Sunduk.PWA.Infrastructure
 
         public enum GetNumberOption { Any, OnlyPositive }
         public enum PrettyStringOption { AsIs, ZeroToEmpty }
-        public enum ToolDescriptionOption { General, L230, GoodwayLeft, GoodwayRight, ToolTable, MillingToolChange }
         public enum NcDecimalPointOption { With, Without }
         public enum TranslateOption { RemoveBadSymbols, OnlyTranslate }
 
@@ -144,17 +144,6 @@ namespace Sunduk.PWA.Infrastructure
             return option != TranslateOption.RemoveBadSymbols ? value : Path.GetInvalidPathChars().Union(Path.GetInvalidFileNameChars()).Aggregate(value, (current, item) => current.Replace(item, '-'));
         }
 
-        public static MachineType GetMachineType(this Machine machine)
-        {
-            return machine switch
-            {
-                Machine.L230A => MachineType.Turning,
-                Machine.GS1500 => MachineType.Turning,
-                Machine.A110 => MachineType.Milling,
-                _ => MachineType.Turning
-            };
-        }
-
         /// <summary>
         /// Добавляет отверстия к переданному куску перехода сверления
         /// </summary>
@@ -227,15 +216,52 @@ namespace Sunduk.PWA.Infrastructure
 
 
         /// <summary>
-        /// Описание инструмента в УП
+        /// Строка вызова инструмента в УП — шаблон станка (Machine.ToolCallTemplate) с подстановкой
+        /// {T}/{T2}/{T4} (номер инструмента без/с 2/4-значным дополнением нулями), {TOOL}
+        /// (Tool.CallDetails), {CS} (система координат перехода — пусто, если у станка только
+        /// одна СК) и {COOLANT} (код включения СОЖ перехода — пусто при Coolant.None). Перевод
+        /// строки внутри шаблона переносит то, что после него, на следующую строку УП.
         /// </summary>
-        /// <param name="tool">Инструмент</param>
-        /// <param name="option">Тип описания: общий, под конкретный станок</param>
-        /// <returns></returns>
-        public static string Description(this Tool tool, ToolDescriptionOption option = ToolDescriptionOption.General)
+        /// <summary>
+        /// Перегрузка для мест без осмысленного выбора СК/СОЖ перехода (например превью в списке
+        /// инструментов) — берёт первую СК станка и Coolant.General, ничего не меняя в генерации
+        /// самой УП.
+        /// </summary>
+        public static string ToolCall(this Tool tool, Machine machine)
+            => tool.ToolCall(machine, machine.CoordinateSystems.FirstOrDefault());
+
+        public static string ToolCall(this Tool tool, Machine machine, CoordinateSystem coordinateSystem, Coolant coolant = Coolant.General)
         {
-            return tool.Description(option);
+            var template = string.IsNullOrWhiteSpace(machine.ToolCallTemplate) ? "{T}" : machine.ToolCallTemplate;
+            template = Regex.Replace(template, @"\{T(\d+)\}", m => tool.Position.ToString("D" + m.Groups[1].Value));
+            return template
+                .Replace("{T}", tool.Position.ToString())
+                .Replace("{TOOL}", tool.CallDetails)
+                .Replace("{CS}", machine.CoordinateSystems.Count > 1 ? coordinateSystem.ToString() : string.Empty)
+                .Replace("{COOLANT}", Templates.Operation.CoolantOn(machine, coolant))
+                .Replace(',', '.');
         }
+
+        /// <summary>
+        /// Явно ли шаблон вызова инструмента станка сам выводит систему координат — если да,
+        /// гарантированная отдельная строка с СК (см. места вызова <see cref="ToolCall"/> в
+        /// Templates/*.cs) не дублируется.
+        /// </summary>
+        public static bool ToolCallTemplateHasCoordinateSystem(this Machine machine)
+            => !string.IsNullOrWhiteSpace(machine.ToolCallTemplate) && machine.ToolCallTemplate.Contains("{CS}");
+
+        /// <summary>
+        /// Явно ли шаблон вызова инструмента станка сам выводит включение СОЖ — если да,
+        /// гарантированная отдельная строка/встройка СОЖ (см. места вызова <see cref="ToolCall"/>
+        /// в Templates/*.cs) не дублируется.
+        /// </summary>
+        public static bool ToolCallTemplateHasCoolant(this Machine machine)
+            => !string.IsNullOrWhiteSpace(machine.ToolCallTemplate) && machine.ToolCallTemplate.Contains("{COOLANT}");
+
+        /// <summary>
+        /// Описание инструмента для таблицы инструментов в шапке программы.
+        /// </summary>
+        public static string TableDescription(this Tool tool) => tool.CallDetails.Replace(',', '.');
 
         /// <summary>
         /// Описание перехода
@@ -312,61 +338,39 @@ namespace Sunduk.PWA.Infrastructure
             List<string> tools = new();
             foreach (var seq in program.Skip(2))
             {
-                string tool = machine switch
+                string tool = machine.MachineType switch
                 {
-                    Machine.L230A => seq switch 
+                    MachineType.Turning => seq switch
                     {
-                        FacingSequence facingSequence => $"({facingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        FinishFacingCycleSequence finishFacingCycleSequence => $"({finishFacingCycleSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        FinishFacingSequence finishFacingSequence => $"({finishFacingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        LimiterSequence limiterSequence => $"({limiterSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        RoughFacingCycleSequence roughFacingCycleSequence => $"({roughFacingCycleSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        RoughFacingSequence roughFacingSequence => $"({roughFacingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        ThreadCuttingSequence threadCuttingSequence => $"({threadCuttingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningCutOffSequence turningCutOffSequence => $"({turningCutOffSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningExternalGroovingSequence turningGroovingSequence => $"({turningGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningInternalGroovingSequence turningInternalGroovingSequence => $"({turningInternalGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningExternalRoughGroovingSequence turningExternalRoughGroovingSequence => $"({turningExternalRoughGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningInternalRoughGroovingSequence turningInternalRoughGroovingSequence => $"({turningInternalRoughGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningFaceGroovingSequence turningFaceGroovingSequence => $"({turningFaceGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningFaceRoughGroovingSequence turningFaceRoughGroovingSequence => $"({turningFaceRoughGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence => $"({turningHighSpeedDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence => $"({turningPeckDeepDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningPeckDrillingSequence turningPeckDrillingSequence => $"({turningPeckDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningTappingSequence turningTappingSequence => $"({turningTappingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningCustomSequence turningCustomSequence => $"({turningCustomSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        FacingSequence facingSequence => $"({facingSequence.Tool.TableDescription()})",
+                        FinishFacingCycleSequence finishFacingCycleSequence => $"({finishFacingCycleSequence.Tool.TableDescription()})",
+                        FinishFacingSequence finishFacingSequence => $"({finishFacingSequence.Tool.TableDescription()})",
+                        LimiterSequence limiterSequence => $"({limiterSequence.Tool.TableDescription()})",
+                        RoughFacingCycleSequence roughFacingCycleSequence => $"({roughFacingCycleSequence.Tool.TableDescription()})",
+                        RoughFacingSequence roughFacingSequence => $"({roughFacingSequence.Tool.TableDescription()})",
+                        ThreadCuttingSequence threadCuttingSequence => $"({threadCuttingSequence.Tool.TableDescription()})",
+                        TurningCutOffSequence turningCutOffSequence => $"({turningCutOffSequence.Tool.TableDescription()})",
+                        TurningExternalGroovingSequence turningGroovingSequence => $"({turningGroovingSequence.Tool.TableDescription()})",
+                        TurningInternalGroovingSequence turningInternalGroovingSequence => $"({turningInternalGroovingSequence.Tool.TableDescription()})",
+                        TurningExternalRoughGroovingSequence turningExternalRoughGroovingSequence => $"({turningExternalRoughGroovingSequence.Tool.TableDescription()})",
+                        TurningInternalRoughGroovingSequence turningInternalRoughGroovingSequence => $"({turningInternalRoughGroovingSequence.Tool.TableDescription()})",
+                        TurningFaceGroovingSequence turningFaceGroovingSequence => $"({turningFaceGroovingSequence.Tool.TableDescription()})",
+                        TurningFaceRoughGroovingSequence turningFaceRoughGroovingSequence => $"({turningFaceRoughGroovingSequence.Tool.TableDescription()})",
+                        TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence => $"({turningHighSpeedDrillingSequence.Tool.TableDescription()})",
+                        TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence => $"({turningPeckDeepDrillingSequence.Tool.TableDescription()})",
+                        TurningPeckDrillingSequence turningPeckDrillingSequence => $"({turningPeckDrillingSequence.Tool.TableDescription()})",
+                        TurningTappingSequence turningTappingSequence => $"({turningTappingSequence.Tool.TableDescription()})",
+                        TurningCustomSequence turningCustomSequence => $"({turningCustomSequence.Tool.TableDescription()})",
                         _ => string.Empty,
                     },
-                    Machine.GS1500 => seq switch
+                    MachineType.Milling => seq switch
                     {
-                        FacingSequence facingSequence => $"({facingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        FinishFacingCycleSequence finishFacingCycleSequence => $"({finishFacingCycleSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        FinishFacingSequence finishFacingSequence => $"({finishFacingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        LimiterSequence limiterSequence => $"({limiterSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        RoughFacingCycleSequence roughFacingCycleSequence => $"({roughFacingCycleSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        RoughFacingSequence roughFacingSequence => $"({roughFacingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        ThreadCuttingSequence threadCuttingSequence => $"({threadCuttingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningExternalGroovingSequence turningGroovingSequence => $"({turningGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningInternalGroovingSequence turningInternalGroovingSequence => $"({turningInternalGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningExternalRoughGroovingSequence turningExternalRoughGroovingSequence => $"({turningExternalRoughGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningInternalRoughGroovingSequence turningInternalRoughGroovingSequence => $"({turningInternalRoughGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningFaceGroovingSequence turningFaceGroovingSequence => $"({turningFaceGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningFaceRoughGroovingSequence turningFaceRoughGroovingSequence => $"({turningFaceRoughGroovingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningHighSpeedDrillingSequence turningHighSpeedDrillingSequence => $"({turningHighSpeedDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningPeckDeepDrillingSequence turningPeckDeepDrillingSequence => $"({turningPeckDeepDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningPeckDrillingSequence turningPeckDrillingSequence => $"({turningPeckDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningTappingSequence turningTappingSequence => $"({turningTappingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        TurningCustomSequence turningCustomSequence => $"({turningCustomSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
+                        MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence => $"(T{(millingHighSpeedDrillingSequence.Tool.Position > 9 ? millingHighSpeedDrillingSequence.Tool.Position : millingHighSpeedDrillingSequence.Tool.Position + " ")} - {millingHighSpeedDrillingSequence.Tool.TableDescription()})",
+                        MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence => $"(T{(millingPeckDeepDrillingSequence.Tool.Position > 9 ? millingPeckDeepDrillingSequence.Tool.Position : millingPeckDeepDrillingSequence.Tool.Position + " ")} - {millingPeckDeepDrillingSequence.Tool.TableDescription()})",
+                        MillingPeckDrillingSequence millingPeckDrillingSequence => $"(T{(millingPeckDrillingSequence.Tool.Position > 9 ? millingPeckDrillingSequence.Tool.Position : millingPeckDrillingSequence.Tool.Position + " ")} - {millingPeckDrillingSequence.Tool.TableDescription()})",
+                        MillingCustomSequence millingCustomSequence => $"(T{(millingCustomSequence.Tool.Position > 9 ? millingCustomSequence.Tool.Position : millingCustomSequence.Tool.Position + " ")} - {millingCustomSequence.Tool.TableDescription()})",
                         _ => string.Empty,
                     },
-                    Machine.A110 => seq switch
-                    {
-                        MillingHighSpeedDrillingSequence millingHighSpeedDrillingSequence => $"(T{(millingHighSpeedDrillingSequence.Tool.Position > 9 ? millingHighSpeedDrillingSequence.Tool.Position : millingHighSpeedDrillingSequence.Tool.Position + " ")} - {millingHighSpeedDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        MillingPeckDeepDrillingSequence millingPeckDeepDrillingSequence => $"(T{(millingPeckDeepDrillingSequence.Tool.Position > 9 ? millingPeckDeepDrillingSequence.Tool.Position : millingPeckDeepDrillingSequence.Tool.Position + " ")} - {millingPeckDeepDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        MillingPeckDrillingSequence millingPeckDrillingSequence => $"(T{(millingPeckDrillingSequence.Tool.Position > 9 ? millingPeckDrillingSequence.Tool.Position : millingPeckDrillingSequence.Tool.Position + " ")} - {millingPeckDrillingSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        MillingCustomSequence millingCustomSequence => $"(T{(millingCustomSequence.Tool.Position > 9 ? millingCustomSequence.Tool.Position : millingCustomSequence.Tool.Position + " ")} - {millingCustomSequence.Tool.Description(ToolDescriptionOption.ToolTable)})",
-                        _ => string.Empty,
-                    }, 
                     _ => string.Empty,
                 };
                 if (!tools.Contains(tool)) tools.Add(tool);

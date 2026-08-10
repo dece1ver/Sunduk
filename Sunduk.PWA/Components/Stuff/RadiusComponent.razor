@@ -1,4 +1,5 @@
-﻿<style>
+﻿@inject RadiusState State
+<style>
     .monofield textarea {
         font-family: 'Roboto Mono', monospace;
     }
@@ -152,7 +153,7 @@
     readonly int _imgHeigth = 197;
     readonly int _imgWidth = 250;
 
-    bool showClassicRadius = true;
+    bool showClassicRadius { get => State.ShowClassicRadius; set => State.ShowClassicRadius = value; }
 
     public enum Images
     {
@@ -166,7 +167,7 @@
         InternalToolRadius,
     };
     public enum ImageType { Diameter, ToolRaduis, ChamferAngle, ChamferSize };
-    public Images CurrentImage { get; set; } = Images.ExternalRadius;
+    public Images CurrentImage { get => State.CurrentImage; set => State.CurrentImage = value; }
 
     public string RadiusExample
     {
@@ -198,15 +199,15 @@
         }
     }
     public enum Radius { External, Internal };
-    public Radius RadiusType { get; set; } = Radius.External;
+    public Radius RadiusType { get => State.RadiusType; set => State.RadiusType = value; }
 
-    public string _RadiusDiameter { get; set; } = string.Empty;
+    public string _RadiusDiameter { get => State.RadiusDiameter; set => State.RadiusDiameter = value; }
     public double RadiusDiameter => Util.GetDouble(_RadiusDiameter);
 
-    public string _RadiusSize { get; set; } = string.Empty;
+    public string _RadiusSize { get => State.RadiusSize; set => State.RadiusSize = value; }
     public double RadiusSize => Util.GetDouble(_RadiusSize);
 
-    public string _InsertRadius { get; set; } = string.Empty;
+    public string _InsertRadius { get => State.InsertRadius; set => State.InsertRadius = value; }
     public double InsertRadius => Util.GetDouble(_InsertRadius);
 
     public double RadiusStartDiameter

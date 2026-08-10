@@ -12,24 +12,26 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 
         public override MachineType MachineType => MachineType.Turning;
         public override string Operation => Templates.GroovingOperation.FaceGroovingSequence(
-            Machine, 
-            Material, 
-            Tool, 
+            Machine,
+            CoordinateSystem,
+            Material,
+            Tool,
             Width, // используется как startPoint
-            ExternalDiameter, 
-            InternalDiameter, 
-            CuttingPoint, 
-            StepOver, 
-            ProfStockAllow, 
-            OuterCornerBlunt, 
-            InnerCornerBlunt, 
-            OuterBluntType, 
-            InnerBluntType, 
-            true, 
-            SpeedRough, 
-            SpeedFinish, 
-            FeedRough, 
-            FeedFinish);
+            ExternalDiameter,
+            InternalDiameter,
+            CuttingPoint,
+            StepOver,
+            ProfStockAllow,
+            OuterCornerBlunt,
+            InnerCornerBlunt,
+            OuterBluntType,
+            InnerBluntType,
+            true,
+            SpeedRough,
+            SpeedFinish,
+            FeedRough,
+            FeedFinish,
+            Coolant);
         public override string Name => $"Канавка торцевая {Width.ToPrettyString()}мм на Ø{InternalDiameter.ToPrettyString()}-{ExternalDiameter.ToPrettyString()}";
         public override OperationTime MachineTime
         {
@@ -65,6 +67,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 
         public TurningFaceGroovingSequence(
             Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
             GroovingFaceTool tool,
             double cuttingPoint,
@@ -76,26 +79,27 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double outerCornerBlunt,
             double innerCornerBlunt,
             Blunt outerBluntType,
-            Blunt innerBluntType, 
-            int speedRough, 
-            int speedFinish, 
-            double feedRough, 
+            Blunt innerBluntType,
+            int speedRough,
+            int speedFinish,
+            double feedRough,
             double feedFinish)
             : base(machine,
+                coordinateSystem,
                 material,
                 cuttingPoint,
-                externalDiameter, 
-                internalDiameter, 
-                width, 
-                stepOver, 
-                profStockAllow, 
-                outerCornerBlunt, 
+                externalDiameter,
+                internalDiameter,
+                width,
+                stepOver,
+                profStockAllow,
+                outerCornerBlunt,
                 innerCornerBlunt,
                 outerBluntType,
-                innerBluntType, 
+                innerBluntType,
                 speedRough,
                 speedFinish,
-                feedRough, 
+                feedRough,
                 feedFinish)
         {
             Tool = tool;

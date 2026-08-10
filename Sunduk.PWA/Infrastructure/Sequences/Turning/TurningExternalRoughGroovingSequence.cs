@@ -38,6 +38,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public override MachineType MachineType => MachineType.Turning;
         public override string Operation => Templates.GroovingOperation.GroovingSequence(
             Machine,
+            CoordinateSystem,
             Material,
             Tool,
             CuttingPoint,
@@ -50,13 +51,15 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             InnerCornerBlunt,
             OuterBluntType,
             InnerBluntType,
-            false, 
-            SpeedRough, 0, 
-            FeedRough, 0);
+            false,
+            SpeedRough, 0,
+            FeedRough, 0,
+            Coolant);
     public override string Name => $"Канавка черновая наружная {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}";
 
         public TurningExternalRoughGroovingSequence(
             Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
             GroovingExternalTool tool,
             double cuttingPoint,
@@ -69,9 +72,9 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double innerCornerBlunt,
             Blunt outerBluntType,
             Blunt innerBluntType,
-            int speedRough, 
+            int speedRough,
             double feedRough)
-            : base(machine, material, cuttingPoint, externalDiameter, internalDiameter, width, stepOver, profStockAllow, outerCornerBlunt, innerCornerBlunt, outerBluntType, innerBluntType, speedRough, 0,feedRough, 0)
+            : base(machine, coordinateSystem, material, cuttingPoint, externalDiameter, internalDiameter, width, stepOver, profStockAllow, outerCornerBlunt, innerCornerBlunt, outerBluntType, innerBluntType, speedRough, 0, feedRough, 0)
         {
             Tool = tool;
         }

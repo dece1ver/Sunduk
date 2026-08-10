@@ -8,6 +8,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Factories
     {
         public static FacingSequence CreateFacing(
             Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
             TurningExternalTool tool,
             double externalDiameter,
@@ -23,11 +24,13 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Factories
             int speedRough,
             int speedFinish,
             double feedRough,
-            double feedFinish)
-            => new(machine, material, tool, externalDiameter, internalDiameter, roughStockAllow, profStockAllow, stepOver, seqNumbers, bluntType, bluntCustomAngle, bluntCustomRadius, cornerBlunt, speedRough, speedFinish, feedRough, feedFinish);
+            double feedFinish,
+            Coolant coolant = Coolant.General)
+            => new(machine, coordinateSystem, material, tool, externalDiameter, internalDiameter, roughStockAllow, profStockAllow, stepOver, seqNumbers, bluntType, bluntCustomAngle, bluntCustomRadius, cornerBlunt, speedRough, speedFinish, feedRough, feedFinish) { Coolant = coolant };
 
         public static RoughFacingCycleSequence CreateRoughFacingCycle(
             Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
             TurningExternalTool tool,
             double externalDiameter,
@@ -41,11 +44,13 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Factories
             double bluntCustomRadius,
             double cornerBlunt,
             int speedRough,
-            double feedRough)
-            => new(machine, material, tool, externalDiameter, internalDiameter, roughStockAllow, profStockAllow, stepOver, seqNumbers, bluntType, bluntCustomAngle, bluntCustomRadius, cornerBlunt, speedRough, feedRough);
+            double feedRough,
+            Coolant coolant = Coolant.General)
+            => new(machine, coordinateSystem, material, tool, externalDiameter, internalDiameter, roughStockAllow, profStockAllow, stepOver, seqNumbers, bluntType, bluntCustomAngle, bluntCustomRadius, cornerBlunt, speedRough, feedRough) { Coolant = coolant };
 
         public static RoughFacingSequence CreateRoughFacing(
             Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
             TurningExternalTool tool,
             double externalDiameter,
@@ -59,8 +64,9 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Factories
             double bluntCustomRadius,
             double cornerBlunt,
             int speedRough,
-            double feedRough)
-            => new(machine, material, tool, externalDiameter, internalDiameter, roughStockAllow, profStockAllow, stepOver, seqNumbers, bluntType, bluntCustomAngle, bluntCustomRadius, cornerBlunt, speedRough, feedRough);
+            double feedRough,
+            Coolant coolant = Coolant.General)
+            => new(machine, coordinateSystem, material, tool, externalDiameter, internalDiameter, roughStockAllow, profStockAllow, stepOver, seqNumbers, bluntType, bluntCustomAngle, bluntCustomRadius, cornerBlunt, speedRough, feedRough) { Coolant = coolant };
 
         public static FinishFacingCycleSequence CreateFinishFacingCycle(
             TurningExternalTool tool,
@@ -71,6 +77,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Factories
 
         public static FinishFacingSequence CreateFinishFacing(
             Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
             TurningExternalTool tool,
             double externalDiameter,
@@ -81,7 +88,8 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Factories
             double bluntCustomRadius,
             double cornerBlunt,
             int speedFinish,
-            double feedFinish)
-            => new(machine, material, tool, externalDiameter, internalDiameter, profStockAllow, bluntType, bluntCustomAngle, bluntCustomRadius, cornerBlunt, speedFinish, feedFinish);
+            double feedFinish,
+            Coolant coolant = Coolant.General)
+            => new(machine, coordinateSystem, material, tool, externalDiameter, internalDiameter, profStockAllow, bluntType, bluntCustomAngle, bluntCustomRadius, cornerBlunt, speedFinish, feedFinish) { Coolant = coolant };
     }
 }

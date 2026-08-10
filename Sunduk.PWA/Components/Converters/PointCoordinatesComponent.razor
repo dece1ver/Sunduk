@@ -1,4 +1,5 @@
-﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+﻿@inject PointCoordinatesState State
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="12" md="12">
             <MudField Variant="Variant.Filled" Label="Декартова СК" Underline="false">
@@ -33,17 +34,15 @@
 
 @code
 {
-    public bool CalcPolar { get; set; } = false;
+    public bool CalcPolar { get => State.CalcPolar; set => State.CalcPolar = value; }
 
-
-    private double? _X;
 
     public double? X
     {
-        get => _X;
+        get => State.X;
         set
         {
-            _X = value;
+            State.X = value;
             if (CalcPolar)
             {
                 if (X is null || Y is null)
@@ -60,15 +59,13 @@
         }
     }
 
-
-    private double? _Y;
 
     public double? Y
     {
-        get => _Y;
+        get => State.Y;
         set
         {
-            _Y = value;
+            State.Y = value;
             if (CalcPolar)
             {
                 if (X is null || Y is null)
@@ -88,14 +85,12 @@
 
 
 
-    private double? radius;
-
     public double? Radius
     {
-        get => radius;
+        get => State.Radius;
         set
         {
-            radius = value;
+            State.Radius = value;
             if (!CalcPolar)
             {
                 if (Radius is null || Angle is null)
@@ -133,14 +128,12 @@
         }
     }
 
-    private double? angle;
-
     public double? Angle
     {
-        get => angle;
+        get => State.Angle;
         set
         {
-            angle = value;
+            State.Angle = value;
             if (!CalcPolar)
             {
                 if (Radius is null || Angle is null)

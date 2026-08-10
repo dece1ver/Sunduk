@@ -44,6 +44,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public override MachineType MachineType => MachineType.Turning;
         public override string Operation => Templates.GroovingOperation.GroovingSequence(
             Machine,
+            CoordinateSystem,
             Material,
             Tool,
             CuttingPoint,
@@ -56,15 +57,17 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             InnerCornerBlunt,
             OuterBluntType,
             InnerBluntType,
-            true, 
+            true,
             SpeedRough,
-            SpeedFinish, 
-            FeedRough, 
-            FeedFinish);
+            SpeedFinish,
+            FeedRough,
+            FeedFinish,
+            Coolant);
         public override string Name => $"Канавка внутренняя {Width.ToPrettyString()}мм на Ø{ExternalDiameter.ToPrettyString()}";
 
         public TurningInternalGroovingSequence(
             Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
             GroovingInternalTool tool,
             double cuttingPoint,
@@ -76,12 +79,12 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double outerCornerBlunt,
             double innerCornerBlunt,
             Blunt outerBluntType,
-            Blunt innerBluntType, 
-            int speedRough, 
+            Blunt innerBluntType,
+            int speedRough,
             int speedFinish,
-            double feedRough, 
+            double feedRough,
             double feedFinish)
-            : base(machine, material, cuttingPoint, externalDiameter, internalDiameter, width, stepOver, profStockAllow, outerCornerBlunt, innerCornerBlunt, outerBluntType, innerBluntType, speedRough, speedFinish, feedRough, feedFinish)
+            : base(machine, coordinateSystem, material, cuttingPoint, externalDiameter, internalDiameter, width, stepOver, profStockAllow, outerCornerBlunt, innerCornerBlunt, outerBluntType, innerBluntType, speedRough, speedFinish, feedRough, feedFinish)
         {
             Tool = tool;
         }

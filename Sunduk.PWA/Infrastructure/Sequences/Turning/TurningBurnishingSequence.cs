@@ -9,6 +9,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class TurningBurnishingSequence : Sequence
     {
         public Machine Machine { get; set; }
+        public CoordinateSystem CoordinateSystem { get; set; }
         public TurningBurnishingTool Tool { get; set; }
         public double Diameter { get; set; }
         public double StartZ { get; set; }
@@ -35,7 +36,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
                 return name;
             }
         }
-        public override string Operation => Templates.Operation.BurnishingOperation(Machine, Tool, Diameter, StartZ, EndZ);
+        public override string Operation => Templates.Operation.BurnishingOperation(Machine, CoordinateSystem, Tool, Diameter, StartZ, EndZ, Coolant);
         public override OperationTime MachineTime
         {
             get
@@ -57,9 +58,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         }
         public override MachineType MachineType => MachineType.Turning;
 
-        public TurningBurnishingSequence(Machine machine, TurningBurnishingTool tool, double diameter, double startZ, double endZ, int speedFinish, double feedFinish)
+        public TurningBurnishingSequence(Machine machine, CoordinateSystem coordinateSystem, TurningBurnishingTool tool, double diameter, double startZ, double endZ, int speedFinish, double feedFinish)
         {
             Machine = machine;
+            CoordinateSystem = coordinateSystem;
             Tool = tool;
             Diameter = diameter;
             StartZ = startZ;

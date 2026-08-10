@@ -12,6 +12,29 @@
         }
     </MudSelect>
 </MudItem>
+@if (Machine.CoordinateSystems.Count > 1)
+{
+    <MudItem xs="12" sm="6" md="4">
+        <MudSelect Label="Система координат" T="CoordinateSystem" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SelectedCoordinateSystem">
+            @foreach (var cs in Machine.CoordinateSystems)
+            {
+                <MudSelectItem Value="@cs" />
+            }
+        </MudSelect>
+    </MudItem>
+}
+@if (ThreadingSequence is ThreadingSequences.ThreadCutting || (ThreadingSequence is ThreadingSequences.Tapping && MachineType == MachineType.Turning))
+{
+    <MudItem xs="12" sm="6" md="4">
+        <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SelectedCoolant">
+            <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.Full)">Вся подача СОЖ</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.None)">Без СОЖ</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+}
 @switch (ThreadingSequence)
 {
     case ThreadingSequences.ThreadCutting:
@@ -22,7 +45,7 @@
                     <MudSelect ValueChanged="OnToolChanged" Variant="@Variant.Filled" Margin="@Margin.Dense" Label="Инструмент" T="Tool">
                         @foreach (var tool in Tools.Where(x => x is ThreadingExternalTool))
                         {
-                            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>
@@ -32,7 +55,7 @@
                     <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                         @foreach (var tool in Tools.Where(x => x is ThreadingInternalTool))
                         {
-                            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                            <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>
@@ -102,14 +125,14 @@
                 {
                     @foreach (var tool in Tools.Where(x => x is TurningTappingTool))
                     {
-                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
                     }
                 }
                 @if (MachineType == MachineType.Milling)
                 {
                     @foreach (var tool in Tools.Where(x => x is MillingTappingTool))
                     {
-                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
                     }
                 }
             </MudSelect>
@@ -189,7 +212,7 @@
                 {
                     @foreach (var tool in Tools.Where(x => x is MillingThreadCuttingTool))
                     {
-                        <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                        <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
                     }
                 }
             </MudSelect>
@@ -311,6 +334,8 @@
     [Parameter] public EventCallback<Sequence> OnSubmit { get; set; }
 
     private ThreadingSequences ThreadingSequence { get; set; }
+    private CoordinateSystem SelectedCoordinateSystem { get; set; }
+    private Coolant SelectedCoolant { get; set; }
     private CuttingType ThreadType { get; set; }
     private ThreadStandard ThreadStandard { get; set; }
     private Tool Tool { get; set; }
@@ -377,6 +402,7 @@
         ThreadingSequence = MachineType == MachineType.Turning ? ThreadingSequences.ThreadCutting : ThreadingSequences.Tapping;
         if (Holes.Count == 0) Holes.Add(new Hole());
         HolesCount = 1;
+        SelectedCoordinateSystem = CoordinateSystem;
         if (SequenceToEdit is not null) LoadFromSequence(SequenceToEdit);
     }
 
@@ -395,6 +421,8 @@
                 _ThreadEnd = (threadCut.EndZ + Math.Round(Thread.ThreadRunout(threadCut.ThreadStandard, threadCut.ThreadPitch, threadCut.Type), 1)).ToPrettyString();
                 ThreadNPTPlane = threadCut.ThreadNptPlane;
                 SpeedFinish = threadCut.Speed;
+                SelectedCoordinateSystem = threadCut.CoordinateSystem;
+                SelectedCoolant = threadCut.Coolant;
                 break;
             case TurningTappingSequence tTap:
                 ThreadingSequence = ThreadingSequences.Tapping;
@@ -402,6 +430,8 @@
                 _TapCutSpeed = tTap.CutSpeed.ToPrettyString();
                 _TapStart = tTap.StartZ.ToPrettyString();
                 _TapEnd = tTap.EndZ.ToPrettyString();
+                SelectedCoordinateSystem = tTap.CoordinateSystem;
+                SelectedCoolant = tTap.Coolant;
                 break;
             case MillingTappingSequence mTap:
                 ThreadingSequence = ThreadingSequences.Tapping;
@@ -411,6 +441,7 @@
                 _TapEnd = mTap.EndZ.ToPrettyString();
                 Holes = mTap.Holes;
                 ToolCallPolar = mTap.Polar;
+                SelectedCoordinateSystem = mTap.CoordinateSystem;
                 break;
             case ThreadMillingCustomSequence threadMillCustom:
                 ThreadingSequence = ThreadingSequences.CustomThreadMilling;
@@ -427,6 +458,7 @@
                 ThreadMillingFullCut = threadMillCustom.FullCut;
                 Holes = threadMillCustom.Holes;
                 ToolCallPolar = threadMillCustom.Polar;
+                SelectedCoordinateSystem = threadMillCustom.CoordinateSystem;
                 break;
             case ThreadMillingSequence threadMill:
                 ThreadingSequence = ThreadingSequences.ThreadMilling;
@@ -443,6 +475,7 @@
                 ThreadMillingFullCut = threadMill.FullCut;
                 Holes = threadMill.Holes;
                 ToolCallPolar = threadMill.Polar;
+                SelectedCoordinateSystem = threadMill.CoordinateSystem;
                 break;
         }
     }
@@ -531,6 +564,7 @@
                     if (SpeedFinish <= 0) return string.Empty;
                     CurrentSequence = ThreadingSequenceFactory.CreateThreadCutting(
                         machine: Machine,
+                        coordinateSystem: SelectedCoordinateSystem,
                         tool: Tool as ThreadingExternalTool,
                         threadStandard: ThreadStandard,
                         type: ThreadType,
@@ -539,12 +573,14 @@
                         startZ: ThreadStart,
                         endZ: ThreadEnd,
                         threadNptPlane: ThreadNPTPlane,
-                        speed: SpeedFinish);
+                        speed: SpeedFinish,
+                        coolant: SelectedCoolant);
                     return CurrentSequence.Operation;
                 case ThreadingSequences.ThreadCutting when ThreadType is CuttingType.Internal:
                     if (SpeedFinish <= 0) return string.Empty;
                     CurrentSequence = ThreadingSequenceFactory.CreateThreadCutting(
                         machine: Machine,
+                        coordinateSystem: SelectedCoordinateSystem,
                         tool: Tool as ThreadingInternalTool,
                         threadStandard: ThreadStandard,
                         type: ThreadType,
@@ -553,19 +589,20 @@
                         startZ: ThreadStart,
                         endZ: ThreadEnd,
                         threadNptPlane: ThreadNPTPlane,
-                        speed: SpeedFinish);
+                        speed: SpeedFinish,
+                        coolant: SelectedCoolant);
                     return CurrentSequence.Operation;
                 case ThreadingSequences.Tapping:
                     if (TapCutSpeed <= 0) return string.Empty;
                     switch (MachineType)
                     {
                         case MachineType.Turning:
-                            CurrentSequence = ThreadingSequenceFactory.CreateTurningTapping(machine: Machine, tool: Tool as TurningTappingTool, cutSpeed: TapCutSpeed, startZ: TapStart, endZ: TapEnd);
+                            CurrentSequence = ThreadingSequenceFactory.CreateTurningTapping(machine: Machine, coordinateSystem: SelectedCoordinateSystem, tool: Tool as TurningTappingTool, cutSpeed: TapCutSpeed, startZ: TapStart, endZ: TapEnd, coolant: SelectedCoolant);
                             return CurrentSequence.Operation;
                         case MachineType.Milling:
                             CurrentSequence = ThreadingSequenceFactory.CreateMillingTapping(
                                 machine: Machine,
-                                coordinateSystem: CoordinateSystem,
+                                coordinateSystem: SelectedCoordinateSystem,
                                 tool: Tool as MillingTappingTool,
                                 cutSpeed: TapCutSpeed,
                                 startZ: TapStart,
@@ -580,7 +617,7 @@
                     if (ThreadMillingCutSpeed <= 0) return string.Empty;
                     CurrentSequence = ThreadingSequenceFactory.CreateThreadMilling(
                         machine: Machine,
-                        coordinateSystem: CoordinateSystem,
+                        coordinateSystem: SelectedCoordinateSystem,
                         tool: Tool as MillingThreadCuttingTool,
                         threadDiameter: ThreadMillingDiameter,
                         cutSpeed: ThreadMillingCutSpeed,
@@ -600,7 +637,7 @@
                     if (ThreadMillingCutSpeed <= 0) return string.Empty;
                     CurrentSequence = ThreadingSequenceFactory.CreateCustomThreadMilling(
                         machine: Machine,
-                        coordinateSystem: CoordinateSystem,
+                        coordinateSystem: SelectedCoordinateSystem,
                         tool: Tool as MillingThreadCuttingTool,
                         threadDiameter: ThreadMillingDiameter,
                         cutSpeed: ThreadMillingCutSpeed,

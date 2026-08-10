@@ -11,10 +11,33 @@
     <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
         @foreach (var tool in Tools.Where(x => x is TurningExternalTool))
         {
-            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+            <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
         }
     </MudSelect>
 </MudItem>
+@if (Machine.CoordinateSystems.Count > 1 && TurningSequence is not TurningSequences.FinishFacingCycle)
+{
+    <MudItem xs="12" md="4">
+        <MudSelect Label="Система координат" T="CoordinateSystem" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SelectedCoordinateSystem">
+            @foreach (var cs in Machine.CoordinateSystems)
+            {
+                <MudSelectItem Value="@cs" />
+            }
+        </MudSelect>
+    </MudItem>
+}
+@if (TurningSequence is not TurningSequences.FinishFacingCycle)
+{
+    <MudItem xs="12" md="4">
+        <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SelectedCoolant">
+            <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.Full)">Вся подача СОЖ</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.None)">Без СОЖ</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+}
 @switch (TurningSequence)
 {
     case TurningSequences.RoughFacing:
@@ -148,6 +171,7 @@ else
 @code {
     [Parameter] public Machine Machine { get; set; }
     [Parameter] public MachineType MachineType { get; set; }
+    [Parameter] public CoordinateSystem CoordinateSystem { get; set; }
     [Parameter] public Material WorkpieceMaterial { get; set; }
     [Parameter] public double WorkpieceExternalDiameter { get; set; }
     [Parameter] public double WorkpieceInternalDiameter { get; set; }
@@ -159,6 +183,8 @@ else
     [Parameter] public EventCallback<Sequence> OnSubmit { get; set; }
 
     private TurningSequences TurningSequence { get; set; }
+    private CoordinateSystem SelectedCoordinateSystem { get; set; }
+    private Coolant SelectedCoolant { get; set; }
     private Tool Tool { get; set; }
     private Sequence RepeatableRoughFacingSequence { get; set; }
 
@@ -236,6 +262,7 @@ else
     protected override void OnInitialized()
     {
         _FacingCustomChamferAngle = "45";
+        SelectedCoordinateSystem = CoordinateSystem;
         if (SequenceToEdit is not null) LoadFromSequence(SequenceToEdit);
     }
 
@@ -258,6 +285,8 @@ else
                 SpeedFinish = facing.SpeedFinish;
                 _FeedRough = facing.FeedRough.ToPrettyString();
                 _FeedFinish = facing.FeedFinish.ToPrettyString();
+                SelectedCoordinateSystem = facing.CoordinateSystem;
+                SelectedCoolant = facing.Coolant;
                 break;
             case RoughFacingSequence roughFacing:
                 TurningSequence = TurningSequences.RoughFacing;
@@ -272,6 +301,8 @@ else
                 _facingCustomChamferDiameter = (roughFacing.ExternalDiameter - 2 * roughFacing.CornerBlunt * Math.Tan(roughFacing.BluntCustomAngle.Radians())).ToPrettyString();
                 SpeedRough = roughFacing.SpeedRough;
                 _FeedRough = roughFacing.FeedRough.ToPrettyString();
+                SelectedCoordinateSystem = roughFacing.CoordinateSystem;
+                SelectedCoolant = roughFacing.Coolant;
                 break;
             case RoughFacingCycleSequence roughCycle:
                 TurningSequence = TurningSequences.RoughFacingCycle;
@@ -286,6 +317,8 @@ else
                 _facingCustomChamferDiameter = (roughCycle.ExternalDiameter - 2 * roughCycle.CornerBlunt * Math.Tan(roughCycle.BluntCustomAngle.Radians())).ToPrettyString();
                 SpeedRough = roughCycle.SpeedRough;
                 _FeedRough = roughCycle.FeedRough.ToPrettyString();
+                SelectedCoordinateSystem = roughCycle.CoordinateSystem;
+                SelectedCoolant = roughCycle.Coolant;
                 break;
             case FinishFacingSequence finishFacing:
                 TurningSequence = TurningSequences.FinishFacing;
@@ -298,6 +331,8 @@ else
                 _facingCustomChamferDiameter = (finishFacing.ExternalDiameter - 2 * finishFacing.CornerBlunt * Math.Tan(finishFacing.BluntCustomAngle.Radians())).ToPrettyString();
                 SpeedFinish = finishFacing.SpeedFinish;
                 _FeedFinish = finishFacing.FeedFinish.ToPrettyString();
+                SelectedCoordinateSystem = finishFacing.CoordinateSystem;
+                SelectedCoolant = finishFacing.Coolant;
                 break;
             case FinishFacingCycleSequence finishCycle:
                 TurningSequence = TurningSequences.FinishFacingCycle;
@@ -335,6 +370,7 @@ else
                     if (SpeedRough <= 0 || FeedRough <= 0 || (FacingRoughStockAllow > 0 && SpeedFinish <= 0 || FeedFinish <= 0)) return string.Empty;
                     CurrentSequence = FacingSequenceFactory.CreateFacing(
                         machine: Machine,
+                        coordinateSystem: SelectedCoordinateSystem,
                         material: WorkpieceMaterial,
                         tool: Tool as TurningExternalTool,
                         externalDiameter: WorkpieceExternalDiameter,
@@ -350,12 +386,14 @@ else
                         speedRough: SpeedRough,
                         speedFinish: SpeedFinish,
                         feedRough: FeedRough,
-                        feedFinish: FeedFinish);
+                        feedFinish: FeedFinish,
+                        coolant: SelectedCoolant);
                     return CurrentSequence.Operation;
                 case TurningSequences.RoughFacingCycle:
                     if (SpeedRough <= 0 || FeedRough <= 0) return string.Empty;
                     CurrentSequence = FacingSequenceFactory.CreateRoughFacingCycle(
                         machine: Machine,
+                        coordinateSystem: SelectedCoordinateSystem,
                         material: WorkpieceMaterial,
                         tool: Tool as TurningExternalTool,
                         externalDiameter: WorkpieceExternalDiameter,
@@ -369,12 +407,14 @@ else
                         bluntCustomRadius: FacingCustomChamferBlunt,
                         cornerBlunt: FacingCornerBlunt,
                         speedRough: SpeedRough,
-                        feedRough: FeedRough);
+                        feedRough: FeedRough,
+                        coolant: SelectedCoolant);
                     return CurrentSequence.Operation;
                 case TurningSequences.RoughFacing:
                     if (SpeedRough <= 0 || FeedRough <= 0) return string.Empty;
                     CurrentSequence = FacingSequenceFactory.CreateRoughFacing(
                         machine: Machine,
+                        coordinateSystem: SelectedCoordinateSystem,
                         material: WorkpieceMaterial,
                         tool: Tool as TurningExternalTool,
                         externalDiameter: WorkpieceExternalDiameter,
@@ -388,7 +428,8 @@ else
                         bluntCustomRadius: FacingCustomChamferBlunt,
                         cornerBlunt: FacingCornerBlunt,
                         speedRough: SpeedRough,
-                        feedRough: FeedRough);
+                        feedRough: FeedRough,
+                        coolant: SelectedCoolant);
                     return CurrentSequence.Operation;
                 case TurningSequences.FinishFacingCycle:
                     if (SpeedFinish <= 0 || FeedFinish <= 0) return string.Empty;
@@ -398,6 +439,7 @@ else
                     if (SpeedFinish <= 0 || FeedFinish <= 0) return string.Empty;
                     CurrentSequence = FacingSequenceFactory.CreateFinishFacing(
                         machine: Machine,
+                        coordinateSystem: SelectedCoordinateSystem,
                         material: WorkpieceMaterial,
                         tool: Tool as TurningExternalTool,
                         externalDiameter: WorkpieceExternalDiameter,
@@ -408,7 +450,8 @@ else
                         bluntCustomRadius: FacingCustomChamferBlunt,
                         cornerBlunt: FacingCornerBlunt,
                         speedFinish: SpeedFinish,
-                        feedFinish: FeedFinish);
+                        feedFinish: FeedFinish,
+                        coolant: SelectedCoolant);
                     return CurrentSequence.Operation;
             }
             return string.Empty;

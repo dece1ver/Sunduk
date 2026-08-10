@@ -5,6 +5,26 @@
         <MudSelectItem Value="@(TurningGroovingSequences.Grooving)">Канавка</MudSelectItem>
     </MudSelect>
 </MudItem>
+@if (Machine.CoordinateSystems.Count > 1)
+{
+    <MudItem xs="12" md="4">
+        <MudSelect Label="Система координат" T="CoordinateSystem" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SelectedCoordinateSystem">
+            @foreach (var cs in Machine.CoordinateSystems)
+            {
+                <MudSelectItem Value="@cs" />
+            }
+        </MudSelect>
+    </MudItem>
+}
+<MudItem xs="12" md="4">
+    <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SelectedCoolant">
+        <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
+        <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
+        <MudSelectItem Value="@(Coolant.Full)">Вся подача СОЖ</MudSelectItem>
+        <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
+        <MudSelectItem Value="@(Coolant.None)">Без СОЖ</MudSelectItem>
+    </MudSelect>
+</MudItem>
 @switch (GroovingSequence)
 {
     case TurningGroovingSequences.Grooving or TurningGroovingSequences.RoughGrooving when GrooveType is CuttingType.Radial:
@@ -12,7 +32,7 @@
             <MudSelect @bind-Value="@Tool" Variant="@Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                 @foreach (var tool in Tools.Where(x => x is GroovingExternalTool or GroovingInternalTool))
                 {
-                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                    <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
                 }
             </MudSelect>
         </MudItem>
@@ -22,7 +42,7 @@
             <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                 @foreach (var tool in Tools.Where(x => x is GroovingExternalTool))
                 {
-                    <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                    <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
                 }
             </MudSelect>
         </MudItem>
@@ -34,7 +54,7 @@
         <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
             @foreach (var tool in Tools.Where(x => x is GroovingFaceTool))
             {
-                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
             }
         </MudSelect>
     </MudItem>
@@ -176,6 +196,7 @@
 @code {
     [Parameter] public Machine Machine { get; set; }
     [Parameter] public MachineType MachineType { get; set; }
+    [Parameter] public CoordinateSystem CoordinateSystem { get; set; }
     [Parameter] public Material WorkpieceMaterial { get; set; }
     [Parameter] public double WorkpieceExternalDiameter { get; set; }
     [Parameter] public List<Tool> Tools { get; set; }
@@ -183,6 +204,8 @@
     [Parameter] public EventCallback<Sequence> OnSubmit { get; set; }
 
     private TurningGroovingSequences GroovingSequence { get; set; }
+    private CoordinateSystem SelectedCoordinateSystem { get; set; }
+    private Coolant SelectedCoolant { get; set; }
     private CuttingType GrooveType { get; set; }
     private Tool Tool { get; set; }
 
@@ -291,6 +314,7 @@
         _GroovingInternalDiameter = (GroovingExternalDiameter - 2).ToPrettyString();
         OuterGroovingBluntType = Blunt.Radius;
         InnerGroovingBluntType = Blunt.Radius;
+        SelectedCoordinateSystem = CoordinateSystem;
         if (SequenceToEdit is not null) LoadFromSequence(SequenceToEdit);
     }
 
@@ -312,6 +336,8 @@
                 _cuttingCustomChamferDiameter = (cutOff.ExternalDiameter - 2 * cutOff.CornerBlunt * Math.Tan(cutOff.BluntCustomAngle.Radians())).ToPrettyString();
                 SpeedRough = cutOff.SpeedRough;
                 _FeedRough = cutOff.FeedRough.ToPrettyString();
+                SelectedCoordinateSystem = cutOff.CoordinateSystem;
+                SelectedCoolant = cutOff.Coolant;
                 break;
             case TurningExternalGroovingSequence extGroove:
                 GroovingSequence = TurningGroovingSequences.Grooving;
@@ -331,6 +357,8 @@
                 SpeedFinish = extGroove.SpeedFinish;
                 _FeedRough = extGroove.FeedRough.ToPrettyString();
                 _FeedFinish = extGroove.FeedFinish.ToPrettyString();
+                SelectedCoordinateSystem = extGroove.CoordinateSystem;
+                SelectedCoolant = extGroove.Coolant;
                 break;
             case TurningInternalGroovingSequence intGroove:
                 GroovingSequence = TurningGroovingSequences.Grooving;
@@ -350,6 +378,8 @@
                 SpeedFinish = intGroove.SpeedFinish;
                 _FeedRough = intGroove.FeedRough.ToPrettyString();
                 _FeedFinish = intGroove.FeedFinish.ToPrettyString();
+                SelectedCoordinateSystem = intGroove.CoordinateSystem;
+                SelectedCoolant = intGroove.Coolant;
                 break;
             case TurningFaceGroovingSequence faceGroove:
                 GroovingSequence = TurningGroovingSequences.Grooving;
@@ -369,6 +399,8 @@
                 SpeedFinish = faceGroove.SpeedFinish;
                 _FeedRough = faceGroove.FeedRough.ToPrettyString();
                 _FeedFinish = faceGroove.FeedFinish.ToPrettyString();
+                SelectedCoordinateSystem = faceGroove.CoordinateSystem;
+                SelectedCoolant = faceGroove.Coolant;
                 break;
             case TurningExternalRoughGroovingSequence extRoughGroove:
                 GroovingSequence = TurningGroovingSequences.RoughGrooving;
@@ -386,6 +418,8 @@
                 InnerGroovingBluntType = extRoughGroove.InnerBluntType;
                 SpeedRough = extRoughGroove.SpeedRough;
                 _FeedRough = extRoughGroove.FeedRough.ToPrettyString();
+                SelectedCoordinateSystem = extRoughGroove.CoordinateSystem;
+                SelectedCoolant = extRoughGroove.Coolant;
                 break;
             case TurningInternalRoughGroovingSequence intRoughGroove:
                 GroovingSequence = TurningGroovingSequences.RoughGrooving;
@@ -403,6 +437,8 @@
                 InnerGroovingBluntType = intRoughGroove.InnerBluntType;
                 SpeedRough = intRoughGroove.SpeedRough;
                 _FeedRough = intRoughGroove.FeedRough.ToPrettyString();
+                SelectedCoordinateSystem = intRoughGroove.CoordinateSystem;
+                SelectedCoolant = intRoughGroove.Coolant;
                 break;
             case TurningFaceRoughGroovingSequence faceRoughGroove:
                 GroovingSequence = TurningGroovingSequences.RoughGrooving;
@@ -420,6 +456,8 @@
                 InnerGroovingBluntType = faceRoughGroove.InnerBluntType;
                 SpeedRough = faceRoughGroove.SpeedRough;
                 _FeedRough = faceRoughGroove.FeedRough.ToPrettyString();
+                SelectedCoordinateSystem = faceRoughGroove.CoordinateSystem;
+                SelectedCoolant = faceRoughGroove.Coolant;
                 break;
         }
     }
@@ -453,6 +491,7 @@
                     if (SpeedRough <= 0 || FeedRough <= 0) return string.Empty;
                     CurrentSequence = GroovingSequenceFactory.CreateCutOff(
                         machine: Machine,
+                        coordinateSystem: SelectedCoordinateSystem,
                         material: WorkpieceMaterial,
                         tool: Tool as GroovingExternalTool,
                         cuttingPoint: CuttingPoint,
@@ -464,7 +503,8 @@
                         bluntCustomAngle: CuttingCustomChamferAngle,
                         bluntCustomRadius: CuttingCustomChamferBlunt,
                         speedRough: SpeedRough,
-                        feedRough: FeedRough);
+                        feedRough: FeedRough,
+                        coolant: SelectedCoolant);
                     return CurrentSequence.Operation;
                 case TurningGroovingSequences.Grooving:
                     if (SpeedRough <= 0 || FeedRough <= 0 || (GroovingProfStockAllow > 0 && SpeedFinish <= 0 || FeedFinish <= 0)) return string.Empty;
@@ -472,30 +512,30 @@
                     {
                         case GroovingExternalTool groovingExternalTool:
                             CurrentSequence = GroovingSequenceFactory.CreateExternalGrooving(
-                                machine: Machine, material: WorkpieceMaterial, tool: groovingExternalTool,
+                                machine: Machine, coordinateSystem: SelectedCoordinateSystem, material: WorkpieceMaterial, tool: groovingExternalTool,
                                 cuttingPoint: GroovingCuttingPoint, externalDiameter: GroovingExternalDiameter, internalDiameter: GroovingInternalDiameter,
                                 width: GroovingWidth, stepOver: GroovingStepOver, profStockAllow: GroovingProfStockAllow,
                                 outerCornerBlunt: OuterGroovingCornerBlunt, innerCornerBlunt: InnerGroovingCornerBlunt,
                                 outerBluntType: OuterGroovingBluntType, innerBluntType: InnerGroovingBluntType,
-                                speedRough: SpeedRough, speedFinish: SpeedFinish, feedRough: FeedRough, feedFinish: FeedFinish);
+                                speedRough: SpeedRough, speedFinish: SpeedFinish, feedRough: FeedRough, feedFinish: FeedFinish, coolant: SelectedCoolant);
                             return CurrentSequence.Operation;
                         case GroovingInternalTool groovingInternalTool:
                             CurrentSequence = GroovingSequenceFactory.CreateInternalGrooving(
-                                machine: Machine, material: WorkpieceMaterial, tool: groovingInternalTool,
+                                machine: Machine, coordinateSystem: SelectedCoordinateSystem, material: WorkpieceMaterial, tool: groovingInternalTool,
                                 cuttingPoint: GroovingCuttingPoint, externalDiameter: GroovingExternalDiameter, internalDiameter: GroovingInternalDiameter,
                                 width: GroovingWidth, stepOver: GroovingStepOver, profStockAllow: GroovingProfStockAllow,
                                 outerCornerBlunt: OuterGroovingCornerBlunt, innerCornerBlunt: InnerGroovingCornerBlunt,
                                 outerBluntType: OuterGroovingBluntType, innerBluntType: InnerGroovingBluntType,
-                                speedRough: SpeedRough, speedFinish: SpeedFinish, feedRough: FeedRough, feedFinish: FeedFinish);
+                                speedRough: SpeedRough, speedFinish: SpeedFinish, feedRough: FeedRough, feedFinish: FeedFinish, coolant: SelectedCoolant);
                             return CurrentSequence.Operation;
                         case GroovingFaceTool groovingFaceTool:
                             CurrentSequence = GroovingSequenceFactory.CreateFaceGrooving(
-                                machine: Machine, material: WorkpieceMaterial, tool: groovingFaceTool,
+                                machine: Machine, coordinateSystem: SelectedCoordinateSystem, material: WorkpieceMaterial, tool: groovingFaceTool,
                                 cuttingPoint: GroovingCuttingPoint, externalDiameter: GroovingExternalDiameter, internalDiameter: GroovingInternalDiameter,
                                 width: GroovingStartPoint, stepOver: GroovingStepOver, profStockAllow: GroovingProfStockAllow,
                                 outerCornerBlunt: OuterGroovingCornerBlunt, innerCornerBlunt: InnerGroovingCornerBlunt,
                                 outerBluntType: OuterGroovingBluntType, innerBluntType: InnerGroovingBluntType,
-                                speedRough: SpeedRough, speedFinish: SpeedFinish, feedRough: FeedRough, feedFinish: FeedFinish);
+                                speedRough: SpeedRough, speedFinish: SpeedFinish, feedRough: FeedRough, feedFinish: FeedFinish, coolant: SelectedCoolant);
                             return CurrentSequence.Operation;
                     }
                     break;
@@ -505,30 +545,30 @@
                     {
                         case GroovingExternalTool groovingExternalTool:
                             CurrentSequence = GroovingSequenceFactory.CreateExternalRoughGrooving(
-                                machine: Machine, material: WorkpieceMaterial, tool: groovingExternalTool,
+                                machine: Machine, coordinateSystem: SelectedCoordinateSystem, material: WorkpieceMaterial, tool: groovingExternalTool,
                                 cuttingPoint: GroovingCuttingPoint, externalDiameter: GroovingExternalDiameter, internalDiameter: GroovingInternalDiameter,
                                 width: GroovingWidth, stepOver: GroovingStepOver, profStockAllow: GroovingProfStockAllow,
                                 outerCornerBlunt: OuterGroovingCornerBlunt, innerCornerBlunt: InnerGroovingCornerBlunt,
                                 outerBluntType: OuterGroovingBluntType, innerBluntType: InnerGroovingBluntType,
-                                speedRough: SpeedRough, feedRough: FeedRough);
+                                speedRough: SpeedRough, feedRough: FeedRough, coolant: SelectedCoolant);
                             return CurrentSequence.Operation;
                         case GroovingInternalTool groovingInternalTool:
-                            CurrentSequence = GroovingSequenceFactory.CreateInternalGrooving(
-                                machine: Machine, material: WorkpieceMaterial, tool: groovingInternalTool,
+                            CurrentSequence = GroovingSequenceFactory.CreateInternalRoughGrooving(
+                                machine: Machine, coordinateSystem: SelectedCoordinateSystem, material: WorkpieceMaterial, tool: groovingInternalTool,
                                 cuttingPoint: GroovingCuttingPoint, externalDiameter: GroovingExternalDiameter, internalDiameter: GroovingInternalDiameter,
                                 width: GroovingWidth, stepOver: GroovingStepOver, profStockAllow: GroovingProfStockAllow,
                                 outerCornerBlunt: OuterGroovingCornerBlunt, innerCornerBlunt: InnerGroovingCornerBlunt,
                                 outerBluntType: OuterGroovingBluntType, innerBluntType: InnerGroovingBluntType,
-                                speedRough: SpeedRough, speedFinish: SpeedFinish, feedRough: FeedRough, feedFinish: FeedFinish);
+                                speedRough: SpeedRough, feedRough: FeedRough, coolant: SelectedCoolant);
                             return CurrentSequence.Operation;
                         case GroovingFaceTool groovingFaceTool:
                             CurrentSequence = GroovingSequenceFactory.CreateFaceRoughGrooving(
-                                machine: Machine, material: WorkpieceMaterial, tool: groovingFaceTool,
+                                machine: Machine, coordinateSystem: SelectedCoordinateSystem, material: WorkpieceMaterial, tool: groovingFaceTool,
                                 cuttingPoint: GroovingCuttingPoint, externalDiameter: GroovingExternalDiameter, internalDiameter: GroovingInternalDiameter,
                                 width: GroovingStartPoint, stepOver: GroovingStepOver, profStockAllow: GroovingProfStockAllow,
                                 outerCornerBlunt: OuterGroovingCornerBlunt, innerCornerBlunt: InnerGroovingCornerBlunt,
                                 outerBluntType: OuterGroovingBluntType, innerBluntType: InnerGroovingBluntType,
-                                speedRough: SpeedRough, feedRough: FeedRough);
+                                speedRough: SpeedRough, feedRough: FeedRough, coolant: SelectedCoolant);
                             return CurrentSequence.Operation;
                     }
                     break;

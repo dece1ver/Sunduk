@@ -9,6 +9,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class RoughFacingSequence : Sequence
     {
         public Machine Machine { get; set; }
+        public CoordinateSystem CoordinateSystem { get; set; }
         public Material Material { get; set; }
         public TurningExternalTool Tool { get; set; }
         public double ExternalDiameter { get; set; }
@@ -48,9 +49,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             }
         }
         public override string Operation => Templates.FacingOperation.Facing(
-            Machine, 
-            Material, 
-            Tool, 
+            Machine,
+            CoordinateSystem,
+            Material,
+            Tool,
             ExternalDiameter, 
             Tool is null ? InternalDiameter : InternalDiameter - (Tool.Radius * 2), 
             RoughStockAllow, 
@@ -64,9 +66,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             false, 
             false, 
             SpeedRough, 
-            0, 
-            FeedRough, 
-            0);
+            0,
+            FeedRough,
+            0,
+            Coolant);
         public override MachineType MachineType => MachineType.Turning;
         public override string Name { get 
                 {
@@ -77,9 +80,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             }
 
         public RoughFacingSequence(
-            Machine machine, 
-            Material material, 
-            TurningExternalTool tool, 
+            Machine machine,
+            CoordinateSystem coordinateSystem,
+            Material material,
+            TurningExternalTool tool,
             double externalDiameter, 
             double internalDiameter,
             double roughStockAllow, 
@@ -94,6 +98,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double feedRough)
         {
             Machine = machine;
+            CoordinateSystem = coordinateSystem;
             Material = material;
             Tool = tool;
             ExternalDiameter = externalDiameter;

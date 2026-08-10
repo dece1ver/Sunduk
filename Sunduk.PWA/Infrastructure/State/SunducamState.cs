@@ -1,6 +1,5 @@
 using Sunduk.PWA.Infrastructure.CAM;
 using Sunduk.PWA.Infrastructure.Sequences.Base;
-using Sunduk.PWA.Infrastructure.Tools.Base;
 using System.Collections.Generic;
 
 namespace Sunduk.PWA.Infrastructure.State
@@ -17,7 +16,6 @@ namespace Sunduk.PWA.Infrastructure.State
         public int SelectedSequenceIndex { get; set; }
         public Sequence CurrentSelectedSequence { get; set; }
         public List<Sequence> Program { get; set; }
-        public List<Tool> Tools { get; set; } = new();
 
         public Machine Machine { get; set; }
         public CoordinateSystem CoordinateSystem { get; set; } = CoordinateSystem.G54;

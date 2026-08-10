@@ -21,13 +21,13 @@
                                     WorkpieceExternalDiameter="WorkpieceExternalDiameter" Tools="Tools" SequenceToEdit="Sequence" OnSubmit="Submit" />
             break;
         case SequenceType.Facing:
-            <FacingSequenceEditor Machine="Machine" MachineType="MachineType" WorkpieceMaterial="WorkpieceMaterial"
+            <FacingSequenceEditor Machine="Machine" MachineType="MachineType" CoordinateSystem="CoordinateSystem" WorkpieceMaterial="WorkpieceMaterial"
                                    WorkpieceExternalDiameter="WorkpieceExternalDiameter" WorkpieceInternalDiameter="WorkpieceInternalDiameter"
                                    WorkpieceCurrentInternalDiameter="WorkpieceCurrentInternalDiameter" CyclesCount="CyclesCount"
                                    Tools="Tools" Program="Program" SequenceToEdit="Sequence" OnSubmit="Submit" />
             break;
         case SequenceType.ExternalTurning:
-            <ExternalTurningSequenceEditor Machine="Machine" MachineType="MachineType" WorkpieceMaterial="WorkpieceMaterial"
+            <ExternalTurningSequenceEditor Machine="Machine" MachineType="MachineType" CoordinateSystem="CoordinateSystem" WorkpieceMaterial="WorkpieceMaterial"
                                             Tools="Tools" SequenceToEdit="Sequence" OnSubmit="Submit" />
             break;
         case SequenceType.Drilling:
@@ -39,11 +39,11 @@
                                       Tools="Tools" SequenceToEdit="Sequence" OnSubmit="Submit" />
             break;
         case SequenceType.Grooving:
-            <GroovingSequenceEditor Machine="Machine" MachineType="MachineType" WorkpieceMaterial="WorkpieceMaterial"
+            <GroovingSequenceEditor Machine="Machine" MachineType="MachineType" CoordinateSystem="CoordinateSystem" WorkpieceMaterial="WorkpieceMaterial"
                                      WorkpieceExternalDiameter="WorkpieceExternalDiameter" Tools="Tools" SequenceToEdit="Sequence" OnSubmit="Submit" />
             break;
         case SequenceType.Burnishing:
-            <BurnishingSequenceEditor Machine="Machine" Tools="Tools" SequenceToEdit="Sequence" OnSubmit="Submit" />
+            <BurnishingSequenceEditor Machine="Machine" CoordinateSystem="CoordinateSystem" Tools="Tools" SequenceToEdit="Sequence" OnSubmit="Submit" />
             break;
     }
 </MudGrid>

@@ -15,7 +15,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Нарезание резьбы метчиком
         /// </summary>
-        public static string TurningTapping(Machine machine, TappingTool tool, double cutSpeed, double startZ, double endZ)
+        public static string TurningTapping(Machine machine, CoordinateSystem coordinateSystem, TappingTool tool, double cutSpeed, double startZ, double endZ, Coolant coolant = Coolant.General)
         {
             if (tool is null ||
                 startZ <= endZ) return string.Empty;
@@ -25,158 +25,102 @@ namespace Sunduk.PWA.Infrastructure.Templates
             string exit = startZ > 0
                 ? string.Empty
                 : $"G0 Z{SafeApproachDistance.NC()}\n";
-            return machine switch
-            {
-                Machine.GS1500 => new GCodeBuilder()
-                    .Raw(TurningReferentPoint)
-                    .Line(tool.Description(ToolDescriptionOption.GoodwayLeft))
-                    .Raw(approach)
-                    .Line($"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}")
-                    .Line("G80")
-                    .Raw(exit)
-                    .Line($"G96 {CoolantOff(machine)}")
-                    .Raw(TurningReferentPoint)
-                    .ToString(),
-
-                Machine.L230A => new GCodeBuilder()
-                    .Line(tool.Description(ToolDescriptionOption.L230))
-                    .Line(CoolantOn(machine))
-                    .Raw(approach)
-                    .Line($"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}")
-                    .Line("G80")
-                    .Raw(exit)
-                    .Line($"G96 {CoolantOff(machine)}")
-                    .Raw(TurningReferentPoint)
-                    .ToString(),
-                _ => string.Empty
-            };
+            if (machine.MachineType != MachineType.Turning) return string.Empty;
+            return new GCodeBuilder()
+                .ReferentPoint(machine, leading: true)
+                .ToolCall(tool, machine, coordinateSystem, coolant)
+                .CoordinateSystemFallback(machine, coordinateSystem)
+                .CoolantOn(machine, coolant, also: !machine.LeadingReferentPoint)
+                .Raw(approach)
+                .Line($"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}")
+                .Line("G80")
+                .Raw(exit)
+                .Line($"G96 {CoolantOff(machine, coolant)}")
+                .ReferentPoint(machine, leading: false)
+                .ToString();
         }
 
         public static string MillingTapping(Machine machine, CoordinateSystem coordinateSystem, MillingTappingTool tool, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
+            if (machine.MachineType != MachineType.Milling) return string.Empty;
             var spindleSpeed = cutSpeed.ToSpindleSpeed(tool.Diameter, 10);
-            string result = machine switch
-            {
-
-                Machine.A110 =>
-                tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
-                $"{coordinateSystem}{(polar ? " G16" : string.Empty)} G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
-                $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
-                $"G95 G84 Z{endZ.NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} P500 F{tool.Pitch.NC()}\n",
-                _ => string.Empty
-            };
-
-            AddPoints(ref result, holes, polar);
-
-            if (!string.IsNullOrEmpty(result))
-            {
-                result += machine switch
-                {
-                    Machine.A110 =>
-                    $"G80\n" +
-                    $"G94 {CoolantOff(machine)}\n" +
-                    $"{(polar ? "G15\n" : string.Empty)}" +
-                    SpindleStop + "\n" +
-                    MillingReferentPoint,
-                    _ => string.Empty
-                };
-            }
-            return result;
+            return new GCodeBuilder()
+                .ToolCall(tool, machine, coordinateSystem, Coolant.General)
+                .Line($"{coordinateSystem}{(polar ? " G16" : string.Empty)} G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}")
+                .Line($"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}")
+                .Line($"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}")
+                .HolePattern(holes, polar, hole => $"G95 G84 Z{endZ.NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} P500 F{tool.Pitch.NC()}")
+                .Line("G80")
+                .Line($"G94 {CoolantOff(machine)}")
+                .LineIf(polar, "G15")
+                .Line(SpindleStop)
+                .Raw(MillingReferentPoint)
+                .ToString();
         }
 
         public static string ThreadMilling(Machine machine, CoordinateSystem coordinateSystem, MillingThreadCuttingTool tool, double diameter, double cutSpeed, double startZ, double endZ, List<Hole> holes, bool polar, double safePlane)
         {
             if (tool is null || startZ <= endZ) return string.Empty;
+            if (machine.MachineType != MachineType.Milling) return string.Empty;
             var spindleSpeed = cutSpeed.ToSpindleSpeed(tool.Diameter, 10);
-            string result = machine switch
-            {
-
-                Machine.A110 =>
-                tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
-                $"{coordinateSystem}{(polar ? "G16 " : string.Empty)} G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
-                $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
-                $"G95 G84 Z{endZ.NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} P500 F{tool.Pitch.NC()}\n",
-                _ => string.Empty
-            };
-
-            AddPoints(ref result, holes, polar);
-
-            if (!string.IsNullOrEmpty(result))
-            {
-                result += machine switch
-                {
-                    Machine.A110 =>
-                    $"G80\n" +
-                    $"{CoolantOff(machine)}\n" +
-                    $"{(polar ? "G15\n" : string.Empty)}" +
-                    SpindleStop + "\n" +
-                    MillingReferentPoint,
-                    _ => string.Empty
-                };
-            }
-            return result;
+            return new GCodeBuilder()
+                .ToolCall(tool, machine, coordinateSystem, Coolant.General)
+                .Line($"{coordinateSystem}{(polar ? "G16 " : string.Empty)} G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}")
+                .Line($"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}")
+                .Line($"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}")
+                .HolePattern(holes, polar, hole => $"G95 G84 Z{endZ.NC(option: NcDecimalPointOption.Without)} R{startZ.NC(option: NcDecimalPointOption.Without)} P500 F{tool.Pitch.NC()}")
+                .Line("G80")
+                .Line($"{CoolantOff(machine)}")
+                .LineIf(polar, "G15")
+                .Line(SpindleStop)
+                .Raw(MillingReferentPoint)
+                .ToString();
         }
 
         public static string CustomThreadMilling(
-            Machine machine, 
-            CoordinateSystem coordinateSystem, 
-            MillingThreadCuttingTool tool, 
-            double diameter, 
-            double cutSpeed, 
-            double cutFeed, 
-            double startZ, 
+            Machine machine,
+            CoordinateSystem coordinateSystem,
+            MillingThreadCuttingTool tool,
+            double diameter,
+            double cutSpeed,
+            double cutFeed,
+            double startZ,
             double endZ,
             int roughPasses,
             double roughStepOver,
             double profStockAllow,
             double exitPlane,
-            bool fullCut, 
-            List<Hole> holes, 
-            bool polar, 
+            bool fullCut,
+            List<Hole> holes,
+            bool polar,
             double safePlane)
         {
             if (tool is null || startZ <= endZ || diameter <= 0 || cutSpeed <= 0 || cutFeed <= 0 || roughPasses < 1 || roughStepOver <= 0 || profStockAllow <= 0) return string.Empty;
+            if (machine.MachineType != MachineType.Milling) return string.Empty;
             var spindleSpeed = cutSpeed.ToSpindleSpeed(tool.Diameter, 10);
-            string result = machine switch
-            {
-
-                Machine.A110 =>
-                tool.Description(ToolDescriptionOption.MillingToolChange) + "\n" +
-                $"{coordinateSystem}{(polar ? "G16 " : string.Empty)} G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}\n" +
-                $"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}\n" +
-                $"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}\n" +
-                $"G166 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} " +
-                $"T{tool.Diameter.NC(option: NcDecimalPointOption.Without)} D{diameter.NC(option: NcDecimalPointOption.Without)} H{tool.Pitch.NC(option: NcDecimalPointOption.Without)} Z{endZ.NC(option: NcDecimalPointOption.Without)} E{roughPasses} " +
-                $"W{roughStepOver.NC(option: NcDecimalPointOption.Without)} R{profStockAllow.NC(option: NcDecimalPointOption.Without)} U{exitPlane.NC(option: NcDecimalPointOption.Without)} " +
-                $"A{(fullCut ? 1 : 0)} S{spindleSpeed} F{cutFeed.ToFeedPerMin(spindleSpeed, 10)}\n",
-                _ => string.Empty
-            };
-
-            AddPoints(ref result, holes, polar);
-
-            if (!string.IsNullOrEmpty(result))
-            {
-                result += machine switch
-                {
-                    Machine.A110 =>
-                    $"G67\n" +
-                    $"{CoolantOff(machine)}\n" +
-                    $"{(polar ? "G15\n" : string.Empty)}" +
-                    SpindleStop + "\n" +
-                    MillingReferentPoint,
-                    _ => string.Empty
-                };
-            }
-            return result;
+            return new GCodeBuilder()
+                .ToolCall(tool, machine, coordinateSystem, Coolant.General)
+                .Line($"{coordinateSystem}{(polar ? "G16 " : string.Empty)} G0 X{holes[0].X.NC(option: NcDecimalPointOption.Without)} Y{holes[0].Y.NC(option: NcDecimalPointOption.Without)} S{spindleSpeed} {Direction(tool)}")
+                .Line($"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {CoolantOn(machine, Coolant.Through)}")
+                .Line($"G0 Z{startZ.NC(option: NcDecimalPointOption.Without)}")
+                .HolePattern(holes, polar, hole =>
+                    $"G166 X{hole.X.NC(option: NcDecimalPointOption.Without)} Y{hole.Y.NC(option: NcDecimalPointOption.Without)} " +
+                    $"T{tool.Diameter.NC(option: NcDecimalPointOption.Without)} D{diameter.NC(option: NcDecimalPointOption.Without)} H{tool.Pitch.NC(option: NcDecimalPointOption.Without)} Z{endZ.NC(option: NcDecimalPointOption.Without)} E{roughPasses} " +
+                    $"W{roughStepOver.NC(option: NcDecimalPointOption.Without)} R{profStockAllow.NC(option: NcDecimalPointOption.Without)} U{exitPlane.NC(option: NcDecimalPointOption.Without)} " +
+                    $"A{(fullCut ? 1 : 0)} S{spindleSpeed} F{cutFeed.ToFeedPerMin(spindleSpeed, 10)}")
+                .Line("G67")
+                .Line($"{CoolantOff(machine)}")
+                .LineIf(polar, "G15")
+                .Line(SpindleStop)
+                .Raw(MillingReferentPoint)
+                .ToString();
         }
 
         /// <summary>
         /// Нарезание резьбы
         /// </summary>
-        public static string ThreadCutting(Machine machine, Tool tool, ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNptPlane, int speed)
+        public static string ThreadCutting(Machine machine, CoordinateSystem coordinateSystem, Tool tool, ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNptPlane, int speed, Coolant coolant = Coolant.General)
         {
             if (tool is null ||
                 threadDiameter <= 0 ||
@@ -199,30 +143,18 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 };
             }
 
-            return machine switch
-            {
-                Machine.GS1500 => new GCodeBuilder()
-                    .Raw(TurningReferentPoint)
-                    .Line(tool.Description(ToolDescriptionOption.GoodwayLeft))
-                    .Line($"G0 X{approachDiameter} Z{startZ.NC()} S{speed.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97")
-                    .Line($"G76 P0201{threadStandard.Profile()} Q{minStep} R{lastPass.NC()}")
-                    .Line($"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}")
-                    .Line($"G96 {CoolantOff(machine)}")
-                    .Raw(TurningReferentPoint)
-                    .ToString(),
-
-                Machine.L230A => new GCodeBuilder()
-                    .Line(tool.Description(ToolDescriptionOption.L230))
-                    .Line(CoolantOn(machine))
-                    .Line($"G0 X{approachDiameter} Z{startZ.NC()} S{speed.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97")
-                    .Line($"G76 P0201{threadStandard.Profile()} Q{minStep} R{lastPass.NC()}")
-                    .Line($"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}")
-                    .Line($"G96 {CoolantOff(machine)}")
-                    .Raw(TurningReferentPoint)
-                    .ToString(),
-
-                _ => string.Empty,
-            };
+            if (machine.MachineType != MachineType.Turning) return string.Empty;
+            return new GCodeBuilder()
+                .ReferentPoint(machine, leading: true)
+                .ToolCall(tool, machine, coordinateSystem, coolant)
+                .CoordinateSystemFallback(machine, coordinateSystem)
+                .CoolantOn(machine, coolant, also: !machine.LeadingReferentPoint)
+                .Line($"G0 X{approachDiameter} Z{startZ.NC()} S{speed.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97")
+                .Line($"G76 P0201{threadStandard.Profile()} Q{minStep} R{lastPass.NC()}")
+                .Line($"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}")
+                .Line($"G96 {CoolantOff(machine, coolant)}")
+                .ReferentPoint(machine, leading: false)
+                .ToString();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿<style>
+﻿@inject SawingTimeState State
+<style>
     .tl {
         padding: 0px 15px 0px 0px;
     }
@@ -166,33 +167,33 @@
         }
     }
 
-    private bool _debug = false;
+    private bool _debug { get => State.Debug; set => State.Debug = value; }
 
     public enum Form { Circle, Rectangle }
-    public Form WorkpieceForm { get; set; } = Form.Circle;
+    public Form WorkpieceForm { get => State.WorkpieceForm; set => State.WorkpieceForm = value; }
 
     public enum Material { Steel, Stainless }
-    public Material WorkpieceMaterial { get; set; } = Material.Stainless;
+    public Material WorkpieceMaterial { get => State.WorkpieceMaterial; set => State.WorkpieceMaterial = value; }
 
     public enum TimeValue { Second = 1, Minute = 60, Hour = 3600 }
-    public TimeValue TimeModifier { get; set; } = TimeValue.Minute;
+    public TimeValue TimeModifier { get => State.TimeModifier; set => State.TimeModifier = value; }
 
-    public string _WorkpieceExternalDiameter { get; set; } = string.Empty;
+    public string _WorkpieceExternalDiameter { get => State.WorkpieceExternalDiameter; set => State.WorkpieceExternalDiameter = value; }
     public double WorkpieceExternalDiameter => Util.GetDouble(_WorkpieceExternalDiameter);
 
-    public string _WorkpieceInternalDiameter { get; set; } = string.Empty;
+    public string _WorkpieceInternalDiameter { get => State.WorkpieceInternalDiameter; set => State.WorkpieceInternalDiameter = value; }
     public double WorkpieceInternalDiameter => Util.GetDouble(_WorkpieceInternalDiameter);
 
-    public string _WorkpieceWidth { get; set; } = string.Empty;
+    public string _WorkpieceWidth { get => State.WorkpieceWidth; set => State.WorkpieceWidth = value; }
     public double WorkpieceWidth => Util.GetDouble(_WorkpieceWidth);
 
-    public string _WorkpieceHeight { get; set; } = string.Empty;
+    public string _WorkpieceHeight { get => State.WorkpieceHeight; set => State.WorkpieceHeight = value; }
     public double WorkpieceHeight => Util.GetDouble(_WorkpieceHeight);
 
-    public string _WorkpieceLength { get; set; } = string.Empty;
+    public string _WorkpieceLength { get => State.WorkpieceLength; set => State.WorkpieceLength = value; }
     public double WorkpieceLength => Util.GetDouble(_WorkpieceLength);
 
-    public string _PartsCount { get; set; } = string.Empty;
+    public string _PartsCount { get => State.PartsCount; set => State.PartsCount = value; }
     public double PartsCount => Util.GetDouble(_PartsCount, 1);
 
     #region Заготовка

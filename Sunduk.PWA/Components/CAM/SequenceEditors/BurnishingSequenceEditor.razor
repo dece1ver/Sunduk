@@ -2,8 +2,28 @@
     <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
         @foreach (var tool in Tools.Where(x => x is TurningBurnishingTool))
         {
-            <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+            <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
         }
+    </MudSelect>
+</MudItem>
+@if (Machine.CoordinateSystems.Count > 1)
+{
+    <MudItem xs="12" md="4">
+        <MudSelect Label="Система координат" T="CoordinateSystem" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SelectedCoordinateSystem">
+            @foreach (var cs in Machine.CoordinateSystems)
+            {
+                <MudSelectItem Value="@cs" />
+            }
+        </MudSelect>
+    </MudItem>
+}
+<MudItem xs="12" md="4">
+    <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SelectedCoolant">
+        <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
+        <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
+        <MudSelectItem Value="@(Coolant.Full)">Вся подача СОЖ</MudSelectItem>
+        <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
+        <MudSelectItem Value="@(Coolant.None)">Без СОЖ</MudSelectItem>
     </MudSelect>
 </MudItem>
 <MudItem xs="12" md="4">
@@ -35,10 +55,13 @@
 
 @code {
     [Parameter] public Machine Machine { get; set; }
+    [Parameter] public CoordinateSystem CoordinateSystem { get; set; }
     [Parameter] public List<Tool> Tools { get; set; }
     [Parameter] public Sequence SequenceToEdit { get; set; }
     [Parameter] public EventCallback<Sequence> OnSubmit { get; set; }
 
+    private CoordinateSystem SelectedCoordinateSystem { get; set; }
+    private Coolant SelectedCoolant { get; set; }
     private Tool Tool { get; set; }
     private string _BurnishingDiameter { get; set; }
     private double BurnishingDiameter => _BurnishingDiameter.GetDouble();
@@ -54,6 +77,7 @@
 
     protected override void OnInitialized()
     {
+        SelectedCoordinateSystem = CoordinateSystem;
         if (SequenceToEdit is not null) LoadFromSequence(SequenceToEdit);
     }
 
@@ -67,6 +91,8 @@
             _BurnishingEnd = burn.EndZ.ToPrettyString();
             SpeedFinish = burn.SpeedFinish;
             _FeedFinish = burn.FeedFinish.ToPrettyString();
+            SelectedCoordinateSystem = burn.CoordinateSystem;
+            SelectedCoolant = burn.Coolant;
         }
     }
 
@@ -82,12 +108,14 @@
             if (SpeedFinish <= 0 || FeedFinish <= 0) return string.Empty;
             CurrentSequence = BurnishingSequenceFactory.CreateTurningBurnishing(
                 machine: Machine,
+                coordinateSystem: SelectedCoordinateSystem,
                 tool: Tool as TurningBurnishingTool,
                 diameter: BurnishingDiameter,
                 startZ: BurnishingStart,
                 endZ: BurnishingEnd,
                 speedFinish: SpeedFinish,
-                feedFinish: FeedFinish);
+                feedFinish: FeedFinish,
+                coolant: SelectedCoolant);
             return CurrentSequence.Operation;
         }
     }

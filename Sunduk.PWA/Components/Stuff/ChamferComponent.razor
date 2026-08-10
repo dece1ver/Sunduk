@@ -1,4 +1,5 @@
 ﻿@using System.Threading.Tasks
+@inject ChamferState State
 <style>
     .monofield {
         font-family: 'Roboto Mono', monospace;
@@ -226,8 +227,8 @@
     readonly int _imgHeigth = 249;
     readonly int _imgWidth = 270;
 
-    bool calcStartDiam = true;
-    bool showClassicChamfer = true;
+    bool calcStartDiam { get => State.CalcStartDiam; set => State.CalcStartDiam = value; }
+    bool showClassicChamfer { get => State.ShowClassicChamfer; set => State.ShowClassicChamfer = value; }
 
     public string ChamferExample
     {
@@ -299,17 +300,16 @@
         }
     }
     public enum Chamfer { External, Internal };
-    public Chamfer ChamferType { get; set; } = Chamfer.External;
+    public Chamfer ChamferType { get => State.ChamferType; set => State.ChamferType = value; }
 
     public enum Calculation { Simplified, Precise };
 
-    private Calculation _CalculationType = Calculation.Simplified;
     public Calculation CalculationType
     {
-        get => _CalculationType;
+        get => State.CalculationType;
         set
         {
-            _CalculationType = value;
+            State.CalculationType = value;
             CalculateAll();
         }
     }
@@ -330,39 +330,36 @@
         InternalToolRadius,
     };
     //public enum ImageType { Diameter, ToolRadius, ChamferAngle, ChamferSize };
-    public Images CurrentImage { get; set; } = Images.ExternalChamfer;
+    public Images CurrentImage { get => State.CurrentImage; set => State.CurrentImage = value; }
 
-    private string _chamferEndDiameter = "";
     public string _ChamferEndDiameter
     {
-        get => _chamferEndDiameter;
+        get => State.ChamferEndDiameter;
         set
         {
-            _chamferEndDiameter = value;
+            State.ChamferEndDiameter = value;
             CalculateAll();
         }
     }
     public double ChamferEndDiameter => Util.GetDouble(_ChamferEndDiameter);
 
-    private string _chamferStartDiameter = "";
     public string _ChamferStartDiameter
     {
-        get => _chamferStartDiameter;
+        get => State.ChamferStartDiameter;
         set
         {
-            _chamferStartDiameter = value;
+            State.ChamferStartDiameter = value;
             CalculateChamferSize();
         }
     }
     public double ChamferStartDiameter => Util.GetDouble(_ChamferStartDiameter);
 
-    private string _angle = "";
     public string _Angle
     {
-        get => _angle;
+        get => State.Angle;
         set
         {
-            _angle = value;
+            State.Angle = value;
             if (Angle == 45) CalculationType = Calculation.Simplified;
             else CalculationType = Calculation.Precise;
             CalculateAll();
@@ -370,25 +367,23 @@
     }
     public double Angle => Util.GetDouble(_Angle);
 
-    private string _chamferSize = "";
     public string _ChamferSize
     {
-        get => _chamferSize;
+        get => State.ChamferSize;
         set
         {
-            _chamferSize = value;
+            State.ChamferSize = value;
             CalculateStartDiam();
         }
     }
     public double ChamferSize => Util.GetDouble(_ChamferSize);
 
-    private string _chamferInsertRadius = "";
     public string _ChamferInsertRadius
     {
-        get => _chamferInsertRadius;
+        get => State.ChamferInsertRadius;
         set
         {
-            _chamferInsertRadius = value;
+            State.ChamferInsertRadius = value;
             CalculateAll();
         }
     }
@@ -413,8 +408,8 @@
         set { }
     }
 
-    public bool RoundCorners { get; set; } = false;
-    public string _RoundCorner { get; set; } = "0.3";
+    public bool RoundCorners { get => State.RoundCorners; set => State.RoundCorners = value; }
+    public string _RoundCorner { get => State.RoundCorner; set => State.RoundCorner = value; }
     public double RoundCorner => Util.GetDouble(_RoundCorner);
 
     public double XRadiusShift

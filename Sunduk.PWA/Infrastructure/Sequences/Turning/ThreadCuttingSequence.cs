@@ -9,6 +9,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class ThreadCuttingSequence : Sequence
     {
         public Machine Machine { get; set; }
+        public CoordinateSystem CoordinateSystem { get; set; }
         public ThreadingTool Tool { get; set; }
         public ThreadStandard ThreadStandard { get; set; }
         public CuttingType Type { get; set; }
@@ -19,7 +20,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double ThreadNptPlane { get; set; }
         public string StandardTemplate { get; set; }
         public int Speed { get; set; }
-        public override string Operation => Templates.ThreadOperation.ThreadCutting(Machine, Tool, ThreadStandard, Type, ThreadDiameter, ThreadPitch, StartZ, EndZ, ThreadNptPlane, Speed);
+        public override string Operation => Templates.ThreadOperation.ThreadCutting(Machine, CoordinateSystem, Tool, ThreadStandard, Type, ThreadDiameter, ThreadPitch, StartZ, EndZ, ThreadNptPlane, Speed, Coolant);
         public override MachineType MachineType => MachineType.Turning;
         public override string Name
         {
@@ -55,9 +56,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             }
         }
 
-        public ThreadCuttingSequence(Machine machine, ThreadingTool tool, ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNptPlane, int speed, string standardTemplate = "")
+        public ThreadCuttingSequence(Machine machine, CoordinateSystem coordinateSystem, ThreadingTool tool, ThreadStandard threadStandard, CuttingType type, double threadDiameter, double threadPitch, double startZ, double endZ, double threadNptPlane, int speed, string standardTemplate = "")
         {
             Machine = machine;
+            CoordinateSystem = coordinateSystem;
             Tool = tool;
             ThreadStandard = threadStandard;
             Type = type;

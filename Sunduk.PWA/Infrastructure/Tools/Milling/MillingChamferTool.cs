@@ -6,13 +6,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
     {
         public override MachineType MachineType => MachineType.Milling;
         public override string Name => "FASKA";
-        public override string Description(Util.ToolDescriptionOption option) => option switch
-        {
-            Util.ToolDescriptionOption.General => $"T{Position:D2} ({Name} D{Diameter.NC(option: Util.NcDecimalPointOption.Without)}x{Angle.NC(option: Util.NcDecimalPointOption.Without)})",
-            Util.ToolDescriptionOption.MillingToolChange => $"T{Position} M6 ({Name} D{Diameter.NC(option: Util.NcDecimalPointOption.Without)}x{Angle.NC(option: Util.NcDecimalPointOption.Without)})",
-            Util.ToolDescriptionOption.ToolTable => Description(Util.ToolDescriptionOption.General).Split('(')[1].TrimEnd(')'),
-            _ => string.Empty,
-        };
+        public override string CallDetails => $"{Name} D{Diameter.NC(option: Util.NcDecimalPointOption.Without)}x{Angle.NC(option: Util.NcDecimalPointOption.Without)}";
         public double Diameter { get; set; }
         public double Angle { get; set; }
         public double TipCompensation { get; set; }

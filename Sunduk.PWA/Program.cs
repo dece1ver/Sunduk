@@ -67,6 +67,23 @@ namespace Sunduk.PWA
             builder.Services.AddMudExtensions();
 
             builder.Services.AddSingleton<SunducamState>();
+            builder.Services.AddSingleton<AngleConverterState>();
+            builder.Services.AddSingleton<PointCoordinatesState>();
+            builder.Services.AddSingleton<SawingTimeState>();
+            builder.Services.AddSingleton<TurningTimeState>();
+            builder.Services.AddSingleton<DrillAngleState>();
+            builder.Services.AddSingleton<HoleCapacityState>();
+            builder.Services.AddSingleton<RadiusState>();
+            builder.Services.AddSingleton<NippleState>();
+            builder.Services.AddSingleton<Arc2State>();
+            builder.Services.AddSingleton<ChamferState>();
+            builder.Services.AddSingleton<ThreadTurningState>();
+            builder.Services.AddSingleton<CalculatorPageState>();
+            // Scoped, не Singleton: ILocalStorageService у Blazored.LocalStorage зарегистрирован
+            // как Scoped, а singleton не может зависеть от scoped-сервиса. В WASM-приложении
+            // весь рантайм — один scope на всё время жизни вкладки, так что для наших целей
+            // Scoped здесь эквивалентен Singleton (тот же экземпляр везде).
+            builder.Services.AddScoped<MachineRegistry>();
 
             await builder.Build().RunAsync();
         }

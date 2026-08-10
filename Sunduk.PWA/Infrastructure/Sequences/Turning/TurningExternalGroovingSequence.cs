@@ -13,6 +13,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public override MachineType MachineType => MachineType.Turning;
         public override string Operation => Templates.GroovingOperation.GroovingSequence(
             Machine,
+            CoordinateSystem,
             Material,
             Tool,
             CuttingPoint,
@@ -25,11 +26,12 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             InnerCornerBlunt,
             OuterBluntType,
             InnerBluntType,
-            true, 
-            SpeedRough, 
-            SpeedFinish, 
-            FeedRough, 
-            FeedFinish);
+            true,
+            SpeedRough,
+            SpeedFinish,
+            FeedRough,
+            FeedFinish,
+            Coolant);
     public override string Name => $"Канавка наружная {Width.NC(option: Util.NcDecimalPointOption.Without)}мм на Ø{ExternalDiameter.NC(option: Util.NcDecimalPointOption.Without)}";
     public override OperationTime MachineTime
     {
@@ -65,6 +67,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 
     public TurningExternalGroovingSequence(
             Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
             GroovingExternalTool tool,
             double cuttingPoint,
@@ -76,27 +79,28 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double outerCornerBlunt,
             double innerCornerBlunt,
             Blunt outerBluntType,
-            Blunt innerBluntType, 
-            int speedRough, 
-            int speedFinish, 
-            double feedRough, 
+            Blunt innerBluntType,
+            int speedRough,
+            int speedFinish,
+            double feedRough,
             double feedFinish)
             : base(
-                machine, 
-                material, 
-                cuttingPoint, 
-                externalDiameter, 
+                machine,
+                coordinateSystem,
+                material,
+                cuttingPoint,
+                externalDiameter,
                 internalDiameter,
                 width,
-                stepOver, 
-                profStockAllow, 
-                outerCornerBlunt, 
-                innerCornerBlunt, 
+                stepOver,
+                profStockAllow,
+                outerCornerBlunt,
+                innerCornerBlunt,
                 outerBluntType,
                 innerBluntType,
-                speedRough, 
-                speedFinish, 
-                feedRough, 
+                speedRough,
+                speedFinish,
+                feedRough,
                 feedFinish)
         {
             Tool = tool;

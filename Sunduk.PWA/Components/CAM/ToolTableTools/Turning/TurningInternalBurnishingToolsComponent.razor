@@ -1,4 +1,4 @@
-﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+﻿@inject MachineRegistry MachineRegistry
 
 <MudTable Items="TurningInternalBurnishingTools" ReadOnly="ReadOnly" Hover="true" CanCancelEdit="false" Elevation="0">
     <HeaderContent>
@@ -61,13 +61,13 @@
     private async Task AddTurningInternalBurnishingTool()
     {
         Tools.Add(new TurningInternalBurnishingTool(0101, TurningInternalBurnishingTool.Types.Diamond, 32));
-        await LocalStorage.SetItemAsync(nameof(TurningInternalBurnishingTools), TurningInternalBurnishingTools);
+        await MachineRegistry.SaveAsync();
         await ToolsChanged.InvokeAsync(Tools);
     }
     private async Task RemoveTurningInternalBurnishingTool(TurningInternalBurnishingTool tool)
     {
         Tools.Remove(tool);
-        await LocalStorage.SetItemAsync(nameof(TurningInternalBurnishingTools), TurningInternalBurnishingTools);
+        await MachineRegistry.SaveAsync();
         await ToolsChanged.InvokeAsync(Tools);
     }
 }

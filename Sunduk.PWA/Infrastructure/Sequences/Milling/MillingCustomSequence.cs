@@ -6,7 +6,6 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Milling
 {
     public class MillingCustomSequence : CustomSequence
     {
-        public Coolant Coolant { get; set; }
         public bool Polar { get; set; }
         public double SafePlane { get; set; }
         public CoordinateSystem CoordinateSystem { get; set; }

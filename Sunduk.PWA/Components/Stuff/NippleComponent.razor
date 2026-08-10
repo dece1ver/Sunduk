@@ -1,4 +1,5 @@
-﻿<style>
+﻿@inject NippleState State
+<style>
     .monofield {
         font-family: 'Roboto Mono', monospace;
     }
@@ -151,7 +152,7 @@
     readonly int _imgHeigth = 157;
     readonly int _imgWidth = 250;
 
-    public bool RoundCorner { get; set; } = false;
+    public bool RoundCorner { get => State.RoundCorner; set => State.RoundCorner = value; }
 
     public enum Images
     {
@@ -162,7 +163,7 @@
         NippleToolRaduis,
     };
     public enum ImageType { Diameter, ToolRaduis, ChamferAngle, ChamferSize };
-    public Images CurrentImage { get; set; } = Images.NippleBase;
+    public Images CurrentImage { get => State.CurrentImage; set => State.CurrentImage = value; }
 
     public string RadiusExample
     {
@@ -183,21 +184,21 @@
         }
     }
     public enum Radius { External, Internal };
-    public Radius RadiusType { get; set; } = Radius.External;
+    public Radius RadiusType { get => State.RadiusType; set => State.RadiusType = value; }
 
-    public string _NippleDiameter { get; set; } = string.Empty;
+    public string _NippleDiameter { get => State.NippleDiameter; set => State.NippleDiameter = value; }
     public double NippleDiameter => Util.GetDouble(_NippleDiameter);
 
-    public string _ArcCenter { get; set; } = string.Empty;
+    public string _ArcCenter { get => State.ArcCenter; set => State.ArcCenter = value; }
     public double ArcCenter => Util.GetDouble(_ArcCenter);
 
-    public string _RadiusSize { get; set; } = string.Empty;
+    public string _RadiusSize { get => State.RadiusSize; set => State.RadiusSize = value; }
     public double RadiusSize => NippleDiameter / 2;
 
-    public string _InsertRadius { get; set; } = string.Empty;
+    public string _InsertRadius { get => State.InsertRadius; set => State.InsertRadius = value; }
     public double InsertRadius => Util.GetDouble(_InsertRadius);
 
-    public string _NippleBlunt { get; set; } = "0.3";
+    public string _NippleBlunt { get => State.NippleBlunt; set => State.NippleBlunt = value; }
     public double NippleBlunt => Util.GetDouble(_NippleBlunt);
     public double NippleBluntRadius => NippleBlunt + InsertRadius;
 

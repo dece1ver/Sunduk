@@ -9,6 +9,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class FacingSequence : Sequence
     {
         public Machine Machine { get; set; }
+        public CoordinateSystem CoordinateSystem { get; set; }
         public Material Material { get; set; }
         public override OperationTime MachineTime
         {
@@ -54,9 +55,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double FeedRough { get; set; }
         public double FeedFinish { get; set; }
         public override string Operation => Templates.FacingOperation.Facing(
-            Machine, 
-            Material, 
-            Tool, 
+            Machine,
+            CoordinateSystem,
+            Material,
+            Tool,
             ExternalDiameter,
             Tool is null ? InternalDiameter : InternalDiameter - (Tool.Radius * 2),
             RoughStockAllow, 
@@ -69,10 +71,11 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             CornerBlunt,
             true,
             true, 
-            SpeedRough, 
-            SpeedFinish, 
-            FeedRough, 
-            FeedFinish);
+            SpeedRough,
+            SpeedFinish,
+            FeedRough,
+            FeedFinish,
+            Coolant);
 
         public override MachineType MachineType => MachineType.Turning;
         public override string Name { get 
@@ -85,7 +88,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 
 
 
-        public FacingSequence(Machine machine, Material material, TurningExternalTool tool, double externalDiameter,
+        public FacingSequence(Machine machine, CoordinateSystem coordinateSystem, Material material, TurningExternalTool tool, double externalDiameter,
             double internalDiameter,
             double roughStockAllow, 
             double profStockAllow, 
@@ -101,6 +104,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double feedFinish)
         {
             Machine = machine;
+            CoordinateSystem = coordinateSystem;
             Material = material;
             Tool = tool;
             ExternalDiameter = externalDiameter;

@@ -11,18 +11,41 @@
         {
             @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
             {
-                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
             }
         }
         @if (MachineType == MachineType.Milling)
         {
             @foreach (var tool in Tools.Where(x => x is MillingDrillingTool))
             {
-                <MudSelectItem Value="@tool">@tool.Description()</MudSelectItem>
+                <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
             }
         }
     </MudSelect>
 </MudItem>
+@if (Machine.CoordinateSystems.Count > 1)
+{
+    <MudItem xs="12" md="4">
+        <MudSelect Label="Система координат" T="CoordinateSystem" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SelectedCoordinateSystem">
+            @foreach (var cs in Machine.CoordinateSystems)
+            {
+                <MudSelectItem Value="@cs" />
+            }
+        </MudSelect>
+    </MudItem>
+}
+@if (MachineType == MachineType.Turning)
+{
+    <MudItem xs="12" md="4">
+        <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SelectedCoolant">
+            <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.Full)">Вся подача СОЖ</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.None)">Без СОЖ</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+}
 @switch (DrillingSequence)
 {
     case DrillingSequences.HighSpeedDrilling:
@@ -145,6 +168,8 @@
     [Parameter] public EventCallback<Sequence> OnSubmit { get; set; }
 
     private DrillingSequences DrillingSequence { get; set; }
+    private CoordinateSystem SelectedCoordinateSystem { get; set; }
+    private Coolant SelectedCoolant { get; set; }
     private Tool Tool { get; set; }
     private bool ToolCallPolar { get; set; }
 
@@ -181,6 +206,7 @@
     {
         if (Holes.Count == 0) Holes.Add(new Hole());
         HolesCount = 1;
+        SelectedCoordinateSystem = CoordinateSystem;
         if (SequenceToEdit is not null) LoadFromSequence(SequenceToEdit);
     }
 
@@ -195,6 +221,8 @@
                 _DrillEnd = tHs.EndZ.ToPrettyString();
                 SpeedFinish = tHs.Speed;
                 _FeedFinish = tHs.Feed.ToPrettyString();
+                SelectedCoordinateSystem = tHs.CoordinateSystem;
+                SelectedCoolant = tHs.Coolant;
                 break;
             case MillingHighSpeedDrillingSequence mHs:
                 DrillingSequence = DrillingSequences.HighSpeedDrilling;
@@ -205,6 +233,7 @@
                 _FeedFinish = mHs.Feed.ToPrettyString();
                 Holes = mHs.Holes;
                 ToolCallPolar = mHs.Polar;
+                SelectedCoordinateSystem = mHs.CoordinateSystem;
                 break;
             case TurningPeckDrillingSequence tPeck:
                 DrillingSequence = DrillingSequences.PeckingDrilling;
@@ -214,6 +243,8 @@
                 _DrillEnd = tPeck.EndZ.ToPrettyString();
                 SpeedFinish = tPeck.Speed;
                 _FeedFinish = tPeck.Feed.ToPrettyString();
+                SelectedCoordinateSystem = tPeck.CoordinateSystem;
+                SelectedCoolant = tPeck.Coolant;
                 break;
             case MillingPeckDrillingSequence mPeck:
                 DrillingSequence = DrillingSequences.PeckingDrilling;
@@ -225,6 +256,7 @@
                 _FeedFinish = mPeck.Feed.ToPrettyString();
                 Holes = mPeck.Holes;
                 ToolCallPolar = mPeck.Polar;
+                SelectedCoordinateSystem = mPeck.CoordinateSystem;
                 break;
             case TurningPeckDeepDrillingSequence tDeep:
                 DrillingSequence = DrillingSequences.PeckingDeepDrilling;
@@ -234,6 +266,8 @@
                 _DrillEnd = tDeep.EndZ.ToPrettyString();
                 SpeedFinish = tDeep.Speed;
                 _FeedFinish = tDeep.Feed.ToPrettyString();
+                SelectedCoordinateSystem = tDeep.CoordinateSystem;
+                SelectedCoolant = tDeep.Coolant;
                 break;
             case MillingPeckDeepDrillingSequence mDeep:
                 DrillingSequence = DrillingSequences.PeckingDeepDrilling;
@@ -245,6 +279,7 @@
                 _FeedFinish = mDeep.Feed.ToPrettyString();
                 Holes = mDeep.Holes;
                 ToolCallPolar = mDeep.Polar;
+                SelectedCoordinateSystem = mDeep.CoordinateSystem;
                 break;
         }
     }
@@ -283,17 +318,19 @@
                         case MachineType.Turning:
                             CurrentSequence = DrillingSequenceFactory.CreateTurningHighSpeedDrilling(
                                 machine: Machine,
+                                coordinateSystem: SelectedCoordinateSystem,
                                 material: WorkpieceMaterial,
                                 tool: Tool as TurningDrillingTool,
                                 startZ: DrillStart,
                                 endZ: DrillEnd,
                                 speed: SpeedFinish,
-                                feed: FeedFinish);
+                                feed: FeedFinish,
+                                coolant: SelectedCoolant);
                             return CurrentSequence.Operation;
                         case MachineType.Milling:
                             CurrentSequence = DrillingSequenceFactory.CreateMillingHighSpeedDrilling(
                                 machine: Machine,
-                                coordinateSystem: CoordinateSystem,
+                                coordinateSystem: SelectedCoordinateSystem,
                                 material: WorkpieceMaterial,
                                 tool: Tool as MillingDrillingTool,
                                 startZ: DrillStart,
@@ -313,18 +350,20 @@
                         case MachineType.Turning:
                             CurrentSequence = DrillingSequenceFactory.CreateTurningPeckDrilling(
                                 machine: Machine,
+                                coordinateSystem: SelectedCoordinateSystem,
                                 material: WorkpieceMaterial,
                                 tool: Tool as TurningDrillingTool,
                                 depth: PeckingDepth,
                                 startZ: DrillStart,
                                 endZ: DrillEnd,
                                 speed: SpeedFinish,
-                                feed: FeedFinish);
+                                feed: FeedFinish,
+                                coolant: SelectedCoolant);
                             return CurrentSequence.Operation;
                         case MachineType.Milling:
                             CurrentSequence = DrillingSequenceFactory.CreateMillingPeckDrilling(
                                 machine: Machine,
-                                coordinateSystem: CoordinateSystem,
+                                coordinateSystem: SelectedCoordinateSystem,
                                 material: WorkpieceMaterial,
                                 tool: Tool as MillingDrillingTool,
                                 depth: PeckingDepth,
@@ -345,18 +384,20 @@
                         case MachineType.Turning:
                             CurrentSequence = DrillingSequenceFactory.CreateTurningPeckDeepDrilling(
                                 machine: Machine,
+                                coordinateSystem: SelectedCoordinateSystem,
                                 material: WorkpieceMaterial,
                                 tool: Tool as TurningDrillingTool,
                                 depth: PeckingDeepDepth,
                                 startZ: DrillStart,
                                 endZ: DrillEnd,
                                 speed: SpeedFinish,
-                                feed: FeedFinish);
+                                feed: FeedFinish,
+                                coolant: SelectedCoolant);
                             return CurrentSequence.Operation;
                         case MachineType.Milling:
                             CurrentSequence = DrillingSequenceFactory.CreateMillingPeckDeepDrilling(
                                 machine: Machine,
-                                coordinateSystem: CoordinateSystem,
+                                coordinateSystem: SelectedCoordinateSystem,
                                 material: WorkpieceMaterial,
                                 tool: Tool as MillingDrillingTool,
                                 depth: PeckingDeepDepth,

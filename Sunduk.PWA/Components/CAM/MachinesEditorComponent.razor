@@ -1,0 +1,317 @@
+@inject MachineRegistry MachineRegistry
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<MudPaper Class="pa-4 rounded-0" Elevation="0" Outlined="false">
+    <MudToolBar Dense="true" Class="pl-0">
+        <MudText Typo="Typo.h6">Станки</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Add" OnClick="AddMachine">
+            Добавить станок
+        </MudButton>
+    </MudToolBar>
+
+    @if (!MachineRegistry.Initialized)
+    {
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" Class="mt-4" />
+    }
+    else
+    {
+        <MudExpansionPanels MultiExpansion="true" Square="true" Class="mt-2">
+            @foreach (var machine in MachineRegistry.Machines)
+            {
+            <MudExpansionPanel Class="mb-1">
+                <TitleContent>
+                    <div class="d-flex align-center justify-space-between" style="width: 100%;">
+                        <MudText>@machine.Name</MudText>
+                        <div class="d-flex align-center" style="gap: 8px;">
+                            @if (machine.IsBuiltIn)
+                            {
+                                <MudTooltip Text="встроенный">
+                                    <MudIcon Icon="@Icons.Material.Outlined.Verified" Size="Size.Small" Color="Color.Default" />
+                                </MudTooltip>
+                            }
+                            <MudChip T="string" Size="Size.Small" Color="Color.Primary"
+                                     Class="justify-center" Style="width: 110px;">
+                                @(machine.MachineType == MachineType.Turning ? "Токарный" : "Фрезерный")
+                            </MudChip>
+                        </div>
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    <MudTabs Elevation="0" Rounded="false" ApplyEffectsToContainer="true" Class="mt-2">
+                        <MudTabPanel Text="Общее">
+                            <MudGrid Spacing="1">
+                                <MudItem xs="12" sm="6" md="4">
+                                    <MudTextField T="string" Value="machine.Name" Label="Название" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                  Immediate="true" ValueChanged="@(v => { machine.Name = v; Persist(); })" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6" md="4">
+                                    <MudSelect T="MachineType" Value="machine.MachineType" Label="Тип" Variant="Variant.Filled" Margin="Margin.Dense"
+                                               ValueChanged="@(v => { machine.MachineType = v; Persist(); })">
+                                        <MudSelectItem Value="MachineType.Turning">Токарный</MudSelectItem>
+                                        <MudSelectItem Value="MachineType.Milling">Фрезерный</MudSelectItem>
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="12" sm="6" md="4">
+                                    <MudText Typo="Typo.caption" Style="opacity: 0.7;">Системы координат</MudText>
+                                    <div class="d-flex align-center flex-wrap mt-1" style="gap: 4px;">
+                                        @foreach (var cs in machine.CoordinateSystems)
+                                        {
+                                            <MudChip T="string" Size="Size.Small">
+                                                @cs
+                                                @if (machine.CoordinateSystems.Count > 1)
+                                                {
+                                                    <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" Class="pa-0 ml-1"
+                                                                   OnClick="@(() => RemoveCoordinateSystem(machine, cs))" />
+                                                }
+                                            </MudChip>
+                                        }
+                                        @if (NextCoordinateSystem(machine) is { } next)
+                                        {
+                                            <MudTooltip Text="@($"Добавить {next}")">
+                                                <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small" Color="Color.Primary"
+                                                               OnClick="@(() => AddCoordinateSystem(machine, next))" />
+                                            </MudTooltip>
+                                        }
+                                    </div>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudDivider Class="my-2" />
+                                    <MudText Typo="Typo.subtitle2">Шапка программы</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6" md="6">
+                                    <MudSelect T="HeaderStyle" Value="machine.HeaderStyle" Label="Формат номера программы" Variant="Variant.Filled" Margin="Margin.Dense"
+                                               ValueChanged="@(v => { machine.HeaderStyle = v; Persist(); })">
+                                        <MudSelectItem Value="HeaderStyle.ONumber">O-номер (O0001 (номер) / (имя)(версия))</MudSelectItem>
+                                        <MudSelectItem Value="HeaderStyle.AngleBracketName">&lt;Номер&gt; ( &lt;номер&gt;(имя) / (версия) )</MudSelectItem>
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="12" sm="6" md="6">
+                                    <MudTextField T="string" Value="machine.ToolCallTemplate" Label="Формат вызова инструмента" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                  Lines="2" Immediate="true"
+                                                  ValueChanged="@(v => { machine.ToolCallTemplate = v; Persist(); })" />
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField T="string" Value="machine.HeaderExtraLines" Label="Дополнительные строки шапки" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                  Lines="3" Immediate="true"
+                                                  ValueChanged="@(v => { machine.HeaderExtraLines = v; Persist(); })" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6" md="6">
+                                    <MudTextField T="string" Value="machine.HeaderTrailerTemplate" Label="Строка автора/даты" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                  Immediate="true"
+                                                  ValueChanged="@(v => { machine.HeaderTrailerTemplate = v; Persist(); })" />
+                                </MudItem>
+                            </MudGrid>
+                        </MudTabPanel>
+                        <MudTabPanel Text="@(machine.MachineType == MachineType.Turning ? "Точение" : "Фрезеровка")">
+                            @if (machine.MachineType == MachineType.Turning)
+                            {
+                                <MudGrid Spacing="1">
+                                    <MudItem xs="6" sm="3" md="3">
+                                        <MudNumericField T="int" Value="machine.SafetySpeedCap" Label="Максимум оборотов" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                          ValueChanged="@(v => { machine.SafetySpeedCap = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="6" sm="3" md="3">
+                                        <MudNumericField T="int" Value="machine.SafetyDefaultSpeed" Label="Обороты по умолчанию" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                          ValueChanged="@(v => { machine.SafetyDefaultSpeed = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="12" sm="6" md="6" Class="d-flex flex-column justify-center" style="gap: 0;">
+                                        <MudCheckBox T="bool" Value="machine.LeadingReferentPoint" Label="Возврат в референт в начале перехода" Dense="true"
+                                                     ValueChanged="@(v => { machine.LeadingReferentPoint = v; Persist(); })" />
+                                        <MudCheckBox T="bool" Value="machine.TrailingReferentPoint" Label="Возврат в референт в конце перехода" Dense="true"
+                                                     Class="mt-n3" ValueChanged="@(v => { machine.TrailingReferentPoint = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="12">
+                                        <MudTextField T="string" Value="machine.SafetyStringTemplate" Label="Строка безопасности" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      Lines="4" Immediate="true"
+                                                      HelperText="Необязательно: G-код перед первым переходом на этом станке — построчно, как должно попасть в УП. Плейсхолдеры: {CS} — система координат (см. вкладку «Общее»), {S} — ограничение оборотов (с учётом полей выше). Пусто — строка не добавляется."
+                                                      ValueChanged="@(v => { machine.SafetyStringTemplate = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="12">
+                                        <MudDivider Class="my-2" />
+                                        <MudText Typo="Typo.subtitle2">Коды станка</MudText>
+                                    </MudItem>
+                                    <MudItem xs="6" sm="3">
+                                        <MudTextField T="string" Value="machine.TailstockOnCode" Label="Задняя бабка — подвод" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.TailstockOnCode = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="6" sm="3">
+                                        <MudTextField T="string" Value="machine.TailstockOffCode" Label="Задняя бабка — отвод" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.TailstockOffCode = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="6" sm="3">
+                                        <MudTextField T="string" Value="machine.SpindleClampCode" Label="Зажим шпинделя" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.SpindleClampCode = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="6" sm="3">
+                                        <MudTextField T="string" Value="machine.SpindleUnclampCode" Label="Разжим шпинделя" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.SpindleUnclampCode = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="6" sm="3">
+                                        <MudTextField T="string" Value="machine.CoolantOnCode" Label="СОЖ вкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.CoolantOnCode = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="6" sm="3">
+                                        <MudTextField T="string" Value="machine.CoolantOffCode" Label="СОЖ выкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.CoolantOffCode = v; Persist(); })" />
+                                    </MudItem>
+                                </MudGrid>
+                            }
+                            else
+                            {
+                                <MudGrid Spacing="1">
+                                    <MudItem xs="6" sm="4" md="3">
+                                        <MudTextField T="string" Value="machine.CoolantOnCode" Label="СОЖ вкл. (общая)" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.CoolantOnCode = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="6" sm="4" md="3">
+                                        <MudTextField T="string" Value="machine.CoolantOffCode" Label="СОЖ выкл. (общая)" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.CoolantOffCode = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="6" sm="4" md="3">
+                                        <MudTextField T="string" Value="machine.CoolantThroughOnCode" Label="СОЖ через инструмент вкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.CoolantThroughOnCode = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="6" sm="4" md="3">
+                                        <MudTextField T="string" Value="machine.CoolantThroughOffCode" Label="СОЖ через инструмент выкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.CoolantThroughOffCode = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="6" sm="4" md="3">
+                                        <MudTextField T="string" Value="machine.CoolantFullOffCode" Label="СОЖ полная выкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.CoolantFullOffCode = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="6" sm="4" md="3">
+                                        <MudTextField T="string" Value="machine.CoolantBlowOnCode" Label="Обдув вкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.CoolantBlowOnCode = v; Persist(); })" />
+                                    </MudItem>
+                                    <MudItem xs="6" sm="4" md="3">
+                                        <MudTextField T="string" Value="machine.CoolantBlowOffCode" Label="Обдув выкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                                      ValueChanged="@(v => { machine.CoolantBlowOffCode = v; Persist(); })" />
+                                    </MudItem>
+                                </MudGrid>
+                            }
+                        </MudTabPanel>
+                        <MudTabPanel Text="Инструменты">
+                            <ToolTableComponent Tools="machine.Tools" MachineType="machine.MachineType" />
+                        </MudTabPanel>
+                    </MudTabs>
+                    <MudDivider Class="mt-3 mb-2" />
+                    <MudText Typo="Typo.caption" Style="opacity: 0.7;">
+                        «Формат вызова инструмента», «Дополнительные строки шапки» и «Строка автора/даты» — произвольный G-код, вставляется в УП построчно, как есть.
+                        Плейсхолдеры формата вызова инструмента: {TOOL} — название и параметры инструмента; {T} — номер инструмента без
+                        дополнения нулями; {TN} — номер инструмента с N-значным дополнением нулями (например {T2}, {T4}); {CS} — система
+                        координат перехода (пусто, если СК одна); {COOLANT} — код включения СОЖ перехода (пусто при типе СОЖ «Без СОЖ»).
+                        Пустой формат вызова — выводится просто номер инструмента. СК (когда СК несколько) и включение СОЖ и так
+                        гарантированно выводятся отдельными строками сразу после вызова инструмента — {CS}/{COOLANT} в формате нужны, только
+                        если хочется вывести их иначе (например в той же строке, что и вызов инструмента); добавление плейсхолдера в формат
+                        убирает соответствующую отдельную строку.
+                        Плейсхолдеры строки автора/даты: {AUTHOR} — поле «Автор» из наладки (если пусто — схлопывается вместе со своими скобками),
+                        {DATE} — сегодняшняя дата. Если плейсхолдера нет в строке — он просто не появится в шапке; пустая строка — автор/дата не выводятся вовсе.
+                    </MudText>
+                    <div class="d-flex flex-row-reverse mt-2" style="gap: 8px;">
+                        <MudButton Variant="Variant.Text" Color="Color.Error" StartIcon="@Icons.Material.Outlined.Delete"
+                                   Disabled="machine.IsBuiltIn" OnClick="@(() => DeleteMachine(machine))">
+                            Удалить
+                        </MudButton>
+                        <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Outlined.ContentCopy" OnClick="@(() => DuplicateMachine(machine))">
+                            Дублировать
+                        </MudButton>
+                    </div>
+                </ChildContent>
+            </MudExpansionPanel>
+            }
+        </MudExpansionPanels>
+    }
+</MudPaper>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await MachineRegistry.LoadAsync();
+    }
+
+    private async Task Persist() => await MachineRegistry.SaveAsync();
+
+    private static CoordinateSystem? NextCoordinateSystem(Machine machine)
+    {
+        foreach (CoordinateSystem cs in Enum.GetValues<CoordinateSystem>())
+        {
+            if (!machine.CoordinateSystems.Contains(cs)) return cs;
+        }
+        return null;
+    }
+
+    private async Task AddCoordinateSystem(Machine machine, CoordinateSystem cs)
+    {
+        machine.CoordinateSystems.Add(cs);
+        await Persist();
+    }
+
+    private async Task RemoveCoordinateSystem(Machine machine, CoordinateSystem cs)
+    {
+        if (machine.CoordinateSystems.Count <= 1) return;
+        machine.CoordinateSystems.Remove(cs);
+        await Persist();
+    }
+
+    private async Task AddMachine()
+    {
+        MachineRegistry.Machines.Add(new Machine
+        {
+            Name = "Новый станок",
+            MachineType = MachineType.Turning,
+            TrailingReferentPoint = true,
+            HeaderStyle = HeaderStyle.ONumber,
+            HeaderTrailerTemplate = "{AUTHOR}{DATE}",
+        });
+        await Persist();
+    }
+
+    private async Task DuplicateMachine(Machine source)
+    {
+        MachineRegistry.Machines.Add(new Machine
+        {
+            Name = $"{source.Name} (копия)",
+            MachineType = source.MachineType,
+            CoordinateSystems = new List<CoordinateSystem>(source.CoordinateSystems),
+            TailstockOnCode = source.TailstockOnCode,
+            TailstockOffCode = source.TailstockOffCode,
+            SpindleClampCode = source.SpindleClampCode,
+            SpindleUnclampCode = source.SpindleUnclampCode,
+            CoolantOnCode = source.CoolantOnCode,
+            CoolantOffCode = source.CoolantOffCode,
+            CoolantThroughOnCode = source.CoolantThroughOnCode,
+            CoolantThroughOffCode = source.CoolantThroughOffCode,
+            CoolantFullOffCode = source.CoolantFullOffCode,
+            CoolantBlowOnCode = source.CoolantBlowOnCode,
+            CoolantBlowOffCode = source.CoolantBlowOffCode,
+            LeadingReferentPoint = source.LeadingReferentPoint,
+            TrailingReferentPoint = source.TrailingReferentPoint,
+            HeaderStyle = source.HeaderStyle,
+            HeaderExtraLines = source.HeaderExtraLines,
+            HeaderTrailerTemplate = source.HeaderTrailerTemplate,
+            SafetyStringTemplate = source.SafetyStringTemplate,
+            SafetySpeedCap = source.SafetySpeedCap,
+            SafetyDefaultSpeed = source.SafetyDefaultSpeed,
+            ToolCallTemplate = source.ToolCallTemplate,
+            // клонируем через JSON, а не по ссылке — иначе правка инструмента на дубликате
+            // молча меняла бы его и на исходном станке
+            Tools = System.Text.Json.JsonSerializer.Deserialize<List<Tool>>(System.Text.Json.JsonSerializer.Serialize(source.Tools)) ?? new(),
+        });
+        await Persist();
+    }
+
+    private async Task DeleteMachine(Machine machine)
+    {
+        if (machine.IsBuiltIn) return;
+        var result = await DialogService.ShowMessageBoxAsync(
+            "Удаление станка",
+            $"Удалить станок \"{machine.Name}\"?",
+            yesText: "Удалить", cancelText: "Отмена");
+        if (result is not true) return;
+        MachineRegistry.Machines.Remove(machine);
+        await Persist();
+        Snackbar.Add("Станок удалён", Severity.Success);
+    }
+}

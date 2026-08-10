@@ -10,5 +10,6 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
         public abstract string Operation { get; }
         public abstract OperationTime MachineTime { get; }
         public abstract MachineType MachineType { get; }
+        public Coolant Coolant { get; set; } = Coolant.General;
     }
 }

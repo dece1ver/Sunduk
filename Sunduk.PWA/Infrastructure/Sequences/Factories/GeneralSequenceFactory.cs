@@ -7,11 +7,11 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Factories
 {
     public static class GeneralSequenceFactory
     {
-        public static LimiterSequence CreateLimiter(Machine machine, Tool tool, double externalDiameter)
-            => new(machine, tool, externalDiameter);
+        public static LimiterSequence CreateLimiter(Machine machine, CoordinateSystem coordinateSystem, Tool tool, double externalDiameter)
+            => new(machine, coordinateSystem, tool, externalDiameter);
 
-        public static TurningCustomSequence CreateTurningCustom(Machine machine, Tool tool, string customOperation)
-            => new(machine, tool, customOperation);
+        public static TurningCustomSequence CreateTurningCustom(Machine machine, CoordinateSystem coordinateSystem, Tool tool, string customOperation, Coolant coolant = Coolant.General)
+            => new(machine, coordinateSystem, tool, customOperation) { Coolant = coolant };
 
         public static MillingCustomSequence CreateMillingCustom(Machine machine, CoordinateSystem coordinateSystem, Tool tool, string customOperation, Coolant coolant, bool polar, double safePlane)
             => new(machine, coordinateSystem, tool, customOperation, coolant, polar, safePlane);

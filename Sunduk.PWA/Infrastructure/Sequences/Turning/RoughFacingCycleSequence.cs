@@ -9,6 +9,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class RoughFacingCycleSequence : Sequence
     {
         public Machine Machine { get; set; }
+        public CoordinateSystem CoordinateSystem { get; set; }
         public Material Material { get; set; }
         public TurningExternalTool Tool { get; set; }
         public double ExternalDiameter { get; set; }
@@ -48,8 +49,9 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             }
         }
         public override string Operation => Templates.FacingOperation.Facing(
-            Machine, 
-            Material, 
+            Machine,
+            CoordinateSystem,
+            Material,
             Tool,
             ExternalDiameter,
             Tool is null ? InternalDiameter : InternalDiameter - (Tool.Radius * 2),
@@ -64,15 +66,17 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             true, 
             false, 
             SpeedRough, 
-            0, 
-            FeedRough, 
-            0);
+            0,
+            FeedRough,
+            0,
+            Coolant);
         public override MachineType MachineType => MachineType.Turning;
         public override string Name => ProfStockAllow > 0 ? $"Торцовка черновая (под G70)" : $"Торцовка"; 
 
-        public RoughFacingCycleSequence(Machine machine, 
+        public RoughFacingCycleSequence(Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
-            TurningExternalTool tool, 
+            TurningExternalTool tool,
             double externalDiameter, 
             double internalDiameter,
             double roughStockAllow, 
@@ -87,6 +91,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double feedRough)
         {
             Machine = machine;
+            CoordinateSystem = coordinateSystem;
             Material = material;
             Tool = tool;
             ExternalDiameter = externalDiameter;
