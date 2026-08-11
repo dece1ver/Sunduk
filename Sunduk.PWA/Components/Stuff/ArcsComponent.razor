@@ -10,6 +10,9 @@
         <MudTabPanel Text="@("\"Затвор\"")">
             <Arc2Component />
         </MudTabPanel>
+        <MudTabPanel Text="Произвольная">
+            <ArcGeneralComponent />
+        </MudTabPanel>
     </MudTabs>
 </MudSwipeArea>
 
@@ -28,7 +31,7 @@
         }
         else if (direction == SwipeDirection.RightToLeft)
         {
-            if (tabs.GetState(x => x.ActivePanelIndex) < 2)
+            if (tabs.GetState(x => x.ActivePanelIndex) < 3)
             {
                 tabs.ActivatePanelAsync(tabs.GetState(x => x.ActivePanelIndex) + 1);
             }

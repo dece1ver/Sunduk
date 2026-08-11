@@ -27,9 +27,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             if (machine.MachineType != MachineType.Turning) return string.Empty;
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
-                .ToolCall(tool, machine, coordinateSystem, coolant)
-                .CoordinateSystemFallback(machine, coordinateSystem)
-                .CoolantOn(machine, coolant, also: !machine.LeadingReferentPoint)
+                .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
                 .Raw(approach)
                 .Line($"G1 Z{(endZ - tool.PointLength()).NC()} F{feed.NC(2)}")
                 .Raw(exit)
@@ -77,9 +75,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             if (machine.MachineType != MachineType.Turning) return string.Empty;
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
-                .ToolCall(tool, machine, coordinateSystem, coolant)
-                .CoordinateSystemFallback(machine, coordinateSystem)
-                .CoolantOn(machine, coolant, also: !machine.LeadingReferentPoint)
+                .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
                 .Raw(approach)
                 .Line("G74 R0.1")
                 .Line($"G74 Z{(endZ - tool.PointLength()).NC()} Q{depth.Microns()} F{feed.NC(2)}")
@@ -127,9 +123,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             if (machine.MachineType != MachineType.Turning) return string.Empty;
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
-                .ToolCall(tool, machine, coordinateSystem, coolant)
-                .CoordinateSystemFallback(machine, coordinateSystem)
-                .CoolantOn(machine, coolant, also: !machine.LeadingReferentPoint)
+                .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
                 .Raw(approach)
                 .Line($"G83 Z{(endZ - tool.PointLength()).NC()} Q{depth.Microns()} F{feed.NC(2)}")
                 .Line("G80")

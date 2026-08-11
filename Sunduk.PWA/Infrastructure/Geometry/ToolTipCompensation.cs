@@ -20,8 +20,10 @@ namespace Sunduk.PWA.Infrastructure.Geometry
     /// запрограммированному размеру фаски/скругления. R/C-адрес работает только когда ОБЕ
     /// стороны стыка — прямые (включая мнимый торец перед первым узлом контура); если одна из
     /// сторон — дуга, контроллер так скруглить не умеет, и этот модуль сам материализует
-    /// скругление отдельной маленькой дугой (см. <see cref="FaceArcBlunt"/>/<see cref="CylinderArcBlunt"/>,
-    /// по образцу `NippleComponent.GetBluntedShape`/`Arc2Component.GetBluntedShape`). Важно: Blunt
+    /// скругление отдельной маленькой дугой (см. <see cref="ArcAnchor.Face"/>/<see cref="ArcAnchor.Cylinder"/>,
+    /// по образцу `NippleComponent.GetBluntedShape`/`Arc2Component.GetBluntedShape` — сама формула
+    /// вынесена в общий <see cref="ArcAnchor"/>, чтобы её же использовал калькулятор произвольной
+    /// дуги в "Прочее", без второй копии). Важно: Blunt
     /// живёт только на Point/Line, не на Arc — поэтому скругление стыка прямая-дуга представимо
     /// только когда прямая ИДЁТ ПЕРЕД дугой (Blunt стоит на прямой, дуга — следующий узел); стык,
     /// где дуга идёт первой и Blunt нужен на её собственном конце, в текущей модели контура задать
@@ -34,8 +36,8 @@ namespace Sunduk.PWA.Infrastructure.Geometry
     /// сосед, включая мнимый торец в начале контура)-дуга под НЕкасательным углом — сверено с
     /// простым (без скругления) примером `NippleComponent`. Явное скругление (Blunt) на стыке
     /// прямая-дуга — вставка отдельной маленькой дуги сопряжения — реализовано для ОБОИХ
-    /// направлений прямой: торец (<see cref="FaceArcBlunt"/>, сверено с `NippleComponent.GetBluntedShape`)
-    /// и цилиндр (<see cref="CylinderArcBlunt"/>, сверено с `Arc2Component.GetBluntedShape`).
+    /// направлений прямой: торец (<see cref="ArcAnchor.Face"/>, сверено с `NippleComponent.GetBluntedShape`)
+    /// и цилиндр (<see cref="ArcAnchor.Cylinder"/>, сверено с `Arc2Component.GetBluntedShape`).
     /// Формула для цилиндра выведена зеркальным переносом (X↔Z) уже рабочей формулы для торца,
     /// используя ТОЛЬКО номинальные центр/радиус самой дуги — без какого-либо допущения о том, чем
     /// скомпенсирован другой конец дуги (в частности, не зависит от того, что у Arc2 вход дуги в
@@ -52,16 +54,29 @@ namespace Sunduk.PWA.Infrastructure.Geometry
     /// в номинальных координатах, R/C-адрес на нём подавлен (см. <c>GCodeBuilder.BluntSuffix</c>),
     /// а если на узле стоял явный Blunt — он молча теряется (ни доп.дуга не вставляется, ни R/C не
     /// пишется), а не считается по неподтверждённой формуле:</b> (1) острые (без Blunt) стыки
-    /// цилиндр(Z-выровненный сосед)-дуга — пробовал зеркально перенести рабочую формулу для торца
-    /// (аналогично тому, как это удалось для Blunt-случая выше), но числа не сошлись с
-    /// `Arc2Component`'s simple/no-round примером в отведённое время — нужна отдельная проверка.
+    /// цилиндр(Z-выровненный сосед)-дуга — пробовал зеркально перенести (X↔Z) рабочую формулу для
+    /// торца, как это удалось для Blunt-случая (<see cref="CylinderArcBlunt"/>) — НЕ сошлось.
+    /// Уточнение по ходу проверки: простой (без скругления) пример `Arc2Component` — НЕ годный
+    /// эталон для этого случая, хоть и выглядит похоже; его цилиндрический конец в этом примере
+    /// на самом деле касательный (дуга тангенциально входит в торец на ДРУГОМ конце, а
+    /// `StartDiamWithShift` там — прямой линейный сдвиг на радиус пластины без тригонометрии), то
+    /// есть это пример для касательного случая (см. п.2 ниже), а не для общего острого стыка.
+    /// Отдельная попытка проверить зеркальную формулу независимым построением (через положение
+    /// центра носика инструмента в момент перехода плоская кромка → дуга, а не напрямую через
+    /// мнимую вершину) дала близкое, но не точное совпадение с уже проверенным Nipple-примером
+    /// (11.696 вместо 11.6, зеркально) — говорит, что ChamferShifts-конструкция для стыка
+    /// прямая-дуга опирается на что-то более тонкое, чем прямой перенос "мнимая вершина = центр
+    /// носика ± R", и представление о том, что "вершина" и "центр носика" эквивалентны на дуге,
+    /// но НЕ эквивалентны на прямой кромке (собственно то, ради чего вся эта компенсация и нужна)
+    /// — разобраться в точной границе между этими двумя режимами за отведённое время не удалось.
     /// (2) Касательный (или близкий к касательному) вход/выход дуги — для торца это отдельная,
-    /// более простая формула (прямой сдвиг на радиус пластины без тригонометрии), которую в
-    /// отведённое время не удалось надёжно увязать с общей моделью. (3) Стыки дуга-дуга — нет
-    /// эталонного примера для сверки вообще. (4) Вся компенсация на стыке прямая-дуга сделана
-    /// только для наружного точения (<paramref name="external"/> = true) — нет проверенного
-    /// примера с внутренним для сверки знака. Работает в истинных радиусных координатах (не
-    /// диаметр) — конвертация на границе модуля.
+    /// более простая формула (прямой сдвиг на радиус пластины без тригонометрии, как раз
+    /// `Arc2Component.StartDiamWithShift`), которую в отведённое время не удалось надёжно увязать
+    /// с общей моделью. (3) Стыки дуга-дуга — нет эталонного примера для сверки вообще. (4) Вся
+    /// компенсация на стыке прямая-дуга сделана только для наружного точения
+    /// (<paramref name="external"/> = true) — нет проверенного примера с внутренним для сверки
+    /// знака. Работает в истинных радиусных координатах (не диаметр) — конвертация на границе
+    /// модуля.
     /// </summary>
     public static class ToolTipCompensation
     {
@@ -172,33 +187,33 @@ namespace Sunduk.PWA.Infrastructure.Geometry
                     var inDirBlunt = i == 0 ? VirtualFaceDirection : TangentInto(nodes, i);
                     if (inDirBlunt is not null && IsFaceDirection(inDirBlunt.Value))
                     {
-                        var blunted = FaceArcBlunt(curr.Z.Value, arcNext, blunt, toolRadius);
+                        var blunted = ArcAnchor.Face(curr.Z.Value, arcNext.CenterX, arcNext.CenterZ, arcNext.Radius, blunt, toolRadius);
                         if (blunted is not null)
                         {
                             result.Add(curr switch
                             {
-                                Point p => new Point(blunted.Value.startX, curr.Z.Value, 0),
-                                Line l => new Line(blunted.Value.startX, curr.Z.Value, l.Angle, 0, l.BluntType),
+                                Point p => new Point(blunted.Value.StartX, curr.Z.Value, 0),
+                                Line l => new Line(blunted.Value.StartX, curr.Z.Value, l.Angle, 0, l.BluntType),
                                 _ => curr,
                             });
                             finalizedArcs.Add(result.Count);
-                            result.Add(new Arc(blunted.Value.endX, blunted.Value.endZ, blunt + toolRadius, arcNext.Direction, arcNext.CenterX, arcNext.CenterZ));
+                            result.Add(new Arc(blunted.Value.EndX, blunted.Value.EndZ, blunt + toolRadius, arcNext.Direction, arcNext.CenterX, arcNext.CenterZ));
                             continue;
                         }
                     }
                     else if (inDirBlunt is not null && IsCylinderDirection(inDirBlunt.Value))
                     {
-                        var blunted = CylinderArcBlunt(curr.X.Value, arcNext, blunt, toolRadius);
+                        var blunted = ArcAnchor.Cylinder(curr.X.Value, arcNext.CenterX, arcNext.CenterZ, arcNext.Radius, blunt, toolRadius);
                         if (blunted is not null)
                         {
                             result.Add(curr switch
                             {
-                                Point p => new Point(curr.X.Value, blunted.Value.tangentZ, 0),
-                                Line l => new Line(curr.X.Value, blunted.Value.tangentZ, l.Angle, 0, l.BluntType),
+                                Point p => new Point(curr.X.Value, blunted.Value.TangentZ, 0),
+                                Line l => new Line(curr.X.Value, blunted.Value.TangentZ, l.Angle, 0, l.BluntType),
                                 _ => curr,
                             });
                             finalizedArcs.Add(result.Count);
-                            result.Add(new Arc(blunted.Value.handoffX, blunted.Value.handoffZ, blunt + toolRadius, arcNext.Direction, arcNext.CenterX, arcNext.CenterZ));
+                            result.Add(new Arc(blunted.Value.HandoffX, blunted.Value.HandoffZ, blunt + toolRadius, arcNext.Direction, arcNext.CenterX, arcNext.CenterZ));
                             continue;
                         }
                     }
@@ -246,7 +261,20 @@ namespace Sunduk.PWA.Infrastructure.Geometry
                 // класс-докстринг). Реализовано только для торца (X-выровненный сосед) на
                 // наружном точении, под НЕкасательным углом — сверено с простым (без скругления)
                 // примером NippleComponent. Торец+дуга под касательным углом и цилиндр
-                // (Z-выровненный сосед)+дуга — известные ограничения, не реализованы.
+                // (Z-выровненный сосед)+дуга — известные ограничения, не реализованы. Цилиндр+дуга
+                // (острый, без Blunt) пробовал зеркальным (X↔Z) переносом этой же формулы — НЕ
+                // сошлось: попытка проверить независимым построением (нос-инструмента-центр вместо
+                // мнимой вершины на границе плоская кромка/дуга) дала 11.696 вместо доверенных 11.6
+                // на зеркале уже проверенного Nipple-примера — расхождение мелкое, но говорит, что
+                // используемая здесь ChamferShifts-конструкция для стыка прямая-дуга опирается на
+                // что-то более тонкое, чем прямой перенос "мнимая вершина = центр носика ± R",
+                // разобраться в котором за отведённое время не удалось. Ранее казавшийся годным
+                // эталон (простой пример Arc2Component без скругления) тоже НЕ подходит для этого
+                // случая — его цилиндрический конец на самом деле касательный (arc входит в торец
+                // тангенциально на ДРУГОМ конце, а у StartDiamWithShift в Arc2 — прямой линейный
+                // сдвиг на радиус пластины, не тригонометрия), то есть это пример для касательного
+                // случая (см. ниже), а не для общего острого стыка цилиндр-дуга. Оставлено
+                // нескомпенсированным, как и раньше — не подставлять неподтверждённую формулу.
                 if (external && incomingIsArc != outgoingIsArc)
                 {
                     GDirection? arcTangent;
@@ -285,72 +313,6 @@ namespace Sunduk.PWA.Infrastructure.Geometry
             }
 
             return (result, finalizedArcs);
-        }
-
-        /// <summary>
-        /// Обобщение NippleComponent.GetBluntedShape (RoundCorner-режим) на произвольный торец
-        /// (X-выровненный, зафиксирован по Z) и произвольную дугу (не обязательно с центром на
-        /// оси) — численно сверено с исходными формулами Nipple на нескольких наборах параметров
-        /// через временный консольный проект. Возвращает координаты (в истинном радиусе) начала
-        /// маленькой дуги сопряжения (на торце) и её конца (где она переходит в основную дугу,
-        /// уже с увеличенным на <paramref name="toolRadius"/> радиусом). Null, если геометрия не
-        /// сходится (скругление больше, чем позволяет дуга/торец).
-        /// </summary>
-        private static (double startX, double endX, double endZ)? FaceArcBlunt(double faceZ, Arc arc, double blunt, double toolRadius)
-        {
-            var cz0 = faceZ - arc.CenterZ;
-            var catet = cz0 - blunt;
-            if (catet <= Tolerance) return null;
-            var startXSq = Math.Pow(arc.Radius - blunt, 2) - Math.Pow(catet, 2);
-            if (startXSq < 0) return null;
-            var startXRel = Math.Sqrt(startXSq);
-            var angle = Math.Atan(startXRel / catet);
-            var endXRel = blunt * Math.Sin(angle) + startXRel;
-            var endZDepth = blunt - Math.Sqrt(Math.Max(0, Math.Pow(blunt, 2) - Math.Pow(blunt * Math.Sin(angle), 2)));
-            if (toolRadius > 0)
-            {
-                startXRel -= toolRadius;
-                var bluntR = blunt + toolRadius;
-                var catet2 = bluntR * Math.Sin(angle);
-                endXRel = catet2 + startXRel;
-                endZDepth = bluntR - Math.Sqrt(Math.Max(0, Math.Pow(bluntR, 2) - Math.Pow(catet2, 2)));
-            }
-            return (arc.CenterX + startXRel, arc.CenterX + endXRel, faceZ - endZDepth);
-        }
-
-        /// <summary>
-        /// Зеркальное (X↔Z) обобщение <see cref="FaceArcBlunt"/> на цилиндр (Z-выровненный сосед,
-        /// зафиксирован по X) вместо торца — та же конструкция, оси поменяны местами. Использует
-        /// ТОЛЬКО номинальные центр/радиус самой дуги, без каких-либо допущений о том, чем и как
-        /// скомпенсирован её другой конец — сверено точным численным совпадением с
-        /// <c>Arc2Component.GetBluntedShape</c> на нескольких наборах параметров (в т.ч. подстановкой
-        /// его же чисел через временный консольный проект), при этом сама сверка не полагается на
-        /// то, что у Arc2 вход дуги в торец на другом конце — частный (там прямой сдвиг на радиус
-        /// пластины без тригонометрии); эта формула его не использует и не требует. Возвращает
-        /// координаты (в истинном радиусе) точки касания с цилиндром и точки передачи в основную
-        /// дугу (уже с увеличенным на <paramref name="toolRadius"/> радиусом). Null, если геометрия
-        /// не сходится.
-        /// </summary>
-        private static (double tangentZ, double handoffX, double handoffZ)? CylinderArcBlunt(double cylX, Arc arc, double blunt, double toolRadius)
-        {
-            var cx0 = cylX - arc.CenterX;
-            var catet = cx0 - blunt;
-            if (catet <= Tolerance) return null;
-            var startZSq = Math.Pow(arc.Radius - blunt, 2) - Math.Pow(catet, 2);
-            if (startZSq < 0) return null;
-            var startZRel = Math.Sqrt(startZSq);
-            var angle = Math.Atan(startZRel / catet);
-            var endZRel = blunt * Math.Sin(angle) + startZRel;
-            var endXDepth = blunt - Math.Sqrt(Math.Max(0, Math.Pow(blunt, 2) - Math.Pow(blunt * Math.Sin(angle), 2)));
-            if (toolRadius > 0)
-            {
-                startZRel -= toolRadius;
-                var bluntR = blunt + toolRadius;
-                var catet2 = bluntR * Math.Sin(angle);
-                endZRel = catet2 + startZRel;
-                endXDepth = bluntR - Math.Sqrt(Math.Max(0, Math.Pow(bluntR, 2) - Math.Pow(catet2, 2)));
-            }
-            return (arc.CenterZ + startZRel, cylX - endXDepth, arc.CenterZ + endZRel);
         }
 
         private static bool IsFaceDirection(GDirection d) => Math.Abs(d.Z) < Tolerance;

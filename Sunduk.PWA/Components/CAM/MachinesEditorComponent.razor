@@ -88,9 +88,9 @@
                                     </MudSelect>
                                 </MudItem>
                                 <MudItem xs="12" sm="6" md="6">
-                                    <MudTextField T="string" Value="machine.ToolCallTemplate" Label="Формат вызова инструмента" Variant="Variant.Filled" Margin="Margin.Dense"
-                                                  Lines="2" Immediate="true"
-                                                  ValueChanged="@(v => { machine.ToolCallTemplate = v; Persist(); })" />
+                                    <MudTextField T="string" Value="machine.TransitionTemplate" Label="Шаблон перехода" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                  Lines="3" Immediate="true"
+                                                  ValueChanged="@(v => { machine.TransitionTemplate = v; Persist(); })" />
                                 </MudItem>
                                 <MudItem xs="12">
                                     <MudTextField T="string" Value="machine.HeaderExtraLines" Label="Дополнительные строки шапки" Variant="Variant.Filled" Margin="Margin.Dense"
@@ -98,9 +98,9 @@
                                                   ValueChanged="@(v => { machine.HeaderExtraLines = v; Persist(); })" />
                                 </MudItem>
                                 <MudItem xs="12" sm="6" md="6">
-                                    <MudTextField T="string" Value="machine.HeaderTrailerTemplate" Label="Строка автора/даты" Variant="Variant.Filled" Margin="Margin.Dense"
-                                                  Immediate="true"
-                                                  ValueChanged="@(v => { machine.HeaderTrailerTemplate = v; Persist(); })" />
+                                    <MudTextField T="string" Value="machine.HeaderTemplate" Label="Шаблон шапки (автор/дата/время)" Variant="Variant.Filled" Margin="Margin.Dense"
+                                                  Lines="2" Immediate="true"
+                                                  ValueChanged="@(v => { machine.HeaderTemplate = v; Persist(); })" />
                                 </MudItem>
                             </MudGrid>
                         </MudTabPanel>
@@ -198,16 +198,19 @@
                     </MudTabs>
                     <MudDivider Class="mt-3 mb-2" />
                     <MudText Typo="Typo.caption" Style="opacity: 0.7;">
-                        «Формат вызова инструмента», «Дополнительные строки шапки» и «Строка автора/даты» — произвольный G-код, вставляется в УП построчно, как есть.
-                        Плейсхолдеры формата вызова инструмента: {TOOL} — название и параметры инструмента; {T} — номер инструмента без
+                        «Шаблон перехода», «Дополнительные строки шапки» и «Шаблон шапки» — произвольный G-код, вставляется в УП построчно, как есть.
+                        Плейсхолдеры шаблона перехода: {TOOL} — название и параметры инструмента; {T} — номер инструмента без
                         дополнения нулями; {TN} — номер инструмента с N-значным дополнением нулями (например {T2}, {T4}); {CS} — система
                         координат перехода (пусто, если СК одна); {COOLANT} — код включения СОЖ перехода (пусто при типе СОЖ «Без СОЖ»).
-                        Пустой формат вызова — выводится просто номер инструмента. СК (когда СК несколько) и включение СОЖ и так
-                        гарантированно выводятся отдельными строками сразу после вызова инструмента — {CS}/{COOLANT} в формате нужны, только
-                        если хочется вывести их иначе (например в той же строке, что и вызов инструмента); добавление плейсхолдера в формат
-                        убирает соответствующую отдельную строку.
-                        Плейсхолдеры строки автора/даты: {AUTHOR} — поле «Автор» из наладки (если пусто — схлопывается вместе со своими скобками),
-                        {DATE} — сегодняшняя дата. Если плейсхолдера нет в строке — он просто не появится в шапке; пустая строка — автор/дата не выводятся вовсе.
+                        Дополнительно, только для переходов со свободным телом (произвольное точение/фрезерование, точение по контуру):
+                        {PROCESSING} — тело обработки, {MACHINE_TIME} — машинное время перехода, {COOLANT_OFF} — выключение СОЖ; в
+                        типовых циклах (подрезка, сверление, канавки, резьба, обкатывание) эти три плейсхолдера просто не выводятся, даже
+                        если есть в шаблоне — тело/время/выключение СОЖ там формирует сам цикл. Пустой шаблон — выводится просто номер
+                        инструмента. Общее правило для обоих шаблонов: плейсхолдера нет в шаблоне — не выводится вовсе; если из-за пустой
+                        подстановки строка целиком схлопывается — эта строка просто пропускается, отдельных "запасных" настроек на этот
+                        случай больше нет.
+                        Плейсхолдеры шаблона шапки: {AUTHOR} — поле «Автор» из наладки (если пусто — схлопывается вместе со своими скобками),
+                        {DATE} — сегодняшняя дата, {MACHINE_TIME} — машинное время всей программы.
                     </MudText>
                     <div class="d-flex flex-row-reverse mt-2" style="gap: 8px;">
                         <MudButton Variant="Variant.Text" Color="Color.Error" StartIcon="@Icons.Material.Outlined.Delete"
@@ -263,7 +266,7 @@
             MachineType = MachineType.Turning,
             TrailingReferentPoint = true,
             HeaderStyle = HeaderStyle.ONumber,
-            HeaderTrailerTemplate = "{AUTHOR}{DATE}",
+            HeaderTemplate = "{AUTHOR}{DATE}\n{MACHINE_TIME}",
         });
         await Persist();
     }
@@ -290,11 +293,11 @@
             TrailingReferentPoint = source.TrailingReferentPoint,
             HeaderStyle = source.HeaderStyle,
             HeaderExtraLines = source.HeaderExtraLines,
-            HeaderTrailerTemplate = source.HeaderTrailerTemplate,
+            HeaderTemplate = source.HeaderTemplate,
             SafetyStringTemplate = source.SafetyStringTemplate,
             SafetySpeedCap = source.SafetySpeedCap,
             SafetyDefaultSpeed = source.SafetyDefaultSpeed,
-            ToolCallTemplate = source.ToolCallTemplate,
+            TransitionTemplate = source.TransitionTemplate,
             // клонируем через JSON, а не по ссылке — иначе правка инструмента на дубликате
             // молча меняла бы его и на исходном станке
             Tools = System.Text.Json.JsonSerializer.Deserialize<List<Tool>>(System.Text.Json.JsonSerializer.Serialize(source.Tools)) ?? new(),

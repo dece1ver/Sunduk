@@ -13,7 +13,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
     public class RoughTurningSequence : TurningSequence
     {
-        public override string Operation => Templates.Operation.ContourTurning(Machine, CoordinateSystem, Tool, Contour, SpeedRough, FeedRough, Coolant);
+        public override string Operation => Templates.Operation.ContourTurning(Machine, CoordinateSystem, Tool, Contour, SpeedRough, FeedRough, Coolant, TimeSpan.FromSeconds(MachineTime.FullTime));
         public override OperationTime MachineTime
         {
             get

@@ -11,7 +11,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
     public class FinishTurningSequence : TurningSequence
     {
-        public override string Operation => Templates.Operation.ContourTurning(Machine, CoordinateSystem, Tool, Contour, SpeedFinish, FeedFinish, Coolant);
+        public override string Operation => Templates.Operation.ContourTurning(Machine, CoordinateSystem, Tool, Contour, SpeedFinish, FeedFinish, Coolant, TimeSpan.FromSeconds(MachineTime.FullTime));
         public override OperationTime MachineTime
         {
             get

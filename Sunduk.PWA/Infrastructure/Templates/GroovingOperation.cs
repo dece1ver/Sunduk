@@ -69,8 +69,6 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
                 .ToolCall(tool, machine, coordinateSystem, coolant)
-                .CoordinateSystemFallback(machine, coordinateSystem)
-                .CoolantOn(machine, coolant)
                 .Line($"G0 X{(externalDiameter + 2).NC(0)} Z{zPoint.NC()} S{speedRough} {Direction(tool)}")
                 .Raw(blunt)
                 .Raw(cutting)
@@ -219,8 +217,6 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 return new GCodeBuilder()
                     .ReferentPoint(machine, leading: true)
                     .ToolCall(tool, machine, coordinateSystem, coolant)
-                    .CoordinateSystemFallback(machine, coordinateSystem)
-                    .CoolantOn(machine, coolant)
                     .Raw(external
                         ? $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z{centerPoint.NC()} S{speedRough} {Direction(tool)}\n"
                         : $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z2. S{speedRough} {Direction(tool)}\n" +
@@ -269,8 +265,6 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
                 .ToolCall(tool, machine, coordinateSystem, coolant)
-                .CoordinateSystemFallback(machine, coordinateSystem)
-                .CoolantOn(machine, coolant)
                 .Raw(external
                     ? $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z{centerPoint.NC()} S{speedRough} {Direction(tool)}\n"
                     : $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z2. S{speedRough} {Direction(tool)}\n" +
@@ -423,8 +417,6 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 return new GCodeBuilder()
                     .ReferentPoint(machine, leading: true)
                     .ToolCall(tool, machine, coordinateSystem, coolant)
-                    .CoordinateSystemFallback(machine, coordinateSystem)
-                    .CoolantOn(machine, coolant)
                     .Line($"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedRough} {Direction(tool)}")
                     .Raw(roughCutting)
                     .Raw(cutting)
@@ -470,8 +462,6 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
                 .ToolCall(tool, machine, coordinateSystem, coolant)
-                .CoordinateSystemFallback(machine, coordinateSystem)
-                .CoolantOn(machine, coolant)
                 .Line($"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedRough} {Direction(tool)}")
                 .Raw(roughCutting)
                 .Raw(cutting)

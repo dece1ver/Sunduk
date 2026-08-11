@@ -306,18 +306,18 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
                 _ => string.Empty,
             };
-            var authorText = string.IsNullOrWhiteSpace(author) ? string.Empty : $"({author})";
-            var dateText = $"({DateTime.Now:dd.MM.yy})";
-            var trailer = machine.HeaderTrailerTemplate
-                .Replace("{AUTHOR}", authorText)
-                .Replace("{DATE}", dateText)
-                .TrimStart(' ');
+            var values = new Dictionary<string, string>
+            {
+                ["{AUTHOR}"] = string.IsNullOrWhiteSpace(author) ? string.Empty : $"({author})",
+                ["{DATE}"] = $"({DateTime.Now:dd.MM.yy})",
+                ["{MACHINE_TIME}"] = $"({timeSpan.Minutes}M{timeSpan.Seconds}S)",
+            };
+            var trailer = RenderTemplate(machine.HeaderTemplate, values).TrimStart(' ');
             return new GCodeBuilder()
                 .Line("%")
                 .Raw(idBlock)
                 .RawIf(!string.IsNullOrWhiteSpace(machine.HeaderExtraLines), machine.HeaderExtraLines.TrimEnd('\n') + "\n")
                 .LineIf(!string.IsNullOrWhiteSpace(trailer), trailer)
-                .Line($"({timeSpan.Minutes}M{timeSpan.Seconds}S)")
                 .ToString();
         }
 
@@ -347,8 +347,6 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
                 .ToolCall(tool, machine, coordinateSystem, coolant)
-                .CoordinateSystemFallback(machine, coordinateSystem)
-                .CoolantOn(machine, coolant)
                 .Line($"G0 X{diameter.NC()} Z{startZ.NC()} S{BurnishingSpeed(tool)} {Direction(tool)}")
                 .Line($"G1 Z{endZ.NC()} F{BurnishingFeed(tool).NC()}")
                 .Raw(exit)
@@ -377,16 +375,12 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Токарный вызов инструмента
         /// </summary>
-        public static string TurningCustomOperation(Machine machine, CoordinateSystem coordinateSystem, Tool tool, string customOperation, Coolant coolant = Coolant.General)
+        public static string TurningCustomOperation(Machine machine, CoordinateSystem coordinateSystem, Tool tool, string customOperation, Coolant coolant = Coolant.General, TimeSpan? machineTime = null)
         {
             if (tool is null) return string.Empty;
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
-                .ToolCall(tool, machine, coordinateSystem, coolant)
-                .CoordinateSystemFallback(machine, coordinateSystem)
-                .CoolantOn(machine, coolant)
-                .Raw(string.IsNullOrEmpty(customOperation) ? ProcessingSnippet : customOperation + '\n')
-                .CoolantOff(machine, coolant)
+                .Transition(tool, machine, coordinateSystem, coolant, customOperation, machineTime)
                 .ReferentPoint(machine, leading: false)
                 .ToString();
         }
@@ -415,7 +409,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return new GCodeBuilder()
                 .ToolCall(tool, machine, coordinateSystem, coolant)
                 .Line($"{coordinateSystem}{(polar ? " G16" : string.Empty)} G0 X0 Y0 S3000 {direction}")
-                .Line($"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {(coolant is Coolant.General or Coolant.None || machine.ToolCallTemplateHasCoolant() ? string.Empty : CoolantOn(machine, coolant))}")
+                .Line($"G43 Z{safePlane.NC(option: NcDecimalPointOption.Without)} H{tool.Position} {(coolant is Coolant.General or Coolant.None || machine.TransitionTemplateHasCoolant() ? string.Empty : CoolantOn(machine, coolant))}")
                 .Raw(string.IsNullOrEmpty(customOperation) ? ProcessingSnippet : customOperation + '\n')
                 .CoolantOff(machine, coolant)
                 .LineIf(polar, "G15")
@@ -432,18 +426,15 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// съёмом припуска (что-то вроде G71) не реализована. Координаты контура перед рендером
         /// пересчитываются на радиус пластины инструмента — см. <see cref="Geometry.ToolTipCompensation"/>.
         /// </summary>
-        public static string ContourTurning(Machine machine, CoordinateSystem coordinateSystem, TurningTool tool, List<Element> contour, int speed, double feed, Coolant coolant)
+        public static string ContourTurning(Machine machine, CoordinateSystem coordinateSystem, TurningTool tool, List<Element> contour, int speed, double feed, Coolant coolant, TimeSpan? machineTime = null)
         {
             if (tool is null || contour is null || contour.Count < 2) return string.Empty;
             if (machine.MachineType != MachineType.Turning) return string.Empty;
             var compensated = Geometry.ToolTipCompensation.Compensate(contour, tool.Radius, external: tool is TurningExternalTool);
+            var body = new GCodeBuilder().Contour(compensated, speedOnFirstMove: true, speed, feed, tool.Radius).ToString();
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
-                .ToolCall(tool, machine, coordinateSystem, coolant)
-                .CoordinateSystemFallback(machine, coordinateSystem)
-                .CoolantOn(machine, coolant, also: !machine.LeadingReferentPoint)
-                .Contour(compensated, speedOnFirstMove: true, speed, feed, tool.Radius)
-                .CoolantOff(machine, coolant)
+                .Transition(tool, machine, coordinateSystem, coolant, body, machineTime, suppressCoolant: machine.LeadingReferentPoint)
                 .ReferentPoint(machine, leading: false)
                 .ToString();
         }

@@ -49,6 +49,10 @@
         @switch (Mode)
         {
             case Mode.General:
+                <MudItem xs="12">
+                    <StockProfileComponent Program="Program" ExternalDiameter="WorkpieceExternalDiameter"
+                                            InternalDiameter="WorkpieceInternalDiameter" WorkpieceLength="WorkpieceLength" />
+                </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
                         @* onfocusout=DropSelection, но он дропает даже при нажатии кнопок, поэтому убрал пока *@

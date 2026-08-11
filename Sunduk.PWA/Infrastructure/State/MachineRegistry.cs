@@ -45,6 +45,8 @@ namespace Sunduk.PWA.Infrastructure.State
                 migrated |= MigrateBuiltInCoordinateSystems(Machines);
                 migrated |= MigrateBuiltInTemplates(Machines);
                 migrated |= MigrateHeaderTrailerTemplate(Machines);
+                migrated |= MigrateTransitionTemplate(Machines);
+                migrated |= MigrateHeaderTemplate(Machines);
                 migrated |= await MigrateGlobalToolsAsync(Machines);
                 if (migrated) await SaveAsync();
             }
@@ -138,6 +140,20 @@ namespace Sunduk.PWA.Infrastructure.State
                     machine.SafetyStringTemplate = seed.SafetyStringTemplate;
                     migrated = true;
                 }
+                // Очень старые встроенные сохранения без ToolCallTemplate/HeaderTrailerTemplate
+                // вообще (оба пусты) — без этой ветки MigrateTransitionTemplate/MigrateHeaderTemplate
+                // ниже подставили бы общий "{T}" вместо реального шаблона станка (например с
+                // хардкод-токенами GS1500 вроде "G54 M58").
+                if (string.IsNullOrWhiteSpace(machine.TransitionTemplate) && string.IsNullOrWhiteSpace(machine.ToolCallTemplate) && !string.IsNullOrWhiteSpace(seed.TransitionTemplate))
+                {
+                    machine.TransitionTemplate = seed.TransitionTemplate;
+                    migrated = true;
+                }
+                if (string.IsNullOrWhiteSpace(machine.HeaderTemplate) && string.IsNullOrWhiteSpace(machine.HeaderTrailerTemplate) && !string.IsNullOrWhiteSpace(seed.HeaderTemplate))
+                {
+                    machine.HeaderTemplate = seed.HeaderTemplate;
+                    migrated = true;
+                }
             }
             return migrated;
         }
@@ -161,6 +177,65 @@ namespace Sunduk.PWA.Infrastructure.State
                     HeaderStyle.AngleBracketName => "{AUTHOR} {DATE}",
                     _ => "{AUTHOR}{DATE}",
                 };
+                migrated = true;
+            }
+            return migrated;
+        }
+
+        /// <summary>
+        /// Станки, сохранённые до появления Machine.TransitionTemplate, несут его пустым — данные
+        /// лежат в старом Machine.ToolCallTemplate. Переносим текст как есть; для ТОКАРНЫХ станков
+        /// дописываем недостающие {CS}/{COOLANT}/{PROCESSING}/{COOLANT_OFF}/{MACHINE_TIME} —
+        /// {CS}/{COOLANT} раньше гарантировала GCodeBuilder.CoordinateSystemFallback/CoolantOn
+        /// (Contains-проверка и "запасной" вывод) для циклов с фиксированным телом; {PROCESSING}/
+        /// {COOLANT_OFF} КРИТИЧНЫ для `TurningCustomOperation`/`ContourTurning` (Tier B) — без них
+        /// тело обработки и выключение СОЖ в этих двух переходах вообще не попадут в УП, т.к. они
+        /// используют этот же TransitionTemplate через Util.Transition, а не через Util.ToolCall
+        /// (который эти три плейсхолдера принудительно игнорирует). Для ФРЕЗЕРНЫХ станков ничего
+        /// не дописываем вообще — фрезерные переходы эту "запасную" логику никогда не вызывали (СК
+        /// зашита в строку самого рабочего перемещения, СОЖ — в отдельную G43-строку с собственным
+        /// условием на TransitionTemplateHasCoolant, тело — не через шаблон, MillingCustomOperation
+        /// не использует Transition), и добавление любого из этих плейсхолдеров добавило бы новые
+        /// строки, которых раньше не было, и сломало бы условие в G43-строке. Строки сами
+        /// схлопнутся при неприменимости (одна СК у станка, Coolant.None) — см. Util.RenderTemplate.
+        /// Возвращает true, если что-то поменялось.
+        /// </summary>
+        private static bool MigrateTransitionTemplate(List<Machine> machines)
+        {
+            var migrated = false;
+            foreach (var machine in machines)
+            {
+                if (!string.IsNullOrWhiteSpace(machine.TransitionTemplate)) continue;
+                var template = string.IsNullOrWhiteSpace(machine.ToolCallTemplate) ? "{T}" : machine.ToolCallTemplate;
+                if (machine.MachineType == MachineType.Turning)
+                {
+                    if (!template.Contains("{CS}")) template += "\n{CS}";
+                    if (!template.Contains("{COOLANT}")) template += "\n{COOLANT}";
+                    if (!template.Contains("{PROCESSING}")) template += "\n{PROCESSING}{COOLANT_OFF}";
+                    if (!template.Contains("{MACHINE_TIME}")) template += "\n{MACHINE_TIME}";
+                }
+                machine.TransitionTemplate = template;
+                migrated = true;
+            }
+            return migrated;
+        }
+
+        /// <summary>
+        /// Станки, сохранённые до появления Machine.HeaderTemplate, несут его пустым — данные
+        /// лежат в HeaderTrailerTemplate (уже гарантировано непустое после
+        /// MigrateHeaderTrailerTemplate выше). Переносим текст как есть и дописываем
+        /// {MACHINE_TIME} — раньше время шапки было безусловной жёстко зашитой строкой
+        /// (Templates.Operation.Header), теперь обычный плейсхолдер. Возвращает true, если
+        /// что-то поменялось.
+        /// </summary>
+        private static bool MigrateHeaderTemplate(List<Machine> machines)
+        {
+            var migrated = false;
+            foreach (var machine in machines)
+            {
+                if (!string.IsNullOrWhiteSpace(machine.HeaderTemplate)) continue;
+                var trailer = machine.HeaderTrailerTemplate ?? string.Empty;
+                machine.HeaderTemplate = (trailer.TrimEnd('\n') + "\n{MACHINE_TIME}").TrimStart('\n');
                 migrated = true;
             }
             return migrated;
@@ -277,11 +352,11 @@ namespace Sunduk.PWA.Infrastructure.State
                 LeadingReferentPoint = false,
                 TrailingReferentPoint = true,
                 HeaderStyle = HeaderStyle.ONumber,
-                HeaderTrailerTemplate = "{AUTHOR}{DATE}",
+                HeaderTemplate = "{AUTHOR}{DATE}\n{MACHINE_TIME}",
                 SafetyStringTemplate = "G30 U0\nG30 W0\nG40 G80 {CS}\nG50 S{S}\nG96 G23",
                 SafetySpeedCap = 5000,
                 SafetyDefaultSpeed = 3000,
-                ToolCallTemplate = "T{T4} ({TOOL})",
+                TransitionTemplate = "T{T4} ({TOOL})\n{CS}\n{COOLANT}\n{PROCESSING}{COOLANT_OFF}\n{MACHINE_TIME}",
                 Tools = DefaultTools.Turning(),
             },
             new Machine
@@ -300,12 +375,12 @@ namespace Sunduk.PWA.Infrastructure.State
                 LeadingReferentPoint = true,
                 TrailingReferentPoint = true,
                 HeaderStyle = HeaderStyle.AngleBracketName,
-                HeaderTrailerTemplate = "{AUTHOR} {DATE}",
+                HeaderTemplate = "{AUTHOR} {DATE}\n{MACHINE_TIME}",
                 HeaderExtraLines = "G10 L2 P1 Z-100. B300. (G54)\nG10 L2 P2 Z400. (G55)",
                 SafetyStringTemplate = "G30 U0\nG30 W0\nG55 G30 B0\nG40 G80\nG50 S{S}\nG96",
                 SafetySpeedCap = 4000,
                 SafetyDefaultSpeed = 3500,
-                ToolCallTemplate = "T{T4} G54 M58 ({TOOL})",
+                TransitionTemplate = "T{T4} G54 M58 ({TOOL})\n{CS}\n{COOLANT}\n{PROCESSING}{COOLANT_OFF}\n{MACHINE_TIME}",
                 Tools = DefaultTools.Turning(),
             },
             new Machine
@@ -323,8 +398,8 @@ namespace Sunduk.PWA.Infrastructure.State
                 CoolantBlowOnCode = "M57",
                 CoolantBlowOffCode = "M59",
                 HeaderStyle = HeaderStyle.ONumber,
-                HeaderTrailerTemplate = "{AUTHOR}{DATE}",
-                ToolCallTemplate = "T{T} M6 ({TOOL})",
+                HeaderTemplate = "{AUTHOR}{DATE}\n{MACHINE_TIME}",
+                TransitionTemplate = "T{T} M6 ({TOOL})",
                 Tools = DefaultTools.Milling(),
             },
         };

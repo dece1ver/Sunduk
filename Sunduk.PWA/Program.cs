@@ -76,6 +76,7 @@ namespace Sunduk.PWA
             builder.Services.AddSingleton<RadiusState>();
             builder.Services.AddSingleton<NippleState>();
             builder.Services.AddSingleton<Arc2State>();
+            builder.Services.AddSingleton<ArcGeneralState>();
             builder.Services.AddSingleton<ChamferState>();
             builder.Services.AddSingleton<ThreadTurningState>();
             builder.Services.AddSingleton<CalculatorPageState>();

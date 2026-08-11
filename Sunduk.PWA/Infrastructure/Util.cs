@@ -216,12 +216,31 @@ namespace Sunduk.PWA.Infrastructure
 
 
         /// <summary>
-        /// Строка вызова инструмента в УП — шаблон станка (Machine.ToolCallTemplate) с подстановкой
-        /// {T}/{T2}/{T4} (номер инструмента без/с 2/4-значным дополнением нулями), {TOOL}
-        /// (Tool.CallDetails), {CS} (система координат перехода — пусто, если у станка только
-        /// одна СК) и {COOLANT} (код включения СОЖ перехода — пусто при Coolant.None). Перевод
-        /// строки внутри шаблона переносит то, что после него, на следующую строку УП.
+        /// Построчная подстановка плейсхолдеров в шаблон. В отличие от простой цепочки .Replace()
+        /// на весь текст, решает судьбу пустых подстановок построчно: если строка шаблона была
+        /// НЕпустой, а после подстановки схлопнулась в пустую (плейсхолдер, которому нашлось
+        /// пустое значение, был единственным содержимым строки) — строка целиком выбрасывается,
+        /// без следа. Строки, изначально пустые в шаблоне (намеренный отступ автора шаблона), не
+        /// трогаются. Одним универсальным правилом заменяет прежнюю логику "Contains(...) ?
+        /// гарантированная отдельная строка : ничего" — что раньше жило в
+        /// Templates.GCodeBuilder.CoordinateSystemFallback/CoolantOn.
         /// </summary>
+        public static string RenderTemplate(string template, IReadOnlyDictionary<string, string> values)
+        {
+            if (string.IsNullOrEmpty(template)) return string.Empty;
+            var lines = template.Replace("\r\n", "\n").Split('\n');
+            var rendered = new List<string>();
+            foreach (var line in lines)
+            {
+                var wasBlank = string.IsNullOrWhiteSpace(line);
+                var substituted = line;
+                foreach (var kv in values) substituted = substituted.Replace(kv.Key, kv.Value);
+                if (!wasBlank && string.IsNullOrWhiteSpace(substituted)) continue;
+                rendered.Add(substituted);
+            }
+            return string.Join("\n", rendered);
+        }
+
         /// <summary>
         /// Перегрузка для мест без осмысленного выбора СК/СОЖ перехода (например превью в списке
         /// инструментов) — берёт первую СК станка и Coolant.General, ничего не меняя в генерации
@@ -230,33 +249,70 @@ namespace Sunduk.PWA.Infrastructure
         public static string ToolCall(this Tool tool, Machine machine)
             => tool.ToolCall(machine, machine.CoordinateSystems.FirstOrDefault());
 
-        public static string ToolCall(this Tool tool, Machine machine, CoordinateSystem coordinateSystem, Coolant coolant = Coolant.General)
+        /// <summary>
+        /// Строка вызова инструмента в УП (циклы с фиксированным, параметризованным телом —
+        /// подрезка/сверление/канавки/резьба/обкатывание/фрезерный вызов) — шаблон станка
+        /// (Machine.TransitionTemplate) с подстановкой {T}/{T2}/{T4} (номер инструмента без/с
+        /// 2/4-значным дополнением нулями), {TOOL} (Tool.CallDetails), {CS} (система координат
+        /// перехода — пусто, если у станка только одна СК) и {COOLANT} (код включения СОЖ
+        /// перехода — пусто при Coolant.None или <paramref name="suppressCoolant"/>).
+        /// {PROCESSING}/{MACHINE_TIME}/{COOLANT_OFF} здесь ВСЕГДА подставляются пустыми — даже
+        /// если присутствуют в общем Machine.TransitionTemplate станка (используемом также
+        /// <see cref="Transition"/> ниже) — тело/время/выключение СОЖ таких циклов формирует сам
+        /// цикл, не шаблон; без этого голый текст плейсхолдера протекал бы в УП и/или СОЖ
+        /// выключался бы дважды.
+        /// </summary>
+        public static string ToolCall(this Tool tool, Machine machine, CoordinateSystem coordinateSystem, Coolant coolant = Coolant.General, bool suppressCoolant = false)
         {
-            var template = string.IsNullOrWhiteSpace(machine.ToolCallTemplate) ? "{T}" : machine.ToolCallTemplate;
+            var template = string.IsNullOrWhiteSpace(machine.TransitionTemplate) ? "{T}" : machine.TransitionTemplate;
             template = Regex.Replace(template, @"\{T(\d+)\}", m => tool.Position.ToString("D" + m.Groups[1].Value));
-            return template
-                .Replace("{T}", tool.Position.ToString())
-                .Replace("{TOOL}", tool.CallDetails)
-                .Replace("{CS}", machine.CoordinateSystems.Count > 1 ? coordinateSystem.ToString() : string.Empty)
-                .Replace("{COOLANT}", Templates.Operation.CoolantOn(machine, coolant))
-                .Replace(',', '.');
+            var values = new Dictionary<string, string>
+            {
+                ["{T}"] = tool.Position.ToString(),
+                ["{TOOL}"] = tool.CallDetails,
+                ["{CS}"] = machine.CoordinateSystems.Count > 1 ? coordinateSystem.ToString() : string.Empty,
+                ["{COOLANT}"] = suppressCoolant ? string.Empty : Templates.Operation.CoolantOn(machine, coolant),
+                ["{PROCESSING}"] = string.Empty,
+                ["{MACHINE_TIME}"] = string.Empty,
+                ["{COOLANT_OFF}"] = string.Empty,
+            };
+            return RenderTemplate(template, values).Replace(',', '.');
         }
 
         /// <summary>
-        /// Явно ли шаблон вызова инструмента станка сам выводит систему координат — если да,
-        /// гарантированная отдельная строка с СК (см. места вызова <see cref="ToolCall"/> в
-        /// Templates/*.cs) не дублируется.
+        /// Полный переход (циклы со свободным/непрозрачным телом — произвольное точение/
+        /// фрезерование, точение по контуру) — тот же Machine.TransitionTemplate, но с реальной
+        /// подстановкой {PROCESSING} (<paramref name="processingBody"/>, пусто ⇒
+        /// Operation.ProcessingSnippet), {MACHINE_TIME} (<paramref name="machineTime"/>, null ⇒
+        /// плейсхолдер схлопывается, как и любой другой незаполненный), {COOLANT_OFF} (код
+        /// выключения СОЖ перехода).
         /// </summary>
-        public static bool ToolCallTemplateHasCoordinateSystem(this Machine machine)
-            => !string.IsNullOrWhiteSpace(machine.ToolCallTemplate) && machine.ToolCallTemplate.Contains("{CS}");
+        public static string Transition(this Tool tool, Machine machine, CoordinateSystem coordinateSystem, Coolant coolant, string processingBody, TimeSpan? machineTime = null, bool suppressCoolant = false)
+        {
+            var template = string.IsNullOrWhiteSpace(machine.TransitionTemplate)
+                ? "{T}\n{CS}\n{COOLANT}\n{PROCESSING}{COOLANT_OFF}\n{MACHINE_TIME}"
+                : machine.TransitionTemplate;
+            template = Regex.Replace(template, @"\{T(\d+)\}", m => tool.Position.ToString("D" + m.Groups[1].Value));
+            var values = new Dictionary<string, string>
+            {
+                ["{T}"] = tool.Position.ToString(),
+                ["{TOOL}"] = tool.CallDetails,
+                ["{CS}"] = machine.CoordinateSystems.Count > 1 ? coordinateSystem.ToString() : string.Empty,
+                ["{COOLANT}"] = suppressCoolant ? string.Empty : Templates.Operation.CoolantOn(machine, coolant),
+                ["{PROCESSING}"] = string.IsNullOrEmpty(processingBody) ? Templates.Operation.ProcessingSnippet : processingBody.TrimEnd('\n') + "\n",
+                ["{MACHINE_TIME}"] = machineTime is { } t ? $"({t.Minutes}M{t.Seconds}S)" : string.Empty,
+                ["{COOLANT_OFF}"] = Templates.Operation.CoolantOff(machine, coolant),
+            };
+            return RenderTemplate(template, values).Replace(',', '.');
+        }
 
         /// <summary>
-        /// Явно ли шаблон вызова инструмента станка сам выводит включение СОЖ — если да,
-        /// гарантированная отдельная строка/встройка СОЖ (см. места вызова <see cref="ToolCall"/>
-        /// в Templates/*.cs) не дублируется.
+        /// Явно ли шаблон перехода станка сам выводит включение СОЖ — если да, milling-переходы
+        /// (которые не используют общий механизм ToolCall/Transition для своей строки коррекции
+        /// на длину инструмента) не дублируют его там.
         /// </summary>
-        public static bool ToolCallTemplateHasCoolant(this Machine machine)
-            => !string.IsNullOrWhiteSpace(machine.ToolCallTemplate) && machine.ToolCallTemplate.Contains("{COOLANT}");
+        public static bool TransitionTemplateHasCoolant(this Machine machine)
+            => !string.IsNullOrWhiteSpace(machine.TransitionTemplate) && machine.TransitionTemplate.Contains("{COOLANT}");
 
         /// <summary>
         /// Описание инструмента для таблицы инструментов в шапке программы.

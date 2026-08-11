@@ -15,8 +15,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
     /// передавайте текст без завершающего \n. <see cref="Raw"/> добавляет текст как есть,
     /// без своего \n — для констант вроде <see cref="Operation.TurningReferentPoint"/>,
     /// которые уже заканчиваются переводом строки. Кроме этих низкоуровневых примитивов,
-    /// есть набор именованных команд перехода (<see cref="ToolCall"/>,
-    /// <see cref="CoordinateSystemFallback"/>, <see cref="CoolantOn"/>/<see cref="CoolantOff"/>,
+    /// есть набор именованных команд перехода (<see cref="ToolCall"/> — циклы с фиксированным
+    /// телом, <see cref="Transition"/> — циклы со свободным телом, <see cref="CoolantOff"/>,
     /// <see cref="ReferentPoint"/>, <see cref="Contour"/>, <see cref="HolePattern"/>) —
     /// каждая инкапсулирует один смысловой шаг перехода вместо того, чтобы вызывающий метод
     /// вручную повторял постоянно одинаковую логику подстановки/подавления по шаблону станка.
@@ -45,32 +45,24 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public GCodeBuilder RawIf(bool condition, string text) => condition ? Raw(text) : this;
 
         /// <summary>
-        /// Вызов инструмента — строка по шаблону станка (<see cref="Util.ToolCall"/>).
+        /// Вызов инструмента (циклы с фиксированным телом) — строка по шаблону станка
+        /// (<see cref="Util.ToolCall"/>). <paramref name="suppressCoolant"/> — не выводить
+        /// {COOLANT} здесь (например «станок уже вернулся в референтную точку и включит СОЖ там»).
         /// </summary>
-        public GCodeBuilder ToolCall(Tool tool, Machine machine, CoordinateSystem coordinateSystem, Coolant coolant)
-            => Line(tool.ToolCall(machine, coordinateSystem, coolant));
+        public GCodeBuilder ToolCall(Tool tool, Machine machine, CoordinateSystem coordinateSystem, Coolant coolant, bool suppressCoolant = false)
+            => Line(tool.ToolCall(machine, coordinateSystem, coolant, suppressCoolant));
 
         /// <summary>
-        /// Гарантированная отдельная строка с СК сразу после вызова инструмента — только для
-        /// токарных переходов; не дублируется, если СК уже подставлена в
-        /// <see cref="Machine.ToolCallTemplate"/> через {CS}. У фрезерных переходов СК зашита в
-        /// строку самого рабочего перемещения — эта команда там не используется.
+        /// Полный переход (циклы со свободным телом) — строка(и) по шаблону станка
+        /// (<see cref="Util.Transition"/>), включая тело обработки и выключение СОЖ.
         /// </summary>
-        public GCodeBuilder CoordinateSystemFallback(Machine machine, CoordinateSystem coordinateSystem)
-            => LineIf(machine.CoordinateSystems.Count > 1 && !machine.ToolCallTemplateHasCoordinateSystem(), coordinateSystem.ToString());
+        public GCodeBuilder Transition(Tool tool, Machine machine, CoordinateSystem coordinateSystem, Coolant coolant, string processingBody, TimeSpan? machineTime = null, bool suppressCoolant = false)
+            => Line(tool.Transition(machine, coordinateSystem, coolant, processingBody, machineTime, suppressCoolant));
 
         /// <summary>
-        /// Гарантированное включение СОЖ сразу после вызова инструмента — не дублируется, если
-        /// СОЖ уже подставлена в <see cref="Machine.ToolCallTemplate"/> через {COOLANT}.
-        /// <paramref name="also"/> — дополнительное условие конкретного перехода (например
-        /// «не выводить здесь, если станок уже вернулся в референтную точку и включит СОЖ там»).
-        /// </summary>
-        public GCodeBuilder CoolantOn(Machine machine, Coolant coolant, bool also = true)
-            => LineIf(also && !machine.ToolCallTemplateHasCoolant(), Operation.CoolantOn(machine, coolant));
-
-        /// <summary>
-        /// Выключение СОЖ — в отличие от <see cref="CoolantOn"/> никогда не подавляется шаблоном
-        /// вызова инструмента (тот управляет только включением).
+        /// Выключение СОЖ для циклов с фиксированным телом — тело перехода в этих случаях не
+        /// проходит через шаблон (см. <see cref="ToolCall"/>), поэтому выключение СОЖ, в отличие
+        /// от полного <see cref="Transition"/>, остаётся отдельной явной командой.
         /// </summary>
         public GCodeBuilder CoolantOff(Machine machine, Coolant coolant)
             => Line(Operation.CoolantOff(machine, coolant));

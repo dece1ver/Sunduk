@@ -1,0 +1,144 @@
+@using Sunduk.PWA.Infrastructure.Sequences.Base
+<MudField Label="Текущее состояние заготовки" Variant="Variant.Filled" Margin="Margin.Dense" Underline="false">
+    <MudPaper Outlined="true">
+        <div style="text-align: center;">
+            <svg height="140" width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="@ViewBox" preserveAspectRatio="xMidYMid meet">
+                @if (!string.IsNullOrEmpty(ExternalPath))
+                {
+                    <path fill="#FF5722" fill-opacity="0.25" stroke="#FF5722" stroke-width="@Math.Max(1, Scale * 0.25)" d="@ExternalPath"/>
+                }
+                @if (!string.IsNullOrEmpty(InternalPath))
+                {
+                    <path fill="none" stroke="#FF5722" stroke-width="@Math.Max(1, Scale * 0.2)" stroke-dasharray="3,2" d="@InternalPath"/>
+                }
+                @if (Valid)
+                {
+                    <g stroke="#666" stroke-width="1" fill="none">
+                        <path d="@AxisPath"/>
+                    </g>
+                }
+            </svg>
+        </div>
+    </MudPaper>
+</MudField>
+
+@code
+{
+    public const double Scale = 4;
+    public const double Padding = 10;
+    /// <summary>Насколько шире видимого диапазона [-WorkpieceLength, 0] отрисовывать
+    /// бесконечные (ещё не тронутые ни одним переходом) крайние сегменты заготовки.</summary>
+    public const double EdgeMargin = 4;
+
+    [Parameter]
+    public List<Sequence> Program { get; set; } = new();
+
+    [Parameter]
+    public double ExternalDiameter { get; set; }
+
+    [Parameter]
+    public double InternalDiameter { get; set; }
+
+    [Parameter]
+    public double WorkpieceLength { get; set; }
+
+    bool Valid => ExternalDiameter > 0 && WorkpieceLength > 0;
+
+    double VisibleFromZ => -WorkpieceLength - EdgeMargin;
+    double VisibleToZ => EdgeMargin;
+
+    Infrastructure.StockProfile Profile => Infrastructure.StockProfile.Build(Program ?? new List<Sequence>(), Program?.Count ?? 0, ExternalDiameter, InternalDiameter);
+
+    double SX(double z) => z * Scale;
+    double SY(double diameter) => -diameter / 2 * Scale;
+    static string Fmt(double v) => v.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    List<(double FromZ, double ToZ, double Diameter)> ClippedSorted(IReadOnlyList<(double FromZ, double ToZ, double Diameter)> segments)
+    {
+        var result = new List<(double FromZ, double ToZ, double Diameter)>();
+        foreach (var s in segments)
+        {
+            var fromZ = Math.Max(s.FromZ, VisibleFromZ);
+            var toZ = Math.Min(s.ToZ, VisibleToZ);
+            if (fromZ < toZ) result.Add((fromZ, toZ, s.Diameter));
+        }
+        result.Sort((a, b) => a.FromZ.CompareTo(b.FromZ));
+        return result;
+    }
+
+    /// <summary>Точки ступенчатой "лесенки" (в экранных координатах) по сегментам диаметра —
+    /// горизонталь на каждом сегменте, вертикальный шаг на стыке при смене диаметра.
+    /// <paramref name="mirror"/> отражает диаметр в отрицательный радиус (нижняя половина).</summary>
+    List<(double X, double Y)> StaircasePoints(List<(double FromZ, double ToZ, double Diameter)> segments, bool mirror)
+    {
+        var points = new List<(double X, double Y)>();
+        double Y(double diameter) => mirror ? -SY(diameter) : SY(diameter);
+        foreach (var s in segments)
+        {
+            points.Add((SX(s.FromZ), Y(s.Diameter))); // вертикальный шаг на стыке (или старт)
+            points.Add((SX(s.ToZ), Y(s.Diameter))); // горизонталь по сегменту
+        }
+        return points;
+    }
+
+    static string PathFromPoints(IEnumerable<(double X, double Y)> points, bool close)
+    {
+        var sb = new System.Text.StringBuilder();
+        var first = true;
+        foreach (var p in points)
+        {
+            sb.Append(first ? "M " : "L ").Append(Fmt(p.X)).Append(',').Append(Fmt(p.Y)).Append(' ');
+            first = false;
+        }
+        if (close) sb.Append('Z');
+        return sb.ToString();
+    }
+
+    /// <summary>Замкнутый силуэт (верх + низ, зеркально относительно оси) — сплошная заливка
+    /// наружного диаметра как ступенчатая "лесенка" по сегментам StockProfile.</summary>
+    string ExternalPath
+    {
+        get
+        {
+            if (!Valid) return string.Empty;
+            var segments = ClippedSorted(Profile.ExternalSegments);
+            if (segments.Count == 0) return string.Empty;
+
+            var top = StaircasePoints(segments, mirror: false);
+            var bottom = StaircasePoints(segments, mirror: true);
+            bottom.Reverse();
+            return PathFromPoints(top.Concat(bottom), close: true);
+        }
+    }
+
+    /// <summary>Внутренний диаметр (если есть) — верхняя и нижняя линии отдельно, без заливки
+    /// (просто индикатор отверстия/канавки, не полноценная закраска "дырки").</summary>
+    string InternalPath
+    {
+        get
+        {
+            if (!Valid) return string.Empty;
+            var segments = ClippedSorted(Profile.InternalSegments).Where(s => s.Diameter > 0).ToList();
+            if (segments.Count == 0) return string.Empty;
+
+            return PathFromPoints(StaircasePoints(segments, mirror: false), close: false) +
+                   PathFromPoints(StaircasePoints(segments, mirror: true), close: false);
+        }
+    }
+
+    string AxisPath => $"M {Fmt(SX(VisibleFromZ))},{Fmt(SY(0))} L {Fmt(SX(VisibleToZ))},{Fmt(SY(0))}";
+
+    string ViewBox
+    {
+        get
+        {
+            if (!Valid) return $"{-Padding} {-Padding} {2 * Padding} {2 * Padding}";
+            var left = SX(VisibleFromZ) - Padding;
+            var right = SX(VisibleToZ) + Padding;
+            var maxRadius = Math.Max(ExternalDiameter, InternalDiameter) / 2;
+            var top = SY(maxRadius * 2) - Padding;
+            var bottom = -top;
+            return $"{Fmt(left)} {Fmt(top)} {Fmt(Math.Max(right - left, 1))} {Fmt(Math.Max(bottom - top, 1))}";
+        }
+    }
+}

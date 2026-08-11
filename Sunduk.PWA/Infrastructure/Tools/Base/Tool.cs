@@ -40,8 +40,8 @@ namespace Sunduk.PWA.Infrastructure.Tools.Base
 
         /// <summary>
         /// Название и параметры инструмента (без номера и станко-специфичного обрамления) —
-        /// то, что подставляется в плейсхолдер {TOOL} шаблона вызова инструмента станка
-        /// (<see cref="Machine.ToolCallTemplate"/>) и используется как есть в таблице инструментов.
+        /// то, что подставляется в плейсхолдер {TOOL} шаблона перехода станка
+        /// (<see cref="Machine.TransitionTemplate"/>) и используется как есть в таблице инструментов.
         /// </summary>
         public abstract string CallDetails { get; }
     }

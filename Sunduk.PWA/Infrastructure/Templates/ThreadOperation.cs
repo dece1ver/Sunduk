@@ -28,9 +28,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             if (machine.MachineType != MachineType.Turning) return string.Empty;
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
-                .ToolCall(tool, machine, coordinateSystem, coolant)
-                .CoordinateSystemFallback(machine, coordinateSystem)
-                .CoolantOn(machine, coolant, also: !machine.LeadingReferentPoint)
+                .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
                 .Raw(approach)
                 .Line($"G84 Z{endZ.NC()} P1000 F{tool.Pitch.NC()}")
                 .Line("G80")
@@ -146,9 +144,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             if (machine.MachineType != MachineType.Turning) return string.Empty;
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
-                .ToolCall(tool, machine, coordinateSystem, coolant)
-                .CoordinateSystemFallback(machine, coordinateSystem)
-                .CoolantOn(machine, coolant, also: !machine.LeadingReferentPoint)
+                .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
                 .Line($"G0 X{approachDiameter} Z{startZ.NC()} S{speed.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97")
                 .Line($"G76 P0201{threadStandard.Profile()} Q{minStep} R{lastPass.NC()}")
                 .Line($"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}")

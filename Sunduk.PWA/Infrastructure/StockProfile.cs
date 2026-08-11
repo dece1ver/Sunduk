@@ -30,6 +30,13 @@ namespace Sunduk.PWA.Infrastructure
         public double ExternalDiameterAt(double z) => DiameterAt(_external, z);
         public double InternalDiameterAt(double z) => DiameterAt(_internal, z);
 
+        /// <summary>Сегменты наружного диаметра как есть (крайние — от/до бесконечности, пока
+        /// заготовка не обрезана переходом с этой стороны) — для отрисовки силуэта.</summary>
+        public IReadOnlyList<(double FromZ, double ToZ, double Diameter)> ExternalSegments => _external;
+
+        /// <summary>Сегменты внутреннего диаметра как есть — см. <see cref="ExternalSegments"/>.</summary>
+        public IReadOnlyList<(double FromZ, double ToZ, double Diameter)> InternalSegments => _internal;
+
         private void WriteExternal(double z1, double z2, double diameter) => Write(_external, z1, z2, diameter);
         private void WriteInternal(double z1, double z2, double diameter) => Write(_internal, z1, z2, diameter);
 
