@@ -14,6 +14,9 @@ const offlineAssetsExclude = [ /^service-worker\.js$/ ];
 async function onInstall(event) {
     console.info('Service worker: Install');
 
+    // Применяем новую версию сразу, а не после нескольких перезагрузок.
+    self.skipWaiting();
+
     // Fetch and cache all matching items from the assets manifest
     const assetsRequests = self.assetsManifest.assets
         .filter(asset => offlineAssetsInclude.some(pattern => pattern.test(asset.url)))
@@ -30,6 +33,9 @@ async function onActivate(event) {
     await Promise.all(cacheKeys
         .filter(key => key.startsWith(cacheNamePrefix) && key !== cacheName)
         .map(key => caches.delete(key)));
+
+    // Сразу забираем управление, чтобы свежая версия работала с первой загрузки.
+    await self.clients.claim();
 }
 
 async function onFetch(event) {

@@ -42,20 +42,20 @@
         {
             case CuttingType.External:
                 <MudItem xs="12" sm="6" md="4">
-                    <MudSelect ValueChanged="OnToolChanged" Variant="@Variant.Filled" Margin="@Margin.Dense" Label="Инструмент" T="Tool">
+                    <MudSelect Value="Tool" ValueChanged="OnToolChanged" Variant="@Variant.Filled" Margin="@Margin.Dense" Label="Инструмент" T="Tool">
                         @foreach (var tool in Tools.Where(x => x is ThreadingExternalTool))
                         {
-                            <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
+                            <MudSelectItem Value="@tool">@tool.PickerLabel</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>
                 break;
             case CuttingType.Internal:
                 <MudItem xs="12" sm="6" md="4">
-                    <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+                    <MudSelect Value="Tool" ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                         @foreach (var tool in Tools.Where(x => x is ThreadingInternalTool))
                         {
-                            <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
+                            <MudSelectItem Value="@tool">@tool.PickerLabel</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>
@@ -120,19 +120,19 @@
         break;
     case ThreadingSequences.Tapping:
         <MudItem xs="12" sm="6" md="4">
-            <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+            <MudSelect Value="Tool" ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                 @if (MachineType == MachineType.Turning)
                 {
                     @foreach (var tool in Tools.Where(x => x is TurningTappingTool))
                     {
-                        <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
+                        <MudSelectItem Value="@tool">@tool.PickerLabel</MudSelectItem>
                     }
                 }
                 @if (MachineType == MachineType.Milling)
                 {
                     @foreach (var tool in Tools.Where(x => x is MillingTappingTool))
                     {
-                        <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
+                        <MudSelectItem Value="@tool">@tool.PickerLabel</MudSelectItem>
                     }
                 }
             </MudSelect>
@@ -207,12 +207,12 @@
         break;
     case ThreadingSequences.CustomThreadMilling or ThreadingSequences.ThreadMilling:
         <MudItem xs="12" sm="6" md="4">
-            <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+            <MudSelect Value="Tool" ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
                 @if (MachineType == MachineType.Milling)
                 {
                     @foreach (var tool in Tools.Where(x => x is MillingThreadCuttingTool))
                     {
-                        <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
+                        <MudSelectItem Value="@tool">@tool.PickerLabel</MudSelectItem>
                     }
                 }
             </MudSelect>

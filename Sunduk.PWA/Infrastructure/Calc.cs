@@ -12,6 +12,7 @@ using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 using static MudBlazor.Defaults;
 using Sunduk.PWA.Infrastructure.Sequences;
+using Sunduk.Geometry;
 
 namespace Sunduk.PWA.Infrastructure
 {
@@ -43,36 +44,6 @@ namespace Sunduk.PWA.Infrastructure
             }
             return 0;
         }
-
-        /// <summary>
-        /// Переводит радианы в угол</summary>
-        /// <param name="radians">Значение в радианах</param>
-        /// <returns>Угловое значение</returns>
-        public static double Degrees(this double radians)
-        {
-            return radians * 180 / Math.PI;
-        }
-
-        /// <summary>
-        /// Переводит угол в радианы
-        /// </summary>
-        /// <param name="degrees">Угловое значение</param>
-        /// <returns>Радиан</returns>
-        public static double Radians(this double degrees)
-        {
-            return degrees! * Math.PI / 180;
-        }
-
-        /// <summary>
-        /// Переводит угол в радианы
-        /// </summary>
-        /// <param name="degrees">Угловое значение</param>
-        /// <returns>Радиан</returns>
-        public static double Radians(this int degrees)
-        {
-            return degrees * Math.PI / 180;
-        }
-
 
         /// <summary>
         /// Округляет
@@ -163,33 +134,6 @@ namespace Sunduk.PWA.Infrastructure
         /// <param name="drillingTool">Сверло</param>
         /// <returns></returns>
         public static double PointLength(this double diameter, double angle) => (diameter / 2 * Math.Tan((90 - angle / 2).Radians()));
-
-        /// <summary>
-        /// Смещение от виртуальных точек пересечения до концов радиусов
-        /// </summary>
-        /// <param name="angle">Угол фаски от горизонтальной оси</param>
-        /// <param name="radius">Радиус на углах фаски</param>
-        /// <returns></returns>
-        public static (double X, double Z) ChamferRadiusLengths(double angle, double radius, int round = 3)
-        {
-            return (
-                Math.Round(Math.Tan(((90 - angle) / 2).Radians()) * radius, round, MidpointRounding.ToPositiveInfinity),
-                Math.Round(Math.Tan((angle / 2).Radians()) * radius, round, MidpointRounding.ToPositiveInfinity));
-        }
-
-        /// <summary>
-        /// Смещение координат фаски с учетом радиуса пластины
-        /// </summary>
-        /// <param name="angle"></param>
-        /// <param name="radius"></param>
-        /// <returns></returns>
-        public static (double X, double Z) ChamferShifts(double angle, double radius)
-        {
-            return 
-                (Math.Tan(angle.Radians()) * (radius - radius / Math.Tan((90 - angle / 2).Radians())),
-                radius - radius / Math.Tan((90 - angle / 2).Radians()));
-        }
-        
 
         public static double AxialTurningTime(this double length, double spins, double feed)
         {

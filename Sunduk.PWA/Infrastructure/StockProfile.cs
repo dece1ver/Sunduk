@@ -21,10 +21,15 @@ namespace Sunduk.PWA.Infrastructure
         private readonly List<(double FromZ, double ToZ, double Diameter)> _external = new();
         private readonly List<(double FromZ, double ToZ, double Diameter)> _internal = new();
 
-        public StockProfile(double externalDiameter, double internalDiameter)
+        /// <summary><paramref name="rawStockToZ"/> — реальная правая граница сырой заготовки (в
+        /// сторону +Z, откуда торчит необработанный припуск под торцовку), если известна (см.
+        /// <see cref="Build"/>) — до неё материал есть безусловно, дальше его нет вообще, даже если
+        /// в программе ещё не было ни одной торцовки. По умолчанию (+∞) — прежнее поведение для
+        /// вызовов, которым эта граница не важна (например, точечные запросы диаметра на Z=0).</summary>
+        public StockProfile(double externalDiameter, double internalDiameter, double rawStockToZ = double.PositiveInfinity)
         {
-            _external.Add((double.NegativeInfinity, double.PositiveInfinity, externalDiameter));
-            _internal.Add((double.NegativeInfinity, double.PositiveInfinity, internalDiameter));
+            _external.Add((double.NegativeInfinity, rawStockToZ, externalDiameter));
+            _internal.Add((double.NegativeInfinity, rawStockToZ, internalDiameter));
         }
 
         public double ExternalDiameterAt(double z) => DiameterAt(_external, z);
@@ -37,8 +42,39 @@ namespace Sunduk.PWA.Infrastructure
         /// <summary>Сегменты внутреннего диаметра как есть — см. <see cref="ExternalSegments"/>.</summary>
         public IReadOnlyList<(double FromZ, double ToZ, double Diameter)> InternalSegments => _internal;
 
-        private void WriteExternal(double z1, double z2, double diameter) => Write(_external, z1, z2, diameter);
-        private void WriteInternal(double z1, double z2, double diameter) => Write(_internal, z1, z2, diameter);
+        /// <summary>Резать/сверлить можно только там, где материал физически уже есть — переходы
+        /// часто задают Z как безопасную точку подвода (например, сверловка "от Z2", когда торец
+        /// уже обработан до 0.2), а не как реальную границу материала. Без клипа такая запись
+        /// создавала бы "дырку в воздухе" за пределами текущего наружного профиля — в отрисовке
+        /// (заливка через fill-rule=evenodd) это выглядит как ПОЯВИВШИЙСЯ из ниоткуда материал
+        /// (нечётное число пересечений вне охватывающего наружного контура = закрашено), хотя
+        /// реально там ничего не должно меняться.</summary>
+        private void WriteExternal(double z1, double z2, double diameter)
+        {
+            var fromZ = Math.Min(z1, z2);
+            var toZ = Math.Max(z1, z2);
+            foreach (var (segFrom, segTo) in ExistingMaterialRanges(fromZ, toZ)) Write(_external, segFrom, segTo, diameter);
+        }
+
+        private void WriteInternal(double z1, double z2, double diameter)
+        {
+            var fromZ = Math.Min(z1, z2);
+            var toZ = Math.Max(z1, z2);
+            foreach (var (segFrom, segTo) in ExistingMaterialRanges(fromZ, toZ)) Write(_internal, segFrom, segTo, diameter);
+        }
+
+        /// <summary>Части [fromZ, toZ], пересекающиеся с уже существующим наружным материалом
+        /// (Diameter &gt; 0) — см. <see cref="WriteExternal"/>/<see cref="WriteInternal"/>.</summary>
+        private IEnumerable<(double FromZ, double ToZ)> ExistingMaterialRanges(double fromZ, double toZ)
+        {
+            foreach (var segment in _external)
+            {
+                if (segment.Diameter <= 0) continue;
+                var segFrom = Math.Max(segment.FromZ, fromZ);
+                var segTo = Math.Min(segment.ToZ, toZ);
+                if (segFrom < segTo) yield return (segFrom, segTo);
+            }
+        }
 
         private static double DiameterAt(List<(double FromZ, double ToZ, double Diameter)> segments, double z)
         {
@@ -75,11 +111,11 @@ namespace Sunduk.PWA.Infrastructure
         /// <c>program[0..uptoIndex)</c> по порядку — последняя запись в конкретный участок Z
         /// побеждает, что соответствует реальности (последний рез в этом месте детали — тот, что
         /// остался). Переходы без вычислимой геометрии (произвольный G-код и т.п.) пропускаются,
-        /// профиль в этом месте не меняется.
+        /// профиль в этом месте не меняется. <paramref name="rawStockToZ"/> — см. конструктор.
         /// </summary>
-        public static StockProfile Build(IReadOnlyList<Sequence> program, int uptoIndex, double externalDiameter, double internalDiameter)
+        public static StockProfile Build(IReadOnlyList<Sequence> program, int uptoIndex, double externalDiameter, double internalDiameter, double rawStockToZ = double.PositiveInfinity)
         {
-            var profile = new StockProfile(externalDiameter, internalDiameter);
+            var profile = new StockProfile(externalDiameter, internalDiameter, rawStockToZ);
             for (var i = 0; i < uptoIndex && i < program.Count; i++)
             {
                 Apply(profile, program[i]);
@@ -91,6 +127,33 @@ namespace Sunduk.PWA.Infrastructure
         {
             switch (sequence)
             {
+                // Торцовка обрезает заготовку по Z: всё, что было дальше фактического нового
+                // торца (в сторону +Z, откуда торчит необработанный припуск), физически снято.
+                // Реальный конечный Z зависит от конкретного вида торцовки — он НЕ всегда равен
+                // полю ProfStockAllow: у объединённой чёрное+чистовое (FacingSequence) и у G70
+                // чистовой по циклу (FinishFacingCycleSequence) профиль P/Q в самом G-коде всегда
+                // целится в Z=0 (см. FacingOperation.Facing/FinishFacingCycle, endZ = cycleProfStockAllow
+                // ? 0 : profStockAllow, а FinishFacingCycle всегда перезапускает тот же P/Q блок) —
+                // ProfStockAllow там участвует только как параметр W у цикла G72 (сколько оставить
+                // под последующую чистовую), не как реальная координата. У самостоятельной черновой
+                // без запланированного G70 (RoughFacingSequence, RoughFacingCycleSequence до своей
+                // чистовой) и у самостоятельной чистовой (FinishFacingSequence) ProfStockAllow —
+                // это и есть реальный конечный Z.
+                case FacingSequence facing:
+                    ClipFace(profile, 0);
+                    break;
+                case RoughFacingSequence roughFacing:
+                    ClipFace(profile, roughFacing.ProfStockAllow);
+                    break;
+                case RoughFacingCycleSequence roughFacingCycle:
+                    ClipFace(profile, roughFacingCycle.ProfStockAllow);
+                    break;
+                case FinishFacingSequence finishFacing:
+                    ClipFace(profile, finishFacing.ProfStockAllow);
+                    break;
+                case FinishFacingCycleSequence:
+                    ClipFace(profile, 0);
+                    break;
                 case RoughTurningSequence roughTurning:
                     ApplyContour(profile, roughTurning.Tool, roughTurning.Contour);
                     break;
@@ -128,6 +191,18 @@ namespace Sunduk.PWA.Infrastructure
             }
         }
 
+        /// <summary>Обрезает и наружный, и внутренний профиль от фактического нового торца
+        /// <paramref name="faceZ"/> до +∞ (материала физически больше нет). Вызывает низкоуровневый
+        /// <see cref="Write"/> напрямую, а не <see cref="WriteExternal"/>/<see cref="WriteInternal"/> —
+        /// им обеим нужно обнулиться БЕЗУСЛОВНО (это они и есть источник границы материала), а не
+        /// клипаться друг относительно друга: наружный вызов первым же обнулил бы область, и
+        /// внутреннему после него было бы не с чем пересекаться.</summary>
+        private static void ClipFace(StockProfile profile, double faceZ)
+        {
+            Write(profile._external, faceZ, double.PositiveInfinity, 0);
+            Write(profile._internal, faceZ, double.PositiveInfinity, 0);
+        }
+
         private static void ApplyGrooving(StockProfile profile, TurningGroovingTool tool, double cuttingPoint, double width, double diameter, bool isExternal)
         {
             var startPoint = tool.ZeroPoint == TurningGroovingTool.Point.Right ? cuttingPoint : cuttingPoint - tool.Width;
@@ -136,7 +211,7 @@ namespace Sunduk.PWA.Infrastructure
             else profile.WriteInternal(startPoint, endPoint, diameter);
         }
 
-        private static void ApplyContour(StockProfile profile, TurningTool tool, List<Sequences.ContourElements.Base.Element> contour)
+        private static void ApplyContour(StockProfile profile, TurningTool tool, List<Element> contour)
         {
             if (contour is null || contour.Count < 2 || tool is null) return;
             var isExternal = tool is TurningExternalTool;

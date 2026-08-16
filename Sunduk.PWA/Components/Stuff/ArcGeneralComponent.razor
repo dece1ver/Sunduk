@@ -1,4 +1,4 @@
-@using Sunduk.PWA.Infrastructure.Geometry
+@using Sunduk.Geometry
 @inject ArcGeneralState State
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
@@ -15,7 +15,7 @@
                         <MudTextField @bind-Value="_RadiusSize" T="string" Label="Радиус дуги" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Margin="Margin.Dense"/>
                     </MudItem>
                     <MudItem xs="4" Class="d-flex align-center">
-                        <MudIconButton Icon="@(ArcDirection is Infrastructure.Direction.CW ? Icons.Material.Filled.RotateRight : Icons.Material.Filled.RotateLeft)"
+                        <MudIconButton Icon="@(ArcDirection is Sunduk.Geometry.Direction.CW ? Icons.Material.Filled.RotateRight : Icons.Material.Filled.RotateLeft)"
                                        Variant="Variant.Filled" DisableElevation="true" OnClick="ToggleDirection" Title="Направление дуги"/>
                     </MudItem>
                     <MudItem xs="12">
@@ -152,8 +152,8 @@
     public string _InsertRadius { get => State.InsertRadius; set => State.InsertRadius = value; }
     public double InsertRadius => _InsertRadius.GetDouble();
 
-    public Infrastructure.Direction ArcDirection { get => State.ArcDirection; set => State.ArcDirection = value; }
-    void ToggleDirection() => ArcDirection = ArcDirection is Infrastructure.Direction.CW ? Infrastructure.Direction.CCW : Infrastructure.Direction.CW;
+    public Sunduk.Geometry.Direction ArcDirection { get => State.ArcDirection; set => State.ArcDirection = value; }
+    void ToggleDirection() => ArcDirection = ArcDirection is Sunduk.Geometry.Direction.CW ? Sunduk.Geometry.Direction.CCW : Sunduk.Geometry.Direction.CW;
 
     public AnchorKind StartKind { get => State.StartKind; set => State.StartKind = value; }
     public string _StartAnchorValue { get => State.StartAnchorValue; set => State.StartAnchorValue = value; }
@@ -169,54 +169,21 @@
     public string _EndBlunt { get => State.EndBlunt; set => State.EndBlunt = value; }
     public double EndBlunt => RoundEnd ? _EndBlunt.GetDouble() : 0;
 
-    const double Tolerance = 1e-6;
-    const double AngleGuardLow = 1;
-    const double AngleGuardHigh = 89;
-
     bool Valid => RadiusSize > 0;
 
     /// <summary>Точка на самой прямой (торец/цилиндр) без скругления — острый стык, вершина
     /// напрямую переходит в (увеличенную на радиус пластины) дугу, отдельная маленькая дуга не
-    /// вставляется. Угол касательной дуги в этой точке от оси Z + Calc.ChamferShifts — та же
-    /// конструкция, что уже проверена для торца (сверено с NippleComponent); для цилиндра — тот
-    /// же расчёт, применённый к тому же тангенсу (никакого разворота осей местами не требуется,
-    /// "зеркальность" получается сама за счёт вектора касательной) — сверено на само-согласованность
-    /// (X↔Z отражение даёт то же самое, если поменять местами торец/цилиндр), но НЕ сверено с
-    /// внешним калькулятором (эталона для этого случая нет — см. докстринг ToolTipCompensation).
-    /// Возвращает null вне диапазона 1°..89° (почти касательный вход) — не реализовано.</summary>
+    /// вставляется. Математика вынесена в общий <see cref="ArcAnchor.Sharp"/> (тот же метод
+    /// использует <see cref="ToolTipCompensation"/> для CAM-контуров); здесь — только перевод
+    /// «диаметр ⇄ радиус» на входе/выходе. Возвращает null вне диапазона 1°..89° (почти
+    /// касательный вход) — не реализовано.</summary>
     (double X, double Z)? SharpAnchor(AnchorKind kind, double value, double toolRadius)
     {
-        if (RadiusSize <= 0) return null;
-        double px, pz;
-        if (kind == AnchorKind.Face)
-        {
-            var catet = value - CenterZ;
-            var relSq = RadiusSize * RadiusSize - catet * catet;
-            if (relSq < 0) return null;
-            px = CenterXRadius + Math.Sqrt(relSq);
-            pz = value;
-        }
-        else
-        {
-            var catet = value / 2 - CenterXRadius;
-            var relSq = RadiusSize * RadiusSize - catet * catet;
-            if (relSq < 0) return null;
-            px = value / 2;
-            pz = CenterZ + Math.Sqrt(relSq);
-        }
-
-        var radialX = px - CenterXRadius;
-        var radialZ = pz - CenterZ;
-        var tangentX = -radialZ;
-        var tangentZ = radialX;
-        if (Math.Abs(tangentX) < Tolerance && Math.Abs(tangentZ) < Tolerance) return null;
-        var angle = Math.Atan2(Math.Abs(tangentX), Math.Abs(tangentZ)).Degrees();
-        if (angle <= AngleGuardLow || angle >= AngleGuardHigh) return null;
-
-        var shift = Calc.ChamferShifts(angle, toolRadius);
-        return kind == AnchorKind.Face
-            ? (2 * (px - shift.Z), pz)
-            : (2 * px, pz - shift.Z);
+        var shared = ArcAnchor.Sharp(
+            kind == AnchorKind.Face ? ArcAnchorKind.Face : ArcAnchorKind.Cylinder,
+            kind == AnchorKind.Face ? value : value / 2,
+            CenterXRadius, CenterZ, RadiusSize, toolRadius, external: true);
+        return shared is null ? null : (shared.Value.X * 2, shared.Value.Z);
     }
 
     /// <summary>Точка на самой прямой (торец/цилиндр) — начало скругления, либо, если оно не
@@ -273,7 +240,7 @@
             if (!Valid) return string.Empty;
             var end = RoundEnd ? EndHandoffPoint : EndAnchorPoint;
             if (end is null) return string.Empty;
-            var g = ArcDirection is Infrastructure.Direction.CW ? "G2" : "G3";
+            var g = ArcDirection is Sunduk.Geometry.Direction.CW ? "G2" : "G3";
             return $"{g} X{end.Value.X.NC(0)} Z{end.Value.Z.NC()} R{(RadiusSize + InsertRadius).NC()}";
         }
     }
@@ -336,7 +303,7 @@
             }
 
             var mainR = RadiusSize + InsertRadius;
-            var sweep = ArcDirection is Infrastructure.Direction.CCW ? 0 : 1;
+            var sweep = ArcDirection is Sunduk.Geometry.Direction.CCW ? 0 : 1;
             sb.Append($"A{(mainR * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},{(mainR * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},0,0,{sweep},{SX(end.Value.Z).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(end.Value.X).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
 
             var endTangent = EndAnchorPoint;

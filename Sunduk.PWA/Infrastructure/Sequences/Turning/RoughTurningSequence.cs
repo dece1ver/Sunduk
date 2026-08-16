@@ -1,4 +1,4 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base;
+using Sunduk.Geometry.ContourElements.Base;
 using Sunduk.PWA.Infrastructure.Sequences.Turning.Base;
 using System;
 using System.Collections.Generic;
@@ -13,11 +13,12 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
     public class RoughTurningSequence : TurningSequence
     {
-        public override string Operation => Templates.Operation.ContourTurning(Machine, CoordinateSystem, Tool, Contour, SpeedRough, FeedRough, Coolant, TimeSpan.FromSeconds(MachineTime.FullTime));
+        public override string Operation => Templates.Operation.RoughTurning(Machine, CoordinateSystem, Tool, Contour, StepOver, RoughStockAllow, ProfStockAllow, SeqNumbers, SpeedRough, FeedRough, Coolant);
         public override OperationTime MachineTime
         {
             get
             {
+                if (Contour == null || Contour.Count < 2) return new OperationTime(0, 0);
                 double cuttingTime = 0;
                 double rapidTime = 5;
                 var startX = Math.Abs(Contour[0].X ?? 0);
@@ -50,6 +51,9 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         }
         public int SpeedRough { get; set; }
         public double FeedRough { get; set; }
+        /// <summary>Номера строк P/Q блока цикла G71 — как у торцовочных циклов (см.
+        /// <see cref="FacingSequence.SeqNumbers"/>, <see cref="Util.GetCycleRange"/>).</summary>
+        public (int, int) SeqNumbers { get; set; } = (1, 2);
         public override string Name
         {
             get

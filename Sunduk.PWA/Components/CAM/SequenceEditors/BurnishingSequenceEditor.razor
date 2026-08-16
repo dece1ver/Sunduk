@@ -1,8 +1,8 @@
 <MudItem xs="12" md="4">
-    <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+    <MudSelect Value="Tool" ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
         @foreach (var tool in Tools.Where(x => x is TurningBurnishingTool))
         {
-            <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
+            <MudSelectItem Value="@tool">@tool.PickerLabel</MudSelectItem>
         }
     </MudSelect>
 </MudItem>

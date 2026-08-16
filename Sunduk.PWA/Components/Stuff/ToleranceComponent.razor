@@ -1,0 +1,136 @@
+@using Sunduk.PWA.Infrastructure.Tolerances
+@inject ToleranceState State
+<style>
+    .tl {
+        padding: 0px 15px 0px 0px;
+    }
+</style>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-2">
+    <MudGrid Spacing="1">
+        <MudItem xs="12" sm="4">
+            <MudSelect T="int?"
+                       Value="Grade"
+                       Label="Квалитет"
+                       ValueChanged="@(v => Grade = v)"
+                       Variant="Variant.Filled"
+                       Clearable="true">
+                @foreach (var g in Tolerance.Grades)
+                {
+                    <MudSelectItem T="int?" Value="@((int?)g)">IT@(g)</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudSelectExtended T="string"
+                               Label="Поле допуска"
+                               Variant="Variant.Filled"
+                               ItemCollection="@AvailableFields"
+                               Value="@Field"
+                               ValueChanged="OnFieldChanged"
+                               SearchBox="true"
+                               SearchBoxClearable="true"
+                               SearchBoxPlaceholder="Поиск..."
+                               Virtualize="true"
+                               Clearable="true"
+                               AnchorOrigin="Origin.BottomCenter" />
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudTextField @bind-Value="Nominal"
+                          T="string"
+                          Label="Номинальный размер"
+                          Adornment="Adornment.End"
+                          AdornmentText="мм"
+                          Variant="Variant.Filled"
+                          Immediate="true" />
+        </MudItem>
+        <MudItem xs="12">
+            <MudRadioGroup Value="@IsHole" T="bool" Class="d-flex justify-center" ValueChanged="OnIsHoleChanged">
+                <MudRadio Value="true" Color="Color.Primary">Отверстие</MudRadio>
+                <MudRadio Value="false" Color="Color.Primary">Вал</MudRadio>
+            </MudRadioGroup>
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudField Label="Результат" Variant="Variant.Filled" Underline="false">
+                @if (Result is { } r)
+                {
+                    <table>
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">Поле допуска:</MudText></td>
+                            <td><MudText Typo="Typo.caption" Color="Color.Primary">@Designation</MudText></td>
+                        </tr>
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">Размер:</MudText></td>
+                            <td>
+                                <MudText Typo="Typo.caption" Style="font-family: 'Roboto Mono', monospace;">
+                                    <span>@(r.Nominal.ToPrettyString(3, Util.PrettyStringOption.AsIs))</span><span style="display: inline-flex; align-items: center;">
+                                        <span style="font-size: 1.2em;">(</span>
+                                        <span style="display: inline-flex; flex-direction: column; text-align: right; font-size: 0.75em; line-height: 1;">
+                                            <span>@(Dev(r.UpperDeviation))</span>
+                                            <span>@(Dev(r.LowerDeviation))</span>
+                                        </span>
+                                        <span style="font-size: 1.2em;">)</span>
+                                    </span>
+                                </MudText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">Наибольший размер:</MudText></td>
+                            <td><MudText Typo="Typo.caption" Style="font-family: 'Roboto Mono', monospace;">@(r.MaxSize.ToPrettyString(3, Util.PrettyStringOption.AsIs)) мм</MudText></td>
+                        </tr>
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">Наименьший размер:</MudText></td>
+                            <td><MudText Typo="Typo.caption" Style="font-family: 'Roboto Mono', monospace;">@(r.MinSize.ToPrettyString(3, Util.PrettyStringOption.AsIs)) мм</MudText></td>
+                        </tr>
+                        <tr>
+                            <td class="tl"><MudText Typo="Typo.caption">Середина размера:</MudText></td>
+                            <td><MudText Typo="Typo.caption" Style="font-family: 'Roboto Mono', monospace;">@(r.MiddleSize.ToPrettyString(4, Util.PrettyStringOption.AsIs)) мм</MudText></td>
+                        </tr>
+                    </table>
+                }
+                else
+                {
+                    <MudText Typo="Typo.caption">Укажите номинальный размер, квалитет и поле допуска.</MudText>
+                }
+            </MudField>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code
+{
+    public string Nominal { get => State.Nominal; set => State.Nominal = value; }
+    public int? Grade { get => State.Grade; set => State.Grade = value; }
+    public string? Field { get => State.Field; set => State.Field = value; }
+    public bool IsHole { get => State.IsHole; set => State.IsHole = value; }
+
+    private double NominalValue => Nominal.GetDouble(0, Util.GetNumberOption.Any);
+
+    private ICollection<string> AvailableFields => IsHole ? Tolerance.HoleLetters : Tolerance.ShaftLetters;
+
+    private string Designation => $"{Field}{Grade}";
+
+    private Tolerance.Result? Result =>
+        Tolerance.TryCalculate(NominalValue, Designation, out var r, out _) ? r : null;
+
+    private void OnFieldChanged(string value) => Field = value;
+
+    private void OnIsHoleChanged(bool value)
+    {
+        if (IsHole == value) return;
+        IsHole = value;
+        // При переключении вал/отверстие меняем регистр уже выбранной буквы.
+        if (!string.IsNullOrEmpty(Field))
+        {
+            Field = value ? Field.ToUpperInvariant() : Field.ToLowerInvariant();
+        }
+    }
+
+    /// <summary>Форматирует отклонение в мкм/мм со знаком.</summary>
+    private static string Dev(double value)
+    {
+        string v = value.ToPrettyString(3, Util.PrettyStringOption.AsIs);
+        return value > 0 ? $"+{v}" : v;
+    }
+}

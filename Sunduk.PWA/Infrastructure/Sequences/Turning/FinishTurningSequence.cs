@@ -1,4 +1,4 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base;
+using Sunduk.Geometry.ContourElements.Base;
 using Sunduk.PWA.Infrastructure.Sequences.Turning.Base;
 using System;
 using System.Collections.Generic;
@@ -16,6 +16,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         {
             get
             {
+                if (Contour == null || Contour.Count < 2) return new OperationTime(0, 0);
                 double cuttingTime = 0;
                 double rapidTime = 5;
                 var startX = Math.Abs(Contour[0].X ?? 0);

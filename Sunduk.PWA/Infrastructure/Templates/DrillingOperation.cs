@@ -19,8 +19,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
         {
             if (tool is null || startZ <= endZ) return string.Empty;
             string approach = startZ > 0
-                ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()} S{speed} {Direction(tool)}\n"
-                : $"G0 X-{tool.Diameter.NC()} Z{SafeApproachDistance.NC()} S{speed} {Direction(tool)}\n Z{startZ.NC()}\n";
+                ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()} {tool.SpindleOn(speed)}\n"
+                : $"G0 X-{tool.Diameter.NC()} Z{SafeApproachDistance.NC()} {tool.SpindleOn(speed)}\n Z{startZ.NC()}\n";
             string exit = startZ > 0
                 ? $"G0 Z{startZ.NC()}\n"
                 : $"G0 Z{SafeApproachDistance.NC()}\n";
@@ -67,8 +67,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 startZ <= endZ ||
                 depth <= 0) return string.Empty;
             var approach = startZ > 0
-                ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()}S{speed} {Direction(tool)}\n"
-                : $"G0 X-{tool.Diameter.NC()} Z{SafeApproachDistance.NC()}S{speed} {Direction(tool)}\nZ{startZ.NC()}\n";
+                ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()}{tool.SpindleOn(speed)}\n"
+                : $"G0 X-{tool.Diameter.NC()} Z{SafeApproachDistance.NC()}{tool.SpindleOn(speed)}\nZ{startZ.NC()}\n";
             var exit = startZ > 0
                 ? $"G0 Z{startZ.NC()}\n"
                 : $"G0 Z{SafeApproachDistance.NC()}\n";
@@ -115,8 +115,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 startZ <= endZ ||
                 depth <= 0) return string.Empty;
             var approach = startZ > 0
-                ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()} S{speed} {Direction(tool)}\n"
-                : $"G0 X-{tool.Diameter.NC()} Z{SafeApproachDistance.NC()} S{speed} {Direction(tool)}\nZ{startZ.NC()}\n";
+                ? $"G0 X-{tool.Diameter.NC()} Z{startZ.NC()} {tool.SpindleOn(speed)}\n"
+                : $"G0 X-{tool.Diameter.NC()} Z{SafeApproachDistance.NC()} {tool.SpindleOn(speed)}\nZ{startZ.NC()}\n";
             var exit = startZ > 0
                 ? $"G0 Z{startZ.NC()}\n"
                 : $"G0 Z{SafeApproachDistance.NC()}\n";

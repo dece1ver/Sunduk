@@ -51,7 +51,8 @@
             case Mode.General:
                 <MudItem xs="12">
                     <StockProfileComponent Program="Program" ExternalDiameter="WorkpieceExternalDiameter"
-                                            InternalDiameter="WorkpieceInternalDiameter" WorkpieceLength="WorkpieceLength" />
+                                            InternalDiameter="WorkpieceInternalDiameter" WorkpieceLength="WorkpieceLength"
+                                            FacingAllowance="WorkpieceFacingAllowance" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudField Label="Список переходов" Variant="Variant.Filled" Margin="Margin.Dense">
@@ -171,7 +172,6 @@
                             </MudHidden>
                         }
                         <MudItem xs="12" sm="5" md="4">
-                            @*<MudTextField @bind-Value="WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />*@
                             <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал детали" T="Material" Variant="Variant.Filled" Dense="true">
                                 <MudSelectItem Value="@Material.Steel">Черная сталь</MudSelectItem>
                                 <MudSelectItem Value="@Material.Stainless">Нержавеющая сталь</MudSelectItem>
@@ -191,6 +191,12 @@
                             </MudItem>
                             <MudItem xs="6" sm="4">
                                 <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="6" sm="4">
+                                <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="6" sm="4">
+                                <MudTextField @bind-Value="_WorkpieceFacingAllowance" Label="Припуск по торцу" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                             </MudItem>
                             <MudItem xs="12" sm="4">
                                 <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
@@ -266,7 +272,7 @@
     public Sequence CurrentSelectedSequence { get => State.CurrentSelectedSequence; set => State.CurrentSelectedSequence = value; }
 
     public int CyclesCount => Program
-        .Count(x => x is RoughFacingSequence or FacingSequence or RoughFacingCycleSequence) + 1;
+        .Count(x => x is RoughFacingSequence or FacingSequence or RoughFacingCycleSequence or RoughTurningSequence) + 1;
 
     public CoordinateSystem CoordinateSystem { get => State.CoordinateSystem; set => State.CoordinateSystem = value; }
 
@@ -310,6 +316,9 @@
 
     public string _WorkpieceLength { get => State.WorkpieceLength; set => State.WorkpieceLength = value; }
     public double WorkpieceLength => _WorkpieceLength.GetDouble();
+
+    public string _WorkpieceFacingAllowance { get => State.WorkpieceFacingAllowance; set => State.WorkpieceFacingAllowance = value; }
+    public double WorkpieceFacingAllowance => _WorkpieceFacingAllowance.GetDouble();
 
 
     //public Sequence Header => new Sequence { Name = "Шапка", Operation = Operation.Header(Machine, NcDetailNumber, NcDetailName, DrawingVersion) };

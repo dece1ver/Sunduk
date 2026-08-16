@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Sunduk.PWA.Infrastructure.Sequences;
-using Sunduk.PWA.Infrastructure.Sequences.ContourElements;
-using Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base;
+using Sunduk.Geometry.ContourElements;
+using Sunduk.Geometry.ContourElements.Base;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 using static Sunduk.PWA.Infrastructure.Util;
 
@@ -48,6 +48,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// Вызов инструмента (циклы с фиксированным телом) — строка по шаблону станка
         /// (<see cref="Util.ToolCall"/>). <paramref name="suppressCoolant"/> — не выводить
         /// {COOLANT} здесь (например «станок уже вернулся в референтную точку и включит СОЖ там»).
+        /// Скорость/направление шпинделя сюда не входят — см. <see cref="Util.SpindleOn"/>,
+        /// приклеивается к первому G0 самого перехода вызывающим кодом.
         /// </summary>
         public GCodeBuilder ToolCall(Tool tool, Machine machine, CoordinateSystem coordinateSystem, Coolant coolant, bool suppressCoolant = false)
             => Line(tool.ToolCall(machine, coordinateSystem, coolant, suppressCoolant));
@@ -108,13 +110,17 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// ContourComponent.razor), в этот метод контур приходит с уже разрешёнными координатами
         /// (и, для контурного точения, уже скомпенсированными на радиус пластины на острых
         /// стыках — см. <see cref="Geometry.ToolTipCompensation"/> — этот метод сам компенсацию
-        /// не делает).
+        /// не делает). Подача (F) включается на первом резе (G1/G2/G3). Скорость и направление
+        /// шпинделя (<paramref name="spindleOn"/>, см. <see cref="Util.SpindleOn"/> — уже готовая
+        /// строка вида "S200 M3", формирует вызывающий код) приклеиваются к первому рапиду (G0).
         /// </summary>
-        public GCodeBuilder Contour(List<Element> contour, bool speedOnFirstMove, int speed, double feed, double toolRadius = 0)
+        public GCodeBuilder Contour(List<Element> contour, bool feedOnFirstMove, double feed, double toolRadius = 0, string spindleOn = null)
         {
             if (contour is null || contour.Count == 0) return this;
             double? prevX = null;
             double? prevZ = null;
+            var feedEmitted = false;
+            var spindleSuffix = string.IsNullOrEmpty(spindleOn) ? string.Empty : $" {spindleOn}";
             for (var i = 0; i < contour.Count; i++)
             {
                 var element = contour[i];
@@ -134,37 +140,39 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     var startBlunt = element switch
                     {
                         Point p => p.Blunt,
-                        Sunduk.PWA.Infrastructure.Sequences.ContourElements.Line l => l.Blunt,
+                        Sunduk.Geometry.ContourElements.Line l => l.Blunt,
                         _ => 0,
                     };
-                    var startBluntType = element is Sunduk.PWA.Infrastructure.Sequences.ContourElements.Line startLine ? startLine.BluntType : Blunt.Radius;
+                    var startBluntType = element is Sunduk.Geometry.ContourElements.Line startLine ? startLine.BluntType : Blunt.Radius;
                     var startSuffix = BluntSuffix(startBlunt, startBluntType, toolRadius, 0, contour);
                     if (startSuffix.Length > 0)
                     {
                         var compensated = CompensatedBluntSize(startBlunt, startBluntType, toolRadius);
                         var approachX = x.Value + 2 * compensated;
-                        var firstSpeedFeed = speedOnFirstMove ? $" S{speed} F{feed.NC()}" : string.Empty;
-                        Line($"G0 X{approachX.NC(0)} Z{z.Value.NC()}");
-                        Line($"G1 X{x.Value.NC(0)} Z{z.Value.NC()}{startSuffix}{firstSpeedFeed}");
+                        var firstFeed = feedOnFirstMove ? $" F{feed.NC()}" : string.Empty;
+                        if (feedOnFirstMove) feedEmitted = true;
+                        Line($"G0 X{approachX.NC(0)} Z{z.Value.NC()}{spindleSuffix}");
+                        Line($"G1 X{x.Value.NC(0)} Z{z.Value.NC()}{startSuffix}{firstFeed}");
                     }
                     else
                     {
-                        Line($"G0 X{x.Value.NC(0)} Z{z.Value.NC()}");
+                        Line($"G0 X{x.Value.NC(0)} Z{z.Value.NC()}{spindleSuffix}");
                     }
                     prevX = x; prevZ = z;
                     continue;
                 }
 
-                var speedFeedSuffix = speedOnFirstMove && i == 1 ? $" S{speed} F{feed.NC()}" : string.Empty;
+                var speedFeedSuffix = feedOnFirstMove && !feedEmitted ? $" F{feed.NC()}" : string.Empty;
+                if (speedFeedSuffix.Length > 0) feedEmitted = true;
                 switch (element)
                 {
                     case Arc arc when IsValidArc(arc, prevX, prevZ):
-                        Line($"{(arc.Direction == Direction.CW ? "G2" : "G3")} X{x.Value.NC(0)} Z{z.Value.NC()} R{arc.Radius.NC()}{speedFeedSuffix}");
+                        Line($"{(arc.Direction == Sunduk.Geometry.Direction.CW ? "G2" : "G3")} X{x.Value.NC(0)} Z{z.Value.NC()} R{arc.Radius.NC()}{speedFeedSuffix}");
                         break;
                     case Point point:
                         Line($"G1 X{x.Value.NC(0)} Z{z.Value.NC()}{BluntSuffix(point.Blunt, Blunt.Radius, toolRadius, i, contour)}{speedFeedSuffix}");
                         break;
-                    case Sunduk.PWA.Infrastructure.Sequences.ContourElements.Line line:
+                    case Sunduk.Geometry.ContourElements.Line line:
                         Line($"G1 X{x.Value.NC(0)} Z{z.Value.NC()}{BluntSuffix(line.Blunt, line.BluntType, toolRadius, i, contour)}{speedFeedSuffix}");
                         break;
                     default:

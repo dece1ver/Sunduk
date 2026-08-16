@@ -1,7 +1,15 @@
 using System;
 
-namespace Sunduk.PWA.Infrastructure.Geometry
+namespace Sunduk.Geometry
 {
+    /// <summary>Вид прямого соседа дуги в стыке: торец (Z=const, направление вдоль X) или цилиндр
+    /// (X=const, направление вдоль Z).</summary>
+    public enum ArcAnchorKind
+    {
+        Face,
+        Cylinder,
+    }
+
     /// <summary>
     /// Пересечение дуги (заданной центром и радиусом, в истинных радиусных координатах — не
     /// диаметр) с торцом (Z=const) или цилиндром (X=const), с опциональным скруглением на стыке
@@ -15,6 +23,12 @@ namespace Sunduk.PWA.Infrastructure.Geometry
     public static class ArcAnchor
     {
         private const double Tolerance = 1e-6;
+
+        /// <summary>Острые (без скругления) стыки дуга-прямая под углом от 1° до 89° от оси Z —
+        /// вне этого диапазона (почти касательный вход/выход) работает отдельная простая формула,
+        /// а <see cref="Sharp"/> намеренно возвращает null.</summary>
+        public const double SharpAngleGuardLow = 1;
+        public const double SharpAngleGuardHigh = 89;
 
         /// <summary>
         /// Торец на <paramref name="faceZ"/> встречает дугу (центр/радиус в радиусных
@@ -71,6 +85,55 @@ namespace Sunduk.PWA.Infrastructure.Geometry
                 endXDepth = bluntR - Math.Sqrt(Math.Max(0, Math.Pow(bluntR, 2) - Math.Pow(catet2, 2)));
             }
             return (arcCenterZ + startZRel, cylX - endXDepth, arcCenterZ + endZRel);
+        }
+
+        /// <summary>
+        /// Острый (без скругления) стык прямой (торец/цилиндр) с дугой — вершина мнимой вершины
+        /// инструмента напрямую переходит в (увеличенную на радиус пластины) дугу, отдельная
+        /// маленькая дуга не вставляется. Возвращает скомпенсированную точку на прямой (истинный
+        /// радиус, не диаметр). Угол касательной дуги в точке стыка от оси Z + <see cref="GeometryMath.ChamferShifts"/>
+        /// — конструкция, проверенная для торца (сверено с NippleComponent); для цилиндра — тот же
+        /// расчёт, применённый к тому же тангенсу (никакого разворота осей местами не требуется,
+        /// «зеркальность» получается сама за счёт вектора касательной). Сторона материала
+        /// (<paramref name="external"/>) влияет только на знак сдвига по X (для торца): наружное —
+        /// к оси, внутреннее — от оси; сдвиг по Z (для цилиндра) от стороны материала не зависит
+        /// (направление реза к -Z одинаково). Null вне диапазона 1°..89° (почти касательный вход) —
+        /// там отдельная простая формула, либо если прямая не достаёт дугу.
+        /// </summary>
+        public static (double X, double Z)? Sharp(ArcAnchorKind kind, double anchor, double arcCenterX, double arcCenterZ, double arcRadius, double toolRadius, bool external)
+        {
+            if (arcRadius <= 0) return null;
+            double px, pz; // точка на прямой (торец/цилиндр) в истинных радиусных координатах
+            if (kind == ArcAnchorKind.Face)
+            {
+                var catet = anchor - arcCenterZ;
+                var relSq = arcRadius * arcRadius - catet * catet;
+                if (relSq < 0) return null;
+                px = arcCenterX + Math.Sqrt(relSq);
+                pz = anchor;
+            }
+            else
+            {
+                var catet = anchor - arcCenterX;
+                var relSq = arcRadius * arcRadius - catet * catet;
+                if (relSq < 0) return null;
+                px = anchor;
+                pz = arcCenterZ + Math.Sqrt(relSq);
+            }
+
+            var radialX = px - arcCenterX;
+            var radialZ = pz - arcCenterZ;
+            var tangentX = -radialZ;
+            var tangentZ = radialX;
+            if (Math.Abs(tangentX) < Tolerance && Math.Abs(tangentZ) < Tolerance) return null;
+            var angle = Math.Atan2(Math.Abs(tangentX), Math.Abs(tangentZ)).Degrees();
+            if (angle <= SharpAngleGuardLow || angle >= SharpAngleGuardHigh) return null;
+
+            var shift = GeometryMath.ChamferShifts(angle, toolRadius);
+            var signX = external ? -1 : 1;
+            return kind == ArcAnchorKind.Face
+                ? (px + signX * shift.Z, pz)
+                : (px, pz - shift.Z);
         }
     }
 }

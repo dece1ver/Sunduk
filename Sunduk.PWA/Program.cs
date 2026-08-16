@@ -79,6 +79,7 @@ namespace Sunduk.PWA
             builder.Services.AddSingleton<ArcGeneralState>();
             builder.Services.AddSingleton<ChamferState>();
             builder.Services.AddSingleton<ThreadTurningState>();
+            builder.Services.AddSingleton<ToleranceState>();
             builder.Services.AddSingleton<CalculatorPageState>();
             // Scoped, не Singleton: ILocalStorageService у Blazored.LocalStorage зарегистрирован
             // как Scoped, а singleton не может зависеть от scoped-сервиса. В WASM-приложении

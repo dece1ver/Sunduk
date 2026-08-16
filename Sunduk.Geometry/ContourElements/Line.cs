@@ -1,10 +1,10 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base;
+using Sunduk.Geometry.ContourElements.Base;
 
-namespace Sunduk.PWA.Infrastructure.Sequences.ContourElements
+namespace Sunduk.Geometry.ContourElements
 {
     public sealed class Line : Element
     {
-        public Line(double? x, double? z, double angle = 0, double blunt = 0, Blunt bluntType = Infrastructure.Blunt.Radius)
+        public Line(double? x, double? z, double angle = 0, double blunt = 0, Blunt bluntType = Sunduk.Geometry.Blunt.Radius)
         {
             X = x;
             Z = z;

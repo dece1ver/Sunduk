@@ -1,4 +1,4 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Sequences.Turning;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 using System;
@@ -56,7 +56,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 stepOver == 0) return string.Empty;
 
             var simpleChamferSize = cornerBlunt + tool.Radius / 2;
-            var fullChamferSize = Calc.ChamferShifts(bluntCustomAngle, tool.Radius).Z + cornerBlunt;
+            var fullChamferSize = GeometryMath.ChamferShifts(bluntCustomAngle, tool.Radius).Z + cornerBlunt;
             var fullChamferRadius = bluntType == Blunt.CustomChamfer ? tool.Radius + bluntCustomRadius : tool.Radius + cornerBlunt;
             var endZ = cycleProfStockAllow ? 0 : profStockAllow;
             var blunt = $"G0 Z{endZ.NC()}";
@@ -65,7 +65,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 return new GCodeBuilder()
                     .ReferentPoint(machine, leading: true)
                     .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
-                    .Line($"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{speedRough} {Direction(tool)}")
+                    .Line($"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} {tool.SpindleOn(speedRough)}")
                     .Line($"G72 W{stepOver.NC()} R0.1")
                     .Line($"G72 P{seqNo.Item1} Q{seqNo.Item2}{((profStockAllow > 0 && cycleProfStockAllow) ? " W" + profStockAllow.NC() : string.Empty)} F{feedRough.NC()}")
                     .Line($"N{seqNo.Item1} {blunt}")
@@ -90,7 +90,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     blunt = bluntCustomRadius switch
                     {
                         > 0 when bluntCustomAngle > 0 && bluntCustomAngle < 90 =>
-                            $"G0 Z{(profStockAllow - fullChamferSize - Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()}\n" +
+                            $"G0 Z{(profStockAllow - fullChamferSize - GeometryMath.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" +
                             $"Z{(profStockAllow - fullChamferSize).NC()} R{fullChamferRadius.NC()}\n" +
                             $"Z{endZ.NC()} A-{bluntCustomAngle.NC()} R{fullChamferRadius.NC()}",
@@ -105,7 +105,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
                 .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
-                .Line($"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} {Direction(tool)}")
+                .Line($"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} {tool.SpindleOn(CuttingSpeedRough(material))}")
                 .Line($"G72 W{stepOver.NC()} R0.1")
                 .Line($"G72 P{seqNo.Item1} Q{seqNo.Item2}{((profStockAllow > 0 && cycleProfStockAllow) ? " W" + profStockAllow.NC() : string.Empty)} F{FeedRough(tool.Radius).NC()}")
                 .Line($"N{seqNo.Item1} {blunt}")
@@ -178,7 +178,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
                 .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
-                .Line($"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{speed} {Direction(tool)}")
+                .Line($"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} {tool.SpindleOn(speed)}")
                 .Line(g70Line)
                 .CoolantOff(machine, coolant)
                 .ReferentPoint(machine, leading: false)
@@ -194,35 +194,35 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 externalDiameter == 0 ||
                 externalDiameter < internalDiameter) return string.Empty;
             var simpleChamferSize = cornerBlunt + tool.Radius / 2;
-            var fullChamferSize = Calc.ChamferShifts(bluntCustomAngle, tool.Radius).Z + cornerBlunt;
+            var fullChamferSize = GeometryMath.ChamferShifts(bluntCustomAngle, tool.Radius).Z + cornerBlunt;
             var fullChamferRadius = bluntType == Blunt.CustomChamfer ? tool.Radius + bluntCustomRadius : tool.Radius + cornerBlunt;
-            var blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{speedFinish} {Direction(tool)}\n" +
+            var blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} {tool.SpindleOn(speedFinish)}\n" +
                 $"G1 ";
             if (cornerBlunt > 0)
             {
                 switch (bluntType)
                 {
                     case Blunt.SimpleChamfer:
-                        blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - simpleChamferSize).NC()} S{speedFinish} {Direction(tool)}\n" +
+                        blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - simpleChamferSize).NC()} {tool.SpindleOn(speedFinish)}\n" +
                             $"G1 X{externalDiameter.NC()} F{feedFinish.NC()}\n" +
                             $"Z{profStockAllow.NC()} C{simpleChamferSize.NC()}\n";
                         break;
                     case Blunt.Radius:
-                        blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - fullChamferRadius).NC()} S{speedFinish} {Direction(tool)}\n" +
+                        blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - fullChamferRadius).NC()} {tool.SpindleOn(speedFinish)}\n" +
                             $"G1 X{externalDiameter.NC()} F{feedFinish.NC()}\n" +
                             $"Z{profStockAllow.NC()} R{fullChamferRadius.NC()}\n";
                         break;
                     case Blunt.CustomChamfer:
                         if (bluntCustomRadius > 0 && bluntCustomAngle is > 0 and < 90)
                         {
-                            blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - fullChamferSize - Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()} S{speedFinish} {Direction(tool)}\n" +
+                            blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - fullChamferSize - GeometryMath.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()} {tool.SpindleOn(speedFinish)}\n" +
                             $"G1 X{externalDiameter.NC()} F{feedFinish.NC()}\n" +
                             $"Z{(profStockAllow - fullChamferSize).NC()} R{fullChamferRadius.NC()}\n" +
                             $"Z{profStockAllow.NC()} A-{bluntCustomAngle.NC()} R{fullChamferRadius.NC()}\n";
                         }
                         else if (bluntCustomRadius <= 0 && bluntCustomAngle is > 0 and < 90)
                         {
-                            blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - fullChamferSize).NC()} S{speedFinish} {Direction(tool)}\n" +
+                            blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - fullChamferSize).NC()} {tool.SpindleOn(speedFinish)}\n" +
                             $"G1 X{externalDiameter.NC()} F{feedFinish.NC()}\n" +
                             $"Z{profStockAllow.NC()} A-{bluntCustomAngle.NC()}\n";
                         }

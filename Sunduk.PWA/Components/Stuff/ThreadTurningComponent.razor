@@ -1,4 +1,4 @@
-﻿@inject IDialogService DialogService
+@inject IDialogService DialogService
 @inject ThreadTurningState State
 <style>
     .tl {
@@ -560,7 +560,7 @@
                             if (Blunted)
                             {
                                 double threadExtChamferStartX = ThreadDiameter - 2 * ThreadChamfer - InsertRadius;
-                                return $"G0 X{(threadExtChamferStartX - 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
+                                return $"G0 X{(threadExtChamferStartX - 2 * GeometryMath.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
                                        $"G1 Z0. F0.1\n" +
                                        $"X{threadExtChamferStartX.NC()} R{(InsertRadius + BluntSize).NC()}\n" +
                                        $"X{ThreadDiameter.NC()} A-45. R{(InsertRadius + BluntSize).NC()}\n" +
@@ -577,7 +577,7 @@
                             var threadIntChamferStartX = ThreadDiameter - ThreadPitch + 2 * ThreadChamfer + InsertRadius;
                             if (Blunted)
                             {
-                                return $"G0 X{(threadIntChamferStartX + 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
+                                return $"G0 X{(threadIntChamferStartX + 2 * GeometryMath.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
                                        $"G1 Z0. F0.1\n" +
                                        $"X{threadIntChamferStartX.NC()} R{(InsertRadius + BluntSize).NC()}\n" +
                                        $"X{(ThreadDiameter - ThreadPitch).NC()} A45. R{(InsertRadius + BluntSize).NC()}\n" +
@@ -601,7 +601,7 @@
                             if (Blunted)
                             {
                                 var chamferStartX = ThreadDiameter - 2 * ThreadChamfer - InsertRadius;
-                                return $"G0 X{(chamferStartX - 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
+                                return $"G0 X{(chamferStartX - 2 * GeometryMath.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
                                        $"G1 Z0. F0.1\n" +
                                        $"X{chamferStartX.NC()} R{(InsertRadius + BluntSize).NC()}\n" +
                                        $"X{ThreadDiameter.NC()} A-45. R{(InsertRadius + BluntSize).NC()}\n" +
@@ -618,7 +618,7 @@
                             var intChamferStartX = Thread.BsppHoleDiameter(CurrentThreadTemplate) + 2 * ThreadChamfer + InsertRadius;
                             if (Blunted)
                             {
-                                return $"G0 X{(intChamferStartX + 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
+                                return $"G0 X{(intChamferStartX + 2 * GeometryMath.ChamferRadiusLengths(45, InsertRadius + BluntSize).X).NC()} Z1. S180 M3\n" +
                                        $"G1 Z0. F0.1\n" +
                                        $"X{intChamferStartX.NC()} R{(InsertRadius + BluntSize).NC()}\n" +
                                        $"X{Thread.BsppHoleDiameter(CurrentThreadTemplate).NC()} A45. R{(InsertRadius + BluntSize).NC()}\n" +
@@ -709,8 +709,8 @@
 
     public double CalculatedNptChamferStartXWithShift => ThreadType switch
     {
-        CuttingType.External => CalculatedNptChamferStartX - 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X,
-        CuttingType.Internal => CalculatedNptChamferStartX + 2 * Calc.ChamferRadiusLengths(45, InsertRadius + BluntSize).X,
+        CuttingType.External => CalculatedNptChamferStartX - 2 * GeometryMath.ChamferRadiusLengths(45, InsertRadius + BluntSize).X,
+        CuttingType.Internal => CalculatedNptChamferStartX + 2 * GeometryMath.ChamferRadiusLengths(45, InsertRadius + BluntSize).X,
         _ => 0,
     };
 
@@ -908,7 +908,7 @@
                         double? tempArcZ = arc.Z ?? Contour[Contour.IndexOf(arc) - 1].Z;
                         if (ValidArc(Contour.IndexOf(arc)))
                         {
-                            path += $"A{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture)},{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture)},0,0{(arc.Direction is Infrastructure.Direction.CCW ? 0 : 1)},{(tempArcZ * 4)?.ToString().Replace(",", ".")},{(-tempArcX / 2 * 4)?.ToString().Replace(",", ".")} ";
+                            path += $"A{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture)},{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture)},0,0{(arc.Direction is Sunduk.Geometry.Direction.CCW ? 0 : 1)},{(tempArcZ * 4)?.ToString().Replace(",", ".")},{(-tempArcX / 2 * 4)?.ToString().Replace(",", ".")} ";
                         }
                         else
                         {

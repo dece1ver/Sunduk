@@ -70,12 +70,12 @@
                                         </MudBadge>
                                     </MudItem>
                                     <MudItem>
-                                        @if (arc.Direction is Infrastructure.Direction.CW)
+                                        @if (arc.Direction is Sunduk.Geometry.Direction.CW)
                                         {
                                             <MudIconButton Style="@($"margin-top: 3px; height: {ButtonSize}px; width: {ButtonSize}px; margin-left: -4px")" Variant="ButtonsVariant" DisableElevation="true"
                                             Icon="@Icons.Material.Filled.RotateRight" OnClick="(() => ToggleArcDirection(arc))"/>
                                         }
-                                        @if (arc.Direction is Infrastructure.Direction.CCW)
+                                        @if (arc.Direction is Sunduk.Geometry.Direction.CCW)
                                         {
                                             <MudIconButton Style="@($"margin-top: 3px; height: {ButtonSize}px; width: {ButtonSize}px; margin-left: -4px")" Variant="ButtonsVariant" DisableElevation="true"
                                             Icon="@Icons.Material.Filled.RotateLeft" OnClick="(() => ToggleArcDirection(arc))"/>
@@ -267,7 +267,7 @@
                         var (aX, aZ) = Resolve(arc.X, arc.Z, prev);
                         if (ValidArc(i))
                         {
-                            int sweep = arc.Direction is Infrastructure.Direction.CCW ? 0 : 1;
+                            int sweep = arc.Direction is Sunduk.Geometry.Direction.CCW ? 0 : 1;
                             sb.Append($"A{(arc.Radius * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},{(arc.Radius * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},0,0,{sweep},{SX(aZ).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(aX).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
                         }
                         else
@@ -297,7 +297,7 @@
         if (type is not ElementType.Arc) return;
         if (Contour[index] is Line line)
         {
-            Contour[index] = new Arc(line.X, line.Z, line.Blunt > 0 ? line.Blunt : 1, Infrastructure.Direction.CCW);
+            Contour[index] = new Arc(line.X, line.Z, line.Blunt > 0 ? line.Blunt : 1, Sunduk.Geometry.Direction.CCW);
             Notify();
         }
     }
@@ -314,7 +314,7 @@
 
     private void ToggleArcDirection(Arc arc)
     {
-        arc.Direction = arc.Direction is Infrastructure.Direction.CW ? Infrastructure.Direction.CCW : Infrastructure.Direction.CW;
+        arc.Direction = arc.Direction is Sunduk.Geometry.Direction.CW ? Sunduk.Geometry.Direction.CCW : Sunduk.Geometry.Direction.CW;
         Notify();
     }
 
@@ -336,7 +336,7 @@
         return element switch
         {
             Line => Icons.Material.Filled.ArrowDropDown,
-            Arc arc => arc.Direction is Infrastructure.Direction.CW ? Icons.Material.Filled.RotateRight : Icons.Material.Filled.RotateLeft,
+            Arc arc => arc.Direction is Sunduk.Geometry.Direction.CW ? Icons.Material.Filled.RotateRight : Icons.Material.Filled.RotateLeft,
             _ => Icons.Material.Filled.ArrowDropDown
             };
     }
@@ -506,7 +506,7 @@
                         double h = Math.Sqrt(arc.Radius * arc.Radius - chord * chord);
                         double nx = -dz / (2 * chord);
                         double nz = (dx / 2) / chord;
-                        double sign = arc.Direction is Infrastructure.Direction.CCW ? 1 : -1;
+                        double sign = arc.Direction is Sunduk.Geometry.Direction.CCW ? 1 : -1;
                         arc.CenterX = mx + sign * h * nx;
                         arc.CenterZ = mz + sign * h * nz;
                     }

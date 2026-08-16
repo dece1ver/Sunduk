@@ -1,4 +1,4 @@
-﻿@using System.Threading.Tasks
+@using System.Threading.Tasks
 @inject ChamferState State
 <style>
     .monofield {
@@ -266,11 +266,11 @@
             else if (ValidResult() && RoundCorners && showClassicChamfer)
             {
                 return
-                $"G0 X{(ChamferType == Chamfer.External ? ChamferStartDiamWithShift - 2 * (Calc.ChamferRadiusLengths(Angle, CornerFullRadius).X) : ChamferStartDiamWithShift + 2 * (Calc.ChamferRadiusLengths(Angle, CornerFullRadius).X)).NC()} Z1. S180 M3\n" +
+                $"G0 X{(ChamferType == Chamfer.External ? ChamferStartDiamWithShift - 2 * (GeometryMath.ChamferRadiusLengths(Angle, CornerFullRadius).X) : ChamferStartDiamWithShift + 2 * (GeometryMath.ChamferRadiusLengths(Angle, CornerFullRadius).X)).NC()} Z1. S180 M3\n" +
                 $"G1 Z0. F0.1\n" +
                 $"X{ChamferStartDiamWithShift.NC()} R{(CornerFullRadius).NC()}\n" +
                 $"X{ChamferEndDiameter.NC()} A{(ChamferType == Chamfer.External ? '-' : string.Empty)}{Angle.NC()} R{(CornerFullRadius).NC()}\n" +
-                $"W-{(Calc.ChamferRadiusLengths(Angle, CornerFullRadius).Z).NC()}";
+                $"W-{(GeometryMath.ChamferRadiusLengths(Angle, CornerFullRadius).Z).NC()}";
             }
             // обратная со скруглениями
             else if (ValidResult() && RoundCorners && !showClassicChamfer)
@@ -279,19 +279,19 @@
                 {
                     case Chamfer.External:
                         return
-                        $"G0 X{(ChamferEndDiameter + 1).NC(1)} Z-{(ChamferSizeWithShift + (Calc.ChamferRadiusLengths(Angle, CornerFullRadius).Z)).NC()} S180 M3\n" +
+                        $"G0 X{(ChamferEndDiameter + 1).NC(1)} Z-{(ChamferSizeWithShift + (GeometryMath.ChamferRadiusLengths(Angle, CornerFullRadius).Z)).NC()} S180 M3\n" +
                         $"G1 X{ChamferEndDiameter.NC()}\n" +
                         $"Z-{ChamferSizeWithShift.NC()} R{(CornerFullRadius).NC()}\n" +
                         $"Z0. A-{Angle.NC()} R{(CornerFullRadius).NC()}\n" +
-                        $"U-{(2 * (Calc.ChamferRadiusLengths(Angle, CornerFullRadius).X)).NC()}";
+                        $"U-{(2 * (GeometryMath.ChamferRadiusLengths(Angle, CornerFullRadius).X)).NC()}";
                     case Chamfer.Internal:
                         return
                         $"G0 X{(ChamferEndDiameter - 1).NC(1)} Z1. S180 M3\n" +
-                        $"Z-{(ChamferSizeWithShift + (Calc.ChamferRadiusLengths(Angle, CornerFullRadius).Z)).NC()}\n" +
+                        $"Z-{(ChamferSizeWithShift + (GeometryMath.ChamferRadiusLengths(Angle, CornerFullRadius).Z)).NC()}\n" +
                         $"G1 X{ChamferEndDiameter.NC()}\n" +
                         $"Z-{ChamferSizeWithShift.NC()} R{(CornerFullRadius).NC()}\n" +
                         $"Z0. A{Angle.NC()} R{(CornerFullRadius).NC()}\n" +
-                        $"U{(2 * (Calc.ChamferRadiusLengths(Angle, CornerFullRadius).X)).NC()}";
+                        $"U{(2 * (GeometryMath.ChamferRadiusLengths(Angle, CornerFullRadius).X)).NC()}";
                     default:
                         return string.Empty;
                 }
@@ -396,11 +396,11 @@
             double result;
             if (ChamferType == Chamfer.External)
             {
-                result = (ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Calc.Radians(Angle)))) - ChamferInsertRadius * Math.Tan(Calc.Radians(Angle));
+                result = (ChamferEndDiameter - (2 * ChamferSize * Math.Tan(GeometryMath.Radians(Angle)))) - ChamferInsertRadius * Math.Tan(GeometryMath.Radians(Angle));
             }
             else
             {
-                result = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Calc.Radians(Angle)))) + ChamferInsertRadius * Math.Tan(Calc.Radians(Angle)));
+                result = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(GeometryMath.Radians(Angle)))) + ChamferInsertRadius * Math.Tan(GeometryMath.Radians(Angle)));
 
             }
             return result;
@@ -418,7 +418,7 @@
         {
             if (CalculationType == Calculation.Precise)
             {
-                return Calc.ChamferShifts(Angle, ChamferInsertRadius).X;
+                return GeometryMath.ChamferShifts(Angle, ChamferInsertRadius).X;
             }
             return ChamferInsertRadius * Math.Tan(Angle.Radians()) / 2;
         }
@@ -431,7 +431,7 @@
         {
             if (CalculationType == Calculation.Precise)
             {
-                return Calc.ChamferShifts(Angle, ChamferInsertRadius).Z;
+                return GeometryMath.ChamferShifts(Angle, ChamferInsertRadius).Z;
             }
             return ChamferInsertRadius * Math.Tan((90 - Angle).Radians()) / 2;
         }
@@ -503,11 +503,11 @@
     {
         if (calcStartDiam && ChamferType == Chamfer.External && ValidResult())
         {
-            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Calc.Radians(Angle))))).ToPrettyString();
+            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(GeometryMath.Radians(Angle))))).ToPrettyString();
         }
         else if (calcStartDiam && ChamferType == Chamfer.Internal && ValidResult())
         {
-            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Calc.Radians(Angle))))).ToPrettyString();
+            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(GeometryMath.Radians(Angle))))).ToPrettyString();
         }
         else if (!calcStartDiam && ValidResult())
         {
@@ -528,11 +528,11 @@
 
         if (calcStartDiam && ChamferType == Chamfer.External && ValidResult())
         {
-            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(Calc.Radians(Angle))))).ToPrettyString();
+            _ChamferStartDiameter = ((ChamferEndDiameter - (2 * ChamferSize * Math.Tan(GeometryMath.Radians(Angle))))).ToPrettyString();
         }
         else if (calcStartDiam && ChamferType == Chamfer.Internal && ValidResult())
         {
-            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(Calc.Radians(Angle))))).ToPrettyString();
+            _ChamferStartDiameter = ((ChamferEndDiameter + (2 * ChamferSize * Math.Tan(GeometryMath.Radians(Angle))))).ToPrettyString();
         }
         else if (calcStartDiam && !ValidResult())
         {

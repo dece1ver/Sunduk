@@ -1,4 +1,4 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences.Turning;
+using Sunduk.PWA.Infrastructure.Sequences.Turning;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 using Sunduk.PWA.Infrastructure.Tools.Turning.Base;
@@ -20,7 +20,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             if (machine.MachineType != MachineType.Turning) return string.Empty;
             var zPoint = tool.ZeroPoint == TurningGroovingTool.Point.Right ? cuttingPoint : cuttingPoint - tool.Width;
             var simpleChamferSize = cornerBlunt + tool.CornerRadius / 2;
-            var (fullChamferSizeX, fullChamferSizeZ) = Calc.ChamferShifts(bluntCustomAngle, tool.CornerRadius);
+            var (fullChamferSizeX, fullChamferSizeZ) = GeometryMath.ChamferShifts(bluntCustomAngle, tool.CornerRadius);
             fullChamferSizeX += cornerBlunt;
             fullChamferSizeZ += cornerBlunt;
             var fullChamferRadius = bluntType == Blunt.CustomChamfer ? tool.CornerRadius + bluntCustomRadius : tool.CornerRadius + cornerBlunt;
@@ -40,15 +40,15 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     Blunt.CustomChamfer => bluntCustomRadius switch
                     {
                         > 0 when bluntCustomAngle is > 0 and < 90 =>
-                            $"G1 X{(externalDiameter - 2 * (fullChamferSizeX * Math.Tan(bluntCustomAngle.Radians()) + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X)).NC()} F{feedRough.NC()}\n" +
+                            $"G1 X{(externalDiameter - 2 * (fullChamferSizeX * Math.Tan(bluntCustomAngle.Radians()) + GeometryMath.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X)).NC()} F{feedRough.NC()}\n" +
                             $"G0 X{(externalDiameter + 1).NC()}\n" +
-                            $"Z{(zPoint + fullChamferSizeZ + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()}\n" +
+                            $"Z{(zPoint + fullChamferSizeZ + GeometryMath.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" +
                             $"Z{(zPoint + fullChamferSizeZ).NC()} R{(fullChamferRadius).NC()}\n" +
                             $"Z{zPoint.NC()} A{bluntCustomAngle.NC()} R{(fullChamferRadius).NC()}\n" +
-                            $"{(stepOver > 0 ? $"U-{(2 * Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X).NC()}\n" : string.Empty)}",
+                            $"{(stepOver > 0 ? $"U-{(2 * GeometryMath.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X).NC()}\n" : string.Empty)}",
                         <= 0 when bluntCustomAngle is > 0 and < 90 =>
-                            $"G1 X{(externalDiameter - 2 * (fullChamferSizeX * Math.Tan(bluntCustomAngle.Radians())) + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X).NC()} F{feedRough.NC()}\n" +
+                            $"G1 X{(externalDiameter - 2 * (fullChamferSizeX * Math.Tan(bluntCustomAngle.Radians())) + GeometryMath.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X).NC()} F{feedRough.NC()}\n" +
                             $"G0 X{(externalDiameter + 1).NC()}\n" + $"Z{(zPoint + fullChamferSizeZ).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" + $"Z{zPoint.NC()} A{bluntCustomAngle.NC()}\n",
                         _ => string.Empty
@@ -63,13 +63,13 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 $"G75 X{internalDiameter.NC()} P{stepOver.Microns()} F{feedRough.NC()}\n";
             if (!string.IsNullOrEmpty(blunt))
             {
-                cutting = $"G1 X{(externalDiameter - 2 * (fullChamferSizeX * Math.Tan(bluntCustomAngle.Radians())) + Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X).NC()}\n" +
+                cutting = $"G1 X{(externalDiameter - 2 * (fullChamferSizeX * Math.Tan(bluntCustomAngle.Radians())) + GeometryMath.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).X).NC()}\n" +
                     cutting;
             }
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
                 .ToolCall(tool, machine, coordinateSystem, coolant)
-                .Line($"G0 X{(externalDiameter + 2).NC(0)} Z{zPoint.NC()} S{speedRough} {Direction(tool)}")
+                .Line($"G0 X{(externalDiameter + 2).NC(0)} Z{zPoint.NC()} {tool.SpindleOn(speedRough)}")
                 .Raw(blunt)
                 .Raw(cutting)
                 .Line($"G0 X{(externalDiameter + 2).NC(0)}")
@@ -218,8 +218,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     .ReferentPoint(machine, leading: true)
                     .ToolCall(tool, machine, coordinateSystem, coolant)
                     .Raw(external
-                        ? $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z{centerPoint.NC()} S{speedRough} {Direction(tool)}\n"
-                        : $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z2. S{speedRough} {Direction(tool)}\n" +
+                        ? $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z{centerPoint.NC()} {tool.SpindleOn(speedRough)}\n"
+                        : $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z2. {tool.SpindleOn(speedRough)}\n" +
                           $"Z{centerPoint.NC()}\n")
                     .Raw(roughCutting)
                     .Raw(cutting)
@@ -266,8 +266,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 .ReferentPoint(machine, leading: true)
                 .ToolCall(tool, machine, coordinateSystem, coolant)
                 .Raw(external
-                    ? $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z{centerPoint.NC()} S{speedRough} {Direction(tool)}\n"
-                    : $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z2. S{speedRough} {Direction(tool)}\n" +
+                    ? $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z{centerPoint.NC()} {tool.SpindleOn(speedRough)}\n"
+                    : $"G0 X{(externalDiameter + clearance * 2).NC(0)} Z2. {tool.SpindleOn(speedRough)}\n" +
                       $"Z{centerPoint.NC()}\n")
                 .Raw(roughCutting)
                 .Raw(cutting)
@@ -324,14 +324,14 @@ namespace Sunduk.PWA.Infrastructure.Templates
 
             var outerBluntLetter = outerBluntType is Blunt.SimpleChamfer ? "C" : "R";
             var innerBluntLetter = innerBluntType is Blunt.SimpleChamfer ? "C" : "R";
-            var bluntUpper = $"X{upperPoint.NC()}{(speedFinish != speedRough ? $" S{speedFinish} {Direction(tool)}" : "")}\n";
+            var bluntUpper = $"X{upperPoint.NC()}{(speedFinish != speedRough ? $" S{speedFinish}" : "")}\n";
             var bluntLower = $"X{lowerPoint.NC()}\n";
             string roughBluntUpper;
             string roughBluntLower;
             if (outerCornerBlunt > 0)
             {
                 bluntUpper =
-                $"X{(upperPoint + outerBluntSize * 2).NC()}{(speedFinish != speedRough ? $" S{speedFinish} {Direction(tool)}" : "")}\n" +
+                $"X{(upperPoint + outerBluntSize * 2).NC()}{(speedFinish != speedRough ? $" S{speedFinish}" : "")}\n" +
                 $"G1 Z{startPoint.NC()}{(feedFinish != feedRough ? $" F{feedFinish.NC()}": "")}\n" +
                 $"X{upperPoint.NC()} {outerBluntLetter}{outerBluntSize.NC()}\n";
                 bluntLower =
@@ -417,7 +417,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 return new GCodeBuilder()
                     .ReferentPoint(machine, leading: true)
                     .ToolCall(tool, machine, coordinateSystem, coolant)
-                    .Line($"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedRough} {Direction(tool)}")
+                    .Line($"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} {tool.SpindleOn(speedRough)}")
                     .Raw(roughCutting)
                     .Raw(cutting)
                     .Line($"G0 Z{(startPoint + clearance * 2).NC(0)}")
@@ -462,7 +462,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
                 .ToolCall(tool, machine, coordinateSystem, coolant)
-                .Line($"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} S{speedRough} {Direction(tool)}")
+                .Line($"G0 X{centerPoint.NC()} Z{(startPoint + clearance * 2).NC(0)} {tool.SpindleOn(speedRough)}")
                 .Raw(roughCutting)
                 .Raw(cutting)
                 .Line($"G0 Z{(startPoint + clearance * 2).NC(0)}")

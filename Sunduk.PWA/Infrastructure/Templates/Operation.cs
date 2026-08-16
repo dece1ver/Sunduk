@@ -1,6 +1,7 @@
-﻿using Sunduk.PWA.Infrastructure.CAM;
+using Sunduk.PWA.Infrastructure.CAM;
 using Sunduk.PWA.Infrastructure.Sequences;
-using Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base;
+using Sunduk.Geometry.ContourElements;
+using Sunduk.Geometry.ContourElements.Base;
 using Sunduk.PWA.Infrastructure.Sequences.Turning;
 using Sunduk.PWA.Infrastructure.Tools;
 using Sunduk.PWA.Infrastructure.Tools.Base;
@@ -347,7 +348,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
                 .ToolCall(tool, machine, coordinateSystem, coolant)
-                .Line($"G0 X{diameter.NC()} Z{startZ.NC()} S{BurnishingSpeed(tool)} {Direction(tool)}")
+                .Line($"G0 X{diameter.NC()} Z{startZ.NC()} {tool.SpindleOn(BurnishingSpeed(tool))}")
                 .Line($"G1 Z{endZ.NC()} F{BurnishingFeed(tool).NC()}")
                 .Raw(exit)
                 .ReferentPoint(machine, leading: false)
@@ -424,19 +425,95 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// черновой, и чистовой переход сейчас трассируют один и тот же контур одним проходом,
         /// отличаясь только скоростью/подачей — многопроходная черновая обработка с реальным
         /// съёмом припуска (что-то вроде G71) не реализована. Координаты контура перед рендером
-        /// пересчитываются на радиус пластины инструмента — см. <see cref="Geometry.ToolTipCompensation"/>.
+        /// пересчитываются на радиус пластины инструмента — см. <see cref="ToolTipCompensation"/>.
         /// </summary>
         public static string ContourTurning(Machine machine, CoordinateSystem coordinateSystem, TurningTool tool, List<Element> contour, int speed, double feed, Coolant coolant, TimeSpan? machineTime = null)
         {
             if (tool is null || contour is null || contour.Count < 2) return string.Empty;
             if (machine.MachineType != MachineType.Turning) return string.Empty;
-            var compensated = Geometry.ToolTipCompensation.Compensate(contour, tool.Radius, external: tool is TurningExternalTool);
-            var body = new GCodeBuilder().Contour(compensated, speedOnFirstMove: true, speed, feed, tool.Radius).ToString();
+            var compensated = ToolTipCompensation.Compensate(contour, tool.Radius, tool.NoseVector);
+            var body = new GCodeBuilder().Contour(compensated, feedOnFirstMove: true, feed, tool.Radius, tool.SpindleOn(speed)).ToString();
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
                 .Transition(tool, machine, coordinateSystem, coolant, body, machineTime, suppressCoolant: machine.LeadingReferentPoint)
                 .ReferentPoint(machine, leading: false)
                 .ToString();
+        }
+
+        /// <summary>
+        /// Черновое точение по контуру многопроходным циклом G71 (продольный съём) с опциональной
+        /// чистовой G70 — по образцу уже существующего G72 в <see cref="FacingOperation.Facing"/>.
+        /// Профиль P/Q блока — скомпенсированный на радиус пластины контур
+        /// (<see cref="ToolTipCompensation"/>): координаты мнимой вершины инструмента уже
+        /// учтены, вектор вершины берётся из <see cref="TurningTool.NoseVector"/>. Припуск под
+        /// чистовую (<paramref name="profStockAllow"/>) уходит в U (радиальный) цикла G71; съём за
+        /// проход — <paramref name="stepOver"/>. Диалект G71 требует сверки с конкретным станком
+        /// (тип I/II, единицы U/W), как и прочие циклы этой программы.
+        /// </summary>
+        public static string RoughTurning(Machine machine, CoordinateSystem coordinateSystem, TurningTool tool, List<Element> contour, double stepOver, double roughStockAllow, double profStockAllow, (int, int) seqNo, int speedRough, double feedRough, Coolant coolant)
+        {
+            if (tool is null || contour is null || contour.Count < 2 || stepOver <= 0) return string.Empty;
+            if (machine.MachineType != MachineType.Turning) return string.Empty;
+
+            var external = tool.NoseVector.IsExternal();
+            var compensated = ToolTipCompensation.Compensate(contour, tool.Radius, tool.NoseVector);
+
+            var firstX = compensated[0].X ?? contour[0].X!.Value;
+            var firstZ = compensated[0].Z ?? contour[0].Z!.Value;
+            var approachX = external
+                ? firstX + 2 * roughStockAllow + 2 * SafeApproachDistance
+                : firstX - 2 * roughStockAllow - 2 * SafeApproachDistance;
+
+            var profile = ProfileBlock(compensated);
+
+            var builder = new GCodeBuilder()
+                .ReferentPoint(machine, leading: true)
+                .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
+                .Line($"G0 X{approachX.NC(1)} Z{firstZ.NC()} {tool.SpindleOn(speedRough)}")
+                .Line($"G71 U{stepOver.NC()} R0.1")
+                .Line($"G71 P{seqNo.Item1} Q{seqNo.Item2} U{profStockAllow.NC()} W0. F{feedRough.NC()}");
+            for (var i = 0; i < profile.Count; i++)
+            {
+                var prefix = i == 0 ? $"N{seqNo.Item1} " : i == profile.Count - 1 ? $"N{seqNo.Item2} " : string.Empty;
+                builder.Line(prefix + profile[i]);
+            }
+            builder
+                .CoolantOff(machine, coolant)
+                .ReferentPoint(machine, leading: false);
+
+            return builder.ToString();
+        }
+
+        /// <summary>Профиль P/Q блока цикла G71 — контур как последовательность G1/G2/G3 (X диаметр,
+        /// дуги через R). Первая строка — подвод к началу профиля (G1, инструмент уже подведён к
+        /// стартовой точке циклом), последующие — перемещения по контуру.</summary>
+        private static List<string> ProfileBlock(List<Element> contour)
+        {
+            var lines = new List<string>();
+            double? prevX = null;
+            double? prevZ = null;
+            for (var i = 0; i < contour.Count; i++)
+            {
+                var e = contour[i];
+                var x = e.X ?? prevX;
+                var z = e.Z ?? prevZ;
+                if (x is null || z is null) { prevX = x; prevZ = z; continue; }
+                if (i > 0 && e is Arc arc)
+                {
+                    var dx = (arc.X - prevX) / 2 ?? 0;
+                    var dz = arc.Z - prevZ ?? 0;
+                    var chord = Math.Sqrt(dx * dx + dz * dz);
+                    if (arc.Radius * 2 >= chord)
+                    {
+                        lines.Add($"{(arc.Direction == Sunduk.Geometry.Direction.CW ? "G2" : "G3")} X{x.Value.NC(0)} Z{z.Value.NC(0)} R{arc.Radius.NC()}");
+                        prevX = x; prevZ = z;
+                        continue;
+                    }
+                }
+                lines.Add($"G1 X{x.Value.NC(0)} Z{z.Value.NC(0)}");
+                prevX = x; prevZ = z;
+            }
+            return lines;
         }
 
 

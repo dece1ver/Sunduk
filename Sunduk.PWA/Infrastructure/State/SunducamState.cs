@@ -31,6 +31,9 @@ namespace Sunduk.PWA.Infrastructure.State
         public string WorkpieceExternalDiameter { get; set; } = "50";
         public string WorkpieceInternalDiameter { get; set; } = string.Empty;
         public string WorkpieceLength { get; set; } = "50";
+        /// <summary>Припуск по торцу — сколько необработанного материала торчит за номинальным
+        /// (чистовым) торцом Z0 в сторону +Z до начала обработки (то, что снимает торцовка).</summary>
+        public string WorkpieceFacingAllowance { get; set; } = "2";
         public string SafePlane { get; set; } = "300";
     }
 }

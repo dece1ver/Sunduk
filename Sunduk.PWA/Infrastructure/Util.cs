@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -7,8 +7,8 @@ using System.Text.RegularExpressions;
 using MudBlazor;
 using Sunduk.PWA.Infrastructure.Sequences;
 using Sunduk.PWA.Infrastructure.Sequences.Base;
-using Sunduk.PWA.Infrastructure.Sequences.ContourElements;
-using Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base;
+using Sunduk.Geometry.ContourElements;
+using Sunduk.Geometry.ContourElements.Base;
 using Sunduk.PWA.Infrastructure.Sequences.Milling;
 using Sunduk.PWA.Infrastructure.Sequences.Turning;
 using Sunduk.PWA.Infrastructure.Sequences.Turning.Base;
@@ -250,12 +250,25 @@ namespace Sunduk.PWA.Infrastructure
             => tool.ToolCall(machine, machine.CoordinateSystems.FirstOrDefault());
 
         /// <summary>
+        /// "S{speed} M3/M4" — единая точка форматирования пуска шпинделя, приклеивается суффиксом
+        /// на первый рапид (G0) самого перехода (не отдельная строка шаблона станка) — быстрее и
+        /// привычнее по факту программирования на станке: шпиндель раскручивается ПОКА станок едет
+        /// рапидом к детали, а не стоит смирно до начала движения. Направление (M3/M4, см.
+        /// <see cref="Templates.Operation.Direction"/>) зависит только от <see cref="Tool.Hand"/>,
+        /// не от режимов конкретного перехода — этим и оправдана общая точка форматирования вместо
+        /// повторения `$"S{speed} {Direction(tool)}"` на ~40 местах.
+        /// </summary>
+        public static string SpindleOn(this Tool tool, int speed) => $"S{speed} {Templates.Operation.Direction(tool)}";
+
+        /// <summary>
         /// Строка вызова инструмента в УП (циклы с фиксированным, параметризованным телом —
         /// подрезка/сверление/канавки/резьба/обкатывание/фрезерный вызов) — шаблон станка
         /// (Machine.TransitionTemplate) с подстановкой {T}/{T2}/{T4} (номер инструмента без/с
         /// 2/4-значным дополнением нулями), {TOOL} (Tool.CallDetails), {CS} (система координат
         /// перехода — пусто, если у станка только одна СК) и {COOLANT} (код включения СОЖ
-        /// перехода — пусто при Coolant.None или <paramref name="suppressCoolant"/>).
+        /// перехода — пусто при Coolant.None или <paramref name="suppressCoolant"/>). Скорость и
+        /// направление шпинделя сюда не входят — см. <see cref="SpindleOn"/>, приклеивается прямо
+        /// к первому G0 самого перехода, не через этот шаблон.
         /// {PROCESSING}/{MACHINE_TIME}/{COOLANT_OFF} здесь ВСЕГДА подставляются пустыми — даже
         /// если присутствуют в общем Machine.TransitionTemplate станка (используемом также
         /// <see cref="Transition"/> ниже) — тело/время/выключение СОЖ таких циклов формирует сам
@@ -285,7 +298,7 @@ namespace Sunduk.PWA.Infrastructure
         /// подстановкой {PROCESSING} (<paramref name="processingBody"/>, пусто ⇒
         /// Operation.ProcessingSnippet), {MACHINE_TIME} (<paramref name="machineTime"/>, null ⇒
         /// плейсхолдер схлопывается, как и любой другой незаполненный), {COOLANT_OFF} (код
-        /// выключения СОЖ перехода).
+        /// выключения СОЖ перехода). Скорость/направление — см. <see cref="ToolCall"/> выше.
         /// </summary>
         public static string Transition(this Tool tool, Machine machine, CoordinateSystem coordinateSystem, Coolant coolant, string processingBody, TimeSpan? machineTime = null, bool suppressCoolant = false)
         {
@@ -544,7 +557,7 @@ namespace Sunduk.PWA.Infrastructure
                         double? tempArcZ = arc.Z ?? contour[contour.IndexOf(arc) - 1].Z;
                         if (ValidArc(contour.IndexOf(arc)))
                         {
-                            path += $"A{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},0,0{(arc.Direction is Infrastructure.Direction.CCW ? 0 : 1)},{(tempArcZ * 4)?.ToString().Replace(",", ".")},{(-tempArcX / 2 * 4)?.ToString().Replace(",", ".")} ";
+                            path += $"A{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},0,0{(arc.Direction is Sunduk.Geometry.Direction.CCW ? 0 : 1)},{(tempArcZ * 4)?.ToString().Replace(",", ".")},{(-tempArcX / 2 * 4)?.ToString().Replace(",", ".")} ";
                         }
                         else
                         {

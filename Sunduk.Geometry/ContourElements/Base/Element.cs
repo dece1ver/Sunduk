@@ -1,4 +1,4 @@
-﻿namespace Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base
+namespace Sunduk.Geometry.ContourElements.Base
 {
     public abstract class Element
     {

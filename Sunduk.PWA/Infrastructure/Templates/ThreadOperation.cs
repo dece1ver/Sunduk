@@ -19,9 +19,12 @@ namespace Sunduk.PWA.Infrastructure.Templates
         {
             if (tool is null ||
                 startZ <= endZ) return string.Empty;
+            var spindleSpeed = startZ > 0
+                ? cutSpeed.ToSpindleSpeed(tool.Diameter, 10)
+                : ((int)cutSpeed).ToSpindleSpeed(tool.Diameter, 10);
             string approach = startZ > 0
-                ? $"G0 X0. Z{startZ.NC()} S{cutSpeed.ToSpindleSpeed(tool.Diameter, 10)} {Direction(tool)} G97\n"
-                : $"G0 X0. Z{SafeApproachDistance.NC()} S{((int)cutSpeed).ToSpindleSpeed(tool.Diameter, 10)} {Direction(tool)} G97\nZ{startZ.NC()}\n";
+                ? $"G0 X0. Z{startZ.NC()} {tool.SpindleOn(spindleSpeed)} G97\n"
+                : $"G0 X0. Z{SafeApproachDistance.NC()} {tool.SpindleOn(spindleSpeed)} G97\nZ{startZ.NC()}\n";
             string exit = startZ > 0
                 ? string.Empty
                 : $"G0 Z{SafeApproachDistance.NC()}\n";
@@ -145,7 +148,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             return new GCodeBuilder()
                 .ReferentPoint(machine, leading: true)
                 .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
-                .Line($"G0 X{approachDiameter} Z{startZ.NC()} S{speed.ToSpindleSpeed(threadDiameter, 100)} {Direction(tool)} G97")
+                .Line($"G0 X{approachDiameter} Z{startZ.NC()} {tool.SpindleOn(speed.ToSpindleSpeed(threadDiameter, 100))} G97")
                 .Line($"G76 P0201{threadStandard.Profile()} Q{minStep} R{lastPass.NC()}")
                 .Line($"G76 X{endDiameter} Z{endZ.NC()} P{profile} Q{firstPass}{threadShift} F{threadPitch.NC()}")
                 .Line($"G96 {CoolantOff(machine, coolant)}")

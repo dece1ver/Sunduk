@@ -1,5 +1,5 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
-using Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base;
+using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.Geometry.ContourElements.Base;
 using System.Collections.Generic;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 using Sunduk.PWA.Infrastructure.Tools.Turning;

@@ -9,6 +9,8 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
         public Types Type { get; set; }
         public override string Name => Type == Types.Face ? "TORC" : "PROHOD";
 
+        public override ToolNoseVector NoseVector => ToolNoseVector.TurningExternal;
+
         public override MachineType MachineType => MachineType.Turning;
         public override string CallDetails => $"{Name} {Angle} R{Radius}";
 

@@ -44,5 +44,14 @@ namespace Sunduk.PWA.Infrastructure.Tools.Base
         /// (<see cref="Machine.TransitionTemplate"/>) и используется как есть в таблице инструментов.
         /// </summary>
         public abstract string CallDetails { get; }
+
+        /// <summary>Короткая подпись для выбора инструмента в UI (номер + название) — только
+        /// номер и название, независимо от шаблона перехода конкретного станка
+        /// (<see cref="Machine.TransitionTemplate"/> может содержать СК/СОЖ/направление и т.п.,
+        /// которые здесь не нужны). <see cref="CallDetails"/> собирается сырой интерполяцией
+        /// (без <c>.NC()</c>) — при culture с запятой как разделителем дробной части значения
+        /// вроде радиуса пластины вышли бы "0,8" вместо "0.8"; .Replace здесь — та же защёлка,
+        /// что <see cref="Util.RenderTemplate"/> применяет ко всему остальному G-code-тексту.</summary>
+        public string PickerLabel => $"T{Position} ({CallDetails})".Replace(',', '.');
     }
 }

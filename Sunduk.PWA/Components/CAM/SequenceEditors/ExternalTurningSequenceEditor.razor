@@ -5,10 +5,10 @@
     </MudSelect>
 </MudItem>
 <MudItem xs="12" md="4">
-    <MudSelect ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
+    <MudSelect Value="Tool" ValueChanged="OnToolChanged" Variant="Variant.Filled" Margin="Margin.Dense" Label="Инструмент" T="Tool">
         @foreach (var tool in Tools.Where(x => x is TurningExternalTool && (x as TurningExternalTool).Type == TurningExternalTool.Types.Bar))
         {
-            <MudSelectItem Value="@tool">@tool.ToolCall(Machine, SelectedCoordinateSystem)</MudSelectItem>
+            <MudSelectItem Value="@tool">@tool.PickerLabel</MudSelectItem>
         }
     </MudSelect>
 </MudItem>
@@ -80,6 +80,7 @@ else
     [Parameter] public CoordinateSystem CoordinateSystem { get; set; }
     [Parameter] public Material WorkpieceMaterial { get; set; }
     [Parameter] public List<Tool> Tools { get; set; }
+    [Parameter] public int CyclesCount { get; set; }
     [Parameter] public Sequence SequenceToEdit { get; set; }
     [Parameter] public EventCallback<Sequence> OnSubmit { get; set; }
 
@@ -154,7 +155,7 @@ else
             switch (TurningSequence)
             {
                 case TurningSequences.RoughTurning:
-                    if (SpeedRough <= 0 || FeedRough <= 0) return string.Empty;
+                    if (SpeedRough <= 0 || FeedRough <= 0 || Contour == null || Contour.Count < 2) return string.Empty;
                     CurrentSequence = TurningSequenceFactory.CreateRoughTurning(
                         machine: Machine,
                         coordinateSystem: SelectedCoordinateSystem,
@@ -166,10 +167,11 @@ else
                         profStockAllow: FacingProfStockAllow,
                         speedRough: SpeedRough,
                         feedRough: FeedRough,
-                        coolant: SelectedCoolant);
+                        coolant: SelectedCoolant,
+                        seqNumbers: CyclesCount.GetCycleRange());
                     return CurrentSequence.Operation;
                 case TurningSequences.FinishTurning:
-                    if (SpeedFinish <= 0 || FeedFinish <= 0) return string.Empty;
+                    if (SpeedFinish <= 0 || FeedFinish <= 0 || Contour == null || Contour.Count < 2) return string.Empty;
                     CurrentSequence = TurningSequenceFactory.CreateFinishTurning(
                         machine: Machine,
                         coordinateSystem: SelectedCoordinateSystem,
