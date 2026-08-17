@@ -67,8 +67,8 @@
                                     <span>@(r.Nominal.ToPrettyString(3, Util.PrettyStringOption.AsIs))</span><span style="display: inline-flex; align-items: center;">
                                         <span style="font-size: 1.2em;">(</span>
                                         <span style="display: inline-flex; flex-direction: column; text-align: right; font-size: 0.75em; line-height: 1;">
-                                            <span>@(Dev(r.UpperDeviation))</span>
-                                            <span>@(Dev(r.LowerDeviation))</span>
+                                            <span>@(Dev(r.UpperDeviationMm))</span>
+                                            <span>@(Dev(r.LowerDeviationMm))</span>
                                         </span>
                                         <span style="font-size: 1.2em;">)</span>
                                     </span>
@@ -88,6 +88,10 @@
                             <td><MudText Typo="Typo.caption" Style="font-family: 'Roboto Mono', monospace;">@(r.MiddleSize.ToPrettyString(4, Util.PrettyStringOption.AsIs)) мм</MudText></td>
                         </tr>
                     </table>
+                }
+                else if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Error">@ErrorMessage</MudText>
                 }
                 else
                 {
@@ -111,8 +115,21 @@
 
     private string Designation => $"{Field}{Grade}";
 
-    private Tolerance.Result? Result =>
-        Tolerance.TryCalculate(NominalValue, Designation, out var r, out _) ? r : null;
+    private string ErrorMessage { get; set; } = string.Empty;
+
+    private Tolerance.Result? Result
+    {
+        get
+        {
+            ErrorMessage = string.Empty;
+            if (string.IsNullOrEmpty(Field) || Grade is null || NominalValue <= 0)
+                return null;
+            if (Tolerance.TryCalculate(NominalValue, Designation, out var r, out var error))
+                return r;
+            ErrorMessage = error;
+            return null;
+        }
+    }
 
     private void OnFieldChanged(string value) => Field = value;
 
@@ -127,7 +144,7 @@
         }
     }
 
-    /// <summary>Форматирует отклонение в мкм/мм со знаком.</summary>
+    /// <summary>Форматирует отклонение в мм со знаком.</summary>
     private static string Dev(double value)
     {
         string v = value.ToPrettyString(3, Util.PrettyStringOption.AsIs);

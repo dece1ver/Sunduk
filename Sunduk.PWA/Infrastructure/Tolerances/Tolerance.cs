@@ -175,7 +175,7 @@ namespace Sunduk.PWA.Infrastructure.Tolerances
 
             if (!TryGetDeviation(letter, grade, isHole, nominal, tolerance, out double upper, out double lower))
             {
-                error = $"Поле допуска «{field}» не определено для размера {nominal} мм";
+                error = $"Поле допуска «{field}» не определено для размера {nominal} мм (для данного размера это поле не применяется по стандарту)";
                 return false;
             }
 
