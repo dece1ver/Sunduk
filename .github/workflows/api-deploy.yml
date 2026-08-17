@@ -18,14 +18,13 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       # Ставим .NET
-      - name: Setup .NET 6
-        uses: actions/setup-dotnet@v1
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.x.x'
-          include-prerelease: false
+          dotnet-version: '10.x.x'
       
       - name: SetSecret
         run: dotnet user-secrets set "FeedbackFrom" ${{ secrets.FEEDBACK_FROM }} --project "/home/runner/work/Sunduk/Sunduk/Sunduk.WebApi"
@@ -43,7 +42,7 @@ jobs:
         run: touch release/.nojekyll
       
       - name: Uploading files to gh-api-pages branch
-        uses: JamesIves/github-pages-deploy-action@4.1.7
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-api-pages
           folder: release

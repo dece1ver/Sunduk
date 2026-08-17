@@ -31,7 +31,7 @@ Run a single test project: `dotnet test Sunduk.Geometry.Tests/Sunduk.Geometry.Te
 - Two branches: `master` (prod → sunduk.one) and `test` (WIP → test.sunduk.one).
 - Deploy is GitHub Actions → GitHub Pages (`gh-pages` / `gh-test-pages`), triggered on push. `api-deploy.yml` publishes `Sunduk.WebApi` to a separate `sunduk-api` repo.
 - `Sunduk.WebApi` reads SMTP credentials (`FeedbackFrom`/`FeedbackTo`/`FeedbackPass`) from user-secrets (set in CI from repo secrets). Never hardcode or commit them.
-- Gotcha: `main.yml` (prod) still sets up .NET **9** while `main-test.yml` uses .NET **10** and the code targets `net10.0` — prod deploy may be stale.
+- Gotcha: `api-deploy.yml` sets up .NET **10** but the project targets `net10.0` — was previously on .NET 6 and has been updated.
 
 ## Persistence gotcha
 
