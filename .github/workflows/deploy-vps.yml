@@ -22,24 +22,17 @@ jobs:
       - name: Add .nojekyll
         run: touch release/wwwroot/.nojekyll
 
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s' "${{ secrets.VPS_SSH_KEY }}" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
       - name: Deploy master → www.sunduk.one
         if: github.ref == 'refs/heads/master'
-        uses: burnett01/rsync-deployments@7.0.1
-        with:
-          switches: -avz --delete
-          path: release/wwwroot/
-          remote_path: /var/www/www.sunduk.one/html/
-          remote_host: ${{ secrets.VPS_HOST }}
-          remote_user: root
-          remote_key: ${{ secrets.VPS_SSH_KEY }}
+        run: rsync -avz --delete -e "ssh -i ~/.ssh/deploy_key" release/wwwroot/ root@${{ secrets.VPS_HOST }}:/var/www/www.sunduk.one/html/
 
       - name: Deploy test → test.sunduk.one
         if: github.ref == 'refs/heads/test'
-        uses: burnett01/rsync-deployments@7.0.1
-        with:
-          switches: -avz --delete
-          path: release/wwwroot/
-          remote_path: /var/www/test.sunduk.one/html/
-          remote_host: ${{ secrets.VPS_HOST }}
-          remote_user: root
-          remote_key: ${{ secrets.VPS_SSH_KEY }}
+        run: rsync -avz --delete -e "ssh -i ~/.ssh/deploy_key" release/wwwroot/ root@${{ secrets.VPS_HOST }}:/var/www/test.sunduk.one/html/
