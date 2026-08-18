@@ -8,6 +8,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning.Base
         public enum Types { Diamond, Roller }
         public Types Type { get; set; }
         public override string Name => "NAKATKA " + (Type is Types.Diamond ? "ALMAZ" : "ROLIK");
+        public override string CallDetails => $"{Name}";
 
         public TurningBurnishingTool(int position, Types type, ToolHand hand = ToolHand.Right)
         {

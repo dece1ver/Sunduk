@@ -1,4 +1,4 @@
-﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+﻿@inject MachineRegistry MachineRegistry
 <MudTable Items="GroovingInternalTools" ReadOnly="ReadOnly" Hover="true" CanCancelEdit="false" Elevation="0">
     <HeaderContent>
         <MudTh>Позиция</MudTh>
@@ -71,13 +71,13 @@
     private async Task AddGroovingInternalTool()
     {
         Tools.Add(new GroovingInternalTool(0101, 20, 3, TurningGroovingTool.Point.Left));
-        await LocalStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
+        await MachineRegistry.SaveAsync();
         await ToolsChanged.InvokeAsync(Tools);
     }
     private async Task RemoveGroovingInternalTool(GroovingInternalTool tool)
     {
         Tools.Remove(tool);
-        await LocalStorage.SetItemAsync(nameof(GroovingInternalTools), GroovingInternalTools);
+        await MachineRegistry.SaveAsync();
         await ToolsChanged.InvokeAsync(Tools);
     }
 }

@@ -1,4 +1,4 @@
-﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+﻿@inject MachineRegistry MachineRegistry
 
 <MudTable Items="MillingDrillingTools" ReadOnly="false" Hover="true" CanCancelEdit="false" Elevation="0">
     <HeaderContent>
@@ -90,13 +90,13 @@
     private async Task AddMillingDrillingTool()
     {
         Tools.Add(new MillingDrillingTool(1, DrillingTool.Types.Solid, 10, 140));
-        await LocalStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+        await MachineRegistry.SaveAsync();
         await ToolsChanged.InvokeAsync(Tools);
     }
     private async Task RemoveMillingDrillingTool(MillingDrillingTool tool)
     {
         Tools.Remove(tool);
-        await LocalStorage.SetItemAsync(nameof(MillingDrillingTools), MillingDrillingTools);
+        await MachineRegistry.SaveAsync();
         await ToolsChanged.InvokeAsync(Tools);
     }
 }

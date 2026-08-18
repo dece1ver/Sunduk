@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Base
 {
-    public class ThreadMillingSequence : Sequence
+    public abstract class ThreadMillingSequence : Sequence
     {
         
         public CoordinateSystem CoordinateSystem { get; set; }
@@ -43,7 +43,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
             }
         }
 
-        public override OperationTime MachineTime => this.OperationTime();
+        public override OperationTime MachineTime => new(0, 0);
         public ThreadMillingSequence(
             Machine machine,
             CoordinateSystem coordinateSystem,

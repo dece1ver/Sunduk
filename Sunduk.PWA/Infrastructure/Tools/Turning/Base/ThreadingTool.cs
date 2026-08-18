@@ -2,7 +2,7 @@
 
 namespace Sunduk.PWA.Infrastructure.Tools.Turning.Base
 {
-    public class ThreadingTool : Tool
+    public abstract class ThreadingTool : Tool
     {
         public double Pitch { get; set; }
         public double Angle { get; set; }

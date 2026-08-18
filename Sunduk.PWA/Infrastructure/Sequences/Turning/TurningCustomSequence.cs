@@ -1,4 +1,5 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
+﻿using System;
+using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 
@@ -6,11 +7,14 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
     public class TurningCustomSequence : CustomSequence
     {
-        public override string Operation => Templates.Operation.TurningCustomOperation(Machine, Tool, CustomOperation);
+        public CoordinateSystem CoordinateSystem { get; set; }
+        public override string Operation => Templates.Operation.TurningCustomOperation(Machine, CoordinateSystem, Tool, CustomOperation, Coolant, TimeSpan.FromSeconds(MachineTime.FullTime));
         public override MachineType MachineType => MachineType.Turning;
-        public override OperationTime MachineTime => this.OperationTime();
 
-        public TurningCustomSequence(Machine machine, Tool tool, string customOperation)
-            : base(machine, tool, customOperation) { }
+        public TurningCustomSequence(Machine machine, CoordinateSystem coordinateSystem, Tool tool, string customOperation)
+            : base(machine, tool, customOperation)
+        {
+            CoordinateSystem = coordinateSystem;
+        }
     }
 }

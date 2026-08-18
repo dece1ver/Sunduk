@@ -2,9 +2,10 @@
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning.Base
 {
-    public class TurningGroovingSequence : Sequence
+    public abstract class TurningGroovingSequence : Sequence
     {
         public Machine Machine { get; set; }
+        public CoordinateSystem CoordinateSystem { get; set; }
         public Material Material { get; set; }
         public double CuttingPoint { get; set; }
         public double ExternalDiameter { get; set; }
@@ -25,6 +26,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning.Base
 
         public TurningGroovingSequence(
             Machine machine,
+            CoordinateSystem coordinateSystem,
             Material material,
             double cuttingPoint,
             double externalDiameter,
@@ -35,13 +37,14 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning.Base
             double outerCornerBlunt,
             double innerCornerBlunt,
             Blunt outerBluntType,
-            Blunt innerBluntType, 
-            int speedRough, 
-            int speedFinish, 
-            double feedRough, 
+            Blunt innerBluntType,
+            int speedRough,
+            int speedFinish,
+            double feedRough,
             double feedFinish)
         {
             Machine = machine;
+            CoordinateSystem = coordinateSystem;
             Material = material;
             CuttingPoint = cuttingPoint;
             ExternalDiameter = externalDiameter;

@@ -8,7 +8,7 @@ using Sunduk.PWA.Infrastructure.Templates;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Base
 {
-    public class TappingSequence : Sequence
+    public abstract class TappingSequence : Sequence
     {
         public Machine Machine { get; set; }
         public TappingTool Tool { get; set; }
@@ -33,7 +33,22 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Base
             }
         }
 
-        public override OperationTime MachineTime => this.OperationTime();
+        public override OperationTime MachineTime
+        {
+            get
+            {
+                double cuttingTime = 0;
+                double rapidTime = 5;
+                var fullLength = (Math.Abs(EndZ) + Math.Abs(StartZ));
+                var feed = Tool.Pitch;
+                var speed = CutSpeed;
+                var spins = (speed * 1000) / (Math.PI * Tool.Diameter);
+                if (spins > 3000) spins = 3000;
+                cuttingTime += 2 * fullLength.AxialTurningTime(spins, feed);
+                rapidTime += 1;
+                return new OperationTime(cuttingTime, rapidTime);
+            }
+        }
         public TappingSequence(Machine machine, TappingTool tool, double cutSpeed, double startZ, double endZ)
         {
             Machine = machine;

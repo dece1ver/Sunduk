@@ -7,16 +7,18 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
     public class LimiterSequence : Sequence
     {
         public Machine Machine { get; set; }
+        public CoordinateSystem CoordinateSystem { get; set; }
         public Tool Tool { get; set; }
         public double ExternalDiameter { get; set; }
-        public override string Operation => Templates.Operation.Limiter(Machine, Tool, ExternalDiameter);
+        public override string Operation => Templates.Operation.Limiter(Machine, CoordinateSystem, Tool, ExternalDiameter);
         public override MachineType MachineType => MachineType.Turning;
-        public override OperationTime MachineTime => this.OperationTime();
+        public override OperationTime MachineTime => new(0, 15);
         public override string Name => $"Упор";
 
-        public LimiterSequence(Machine machine, Tool tool, double externalDiameter)
+        public LimiterSequence(Machine machine, CoordinateSystem coordinateSystem, Tool tool, double externalDiameter)
         {
             Machine = machine;
+            CoordinateSystem = coordinateSystem;
             Tool = tool;
             ExternalDiameter = externalDiameter;
         }

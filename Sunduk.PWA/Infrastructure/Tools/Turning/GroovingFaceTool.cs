@@ -8,6 +8,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
         public override string Name => $"KANAVA TORC";
 
         public override MachineType MachineType => MachineType.Turning;
+        public override string CallDetails => $"{Name} {Width}MM {(ZeroPoint == Point.Bottom ? "KAK PROHOD" : "KAK RAST")}";
 
         public GroovingFaceTool(
             int position,

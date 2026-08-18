@@ -1,0 +1,42 @@
+name: Deploy VPS
+
+on:
+  push:
+    branches: [master, test]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x.x'
+
+      - name: Publish
+        run: dotnet publish Sunduk.PWA/Sunduk.PWA.csproj -c Release --output release --nologo
+
+      - name: Add .nojekyll
+        run: touch release/wwwroot/.nojekyll
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY_B64 }}" | base64 -d > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy master → www.sunduk.one
+        if: github.ref == 'refs/heads/master'
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} "rm -rf /var/www/www.sunduk.one/html/*"
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -r release/wwwroot/* root@${{ secrets.VPS_HOST }}:/var/www/www.sunduk.one/html/
+
+      - name: Deploy test → test.sunduk.one
+        if: github.ref == 'refs/heads/test'
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} "rm -rf /var/www/test.sunduk.one/html/*"
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -r release/wwwroot/* root@${{ secrets.VPS_HOST }}:/var/www/test.sunduk.one/html/

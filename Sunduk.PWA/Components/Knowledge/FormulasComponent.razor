@@ -1,0 +1,100 @@
+@using MudBlazor
+
+<MudText Typo="Typo.h6" Class="mb-2">Основные формулы</MudText>
+<MudText Typo="Typo.body2" Class="mb-4 mud-text-secondary">
+    Формулы для самостоятельного расчета режимов резания, геометрических параметров и смещений.
+</MudText>
+
+<style>
+    .formula-card {
+        border-left: 3px solid var(--mud-palette-primary);
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        background: var(--mud-palette-surface);
+        border-radius: 0 4px 4px 0;
+    }
+
+    .formula-title {
+        font-weight: 500;
+        margin-bottom: 6px;
+    }
+
+    .formula-expr {
+        font-family: 'Roboto Mono', monospace;
+        font-size: 15px;
+        padding: 8px 12px;
+        background: var(--mud-palette-surface-hover);
+        border-radius: 4px;
+        display: inline-block;
+        margin: 4px 0;
+    }
+
+    .formula-desc {
+        font-size: 0.875rem;
+        color: var(--mud-palette-text-secondary);
+        margin-top: 4px;
+    }
+</style>
+
+<div class="formula-card">
+    <div class="formula-title">Обороты шпинделя</div>
+    <div class="formula-expr">n = Vc × 1000 / (π × D)</div>
+    <div class="formula-desc">
+        <b>n</b> — обороты (об/мин), <b>Vc</b> — скорость резания (м/мин), <b>D</b> — диаметр (мм).
+        <br/>Пример: Vc=100 м/мин, D=40 мм → n = 100 × 1000 / (3.14 × 40) ≈ 796 об/мин.
+    </div>
+</div>
+
+<div class="formula-card">
+    <div class="formula-title">Подача мм/мин</div>
+    <div class="formula-expr">F = f × n × z</div>
+    <div class="formula-desc">
+        <b>F</b> — подача (мм/мин), <b>f</b> — подача на зуб (мм/зуб) или на оборот (мм/об), <b>n</b> — обороты (об/мин), <b>z</b> — число зубьев (для фрезы, для токарного <b>z = 1</b>).
+        <br/>Пример: f=0.2 мм/об, n=796 об/мин → F = 0.2 × 796 = 159 мм/мин.
+    </div>
+</div>
+
+<div class="formula-card">
+    <div class="formula-title">Длина конуса сверла</div>
+    <div class="formula-expr">L = (D / 2) × tg(90° − α / 2)</div>
+    <div class="formula-desc">
+        <b>L</b> — длина конуса (мм), <b>D</b> — диаметр сверла (мм), <b>α</b> — угол при вершине.
+        <br/>Типичные углы: 118° (универсальное), 140° (для спиральных по дереву/металлу), 152° (для твердосплавных).
+        <br/>Пример: D=10 мм, α=118° → L = 5 × tg(31°) ≈ 5 × 0.601 ≈ 3.0 мм.
+    </div>
+</div>
+
+<div class="formula-card">
+    <div class="formula-title">Глубина метрической резьбы</div>
+    <div class="formula-expr">H = 0.866 × P</div>
+    <div class="formula-desc">
+        <b>H</b> — высота исходного треугольника профиля (мм), <b>P</b> — шаг (мм).
+        <br/><b>Наружная:</b> h = 0.708 × H = 0.613 × P
+        <br/><b>Внутренняя:</b> h = 0.625 × H = 0.541 × P
+        <br/>Пример: М10×1.5 → H = 0.866 × 1.5 = 1.30 мм, h_нар = 0.613 × 1.5 ≈ 0.92 мм.
+    </div>
+</div>
+
+<div class="formula-card">
+    <div class="formula-title">Диаметр сверла под нарезку резьбы</div>
+    <div class="formula-expr">D_св = D − P</div>
+    <div class="formula-desc">
+        <b>D_св</b> — диаметр сверла (мм), <b>D</b> — номинальный диаметр резьбы (мм), <b>P</b> — шаг (мм).
+        <br/>Коррективы: при P=1.25 → D_св = D − 1.2; при P=1.75 → D_св = D − 1.8.
+        <br/>Пример: М10×1.5 → D_св = 10 − 1.5 = 8.5 мм.
+    </div>
+</div>
+
+<div class="formula-card">
+    <div class="formula-title">Смещение по X при точении NPT-резьбы</div>
+    <div class="formula-expr">ΔX = L × tg(1°47')</div>
+    <div class="formula-desc">
+        <b>ΔX</b> — изменение диаметра (мм), <b>L</b> — длина участка резьбы (мм). Угол 1°47' — полуугол конуса 1:16.
+        <br/>tg(1°47') ≈ 0.03125 (ровно 1/32, что соответствует конусу 1:16 по диаметру).
+        <br/>Пример: L=20 мм → ΔX = 20 × 0.03125 = 0.625 мм.
+    </div>
+</div>
+
+<MudText Typo="Typo.body2" Class="mt-2 mud-text-secondary">
+    Все формулы используются в калькуляторах приложения. При отклонениях от стандартных значений (нестандартные углы, шаги, материалы) рекомендуется сверяться с ГОСТ или техническими каталогами.
+</MudText>

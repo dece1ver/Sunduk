@@ -1,0 +1,375 @@
+@using Sunduk.Geometry
+@inject ArcGeneralState State
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+    <MudGrid Spacing="1">
+        <MudItem xs="12" sm="6">
+            <MudField Label="Дуга" Variant="Variant.Filled" Underline="false" Class="mt-1">
+                <MudGrid Spacing="0">
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="_CenterX" T="string" Label="Центр, X" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="_CenterZ" T="string" Label="Центр, Z" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="8">
+                        <MudTextField @bind-Value="_RadiusSize" T="string" Label="Радиус дуги" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="4" Class="d-flex align-center">
+                        <MudIconButton Icon="@(ArcDirection is Sunduk.Geometry.Direction.CW ? Icons.Material.Filled.RotateRight : Icons.Material.Filled.RotateLeft)"
+                                       Variant="Variant.Filled" DisableElevation="true" OnClick="ToggleDirection" Title="Направление дуги"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" Margin="Margin.Dense"/>
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+
+            <MudField Label="Начало дуги" Variant="Variant.Filled" Underline="false" Class="mt-2">
+                <MudGrid Spacing="0">
+                    <MudItem xs="6">
+                        <MudSelect T="AnchorKind" @bind-Value="StartKind" Label="Привязка" Variant="Variant.Text" Margin="Margin.Dense">
+                            <MudSelectItem T="AnchorKind" Value="AnchorKind.Face">Торец (Z)</MudSelectItem>
+                            <MudSelectItem T="AnchorKind" Value="AnchorKind.Cylinder">Цилиндр (X)</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="_StartAnchorValue" T="string" Label="@(StartKind == AnchorKind.Face ? "Z торца" : "Диаметр")" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudSwitch T="bool" @bind-Checked="RoundStart" Label="Скругление" Color="Color.Primary" Class="ma-n1"/>
+                    </MudItem>
+                    <MudItem xs="6">
+                        @if (RoundStart)
+                        {
+                            <MudTextField @bind-Value="_StartBlunt" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"/>
+                        }
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+
+            <MudField Label="Конец дуги" Variant="Variant.Filled" Underline="false" Class="mt-2">
+                <MudGrid Spacing="0">
+                    <MudItem xs="6">
+                        <MudSelect T="AnchorKind" @bind-Value="EndKind" Label="Привязка" Variant="Variant.Text" Margin="Margin.Dense">
+                            <MudSelectItem T="AnchorKind" Value="AnchorKind.Face">Торец (Z)</MudSelectItem>
+                            <MudSelectItem T="AnchorKind" Value="AnchorKind.Cylinder">Цилиндр (X)</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="_EndAnchorValue" T="string" Label="@(EndKind == AnchorKind.Face ? "Z торца" : "Диаметр")" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudSwitch T="bool" @bind-Checked="RoundEnd" Label="Скругление" Color="Color.Primary" Class="ma-n1"/>
+                    </MudItem>
+                    <MudItem xs="6">
+                        @if (RoundEnd)
+                        {
+                            <MudTextField @bind-Value="_EndBlunt" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"/>
+                        }
+                    </MudItem>
+                </MudGrid>
+            </MudField>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudPaper Outlined="true" Class="mt-1">
+                <div style="text-align: center;">
+                    <svg height="260" width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="@ViewBox" preserveAspectRatio="xMidYMid meet">
+                        @if (Valid)
+                        {
+                            <g stroke="#666" stroke-width="1" fill="none">
+                                <path d="@AxesPath"/>
+                            </g>
+                            <g transform="@($"translate({Fmt(SX(0))},{Fmt(SY(-4 * AxesLength))})")">
+                                <text x="3" y="3" fill="#666" style="font-family: 'Roboto Mono', monospace;" font-size="9">X+</text>
+                            </g>
+                            <g transform="@($"translate({Fmt(SX(AxesLength))},{Fmt(SY(0))})")">
+                                <text x="2" y="10" fill="#666" style="font-family: 'Roboto Mono', monospace;" font-size="9">Z+</text>
+                            </g>
+                            <circle cx="@Fmt(SX(CenterZ))" cy="@Fmt(SY(CenterX))" r="@Fmt(RadiusSize * Scale)"
+                                    stroke="#666" stroke-width="1" stroke-dasharray="3,3" fill="none"/>
+                            <path stroke="#aaa" stroke-width="1" fill="none" d="@CenterMarkerPath"/>
+                        }
+                        @if (!string.IsNullOrEmpty(PreviewPath))
+                        {
+                            <path stroke="#FF5722" stroke-width="@Math.Max(1.5, Scale * 0.5)" fill="none" d="@PreviewPath"/>
+                        }
+                        @foreach (var marker in PointMarkers)
+                        {
+                            <circle cx="@Fmt(SX(marker.Point.Z))" cy="@Fmt(SY(marker.Point.X))" r="3" fill="@marker.Color"/>
+                            <g transform="@($"translate({Fmt(SX(marker.Point.Z))},{Fmt(SY(marker.Point.X))})")">
+                                <text x="5" y="-5" fill="@marker.Color" style="font-family: 'Roboto Mono', monospace;" font-size="10">@marker.Label</text>
+                            </g>
+                        }
+                    </svg>
+                </div>
+            </MudPaper>
+
+            <MudField Label="Результат" Variant="Variant.Filled" Underline="false" Class="mt-2">
+                @if (!Valid)
+                {
+                    <MudText Typo="Typo.body2">Заполните радиус дуги и обе привязки</MudText>
+                }
+                else
+                {
+                    <MudGrid Spacing="1">
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.body2">@AnchorSummary(StartKind, "Начало", StartAnchorPoint, RoundStart, StartHandoffPoint, StartBlunt)</MudText>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.body2">@AnchorSummary(EndKind, "Конец", EndAnchorPoint, RoundEnd, EndHandoffPoint, EndBlunt)</MudText>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.body2">@($"Радиус дуги с учётом пластины: {(RadiusSize + InsertRadius).ToPrettyString()} мм")</MudText>
+                        </MudItem>
+                        <MudItem xs="12" Class="mt-2">
+                            <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace;" ReadOnly="true" AutoGrow="true" Lines="1" Value="@ArcMoveExample"/>
+                        </MudItem>
+                    </MudGrid>
+                }
+            </MudField>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code
+{
+    public const double Scale = 4;
+    public const double Padding = 12;
+
+    public enum AnchorKind { Face, Cylinder }
+
+    public string _CenterX { get => State.CenterX; set => State.CenterX = value; }
+    public double CenterX => _CenterX.GetDouble();
+    public double CenterXRadius => CenterX / 2;
+
+    public string _CenterZ { get => State.CenterZ; set => State.CenterZ = value; }
+    public double CenterZ => _CenterZ.GetDouble(0, Util.GetNumberOption.Any);
+
+    public string _RadiusSize { get => State.RadiusSize; set => State.RadiusSize = value; }
+    public double RadiusSize => _RadiusSize.GetDouble();
+
+    public string _InsertRadius { get => State.InsertRadius; set => State.InsertRadius = value; }
+    public double InsertRadius => _InsertRadius.GetDouble();
+
+    public Sunduk.Geometry.Direction ArcDirection { get => State.ArcDirection; set => State.ArcDirection = value; }
+    void ToggleDirection() => ArcDirection = ArcDirection is Sunduk.Geometry.Direction.CW ? Sunduk.Geometry.Direction.CCW : Sunduk.Geometry.Direction.CW;
+
+    public AnchorKind StartKind { get => State.StartKind; set => State.StartKind = value; }
+    public string _StartAnchorValue { get => State.StartAnchorValue; set => State.StartAnchorValue = value; }
+    public double StartAnchorValue => _StartAnchorValue.GetDouble(0, Util.GetNumberOption.Any);
+    public bool RoundStart { get => State.RoundStart; set => State.RoundStart = value; }
+    public string _StartBlunt { get => State.StartBlunt; set => State.StartBlunt = value; }
+    public double StartBlunt => RoundStart ? _StartBlunt.GetDouble() : 0;
+
+    public AnchorKind EndKind { get => State.EndKind; set => State.EndKind = value; }
+    public string _EndAnchorValue { get => State.EndAnchorValue; set => State.EndAnchorValue = value; }
+    public double EndAnchorValue => _EndAnchorValue.GetDouble(0, Util.GetNumberOption.Any);
+    public bool RoundEnd { get => State.RoundEnd; set => State.RoundEnd = value; }
+    public string _EndBlunt { get => State.EndBlunt; set => State.EndBlunt = value; }
+    public double EndBlunt => RoundEnd ? _EndBlunt.GetDouble() : 0;
+
+    bool Valid => RadiusSize > 0;
+
+    /// <summary>Точка на самой прямой (торец/цилиндр) без скругления — острый стык, вершина
+    /// напрямую переходит в (увеличенную на радиус пластины) дугу, отдельная маленькая дуга не
+    /// вставляется. Математика вынесена в общий <see cref="ArcAnchor.Sharp"/> (тот же метод
+    /// использует <see cref="ToolTipCompensation"/> для CAM-контуров); здесь — только перевод
+    /// «диаметр ⇄ радиус» на входе/выходе. Возвращает null вне диапазона 1°..89° (почти
+    /// касательный вход) — не реализовано.</summary>
+    (double X, double Z)? SharpAnchor(AnchorKind kind, double value, double toolRadius)
+    {
+        var shared = ArcAnchor.Sharp(
+            kind == AnchorKind.Face ? ArcAnchorKind.Face : ArcAnchorKind.Cylinder,
+            kind == AnchorKind.Face ? value : value / 2,
+            CenterXRadius, CenterZ, RadiusSize, toolRadius, external: true);
+        return shared is null ? null : (shared.Value.X * 2, shared.Value.Z);
+    }
+
+    /// <summary>Точка на самой прямой (торец/цилиндр) — начало скругления, либо, если оно не
+    /// задано, сама точка сопряжения с дугой (X диаметр, Z как есть).</summary>
+    (double X, double Z)? Anchor(AnchorKind kind, double value, bool round, double blunt, double toolRadius)
+    {
+        if (RadiusSize <= 0) return null;
+        if (!round) return SharpAnchor(kind, value, toolRadius);
+        if (kind == AnchorKind.Face)
+        {
+            var r = ArcAnchor.Face(value, CenterXRadius, CenterZ, RadiusSize, blunt, toolRadius);
+            return r is null ? null : (r.Value.StartX * 2, value);
+        }
+        var r2 = ArcAnchor.Cylinder(value / 2, CenterXRadius, CenterZ, RadiusSize, blunt, toolRadius);
+        return r2 is null ? null : (value, r2.Value.TangentZ);
+    }
+
+    /// <summary>Точка передачи в основную дугу — совпадает с Anchor, если скругление не задано
+    /// (острый стык не вставляет отдельную маленькую дугу).</summary>
+    (double X, double Z)? Handoff(AnchorKind kind, double value, bool round, double blunt, double toolRadius)
+    {
+        if (!round) return SharpAnchor(kind, value, toolRadius);
+        if (RadiusSize <= 0) return null;
+        if (kind == AnchorKind.Face)
+        {
+            var r = ArcAnchor.Face(value, CenterXRadius, CenterZ, RadiusSize, blunt, toolRadius);
+            return r is null ? null : (r.Value.EndX * 2, r.Value.EndZ);
+        }
+        var r2 = ArcAnchor.Cylinder(value / 2, CenterXRadius, CenterZ, RadiusSize, blunt, toolRadius);
+        return r2 is null ? null : (r2.Value.HandoffX * 2, r2.Value.HandoffZ);
+    }
+
+    (double X, double Z)? StartAnchorPoint => Anchor(StartKind, StartAnchorValue, RoundStart, StartBlunt, InsertRadius);
+    (double X, double Z)? StartHandoffPoint => Handoff(StartKind, StartAnchorValue, RoundStart, StartBlunt, InsertRadius);
+    (double X, double Z)? EndAnchorPoint => Anchor(EndKind, EndAnchorValue, RoundEnd, EndBlunt, InsertRadius);
+    (double X, double Z)? EndHandoffPoint => Handoff(EndKind, EndAnchorValue, RoundEnd, EndBlunt, InsertRadius);
+
+    string AnchorSummary(AnchorKind kind, string label, (double X, double Z)? anchor, bool round, (double X, double Z)? handoff, double blunt)
+    {
+        if (anchor is null) return $"{label}: геометрия не сходится (проверьте радиус/скругление)";
+        var kindLabel = kind == AnchorKind.Face ? "торец" : "цилиндр";
+        var text = $"{label} ({kindLabel}), с учётом пластины: X{anchor.Value.X.NC(0)} Z{anchor.Value.Z.NC()}";
+        if (round && handoff is not null)
+        {
+            text += $"; сопряжение с дугой R{(blunt + InsertRadius).ToPrettyString()}: X{handoff.Value.X.NC(0)} Z{handoff.Value.Z.NC()}";
+        }
+        return text;
+    }
+
+    string ArcMoveExample
+    {
+        get
+        {
+            if (!Valid) return string.Empty;
+            var end = RoundEnd ? EndHandoffPoint : EndAnchorPoint;
+            if (end is null) return string.Empty;
+            var g = ArcDirection is Sunduk.Geometry.Direction.CW ? "G2" : "G3";
+            return $"{g} X{end.Value.X.NC(0)} Z{end.Value.Z.NC()} R{(RadiusSize + InsertRadius).NC()}";
+        }
+    }
+
+    double SX(double z) => z * Scale;
+    double SY(double xDiam) => -xDiam / 2 * Scale;
+    static string Fmt(double v) => v.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    const double AxesLength = 8;
+
+    /// <summary>Небольшой крестик системы координат в мировом начале (X=0, Z=0) — точка отсчёта,
+    /// не зависящая ни от центра дуги, ни от привязок, в отличие от <see cref="CenterMarkerPath"/>.</summary>
+    string AxesPath =>
+        $"M {Fmt(SX(-AxesLength))},{Fmt(SY(0))} L {Fmt(SX(AxesLength))},{Fmt(SY(0))} " +
+        $"M {Fmt(SX(0))},{Fmt(SY(-2 * AxesLength))} L {Fmt(SX(0))},{Fmt(SY(2 * AxesLength))}";
+
+    /// <summary>Явные точки-маркеры (начало/конец, привязка и точка сопряжения с дугой, если
+    /// скругление включено) — показываются поверх контура отдельными кружками с подписями, чтобы
+    /// можно было свериться с числами в "Результате" напрямую по картинке, а не только по общей
+    /// линии контура.</summary>
+    IEnumerable<(string Label, string Color, (double X, double Z) Point)> PointMarkers
+    {
+        get
+        {
+            if (!Valid) yield break;
+            if (StartAnchorPoint is { } sa) yield return ("Нач", "#4CAF50", sa);
+            if (RoundStart && StartHandoffPoint is { } sh) yield return ("Нач⌒", "#8BC34A", sh);
+            if (EndAnchorPoint is { } ea) yield return ("Кон", "#2196F3", ea);
+            if (RoundEnd && EndHandoffPoint is { } eh) yield return ("Кон⌒", "#03A9F4", eh);
+        }
+    }
+
+    string PreviewPath
+    {
+        get
+        {
+            if (!Valid) return string.Empty;
+            var start = RoundStart ? StartHandoffPoint : StartAnchorPoint;
+            var end = RoundEnd ? EndHandoffPoint : EndAnchorPoint;
+            if (start is null || end is null) return string.Empty;
+
+            var sb = new System.Text.StringBuilder();
+            var stubLength = Math.Max(RadiusSize * 0.25, 3);
+
+            var startTangent = StartAnchorPoint;
+            if (startTangent is not null)
+            {
+                var stubStart = Stub(StartKind, startTangent.Value, stubLength);
+                sb.Append($"M {SX(stubStart.Item2).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(stubStart.Item1).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
+                sb.Append($"L {SX(startTangent.Value.Z).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(startTangent.Value.X).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
+                if (RoundStart && start is not null)
+                {
+                    var bluntR = StartBlunt + InsertRadius;
+                    sb.Append($"A{(bluntR * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},{(bluntR * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},0,0,1,{SX(start.Value.Z).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(start.Value.X).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
+                }
+            }
+            else
+            {
+                sb.Append($"M {SX(start.Value.Z).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(start.Value.X).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
+            }
+
+            var mainR = RadiusSize + InsertRadius;
+            var sweep = ArcDirection is Sunduk.Geometry.Direction.CCW ? 0 : 1;
+            sb.Append($"A{(mainR * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},{(mainR * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},0,0,{sweep},{SX(end.Value.Z).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(end.Value.X).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
+
+            var endTangent = EndAnchorPoint;
+            if (RoundEnd && endTangent is not null)
+            {
+                var bluntR = EndBlunt + InsertRadius;
+                sb.Append($"A{(bluntR * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},{(bluntR * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},0,0,1,{SX(endTangent.Value.Z).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(endTangent.Value.X).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
+            }
+            if (endTangent is not null)
+            {
+                var stubEnd = Stub(EndKind, endTangent.Value, stubLength);
+                sb.Append($"L {SX(stubEnd.Item2).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(stubEnd.Item1).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
+            }
+
+            return sb.ToString();
+        }
+    }
+
+    /// <summary>Точка на прямом "усе" (визуальном хвостике), продолжающем торец/цилиндр от
+    /// точки касания <paramref name="tangent"/> наружу, в сторону от центра дуги.</summary>
+    (double X, double Z) Stub(AnchorKind kind, (double X, double Z) tangent, double length)
+    {
+        if (kind == AnchorKind.Face)
+        {
+            var sign = tangent.X >= CenterX ? 1 : -1;
+            return (tangent.X + sign * length * 2, tangent.Z);
+        }
+        return (tangent.X, tangent.Z - length);
+    }
+
+    /// <summary>Небольшой неподвижный крестик ровно в центре дуги (Center X/Z) — без него чистый
+    /// сдвиг центра визуально незаметен, т.к. viewBox всегда автоматически подгоняется под саму
+    /// фигуру (которая при сдвиге центра просто целиком переезжает и тут же перецентровывается) —
+    /// крестик даёт неподвижную (относительно самой дуги) точку отсчёта, наглядно показывающую,
+    /// что сдвиг действительно произошёл.</summary>
+    string CenterMarkerPath
+    {
+        get
+        {
+            var cx = SX(CenterZ);
+            var cy = SY(CenterX);
+            var s = Math.Max(RadiusSize * 0.08, 1.5);
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            return $"M {(cx - s).ToString(inv)},{cy.ToString(inv)} L {(cx + s).ToString(inv)},{cy.ToString(inv)} " +
+                   $"M {cx.ToString(inv)},{(cy - s).ToString(inv)} L {cx.ToString(inv)},{(cy + s).ToString(inv)}";
+        }
+    }
+
+    string ViewBox
+    {
+        get
+        {
+            if (!Valid) return $"{-Padding} {-Padding} {2 * Padding} {2 * Padding}";
+            var points = new List<(double X, double Z)> { (CenterX, CenterZ), (0, AxesLength), (0, -AxesLength), (2 * AxesLength, 0), (-4 * AxesLength, 0) };
+            if (StartAnchorPoint is { } sa) points.Add(sa);
+            if (StartHandoffPoint is { } sh) points.Add(sh);
+            if (EndAnchorPoint is { } ea) points.Add(ea);
+            if (EndHandoffPoint is { } eh) points.Add(eh);
+
+            var sxs = points.Select(p => SX(p.Z)).ToList();
+            var sys = points.Select(p => SY(p.X)).ToList();
+            var left = sxs.Min() - Padding * 2;
+            var top = sys.Min() - Padding * 2;
+            var width = sxs.Max() - sxs.Min() + Padding * 4;
+            var height = sys.Max() - sys.Min() + Padding * 4;
+            return $"{left.ToString(System.Globalization.CultureInfo.InvariantCulture)} {top.ToString(System.Globalization.CultureInfo.InvariantCulture)} {Math.Max(width, 1).ToString(System.Globalization.CultureInfo.InvariantCulture)} {Math.Max(height, 1).ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+        }
+    }
+}

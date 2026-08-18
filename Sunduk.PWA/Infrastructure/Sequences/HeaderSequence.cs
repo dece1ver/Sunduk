@@ -19,8 +19,9 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public override OperationTime MachineTime => new(0, 0);
         public override string Operation => $"{Templates.Operation.Header(Machine, DetailNumber, DetailName, Author, DrawVersion, FullTime)}{ToolTable}";
         public override MachineType MachineType => MachineType.Any;
+        public override string Name { get; }
 
-        public HeaderSequence(Machine machine, string number, string name, string author, string drawVersion, string toolTable)
+        public HeaderSequence(Machine machine, string number, string name, string author, string drawVersion, string toolTable, string sequenceName = "Заголовок программы")
         {
             Machine = machine;
             DetailNumber = number;
@@ -28,6 +29,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences
             Author = author;
             DrawVersion = drawVersion;
             ToolTable = toolTable;
+            Name = sequenceName;
         }
     }
 }

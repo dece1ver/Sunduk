@@ -2,12 +2,14 @@
 using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
+using System;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
     public class RoughFacingSequence : Sequence
     {
         public Machine Machine { get; set; }
+        public CoordinateSystem CoordinateSystem { get; set; }
         public Material Material { get; set; }
         public TurningExternalTool Tool { get; set; }
         public double ExternalDiameter { get; set; }
@@ -22,11 +24,35 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double CornerBlunt { get; set; }
         public int SpeedRough { get; set; }
         public double FeedRough { get; set; }
-        public override OperationTime MachineTime => this.OperationTime();
+        public override OperationTime MachineTime
+        {
+            get
+            {
+                double cuttingTime = 0;
+                double rapidTime = 5;
+
+                var startX = ExternalDiameter;
+                var endX = InternalDiameter;
+                var startZ = RoughStockAllow;
+                var endZ = ProfStockAllow;
+                var speedRough = SpeedRough;
+                var feedRough = FeedRough;
+                var fullLength = startZ - endZ;
+                var steps = (int)Math.Round(fullLength / StepOver, MidpointRounding.ToPositiveInfinity);
+                var spins = (speedRough * 1000) / (Math.PI * ((startX - endX) / 2));
+                if (spins > 3000) spins = 3000;
+                cuttingTime += steps * Calc.CrossTurningTime(startX, endX, spins, feedRough);
+
+                rapidTime += steps * Calc.CrossRapidTime(startX, endX);
+
+                return new OperationTime(cuttingTime, rapidTime);
+            }
+        }
         public override string Operation => Templates.FacingOperation.Facing(
-            Machine, 
-            Material, 
-            Tool, 
+            Machine,
+            CoordinateSystem,
+            Material,
+            Tool,
             ExternalDiameter, 
             Tool is null ? InternalDiameter : InternalDiameter - (Tool.Radius * 2), 
             RoughStockAllow, 
@@ -40,9 +66,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             false, 
             false, 
             SpeedRough, 
-            0, 
-            FeedRough, 
-            0);
+            0,
+            FeedRough,
+            0,
+            Coolant);
         public override MachineType MachineType => MachineType.Turning;
         public override string Name { get 
                 {
@@ -53,9 +80,10 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             }
 
         public RoughFacingSequence(
-            Machine machine, 
-            Material material, 
-            TurningExternalTool tool, 
+            Machine machine,
+            CoordinateSystem coordinateSystem,
+            Material material,
+            TurningExternalTool tool,
             double externalDiameter, 
             double internalDiameter,
             double roughStockAllow, 
@@ -70,6 +98,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double feedRough)
         {
             Machine = machine;
+            CoordinateSystem = coordinateSystem;
             Material = material;
             Tool = tool;
             ExternalDiameter = externalDiameter;

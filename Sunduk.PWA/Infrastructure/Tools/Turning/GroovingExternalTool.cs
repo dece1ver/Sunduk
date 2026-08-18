@@ -17,6 +17,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
             };
 
         public override MachineType MachineType => MachineType.Turning;
+        public override string CallDetails => $"{Name} {Width}MM {(ZeroPoint == Point.Left ? "KAK PROHOD" : "KAK OTR")}";
 
         public GroovingExternalTool(
             int position, 

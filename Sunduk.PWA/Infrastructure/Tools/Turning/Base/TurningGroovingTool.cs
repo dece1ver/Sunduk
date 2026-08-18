@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sunduk.PWA.Infrastructure.Tools.Turning.Base
 {
-    public class TurningGroovingTool : Tool
+    public abstract class TurningGroovingTool : Tool
     {
 
         public double Width { get; set; }

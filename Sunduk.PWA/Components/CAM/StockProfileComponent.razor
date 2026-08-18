@@ -1,0 +1,342 @@
+@using Sunduk.PWA.Infrastructure.Sequences.Base
+<MudField Label="Текущее состояние заготовки" Variant="Variant.Filled" Margin="Margin.Dense" Underline="false">
+    <MudPaper Outlined="true">
+        <div style="text-align: center;">
+            <svg height="140" width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="@ViewBox" preserveAspectRatio="xMidYMid meet">
+                @if (!string.IsNullOrEmpty(ExternalPath))
+                {
+                    <path fill="#FF5722" fill-opacity="0.25" fill-rule="evenodd" stroke="none" d="@(ExternalPath + " " + InternalHolePath)"/>
+                    <path fill="none" stroke="#FF5722" stroke-width="@Math.Max(1, Scale * 0.25)" d="@ExternalOutlinePath"/>
+                }
+                @if (!string.IsNullOrEmpty(InternalHoleOutlinePath))
+                {
+                    <path fill="none" stroke="#FF5722" stroke-width="@Math.Max(1, Scale * 0.2)" stroke-dasharray="3,2" d="@InternalHoleOutlinePath"/>
+                }
+                @if (Valid)
+                {
+                    <g stroke="#666" stroke-width="1" fill="none">
+                        <path d="@AxisPath"/>
+                    </g>
+                    <path stroke="#888" stroke-width="1" stroke-dasharray="2,2" fill="none" d="@ZeroMarkPath"/>
+                    @if (WorkpieceLength > 0)
+                    {
+                        <path stroke="#888" stroke-width="1" fill="none" d="@LengthDimPath"/>
+                    }
+                    @((MarkupString)LabelsMarkup)
+                }
+            </svg>
+        </div>
+    </MudPaper>
+</MudField>
+
+@code
+{
+    public const double Scale = 4;
+    public const double Padding = 10;
+    /// <summary>Небольшой визуальный отступ по краям отрисовки сверх реальных границ
+    /// (-WorkpieceLength слева, +FacingAllowance справа), чтобы контур заготовки не упирался
+    /// прямо в край SVG.</summary>
+    public const double EdgeMargin = 4;
+
+    [Parameter]
+    public List<Sequence> Program { get; set; } = new();
+
+    [Parameter]
+    public double ExternalDiameter { get; set; }
+
+    [Parameter]
+    public double InternalDiameter { get; set; }
+
+    [Parameter]
+    public double WorkpieceLength { get; set; }
+
+    /// <summary>Припуск по торцу — сколько сырого материала торчит за номинальным торцом Z0 в
+    /// сторону +Z, пока его не сняла торцовка. Определяет правую границу отрисовки (до первой
+    /// торцовки заготовка видна именно до этой границы, не до произвольного отступа).</summary>
+    [Parameter]
+    public double FacingAllowance { get; set; }
+
+    bool Valid => ExternalDiameter > 0 && WorkpieceLength > 0;
+
+    double VisibleFromZ => -WorkpieceLength - EdgeMargin;
+    double VisibleToZ => Math.Max(FacingAllowance, 0) + EdgeMargin;
+
+    Infrastructure.StockProfile Profile => Infrastructure.StockProfile.Build(Program ?? new List<Sequence>(), Program?.Count ?? 0, ExternalDiameter, InternalDiameter, FacingAllowance);
+
+    double SX(double z) => z * Scale;
+    double SY(double diameter) => -diameter / 2 * Scale;
+    static string Fmt(double v) => v.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    List<(double FromZ, double ToZ, double Diameter)> ClippedSorted(IReadOnlyList<(double FromZ, double ToZ, double Diameter)> segments)
+    {
+        var result = new List<(double FromZ, double ToZ, double Diameter)>();
+        foreach (var s in segments)
+        {
+            var fromZ = Math.Max(s.FromZ, VisibleFromZ);
+            var toZ = Math.Min(s.ToZ, VisibleToZ);
+            if (fromZ < toZ) result.Add((fromZ, toZ, s.Diameter));
+        }
+        result.Sort((a, b) => a.FromZ.CompareTo(b.FromZ));
+        return result;
+    }
+
+    /// <summary>Точки ступенчатой "лесенки" (в экранных координатах) по сегментам диаметра —
+    /// горизонталь на каждом сегменте, вертикальный шаг на стыке при смене диаметра.
+    /// <paramref name="mirror"/> отражает диаметр в отрицательный радиус (нижняя половина).</summary>
+    List<(double X, double Y)> StaircasePoints(List<(double FromZ, double ToZ, double Diameter)> segments, bool mirror)
+    {
+        var points = new List<(double X, double Y)>();
+        double Y(double diameter) => mirror ? -SY(diameter) : SY(diameter);
+        foreach (var s in segments)
+        {
+            points.Add((SX(s.FromZ), Y(s.Diameter))); // вертикальный шаг на стыке (или старт)
+            points.Add((SX(s.ToZ), Y(s.Diameter))); // горизонталь по сегменту
+        }
+        return points;
+    }
+
+    static string PathFromPoints(IEnumerable<(double X, double Y)> points, bool close)
+    {
+        var sb = new System.Text.StringBuilder();
+        var first = true;
+        foreach (var p in points)
+        {
+            sb.Append(first ? "M " : "L ").Append(Fmt(p.X)).Append(',').Append(Fmt(p.Y)).Append(' ');
+            first = false;
+        }
+        if (close) sb.Append('Z');
+        return sb.ToString();
+    }
+
+    /// <summary>Замкнутый силуэт (верх + низ, зеркально относительно оси) — сплошная заливка
+    /// наружного диаметра как ступенчатая "лесенка" по сегментам StockProfile. Всегда полностью
+    /// замкнут (нужен таким для корректного вычитания <see cref="InternalHolePath"/> через
+    /// fill-rule="evenodd") — разрывы для "открытых карманов" делает только версия для обводки,
+    /// см. <see cref="ExternalOutlinePath"/>.</summary>
+    string ExternalPath
+    {
+        get
+        {
+            if (!Valid) return string.Empty;
+            var segments = ClippedSorted(Profile.ExternalSegments);
+            if (segments.Count == 0) return string.Empty;
+
+            var top = StaircasePoints(segments, mirror: false);
+            var bottom = StaircasePoints(segments, mirror: true);
+            bottom.Reverse();
+            return PathFromPoints(top.Concat(bottom), close: true);
+        }
+    }
+
+    /// <summary>Наружный контур для обводки — как <see cref="ExternalPath"/>, но если открытая
+    /// расточка/сверловка достаёт до границы материала (см. <see cref="ExternalBreaches"/>), режет
+    /// разрыв шириной с отверстие вместо сплошной "стенки" — иначе карман на границе выглядит
+    /// закрытым, хотя заливка (evenodd) уже корректно его вычла. Реальный вертикальный переход
+    /// "материал → пусто" почти всегда лежит ВНУТРИ последовательности `top`/`bottom` (между двумя
+    /// сегментами: настоящий материал и "нулевой хвост" до правого края окна отрисовки), а не на
+    /// стыке между top и bottom — поэтому проверка разрыва идёт по ВСЕМ соседним точкам подряд
+    /// (включая замыкание в конце), а не только по двум внешним "швам".</summary>
+    string ExternalOutlinePath
+    {
+        get
+        {
+            if (!Valid) return string.Empty;
+            var segments = ClippedSorted(Profile.ExternalSegments);
+            if (segments.Count == 0) return string.Empty;
+
+            var top = StaircasePoints(segments, mirror: false);
+            var bottom = StaircasePoints(segments, mirror: true);
+            bottom.Reverse();
+            var all = new List<(double X, double Y)>(top.Count + bottom.Count + 1);
+            all.AddRange(top);
+            all.AddRange(bottom);
+            if (all.Count == 0) return string.Empty;
+            all.Add(all[0]); // замыкание проходит ту же проверку разрыва, что и остальные стыки
+
+            var breaches = ExternalBreaches;
+            var sb = new System.Text.StringBuilder();
+            sb.Append("M ").Append(Fmt(all[0].X)).Append(',').Append(Fmt(all[0].Y)).Append(' ');
+            for (var i = 1; i < all.Count; i++)
+                AppendGappedTransition(sb, all[i - 1], all[i], breaches);
+            return sb.ToString();
+        }
+    }
+
+    /// <summary>Вертикальный стык между двумя точками обводки — обычная линия, если разрыва тут
+    /// нет; иначе (см. <see cref="ExternalBreaches"/>) рисует "губу" от края до радиуса отверстия и
+    /// прыгает (без линии) через сам разрыв к следующей точке.</summary>
+    static void AppendGappedTransition(System.Text.StringBuilder sb, (double X, double Y) from, (double X, double Y) to, Dictionary<double, double> breaches)
+    {
+        if (Math.Abs(from.X - to.X) > 1e-6 || Math.Abs(from.Y - to.Y) < 1e-9)
+        {
+            sb.Append("L ").Append(Fmt(to.X)).Append(',').Append(Fmt(to.Y)).Append(' ');
+            return;
+        }
+        if (breaches.TryGetValue(from.X / Scale, out var radius))
+        {
+            var gapY = radius * Scale;
+            if (Math.Abs(from.Y) > gapY) sb.Append("L ").Append(Fmt(from.X)).Append(',').Append(Fmt(Math.Sign(from.Y) * gapY)).Append(' ');
+            sb.Append("M ").Append(Fmt(to.X)).Append(',').Append(Fmt(to.Y)).Append(' ');
+        }
+        else
+        {
+            sb.Append("L ").Append(Fmt(to.X)).Append(',').Append(Fmt(to.Y)).Append(' ');
+        }
+    }
+
+    /// <summary>Смежные сегменты внутреннего диаметра (диаметр &gt; 0), сгруппированные в
+    /// "пробежки" — разрыв (необработанный участок между двумя расточками) начинает новую
+    /// пробежку, а не продолжает старую.</summary>
+    List<List<(double FromZ, double ToZ, double Diameter)>> InternalRuns
+    {
+        get
+        {
+            var segments = ClippedSorted(Profile.InternalSegments).Where(s => s.Diameter > 0).ToList();
+            var runs = new List<List<(double FromZ, double ToZ, double Diameter)>>();
+            var run = new List<(double FromZ, double ToZ, double Diameter)>();
+            foreach (var s in segments)
+            {
+                if (run.Count > 0 && Math.Abs(run[^1].ToZ - s.FromZ) > 1e-6) { runs.Add(run); run = new(); }
+                run.Add(s);
+            }
+            if (run.Count > 0) runs.Add(run);
+            return runs;
+        }
+    }
+
+    /// <summary>Точки, где расточка/сверловка "пробивает" наружу — снаружи по этому Z уже нет
+    /// материала (см. <see cref="Infrastructure.StockProfile.ExternalDiameterAt"/>). Ключ — Z стыка
+    /// в единицах модели (не экрана), значение — радиус самого широкого отверстия в этой точке.</summary>
+    Dictionary<double, double> ExternalBreaches
+    {
+        get
+        {
+            var result = new Dictionary<double, double>();
+            void Note(double z, double radius)
+            {
+                if (!result.TryGetValue(z, out var existing) || radius > existing) result[z] = radius;
+            }
+            const double epsilon = 1e-6;
+            foreach (var run in InternalRuns)
+            {
+                var fromZ = run[0].FromZ;
+                var toZ = run[^1].ToZ;
+                if (Profile.ExternalDiameterAt(toZ + epsilon) <= 0) Note(toZ, run[^1].Diameter / 2);
+                if (Profile.ExternalDiameterAt(fromZ - epsilon) <= 0) Note(fromZ, run[0].Diameter / 2);
+            }
+            return result;
+        }
+    }
+
+    /// <summary>Отверстие/канавка внутреннего диаметра как замкнутый полигон-"дырка" — рисуется
+    /// в одном &lt;path&gt; вместе с <see cref="ExternalPath"/> под fill-rule="evenodd", поэтому
+    /// область, накрытая обоими контурами, вычитается из заливки (реально "пропадает" из детали,
+    /// а не просто рисуется поверх сплошной заливки пунктиром). Всегда полностью замкнут (нужен
+    /// таким для корректного вычитания) — разрывы для "открытых карманов" делает только версия для
+    /// обводки, см. <see cref="InternalHoleOutlinePath"/>.</summary>
+    string InternalHolePath
+    {
+        get
+        {
+            if (!Valid) return string.Empty;
+            var sb = new System.Text.StringBuilder();
+            foreach (var run in InternalRuns)
+            {
+                var top = StaircasePoints(run, mirror: false);
+                var bottom = StaircasePoints(run, mirror: true);
+                bottom.Reverse();
+                sb.Append(PathFromPoints(top.Concat(bottom), close: true)).Append(' ');
+            }
+            return sb.ToString().TrimEnd();
+        }
+    }
+
+    /// <summary>Обводка отверстий для пунктирной линии — в отличие от <see cref="InternalHolePath"/>
+    /// не рисует торцевую грань там, где отверстие реально открывается наружу (снаружи по этому Z
+    /// уже нет материала) — иначе получается видимая "стенка" ровно там, где должен быть открытый
+    /// карман, как у канавки.</summary>
+    string InternalHoleOutlinePath
+    {
+        get
+        {
+            if (!Valid) return string.Empty;
+            const double epsilon = 1e-6;
+            var sb = new System.Text.StringBuilder();
+            foreach (var run in InternalRuns)
+            {
+                var top = StaircasePoints(run, mirror: false);
+                var bottom = StaircasePoints(run, mirror: true);
+                var fromZ = run[0].FromZ;
+                var toZ = run[^1].ToZ;
+                var openLeft = Profile.ExternalDiameterAt(fromZ - epsilon) <= 0;
+                var openRight = Profile.ExternalDiameterAt(toZ + epsilon) <= 0;
+
+                sb.Append("M ").Append(Fmt(top[0].X)).Append(',').Append(Fmt(top[0].Y)).Append(' ');
+                for (var i = 1; i < top.Count; i++)
+                    sb.Append("L ").Append(Fmt(top[i].X)).Append(',').Append(Fmt(top[i].Y)).Append(' ');
+
+                var bottomLast = bottom[^1];
+                sb.Append(openRight ? "M " : "L ").Append(Fmt(bottomLast.X)).Append(',').Append(Fmt(bottomLast.Y)).Append(' ');
+                for (var i = bottom.Count - 2; i >= 0; i--)
+                    sb.Append("L ").Append(Fmt(bottom[i].X)).Append(',').Append(Fmt(bottom[i].Y)).Append(' ');
+
+                if (!openLeft) sb.Append("L ").Append(Fmt(top[0].X)).Append(',').Append(Fmt(top[0].Y)).Append(' ');
+            }
+            return sb.ToString().TrimEnd();
+        }
+    }
+
+    string AxisPath => $"M {Fmt(SX(VisibleFromZ))},{Fmt(SY(0))} L {Fmt(SX(VisibleToZ))},{Fmt(SY(0))}";
+
+    /// <summary>Половина высоты детали в экранных координатах (наружный радиус в масштабе) —
+    /// используется для меток Z=0 и линии габаритной длины, чтобы они не залезали на саму
+    /// деталь.</summary>
+    double PartHalfHeight => -SY(Math.Max(ExternalDiameter, InternalDiameter));
+
+    /// <summary>Вертикальная пунктирная метка номинального торца (Z=0) во всю высоту детали —
+    /// позволяет на глаз оценить, сколько необработанного припуска ещё торчит за торцом.</summary>
+    string ZeroMarkPath => Valid ? $"M {Fmt(SX(0))},{Fmt(-PartHalfHeight)} L {Fmt(SX(0))},{Fmt(PartHalfHeight)}" : string.Empty;
+
+    /// <summary>Подписи "0" и габаритной длины — собраны как сырая разметка (не через
+    /// Razor-элемент &lt;text&gt;, который парсер .razor интерпретирует как служебный тег
+    /// вывода и запрещает атрибуты на нём, см. RZ1023). Оба значения — числа через
+    /// <see cref="Fmt"/> (InvariantCulture), инъекции неоткуда взяться.</summary>
+    string LabelsMarkup
+    {
+        get
+        {
+            if (!Valid) return string.Empty;
+            var sb = new System.Text.StringBuilder();
+            sb.Append($"<text x=\"{Fmt(SX(0))}\" y=\"{Fmt(-PartHalfHeight - 3)}\" font-size=\"8\" fill=\"#888\" text-anchor=\"middle\">0</text>");
+            if (WorkpieceLength > 0)
+            {
+                sb.Append($"<text x=\"{Fmt(SX(-WorkpieceLength / 2))}\" y=\"{Fmt(DimY + 11)}\" font-size=\"8\" fill=\"#888\" text-anchor=\"middle\">{Fmt(WorkpieceLength)} мм</text>");
+            }
+            return sb.ToString();
+        }
+    }
+
+    /// <summary>Отступ размерной линии габаритной длины детали от нижнего края детали.</summary>
+    const double DimGap = 16;
+    const double DimTick = 3;
+    double DimY => PartHalfHeight + 8;
+
+    string LengthDimPath => Valid && WorkpieceLength > 0
+        ? $"M {Fmt(SX(0))},{Fmt(DimY - DimTick)} L {Fmt(SX(0))},{Fmt(DimY + DimTick)} " +
+          $"M {Fmt(SX(0))},{Fmt(DimY)} L {Fmt(SX(-WorkpieceLength))},{Fmt(DimY)} " +
+          $"M {Fmt(SX(-WorkpieceLength))},{Fmt(DimY - DimTick)} L {Fmt(SX(-WorkpieceLength))},{Fmt(DimY + DimTick)}"
+        : string.Empty;
+
+    string ViewBox
+    {
+        get
+        {
+            if (!Valid) return $"{-Padding} {-Padding} {2 * Padding} {2 * Padding}";
+            var left = SX(VisibleFromZ) - Padding;
+            var right = SX(VisibleToZ) + Padding;
+            var top = -PartHalfHeight - Padding;
+            var bottom = PartHalfHeight + Padding + DimGap;
+            return $"{Fmt(left)} {Fmt(top)} {Fmt(Math.Max(right - left, 1))} {Fmt(Math.Max(bottom - top, 1))}";
+        }
+    }
+}

@@ -1,4 +1,4 @@
-﻿namespace Sunduk.PWA.Infrastructure
+namespace Sunduk.Geometry
 {
     public enum Blunt
     {

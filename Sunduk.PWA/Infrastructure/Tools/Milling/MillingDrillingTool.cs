@@ -5,6 +5,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
     public sealed class MillingDrillingTool : DrillingTool 
     {
         public override MachineType MachineType => MachineType.Milling;
+        public override string CallDetails => $"{Name} D{Diameter.NC(option: Util.NcDecimalPointOption.Without)}";
 
         public MillingDrillingTool(int position, Types type, double diameter, double angle, ToolHand hand = ToolHand.Right)
             : base(position, type, diameter, angle, hand)

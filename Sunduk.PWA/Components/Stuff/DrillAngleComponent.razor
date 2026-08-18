@@ -1,4 +1,5 @@
-﻿<MudContainer Class="mt-3">
+﻿@inject DrillAngleState State
+<MudContainer Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="6">
             <MudTextField @bind-Value="_DrillDiameter" T="string" Label="Диаметр" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" 
@@ -77,12 +78,12 @@
         DrillAngle
     };
     public enum ImageType { Diameter, ToolRaduis, ChamferAngle, ChamferSize };
-    public Images CurrentImage { get; set; } = Images.Drill;
+    public Images CurrentImage { get => State.CurrentImage; set => State.CurrentImage = value; }
 
-    public string _DrillDiameter { get; set; }
+    public string _DrillDiameter { get => State.DrillDiameter; set => State.DrillDiameter = value; }
     public double DrillDiameter => Util.GetDouble(_DrillDiameter);
 
-    public string _DrillAngle { get; set; }
+    public string _DrillAngle { get => State.DrillAngle; set => State.DrillAngle = value; }
     public double DrillAngle => Util.GetDouble(_DrillAngle);
 
     public string ResultMessage => $"Длина конуса {((DrillDiameter / 2) * Math.Tan((90 - DrillAngle / 2).Radians())).ToPrettyString()} мм";

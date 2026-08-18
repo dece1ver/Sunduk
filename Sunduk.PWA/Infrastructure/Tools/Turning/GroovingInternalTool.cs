@@ -9,6 +9,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
         public override string Name => $"KANAVA";
 
         public override MachineType MachineType => MachineType.Turning;
+        public override string CallDetails => $"{Name} D{Diameter.ToPrettyString()} {Width}MM {(ZeroPoint == Point.Left ? "KAK RAST" : "KAK OTR")}";
 
         public GroovingInternalTool(
             int position,

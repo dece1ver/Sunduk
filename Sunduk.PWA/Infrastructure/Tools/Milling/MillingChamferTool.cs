@@ -6,6 +6,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
     {
         public override MachineType MachineType => MachineType.Milling;
         public override string Name => "FASKA";
+        public override string CallDetails => $"{Name} D{Diameter.NC(option: Util.NcDecimalPointOption.Without)}x{Angle.NC(option: Util.NcDecimalPointOption.Without)}";
         public double Diameter { get; set; }
         public double Angle { get; set; }
         public double TipCompensation { get; set; }

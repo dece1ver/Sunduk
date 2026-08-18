@@ -5,6 +5,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
     public sealed class MillingSpecialTool : Tool
     {
         public override MachineType MachineType => MachineType.Milling;
+        public override string CallDetails => $"{Name}";
 
         public MillingSpecialTool(int position, string name, ToolHand hand = ToolHand.Right)
         {

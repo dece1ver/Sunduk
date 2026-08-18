@@ -2,12 +2,14 @@
 using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
+using System;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning
 {
     public class FinishFacingSequence : Sequence
     {
         public Machine Machine { get; set; }
+        public CoordinateSystem CoordinateSystem { get; set; }
         public Material Material { get; set; }
         public TurningExternalTool Tool { get; set; }
         public double ExternalDiameter { get; set; }
@@ -19,11 +21,30 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public double CornerBlunt { get; set; }
         public int SpeedFinish { get; set; }
         public double FeedFinish { get; set; }
-        public override OperationTime MachineTime => this.OperationTime();
+        public override OperationTime MachineTime
+        {
+            get
+            {
+                double cuttingTime = 0;
+                double rapidTime = 5;
+
+                var startX = ExternalDiameter;
+                var endX = InternalDiameter;
+
+                var feedFinish = FeedFinish;
+                var speedFinish = SpeedFinish;
+                var spinsFinish = (speedFinish * 1000) / (Math.PI * ((startX - endX) / 2));
+                cuttingTime += Calc.CrossTurningTime(startX, endX, spinsFinish, feedFinish);
+                rapidTime += Calc.CrossRapidTime(startX, endX);
+
+                return new OperationTime(cuttingTime, rapidTime);
+            }
+        }
         public override string Operation => Templates.FacingOperation.FinishFacing(
-            Machine, 
-            Material, 
-            Tool, 
+            Machine,
+            CoordinateSystem,
+            Material,
+            Tool,
             ExternalDiameter,
             Tool is null ? InternalDiameter : InternalDiameter - (Tool.Radius * 2),
             ProfStockAllow,
@@ -31,12 +52,13 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             BluntCustomAngle,
             BluntCustomRadius,
             CornerBlunt, 
-            SpeedFinish, 
-            FeedFinish);
+            SpeedFinish,
+            FeedFinish,
+            Coolant);
         public override MachineType MachineType => MachineType.Turning;
         public override string Name => $"Торцовка чистовая";
 
-        public FinishFacingSequence(Machine machine, Material material, TurningExternalTool tool,
+        public FinishFacingSequence(Machine machine, CoordinateSystem coordinateSystem, Material material, TurningExternalTool tool,
             double externalDiameter, 
             double internalDiameter, 
             double profStockAllow, 
@@ -48,6 +70,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
             double feedFinish)
         {
             Machine = machine;
+            CoordinateSystem = coordinateSystem;
             Material = material;
             Tool = tool;
             ExternalDiameter = externalDiameter;

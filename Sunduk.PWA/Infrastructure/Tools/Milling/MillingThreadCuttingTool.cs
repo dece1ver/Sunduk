@@ -27,6 +27,7 @@ namespace Sunduk.PWA.Infrastructure.Tools.Milling
         public ThreadStandard ThreadStandard { get; set; }
         public string StandardTemplate { get; set; }
         public double Pitch { get; set; }
+        public override string CallDetails => $"{Name}";
 
         public MillingThreadCuttingTool(int position, double diameter, ThreadStandard threadStandard, double pitch, string standardTemplate = "")
         {

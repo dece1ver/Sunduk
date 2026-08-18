@@ -18,6 +18,8 @@
 
     public void OnSwipe(SwipeEventArgs args)
     {
+        if (args.TouchEventArgs.PointerType != "touch") return;
+
         if (args.SwipeDirection == SwipeDirection.LeftToRight)
         {
             if (tabs.GetState(x => tabs.ActivePanelIndex) > 0)

@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 
 namespace Sunduk.PWA.Infrastructure.CAM
 {
-    public enum Mode 
-    { 
-        General, 
-        ToolTable, 
+    public enum Mode
+    {
+        General,
+        ToolTable,
         AddSequence,
         EditSequence,
-        Setup
+        Setup,
+        Machines
     };
 }

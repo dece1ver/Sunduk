@@ -10,7 +10,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning
         public override string Operation => Templates.Operation.TailstockOn(Machine);
         public override string Name => "Подвод задней бабки";
         public override MachineType MachineType => MachineType.Turning;
-        public override OperationTime MachineTime => this.OperationTime();
+        public override OperationTime MachineTime => new(0, 15);
         public Machine Machine { get; set; }
 
         public TailstockOnSequence(Machine machine)

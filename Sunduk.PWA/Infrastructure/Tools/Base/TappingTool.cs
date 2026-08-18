@@ -6,7 +6,7 @@ using Sunduk.PWA.Infrastructure.Sequences;
 
 namespace Sunduk.PWA.Infrastructure.Tools.Base
 {
-    public class TappingTool : Tool
+    public abstract class TappingTool : Tool
     {
         public enum Types { Forming, Cutting }
 

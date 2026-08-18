@@ -1,14 +1,16 @@
 ﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Base
 {
-    public class CustomSequence : Sequence
+    public abstract class CustomSequence : Sequence
     {
         public Machine Machine { get; set; }
         public Tool Tool { get; set; }
         public override string Name => $"Пользовательский переход";
-        public string CustomOperation { get; set; } 
+        public override OperationTime MachineTime => new(0, 0);
+        public string CustomOperation { get; set; }
         public CustomSequence(Machine machine, Tool tool, string customOperation)
         {
             Machine = machine;

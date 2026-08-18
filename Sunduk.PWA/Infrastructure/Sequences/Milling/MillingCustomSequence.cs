@@ -1,11 +1,11 @@
 ﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Time;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Milling
 {
     public class MillingCustomSequence : CustomSequence
     {
-        public Coolant Coolant { get; set; }
         public bool Polar { get; set; }
         public double SafePlane { get; set; }
         public CoordinateSystem CoordinateSystem { get; set; }

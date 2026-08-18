@@ -15,12 +15,14 @@ namespace Sunduk.PWA.Infrastructure.Sequences
         public override string Operation => Templates.Operation.SafetyString(Machine, SpeedLimit, CoordinateSystem);
         public override MachineType MachineType => MachineType.Any;
         public override OperationTime MachineTime => new(0, 0);
+        public override string Name { get; }
 
-        public SafetyStringSequence(Machine machine, int speedLimit, CoordinateSystem coordinateSystem)
+        public SafetyStringSequence(Machine machine, int speedLimit, CoordinateSystem coordinateSystem, string sequenceName = "Строка безопасности")
         {
             Machine = machine;
             SpeedLimit = speedLimit;
             CoordinateSystem = coordinateSystem;
+            Name = sequenceName;
         }
     }
 }

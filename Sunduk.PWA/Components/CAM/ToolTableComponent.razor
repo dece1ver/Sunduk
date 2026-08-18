@@ -10,7 +10,7 @@
 
                 @foreach (var tool in Tools.Where(x => x.MachineType is MachineType.Milling))
                 {
-                    <MudText Style="font-family: 'Roboto Mono', monospace">@tool.Description()</MudText>
+                    <MudText Style="font-family: 'Roboto Mono', monospace">T@(tool.Position.ToString("D2")) (@tool.TableDescription())</MudText>
                 }
             </MudTabPanel>
 
@@ -130,6 +130,8 @@
 
     public void OnSwipe(SwipeEventArgs args)
     {
+        if (args.TouchEventArgs.PointerType != "touch") return;
+
         switch (args.SwipeDirection)
         {
             case SwipeDirection.LeftToRight:

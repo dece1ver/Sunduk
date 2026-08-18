@@ -13,6 +13,9 @@
                         <MudText Class="mx-n4" Typo="Typo.body2">Справочник</MudText>
                     </ChildContent>
                     <NestedList>
+                        <MudListItem Dense="true" Icon="@Icons.Material.Filled.Info" Value="Formulas" Href="@($"/knowledge/{Formulas}")">
+                            <MudText Class="mx-n4" Typo="Typo.body2">Формулы</MudText>
+                        </MudListItem>
                         <MudListItem Dense="true" Icon="@Icons.Material.Filled.Info" Value="CenterLength" Href="@($"/knowledge/{CenterLength}")">
                             <MudText Class="mx-n4" Typo="Typo.body2">Глубина центровки</MudText>
                         </MudListItem>
@@ -57,6 +60,12 @@
             {
                 case About:
                     <AboutKnowledgeComponent />
+                    break;
+                case Formulas:
+                    <FormulasComponent />
+                    break;
+                case CuttingSpeeds:
+                    <CuttingSpeedsComponent />
                     break;
                 case CenterLength:
                     <CenterLengthComponent />
@@ -118,6 +127,8 @@
     public Breakpoint Breakpoint { get; set; }
     
     const string About = "about";
+    const string Formulas = "formulas";
+    const string CuttingSpeeds = "cutting-speeds";
     const string CenterLength = "center-length";
     const string NptThread = "npt-thread";
     const string BsppThread = "bspp-thread";

@@ -1,10 +1,10 @@
-﻿@inject ISnackbar Snackbar
+@inject ISnackbar Snackbar
 
 <MudField Label="Контур" Variant="Variant.Filled" Margin="Margin.Dense" Underline="false">
     <MudGrid Spacing="1">
         <MudItem xs="12" lg="6">
             <MudList Gutters="false" Dense="true" T="string">
-                @foreach (var element in Contour)
+                @foreach (var element in Contour ?? new List<Element>())
                 {
                     <MudListItem Dense="true">
                         <MudPaper Outlined="true" Class="py-n2 my-n2">
@@ -34,31 +34,30 @@
                                         break;
                                     case Line line:
                                     <MudItem>
-                                        <MudSelect T="ElementType" Value="ElementType.Line" Variant="FieldsVariant" Immediate="true" ValueChanged="((type) => SetArc(Contour.IndexOf(line), type))"
-                                        Label="Тип" Margin="Margin.Dense" Style="width: 137px; margin-left: 2px" DisableUnderLine="!FirstFieldsUnderline">
-                                            <MudSelectItem T="ElementType" Value="ElementType.Line">Линия</MudSelectItem>
-                                            <MudSelectItem T="ElementType" Value="ElementType.Arc">Дуга</MudSelectItem>
-                                        </MudSelect>
+                                        <MudBadge Origin="Origin.CenterLeft" Icon="@Icons.Material.Filled.Error" Color="Color.Error" Overlap="true" Visible="@(!ValidLine(Contour.IndexOf(line)))">
+                                            <MudSelect T="ElementType" Value="ElementType.Line" Variant="FieldsVariant" Immediate="true" ValueChanged="((type) => SetArc(Contour.IndexOf(line), type))"
+                                            Label="Тип" Margin="Margin.Dense" Style="width: 137px; margin-left: 2px" DisableUnderLine="!FirstFieldsUnderline">
+                                                <MudSelectItem T="ElementType" Value="ElementType.Line">Линия</MudSelectItem>
+                                                <MudSelectItem T="ElementType" Value="ElementType.Arc">Дуга</MudSelectItem>
+                                            </MudSelect>
+                                        </MudBadge>
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="line.X" Variant="FieldsVariant" Immediate="true" Label="X" DisableUnderLine="!FieldsUnderline" 
+                                        <MudTextField @bind-Value="line.X" Variant="FieldsVariant" Immediate="true" Label="X" DisableUnderLine="!FieldsUnderline"
                                         Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.NullableDoubleConverterWithZero"/>
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="line.Z" Variant="FieldsVariant" Immediate="true" Label="Z" DisableUnderLine="!FieldsUnderline" 
+                                        <MudTextField @bind-Value="line.Z" Variant="FieldsVariant" Immediate="true" Label="Z" DisableUnderLine="!FieldsUnderline"
                                         Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.NullableDoubleConverterWithZero"/>
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="line.Angle" Variant="FieldsVariant" Immediate="true" Label="A" DisableUnderLine="!FieldsUnderline" 
+                                        <MudTextField @bind-Value="line.Angle" Variant="FieldsVariant" Immediate="true" Label="A" DisableUnderLine="!FieldsUnderline"
                                         Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.DoubleConverter"/>
                                     </MudItem>
                                     <MudItem>
-                                        <MudTextField @bind-Value="line.Blunt" Variant="FieldsVariant" Immediate="true" Label="@BluntLabel(line)" DisableUnderLine="!FieldsUnderline" 
+                                        <MudTextField @bind-Value="line.Blunt" Variant="FieldsVariant" Immediate="true" Label="@BluntLabel(line)" DisableUnderLine="!FieldsUnderline"
                                         Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.DoubleConverter"/>
                                     </MudItem>
-                                    @*<MudItem>
-                                        <MudIconButton Style="margin-top: 3px; height: 40px; width: 40px" Variant="Variant.Text"/>
-                                    </MudItem>*@
                                         break;
                                     case Arc arc:
                                     <MudItem>
@@ -71,15 +70,15 @@
                                         </MudBadge>
                                     </MudItem>
                                     <MudItem>
-                                        @if (arc.Direction is Infrastructure.Direction.CW)
+                                        @if (arc.Direction is Sunduk.Geometry.Direction.CW)
                                         {
                                             <MudIconButton Style="@($"margin-top: 3px; height: {ButtonSize}px; width: {ButtonSize}px; margin-left: -4px")" Variant="ButtonsVariant" DisableElevation="true"
-                                            Icon="@Icons.Material.Filled.RotateRight" OnClick="(() => arc.Direction = Infrastructure.Direction.CCW)"/>
+                                            Icon="@Icons.Material.Filled.RotateRight" OnClick="(() => ToggleArcDirection(arc))"/>
                                         }
-                                        @if (arc.Direction is Infrastructure.Direction.CCW)
+                                        @if (arc.Direction is Sunduk.Geometry.Direction.CCW)
                                         {
                                             <MudIconButton Style="@($"margin-top: 3px; height: {ButtonSize}px; width: {ButtonSize}px; margin-left: -4px")" Variant="ButtonsVariant" DisableElevation="true"
-                                            Icon="@Icons.Material.Filled.RotateLeft" OnClick="(() => arc.Direction = Infrastructure.Direction.CW)"/>
+                                            Icon="@Icons.Material.Filled.RotateLeft" OnClick="(() => ToggleArcDirection(arc))"/>
                                         }
                                     </MudItem>
                                     <MudItem>
@@ -94,81 +93,65 @@
                                         <MudTextField @bind-Value="arc.Radius" Variant="FieldsVariant" Immediate="true" Label="R" DisableUnderLine="!FieldsUnderline"
                                         Margin="Margin.Dense" Style="@($"width: {FieldsWidth}px; margin-left: -4px")" Converter="Util.DoubleConverter"/>
                                     </MudItem>
-                                    
+
                                         break;
                                 }
                                 <MudItem Class="d-flex justify-end flex-grow-1 gap-4">
                                     <MudItem>
-                                        <MudIconButton Style="@($"margin-top: 3px; margin-left: 4px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true" 
+                                        <MudIconButton Style="@($"margin-top: 3px; margin-left: 4px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true"
                                         Icon="@Icons.Material.Filled.Calculate" OnClick="(() => CalculateElement(Contour.IndexOf(element)))"/>
                                     </MudItem>
                                     <MudItem>
-                                        <MudIconButton Style="@($"margin-top: 3px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true" 
-                                        Icon="@Icons.Material.Filled.Add" OnClick="(() => Contour.Insert(Contour.IndexOf(element) + 1, new Line(null, null)))"/>
+                                        <MudIconButton Style="@($"margin-top: 3px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true"
+                                        Icon="@Icons.Material.Filled.Add" OnClick="(() => InsertAfter(Contour.IndexOf(element)))"/>
                                     </MudItem>
                                     @if(Contour.IndexOf(element) > 0)
                                     {
                                     <MudItem>
-                                        <MudIconButton Style="@($"margin-top: 3px; margin-left: 4px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true" 
-                                        Icon="@Icons.Material.Filled.Remove" OnClick="(() => Contour.Remove(element))"/>
+                                        <MudIconButton Style="@($"margin-top: 3px; margin-left: 4px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true"
+                                        Icon="@Icons.Material.Filled.Remove" OnClick="(() => RemoveAt(Contour.IndexOf(element)))"/>
                                     </MudItem>
                                     }
                                 </MudItem>
-                                
+
                             </MudGrid>
                             </MudFocusTrap>
                         </MudPaper>
                     </MudListItem>
                 }
-                @*<MudPaper Outlined="true">
-                    <MudListItem Dense="true" OnClick="(() => Contour.Add(new Line(null, null)))">
-                        <MudGrid Justify="Justify.Center">
-                            <MudItem>
-                                <MudIcon Class="mt-1 mb-n1" Icon="@Icons.Material.Filled.Add"/>
-                            </MudItem>
-                        </MudGrid>
-                    </MudListItem>
-                </MudPaper>*@
-                <MudText>
+                <MudText Class="pa-2" Style="font-family: 'Roboto Mono', monospace; font-size: small; color: var(--mud-palette-text-secondary); white-space: pre-wrap;">
                     @Path
                 </MudText>
-                @*<MudText>
-                    @($"MaxX{MaxHeight} MaxZ{MaxLength}")
-                </MudText>
-                <MudText>
-                    @($"MedX{MediumX} MedZ{MediumZ}")
-                </MudText>
-                <MudText>
-                    @($"H{ContourHeight} W{ContourWidth}")
-                </MudText>*@
             </MudList>
         </MudItem>
         <MudItem xs="12" lg="6">
             <MudPaper Outlined="true" Class="mt-1">
-                <div style="text-align: center;" >
-                    <svg height="@FieldHeight" width="600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="@($"{0} {0} {ContourWidth} {ContourHeight}")">
+                <div style="text-align: center;">
+                    <svg height="@FieldHeight" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                         viewBox="@ViewBox" preserveAspectRatio="xMidYMid meet">
                         <defs>
-                            @if (Contour[0].X != null && Contour[0].Z != null)
+                            @if (!string.IsNullOrEmpty(Path))
                             {
-                                <g height="@(ContourHeight)" width="@(ContourWidth)" id="contour">
-                                    <path stroke="#FF5722" stroke-width="2" fill="none"
-                                          d="@Path"/>
-                                </g>
+                                <path id="contour" stroke="#FF5722" stroke-width="@Math.Max(1.5, Scale * 0.5)" fill="none" d="@Path"/>
                             }
-                            <g height="50" width="50" id="cs">
-                                <path stroke="white" stroke-width="1" fill="none"
-                                      d="M 0,-50 L 0,50 
-                                       M -50,0 L 50,0 
-                                       M -3,-42 L 0,-50 L 3,-42 
-                                       M 42,-3 L 50,0 L 42,3"/>
-                            </g>
                         </defs>
-                        <g transform="translate(@(Math.Round(ContourWidth / 2 - (MediumZ ?? 0) * 4)),@(Math.Round(ContourHeight / 2 + (MediumX ?? 0) * 2)))">
+                        @if (!string.IsNullOrEmpty(Path))
+                        {
                             <use xlink:href="#contour"/>
-                            <use xlink:href="#cs"/>
-                            <text x="4" y="-33" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="10">X+</text>
-                            <text x="35" y="12" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="10">Z+</text>
-                        </g>
+                        }
+                        @* Система координат: ось Z — горизонталь, ось X — вертикаль (токарная обработка) *@
+                        @if (HasContour)
+                        {
+                            <g stroke="white" stroke-width="@Math.Max(1, Scale * 0.25)" fill="none">
+                                <path d="@(CsGeometry)"/>
+                            </g>
+                            <g transform="translate(@XPlusX,@XPlusY)">
+                                <text x="0" y="0" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="10">X+</text>
+                            </g>
+                            <g transform="translate(@ZPlusX,@ZPlusY)">
+                                <text x="0" y="0" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="10">Z+</text>
+                            </g>
+                        }
                     </svg>
                 </div>
             </MudPaper>
@@ -178,6 +161,9 @@
 
 
 @code {
+    public const double Scale = 4;
+    public const double Padding = 12;
+    private const double CsLength = 6;
 
     public Variant FieldsVariant => Variant.Filled;
     public Variant ButtonsVariant => Variant.Filled;
@@ -185,8 +171,16 @@
     public bool FirstFieldsUnderline => false;
     public int ButtonSize => 48;
     public int FieldsWidth => 87;
+    public int FieldHeight => Contour.Count < 6 ? 330 : Contour.Count * 55;
 
-    public int ElementIndex { get; set; }
+    [Parameter]
+    public List<Element> Contour { get; set; } = new List<Element>
+    {
+        new Point(null, null)
+    };
+
+    [Parameter]
+    public EventCallback<List<Element>> ContourChanged { get; set; }
 
     public ElementType Type { get; set; }
 
@@ -197,114 +191,144 @@
         Arc
     }
 
-    public double? MaxHeight { get
-        {
-            double? minX = Contour.Select(x => x.X).Min();
-            if (minX > 0) minX = 0;
-            double? maxX = Contour.Select(x => x.X).Max();
-            return maxX - minX;
-        } }
+    bool HasContour => Contour.Count > 0 && Contour[0].X != null && Contour[0].Z != null;
 
-    public double? MediumX { get
-        {
-            double? minX = Contour.Select(x => x.X).Min();
-            if (minX > 0) minX = 0;
-            double? maxX = Contour.Select(x => x.X).Max();
-            return (maxX + minX) / 2;
-        } }
+    /// Экран X ← Z контура (горизонталь), экран Y ← -X/2 (вертикаль, диаметр → радиус).
+    double SX(double? z) => (z ?? 0) * Scale;
+    double SY(double? x) => -(x ?? 0) / 2 * Scale;
 
-    public double? MaxLength { get
-        {
-            double? minZ = Contour.Select(x => x.Z).Min();
-            double? maxZ = Contour.Select(x => x.Z).Max();
-            return maxZ - minZ;
-        } }
+    double AbsMaxX => Contour.Count > 0 ? Math.Max(2.0, Math.Max(Math.Abs(Contour.Where(e => e.X is not null).Select(e => e.X.Value).DefaultIfEmpty(0).Max()),
+                                                              Math.Abs(Contour.Where(e => e.X is not null).Select(e => e.X.Value).DefaultIfEmpty(0).Min()))) : 2;
+    double AbsMaxLength => Contour.Count > 0 ? Math.Max(2.0, Math.Max(Math.Abs(Contour.Where(e => e.Z is not null).Select(e => e.Z.Value).DefaultIfEmpty(0).Max()),
+                                                                Math.Abs(Contour.Where(e => e.Z is not null).Select(e => e.Z.Value).DefaultIfEmpty(0).Min()))) : 2;
 
-    public double? MediumZ { get
-        {
-            double? minZ = Contour.Select(x => x.Z).Min();
-            double? maxZ = Contour.Select(x => x.Z).Max();
-            return (maxZ + minZ) / 2;
-        } }
+    string XPlusX => (SX(0) + 4).ToString(System.Globalization.CultureInfo.InvariantCulture);
+    string XPlusY => (SY(Math.Max(2 * AbsMaxX, 1)) - 3).ToString(System.Globalization.CultureInfo.InvariantCulture);
+    string ZPlusX => (SX(Math.Max(AbsMaxLength * 0.45, 2)) + 3).ToString(System.Globalization.CultureInfo.InvariantCulture);
+    string ZPlusY => (SY(0) + 3).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
-    public double ContourHeight { get
+    public string ViewBox
+    {
+        get
         {
-            double maxHeight = 200;
-            double tempCalc = (MaxHeight ?? 0) * 2 + 20;
-            if (tempCalc > maxHeight) maxHeight = tempCalc;
-            return Math.Abs(maxHeight);
-        } }
+            if (!HasContour) return $"{-Padding} {-Padding} {2 * Padding} {2 * Padding}";
+            double maxZ = Contour.Where(e => e.Z is not null).Select(e => e.Z.Value).Max();
+            double minZ = Contour.Where(e => e.Z is not null).Select(e => e.Z.Value).Min();
+            double maxX = Contour.Where(e => e.X is not null).Select(e => e.X.Value).Max();
+            double minX = Contour.Where(e => e.X is not null).Select(e => e.X.Value).Min();
+            double sxMin = SX(minZ);
+            double sxMax = SX(maxZ);
+            double syMin = SY(maxX);
+            double syMax = SY(minX);
+            double left = sxMin - Padding;
+            double top = syMin - Padding;
+            double width = sxMax - sxMin + 2 * Padding;
+            double height = syMax - syMin + 2 * Padding;
+            return $"{left.ToString(System.Globalization.CultureInfo.InvariantCulture)} {top.ToString(System.Globalization.CultureInfo.InvariantCulture)} {Math.Max(width, 1).ToString(System.Globalization.CultureInfo.InvariantCulture)} {Math.Max(height, 1).ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+        }
+    }
 
-    public double ContourWidth { get
-        {
-            double maxWidth = 400;
-            double tempCalc = (MaxLength ?? 0) * 6;
-            if (tempCalc > maxWidth) maxWidth = tempCalc;
-            return Math.Abs(maxWidth);
-        } }
+    string CsGeometry =>
+        $"M {SX(-CsLength).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(0).ToString(System.Globalization.CultureInfo.InvariantCulture)} L {SX(CsLength).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(0).ToString(System.Globalization.CultureInfo.InvariantCulture)} " +
+        $"M {SX(0).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(-CsLength).ToString(System.Globalization.CultureInfo.InvariantCulture)} L {SX(0).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(CsLength).ToString(System.Globalization.CultureInfo.InvariantCulture)} " +
+        $"M {SX(-3).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(CsLength * 0.85).ToString(System.Globalization.CultureInfo.InvariantCulture)} L {SX(0).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(CsLength).ToString(System.Globalization.CultureInfo.InvariantCulture)} L {SX(3).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(CsLength * 0.85).ToString(System.Globalization.CultureInfo.InvariantCulture)}";
 
-    public double FieldHeight { get
+    public string Path
+    {
+        get
         {
-            if (Contour.Count < 6) return 330;
-            return Contour.Count * 55;
-        } }
-
-    public string Path { get
-        {
+            if (Contour is null || Contour.Count == 0) return string.Empty;
             if (Contour[0].X is null && Contour[0].Z is null) return string.Empty;
-            string path = string.Empty;
-            foreach (var element in Contour)
+
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < Contour.Count; i++)
             {
+                var element = Contour[i];
+                var prev = i > 0 ? Contour[i - 1] : null;
                 switch (element)
                 {
                     case Point point:
-                        path += $"M {(point.Z * 4).ToString().Replace(",", ".")},{(-point.X / 2 * 4).ToString().Replace(",", ".")} ";
-                        if (point.Blunt > 0 && Contour.Count > Contour.IndexOf(point) + 1)
+                        sb.Append($"M {SX(point.Z).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(point.X).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
+                        if (point.Blunt > 0 && i + 1 < Contour.Count)
                         {
-                            path += $"A{(point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},0,0{(point.Z > (Contour[Contour.IndexOf(point) + 1].Z) ? 0 : 1)},{(point.Z > (Contour[Contour.IndexOf(point) + 1].Z) ? -point.Blunt * 4 : point.Blunt * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(-Contour[Contour.IndexOf(point) + 1].X / 2 * 4).ToString().Replace(",", ".")} ";
+                            var next = Contour[i + 1];
+                            var nextX = next.X ?? point.X;
+                            var nextZ = next.Z ?? point.Z;
+                            bool downZ = (point.Z ?? 0) > (nextZ ?? 0);
+                            double bluntJx = downZ ? -point.Blunt : point.Blunt;
+                            sb.Append($"A{(point.Blunt * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},{(point.Blunt * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},0,0,{(downZ ? 0 : 1)},{SX((point.Z ?? 0) + bluntJx).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(nextX).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
                         }
                         break;
                     case Line line:
-                        double? tempLineX = line.X ?? Contour[Contour.IndexOf(line) - 1].X;
-                        double? tempLineZ = line.Z ?? Contour[Contour.IndexOf(line) - 1].Z;
-                        path += $"L {(tempLineZ * 4).ToString().Replace(",", ".")},{(-tempLineX / 2 * 4).ToString().Replace(",", ".")} ";
+                        var (lX, lZ) = Resolve(line.X, line.Z, prev);
+                        sb.Append($"L {SX(lZ).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(lX).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
                         break;
                     case Arc arc:
-                        double? tempArcX = arc.X ?? Contour[Contour.IndexOf(arc) - 1].X;
-                        double? tempArcZ = arc.Z ?? Contour[Contour.IndexOf(arc) - 1].Z;
-                        if (ValidArc(Contour.IndexOf(arc)))
+                        var (aX, aZ) = Resolve(arc.X, arc.Z, prev);
+                        if (ValidArc(i))
                         {
-                            path += $"A{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},{(arc.Radius * 4).ToString(CultureInfo.InvariantCulture).Replace(",", ".")},0,0{(arc.Direction is Infrastructure.Direction.CCW ? 0 : 1)},{(tempArcZ * 4).ToString().Replace(",", ".")},{(-tempArcX / 2 * 4).ToString().Replace(",", ".")} ";
+                            int sweep = arc.Direction is Sunduk.Geometry.Direction.CCW ? 0 : 1;
+                            sb.Append($"A{(arc.Radius * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},{(arc.Radius * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},0,0,{sweep},{SX(aZ).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(aX).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
                         }
                         else
                         {
-                            path += $"L {(tempArcZ * 4).ToString().Replace(",", ".")},{(-tempArcX / 2 * 4).ToString().Replace(",", ".")} ";
+                            sb.Append($"L {SX(aZ).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(aX).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
                         }
                         break;
                 }
             }
-            return path;
-        } set { } }
+            return sb.ToString();
+        }
+    }
 
-    public List<Element> Contour { get; set; } = new List<Element>()
+    static (double? x, double? z) Resolve(double? x, double? z, Element prev)
     {
-        new Point(null, null)
-    };
+        double? rx = x;
+        double? rz = z;
+        if (rx is null && prev is not null) rx = prev.X;
+        if (rz is null && prev is not null) rz = prev.Z;
+        return (rx, rz);
+    }
+
+    void Notify() => ContourChanged.InvokeAsync(Contour);
 
     private void SetArc(int index, ElementType type)
     {
-        if (type is ElementType.Arc)
+        if (type is not ElementType.Arc) return;
+        if (Contour[index] is Line line)
         {
-            Contour[index] = new Arc(Contour[index].X, Contour[index].Z, (Contour[index] as Line).Blunt, Sunduk.PWA.Infrastructure.Direction.CCW);
+            Contour[index] = new Arc(line.X, line.Z, line.Blunt > 0 ? line.Blunt : 1, Sunduk.Geometry.Direction.CCW);
+            Notify();
         }
     }
 
     private void SetLine(int index, ElementType type)
     {
-        if (type is ElementType.Line)
+        if (type is not ElementType.Line) return;
+        if (Contour[index] is Arc arc)
         {
-            Contour[index] = new Line(Contour[index].X, Contour[index].Z, 0, ((Contour[index] as Arc)!).Radius);
+            Contour[index] = new Line(arc.X, arc.Z, 0, arc.Radius);
+            Notify();
         }
+    }
+
+    private void ToggleArcDirection(Arc arc)
+    {
+        arc.Direction = arc.Direction is Sunduk.Geometry.Direction.CW ? Sunduk.Geometry.Direction.CCW : Sunduk.Geometry.Direction.CW;
+        Notify();
+    }
+
+    private void InsertAfter(int index)
+    {
+        Contour.Insert(index + 1, new Line(null, null));
+        Notify();
+    }
+
+    private void RemoveAt(int index)
+    {
+        if (index <= 0) return;
+        Contour.RemoveAt(index);
+        Notify();
     }
 
     string ContourElementIcon(Element element)
@@ -312,7 +336,7 @@
         return element switch
         {
             Line => Icons.Material.Filled.ArrowDropDown,
-            Arc arc => arc.Direction is Infrastructure.Direction.CW ? Icons.Material.Filled.RotateRight : Icons.Material.Filled.RotateLeft,
+            Arc arc => arc.Direction is Sunduk.Geometry.Direction.CW ? Icons.Material.Filled.RotateRight : Icons.Material.Filled.RotateLeft,
             _ => Icons.Material.Filled.ArrowDropDown
             };
     }
@@ -327,44 +351,173 @@
         };
     }
 
+    bool ValidLine(int index)
+    {
+        if (index <= 0) return false;
+        var line = Contour[index] as Line;
+        if (line is null) return false;
+        if (line.X is not null && line.Z is not null) return true;
+        if ((line.X is null || line.Z is null) && line.Angle != 0) return true;
+        var prev = Contour[index - 1];
+        if (line.X is null && prev.X is not null) return true;
+        if (line.Z is null && prev.Z is not null) return true;
+        // backward fallback: может быть рассчитано от следующего
+        if (index + 1 < Contour.Count)
+        {
+            var next = Contour[index + 1];
+            if (line.X is null && next.X is not null) return true;
+            if (line.Z is null && next.Z is not null) return true;
+        }
+        return false;
+    }
+
     bool ValidArc(int index)
     {
-        if (index >= Contour.Count || index <= 0) return false;
-        double radius = ((Contour[index] as Arc)!).Radius;
-        if (radius <= 0) return false; 
-        double? xDifference = (Contour[index].X - Contour[index - 1].X) / 2;
-        double? zDifference = Contour[index].Z - Contour[index - 1].Z;
-        double length = Math.Sqrt(Math.Pow(xDifference ?? 0, 2) + Math.Pow(zDifference ?? 0, 2));
-        return !(radius * 2 < length);
+        if (index <= 0 || index >= Contour.Count) return false;
+        if (Contour[index] is not Arc arc) return false;
+        if (arc.Radius <= 0) return false;
+        var prev = Contour[index - 1];
+        var (x, z) = Resolve(arc.X, arc.Z, prev);
+        var (px, pz) = Resolve(prev.X, prev.Z, null);
+        if (x is null || z is null || px is null || pz is null) return false;
+        double dx = (x.Value - px.Value) / 2;
+        double dz = z.Value - pz.Value;
+        double chord = Math.Sqrt(dx * dx + dz * dz);
+        return arc.Radius * 2 >= chord - 1e-6;
     }
 
     void CalculateElement(int index)
     {
-        var element = Contour[index];
-        if (Contour.Count > index + 1)
+        if (index < 0 || index >= Contour.Count)
         {
-            switch (element)
+            Snackbar.Add("Нечего считать", Severity.Info);
+            return;
+        }
+        var element = Contour[index];
+        var prev = index > 0 ? Contour[index - 1] : null;
+        var next = index + 1 < Contour.Count ? Contour[index + 1] : null;
+
+        switch (element)
+        {
+            case Point point:
             {
-                case Point point:
-                    if (point.Blunt >= 0 &&
-                        point.X is null &&
-                        Contour[index + 1] is Line {X: { } } nextLineX)
-                    {
-                        point.X = nextLineX.X - point.Blunt * 2;
-                    }
-                    if (point.Blunt >= 0 &&
-                        point.Z is null &&
-                        Contour[index + 1] is Line {Z: { } })
-                    {
+                // Special: compute from next Line with blunt
+                if (next is Line nextLine)
+                {
+                    if (point.Blunt >= 0 && point.X is null && nextLine.X is not null)
+                        point.X = nextLine.X - point.Blunt * 2;
+                    if (point.Blunt >= 0 && point.Z is null)
                         point.Z = 0;
+                }
+                // Forward: inherit from prev
+                if (point.X is null && prev?.X is not null) point.X = prev.X;
+                if (point.Z is null && prev?.Z is not null) point.Z = prev.Z;
+                // Backward fallback: inherit from next
+                if (point.X is null && next?.X is not null) point.X = next.X;
+                if (point.Z is null && next?.Z is not null) point.Z = next.Z;
+                break;
+            }
+
+            case Line line:
+            {
+                // Наследование от предыдущего, если null
+                if (line.X is null && prev?.X is not null) line.X = prev.X;
+                if (line.Z is null && prev?.Z is not null) line.Z = prev.Z;
+
+                // Расчёт через угол, если одна координата неизвестна
+                if (line.Angle != 0 && (line.X is null || line.Z is null) && (line.X is not null || line.Z is not null))
+                {
+                    if (line.Angle <= 0 || line.Angle >= 90)
+                    {
+                        Snackbar.Add("Угол должен быть в диапазоне (0, 90)", Severity.Warning);
+                        break;
                     }
-                    return;
+
+                    double tanCompl = Math.Tan((90 - line.Angle).Radians());
+                    bool linePrevFull = prev is { X: not null, Z: not null };
+                    bool lineNextFull = next is { X: not null, Z: not null };
+
+                    if (linePrevFull)
+                    {
+                        double pX = prev.X.Value, pZ = prev.Z.Value;
+                        if (line.X is not null && line.Z is null)
+                        {
+                            double dX = line.X.Value - pX;
+                            line.Z = pZ - Math.Sign(dX) * Math.Abs(dX / 2 * tanCompl);
+                        }
+                        else if (line.Z is not null && line.X is null)
+                        {
+                            double dZ = line.Z.Value - pZ;
+                            line.X = pX - Math.Sign(dZ) * Math.Abs(2 * dZ / tanCompl);
+                        }
+                    }
+                    else if (lineNextFull)
+                    {
+                        double nX = next.X.Value, nZ = next.Z.Value;
+                        if (line.X is not null && line.Z is null)
+                        {
+                            double dX = line.X.Value - nX;
+                            line.Z = nZ - Math.Sign(dX) * Math.Abs(dX / 2 * tanCompl);
+                        }
+                        else if (line.Z is not null && line.X is null)
+                        {
+                            double dZ = line.Z.Value - nZ;
+                            line.X = nX - Math.Sign(dZ) * Math.Abs(2 * dZ / tanCompl);
+                        }
+                    }
+                    else
+                    {
+                        Snackbar.Add("Не хватает соседей для расчёта по углу", Severity.Warning);
+                    }
+                    break;
+                }
+                break;
+            }
+
+            case Arc arc:
+            {
+                // Inherit missing coords from prev, fallback to next
+                if (arc.X is null)
+                {
+                    if (prev?.X is not null) arc.X = prev.X;
+                    else if (next?.X is not null) arc.X = next.X;
+                }
+                if (arc.Z is null)
+                {
+                    if (prev?.Z is not null) arc.Z = prev.Z;
+                    else if (next?.Z is not null) arc.Z = next.Z;
+                }
+
+                bool arcPrevFull = prev is { X: not null, Z: not null };
+                bool arcNextFull = next is { X: not null, Z: not null };
+                var reference = (arcPrevFull || !arcNextFull) ? prev : next;
+
+                var (ax, az) = Resolve(arc.X, arc.Z, reference);
+                var (px, pz) = Resolve(reference?.X, reference?.Z, null);
+                if (ax is not null && az is not null && px is not null && pz is not null && arc.Radius > 0)
+                {
+                    double mx = (ax.Value + px.Value) / 2;
+                    double mz = (az.Value + pz.Value) / 2;
+                    double dx = ax.Value - px.Value;
+                    double dz = az.Value - pz.Value;
+                    double chord = Math.Sqrt((dx / 2) * (dx / 2) + dz * dz);
+                    if (chord <= arc.Radius)
+                    {
+                        double h = Math.Sqrt(arc.Radius * arc.Radius - chord * chord);
+                        double nx = -dz / (2 * chord);
+                        double nz = (dx / 2) / chord;
+                        double sign = arc.Direction is Sunduk.Geometry.Direction.CCW ? 1 : -1;
+                        arc.CenterX = mx + sign * h * nx;
+                        arc.CenterZ = mz + sign * h * nz;
+                    }
+                    else
+                    {
+                        Snackbar.Add("Радиус дуги меньше половины хорды", Severity.Warning);
+                    }
+                }
+                break;
             }
         }
-        else
-        {
-            Snackbar.Add("Нечего считать");
-        }
+        Notify();
     }
-
 }

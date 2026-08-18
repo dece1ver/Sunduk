@@ -12,7 +12,10 @@ namespace Sunduk.PWA.Infrastructure.Tools.Turning
 
         public override string Name => "RAST";
 
+        public override ToolNoseVector NoseVector => ToolNoseVector.BoringInternal;
+
         public override MachineType MachineType => MachineType.Turning;
+        public override string CallDetails => $"{Name} D{Diameter} {Angle} R{Radius}";
 
         public TurningInternalTool(int position, double diameter, double angle, double radius, ToolHand hand = ToolHand.Right)
         {

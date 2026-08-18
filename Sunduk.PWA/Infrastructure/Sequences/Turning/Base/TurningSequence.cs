@@ -1,12 +1,12 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
-using Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base;
+using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.Geometry.ContourElements.Base;
 using System.Collections.Generic;
 using Sunduk.PWA.Infrastructure.Tools.Base;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 
 namespace Sunduk.PWA.Infrastructure.Sequences.Turning.Base
 {
-    public class TurningSequence : Sequence
+    public abstract class TurningSequence : Sequence
     {
         public TurningSequence(Machine machine, Material material, TurningTool tool, List<Element> contour, double stepOver, double roughStockAllow, double profStockAllow)
         {
@@ -20,6 +20,7 @@ namespace Sunduk.PWA.Infrastructure.Sequences.Turning.Base
         }
 
         public Machine Machine { get; set; }
+        public CoordinateSystem CoordinateSystem { get; set; }
         public Material Material { get; set; }
         public TurningTool Tool { get; set; }
         public List<Element> Contour { get; set; }

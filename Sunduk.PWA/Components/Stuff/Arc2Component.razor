@@ -1,4 +1,5 @@
-﻿<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+﻿@inject Arc2State State
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
     <MudGrid Spacing="1">
         <MudItem xs="12" sm="6">
             <MudField Label="Параметры" Variant="Variant.Filled" Underline="false" Class="mt-1"
@@ -144,7 +145,7 @@
     readonly int _imgHeigth = 210;
     readonly int _imgWidth = 250;
 
-    public bool RoundCorner { get; set; } = false;
+    public bool RoundCorner { get => State.RoundCorner; set => State.RoundCorner = value; }
 
     public enum Images
     {
@@ -155,7 +156,7 @@
         ToolRadius,
     };
     public enum ImageType { Diameter, ToolRadius, ChamferAngle, ChamferSize };
-    public Images CurrentImage { get; set; } = Images.Base;
+    public Images CurrentImage { get => State.CurrentImage; set => State.CurrentImage = value; }
 
     public string RadiusExample
     {
@@ -176,21 +177,21 @@
         }
     }
     public enum Radius { External, Internal };
-    public Radius RadiusType { get; set; } = Radius.External;
+    public Radius RadiusType { get => State.RadiusType; set => State.RadiusType = value; }
 
-    public string _PartDiameter { get; set; } = string.Empty;
+    public string _PartDiameter { get => State.PartDiameter; set => State.PartDiameter = value; }
     public double PartDiameter => _PartDiameter.GetDouble();
-    
-    public string _RadiusSize { get; set; } = string.Empty;
+
+    public string _RadiusSize { get => State.RadiusSize; set => State.RadiusSize = value; }
     public double RadiusSize => _RadiusSize.GetDouble();
 
-    public string _StartDiameter { get; set; } = string.Empty;
+    public string _StartDiameter { get => State.StartDiameter; set => State.StartDiameter = value; }
     public double StartDiameter => _StartDiameter.GetDouble();
 
-    public string _InsertRadius { get; set; } = string.Empty;
+    public string _InsertRadius { get => State.InsertRadius; set => State.InsertRadius = value; }
     public double InsertRadius => _InsertRadius.GetDouble();
-    
-    public string _Blunt { get; set; } = "0.3";
+
+    public string _Blunt { get => State.Blunt; set => State.Blunt = value; }
     public double Blunt => _Blunt.GetDouble();
     public double FullBluntRadius => Blunt + InsertRadius;
 

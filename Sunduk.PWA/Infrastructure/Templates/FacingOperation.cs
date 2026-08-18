@@ -1,4 +1,4 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences.Base;
+using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.PWA.Infrastructure.Sequences.Turning;
 using Sunduk.PWA.Infrastructure.Tools.Turning;
 using System;
@@ -34,7 +34,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <param name="feedRough">Черновая подача</param>
         /// <param name="feedFinish">Чистовая подача</param>
         /// <returns></returns>
-        public static string Facing(Machine machine, Material material, TurningExternalTool tool,
+        public static string Facing(Machine machine, CoordinateSystem coordinateSystem, Material material, TurningExternalTool tool,
             double externalDiameter, double internalDiameter, double roughStockAllow, double profStockAllow,
             double stepOver, (int, int) seqNo, 
             Blunt bluntType, 
@@ -43,10 +43,11 @@ namespace Sunduk.PWA.Infrastructure.Templates
             double cornerBlunt, 
             bool cycleProfStockAllow, 
             bool doFinish, 
-            int speedRough, 
-            int speedFinish, 
-            double feedRough, 
-            double feedFinish)
+            int speedRough,
+            int speedFinish,
+            double feedRough,
+            double feedFinish,
+            Coolant coolant = Coolant.General)
         {
             if (tool is null ||
                 externalDiameter == 0 ||
@@ -55,39 +56,24 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 stepOver == 0) return string.Empty;
 
             var simpleChamferSize = cornerBlunt + tool.Radius / 2;
-            var fullChamferSize = Calc.ChamferShifts(bluntCustomAngle, tool.Radius).Z + cornerBlunt;
+            var fullChamferSize = GeometryMath.ChamferShifts(bluntCustomAngle, tool.Radius).Z + cornerBlunt;
             var fullChamferRadius = bluntType == Blunt.CustomChamfer ? tool.Radius + bluntCustomRadius : tool.Radius + cornerBlunt;
             var endZ = cycleProfStockAllow ? 0 : profStockAllow;
             var blunt = $"G0 Z{endZ.NC()}";
+            if (machine.MachineType != MachineType.Turning) return string.Empty;
             if (!(cornerBlunt > 0))
-                return machine switch
-                {
-                    Machine.GS1500 =>
-                        TurningReferentPoint +
-                        tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                        $"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{speedRough} {Direction(tool)}\n" +
-                        $"G72 W{stepOver.NC()} R0.1\n" +
-                        $"G72 P{seqNo.Item1} Q{seqNo.Item2}{((profStockAllow > 0 && cycleProfStockAllow) ? " W" + profStockAllow.NC() : string.Empty)} F{feedRough.NC()}\n" +
-                        $"N{seqNo.Item1} {blunt}\n" +
-                        $"N{seqNo.Item2} {(cornerBlunt <= 0 ? "G1 " : string.Empty)}X{internalDiameter.NC()}\n" +
-                        $"{(doFinish ? $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{speedFinish} F{feedFinish.NC()}\n" : string.Empty)}" +
-                        $"{CoolantOff(machine)}\n" +
-                        TurningReferentPoint,
-
-                    Machine.L230A =>
-                        tool.Description(ToolDescriptionOption.L230) + "\n" +
-                        $"{CoolantOn(machine)}\n" +
-                        $"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{speedRough} {Direction(tool)}\n" +
-                        $"G72 W{stepOver.NC()} R0.1\n" +
-                        $"G72 P{seqNo.Item1} Q{seqNo.Item2}{((profStockAllow > 0 && cycleProfStockAllow) ? " W" + profStockAllow.NC() : string.Empty)} F{feedRough.NC()}\n" +
-                        $"N{seqNo.Item1} {blunt}\n" +
-                        $"N{seqNo.Item2} {(cornerBlunt <= 0 ? "G1 " : string.Empty)}X{internalDiameter.NC()}\n" +
-                        $"{(doFinish ? $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{speedFinish} F{feedFinish.NC()}\n" : string.Empty)}" +
-                        $"{CoolantOff(machine)}\n" +
-                        TurningReferentPoint,
-
-                    _ => string.Empty,
-                };
+                return new GCodeBuilder()
+                    .ReferentPoint(machine, leading: true)
+                    .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
+                    .Line($"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} {tool.SpindleOn(speedRough)}")
+                    .Line($"G72 W{stepOver.NC()} R0.1")
+                    .Line($"G72 P{seqNo.Item1} Q{seqNo.Item2}{((profStockAllow > 0 && cycleProfStockAllow) ? " W" + profStockAllow.NC() : string.Empty)} F{feedRough.NC()}")
+                    .Line($"N{seqNo.Item1} {blunt}")
+                    .Line($"N{seqNo.Item2} {(cornerBlunt <= 0 ? "G1 " : string.Empty)}X{internalDiameter.NC()}")
+                    .RawIf(doFinish, $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{speedFinish} F{feedFinish.NC()}\n")
+                    .CoolantOff(machine, coolant)
+                    .ReferentPoint(machine, leading: false)
+                    .ToString();
             switch (bluntType)
             {
                 case Blunt.SimpleChamfer:
@@ -104,7 +90,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     blunt = bluntCustomRadius switch
                     {
                         > 0 when bluntCustomAngle > 0 && bluntCustomAngle < 90 =>
-                            $"G0 Z{(profStockAllow - fullChamferSize - Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()}\n" +
+                            $"G0 Z{(profStockAllow - fullChamferSize - GeometryMath.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()}\n" +
                             $"G1 X{externalDiameter.NC()}\n" +
                             $"Z{(profStockAllow - fullChamferSize).NC()} R{fullChamferRadius.NC()}\n" +
                             $"Z{endZ.NC()} A-{bluntCustomAngle.NC()} R{fullChamferRadius.NC()}",
@@ -116,34 +102,18 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     break;
             }
 
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TurningReferentPoint +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} {Direction(tool)}\n" +
-                $"G72 W{stepOver.NC()} R0.1\n" +
-                $"G72 P{seqNo.Item1} Q{seqNo.Item2}{((profStockAllow > 0 && cycleProfStockAllow) ? " W" + profStockAllow.NC() : string.Empty)} F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1} {blunt}\n" +
-                $"N{seqNo.Item2} {(cornerBlunt <= 0 ? "G1 " : string.Empty)}X{internalDiameter.NC()}\n" +
-                $"{(doFinish ? $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
-                $"{CoolantOff(machine)}\n" +
-                TurningReferentPoint,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} S{CuttingSpeedRough(material)} {Direction(tool)}\n" +
-                $"G72 W{stepOver.NC()} R0.1\n" +
-                $"G72 P{seqNo.Item1} Q{seqNo.Item2}{((profStockAllow > 0 && cycleProfStockAllow) ? " W" + profStockAllow.NC() : string.Empty)} F{FeedRough(tool.Radius).NC()}\n" +
-                $"N{seqNo.Item1} {blunt}\n" +
-                $"N{seqNo.Item2} {(cornerBlunt <= 0 ? "G1 " : string.Empty)}X{internalDiameter.NC()}\n" +
-                $"{(doFinish ? $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" : string.Empty)}" +
-                $"{CoolantOff(machine)}\n" +
-                TurningReferentPoint,
-
-                _ => string.Empty,
-            };
+            return new GCodeBuilder()
+                .ReferentPoint(machine, leading: true)
+                .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
+                .Line($"G0 X{(externalDiameter + 5).NC(1)} Z{roughStockAllow.NC()} {tool.SpindleOn(CuttingSpeedRough(material))}")
+                .Line($"G72 W{stepOver.NC()} R0.1")
+                .Line($"G72 P{seqNo.Item1} Q{seqNo.Item2}{((profStockAllow > 0 && cycleProfStockAllow) ? " W" + profStockAllow.NC() : string.Empty)} F{FeedRough(tool.Radius).NC()}")
+                .Line($"N{seqNo.Item1} {blunt}")
+                .Line($"N{seqNo.Item2} {(cornerBlunt <= 0 ? "G1 " : string.Empty)}X{internalDiameter.NC()}")
+                .RawIf(doFinish, $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n")
+                .CoolantOff(machine, coolant)
+                .ReferentPoint(machine, leading: false)
+                .ToString();
         }
 
         /// <summary>
@@ -155,6 +125,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
         public static string FinishFacingCycle(TurningExternalTool tool, Sequence roughFacingSequence, int speedFinish, double feedFinish)
         {
             Machine machine;
+            CoordinateSystem coordinateSystem;
             Material material;
             double externalDiameter;
             double internalDiameter;
@@ -164,6 +135,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
             {
                 case RoughFacingSequence sequence:
                     machine = sequence.Machine;
+                    coordinateSystem = sequence.CoordinateSystem;
                     material = sequence.Material;
                     externalDiameter = sequence.ExternalDiameter;
                     internalDiameter = sequence.InternalDiameter;
@@ -172,6 +144,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     break;
                 case RoughFacingCycleSequence roughFacingCycleSequence:
                     machine = roughFacingCycleSequence.Machine;
+                    coordinateSystem = roughFacingCycleSequence.CoordinateSystem;
                     material = roughFacingCycleSequence.Material;
                     externalDiameter = roughFacingCycleSequence.ExternalDiameter;
                     internalDiameter = roughFacingCycleSequence.InternalDiameter;
@@ -180,6 +153,7 @@ namespace Sunduk.PWA.Infrastructure.Templates
                     break;
                 case FacingSequence facingSequence:
                     machine = facingSequence.Machine;
+                    coordinateSystem = facingSequence.CoordinateSystem;
                     material = facingSequence.Material;
                     externalDiameter = facingSequence.ExternalDiameter;
                     internalDiameter = facingSequence.InternalDiameter;
@@ -194,66 +168,61 @@ namespace Sunduk.PWA.Infrastructure.Templates
             if (tool is null ||
                 externalDiameter == 0 ||
                 externalDiameter < internalDiameter) return string.Empty;
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TurningReferentPoint +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{speedFinish} {Direction(tool)}\n" +
-                $"G70 P{seqNo.Item1} Q{seqNo.Item2} F{feedFinish.NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TurningReferentPoint,
+            if (machine.MachineType != MachineType.Turning) return string.Empty;
 
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{CuttingSpeedFinish(material)} {Direction(tool)}\n" +
-                $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}\n" +
-                $"{CoolantOff(machine)}\n" +
-                TurningReferentPoint,
-
-                _ => string.Empty,
-            };
+            var coolant = roughFacingSequence.Coolant;
+            var speed = machine.LeadingReferentPoint ? speedFinish : CuttingSpeedFinish(material);
+            var g70Line = machine.LeadingReferentPoint
+                ? $"G70 P{seqNo.Item1} Q{seqNo.Item2} F{feedFinish.NC()}"
+                : $"G70 P{seqNo.Item1} Q{seqNo.Item2} S{CuttingSpeedFinish(material)} F{FeedFinish(tool.Radius).NC()}";
+            return new GCodeBuilder()
+                .ReferentPoint(machine, leading: true)
+                .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
+                .Line($"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} {tool.SpindleOn(speed)}")
+                .Line(g70Line)
+                .CoolantOff(machine, coolant)
+                .ReferentPoint(machine, leading: false)
+                .ToString();
         }
 
         /// <summary>
         /// Торцовка чистовая
         /// </summary>
-        public static string FinishFacing(Machine machine, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter, double profStockAllow, Blunt bluntType, double bluntCustomAngle, double bluntCustomRadius, double cornerBlunt, int speedFinish, double feedFinish)
+        public static string FinishFacing(Machine machine, CoordinateSystem coordinateSystem, Material material, TurningExternalTool tool, double externalDiameter, double internalDiameter, double profStockAllow, Blunt bluntType, double bluntCustomAngle, double bluntCustomRadius, double cornerBlunt, int speedFinish, double feedFinish, Coolant coolant = Coolant.General)
         {
             if (tool is null ||
                 externalDiameter == 0 ||
                 externalDiameter < internalDiameter) return string.Empty;
             var simpleChamferSize = cornerBlunt + tool.Radius / 2;
-            var fullChamferSize = Calc.ChamferShifts(bluntCustomAngle, tool.Radius).Z + cornerBlunt;
+            var fullChamferSize = GeometryMath.ChamferShifts(bluntCustomAngle, tool.Radius).Z + cornerBlunt;
             var fullChamferRadius = bluntType == Blunt.CustomChamfer ? tool.Radius + bluntCustomRadius : tool.Radius + cornerBlunt;
-            var blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} S{speedFinish} {Direction(tool)}\n" +
+            var blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{profStockAllow.NC()} {tool.SpindleOn(speedFinish)}\n" +
                 $"G1 ";
             if (cornerBlunt > 0)
             {
                 switch (bluntType)
                 {
                     case Blunt.SimpleChamfer:
-                        blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - simpleChamferSize).NC()} S{speedFinish} {Direction(tool)}\n" +
+                        blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - simpleChamferSize).NC()} {tool.SpindleOn(speedFinish)}\n" +
                             $"G1 X{externalDiameter.NC()} F{feedFinish.NC()}\n" +
                             $"Z{profStockAllow.NC()} C{simpleChamferSize.NC()}\n";
                         break;
                     case Blunt.Radius:
-                        blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - fullChamferRadius).NC()} S{speedFinish} {Direction(tool)}\n" +
+                        blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - fullChamferRadius).NC()} {tool.SpindleOn(speedFinish)}\n" +
                             $"G1 X{externalDiameter.NC()} F{feedFinish.NC()}\n" +
                             $"Z{profStockAllow.NC()} R{fullChamferRadius.NC()}\n";
                         break;
                     case Blunt.CustomChamfer:
                         if (bluntCustomRadius > 0 && bluntCustomAngle is > 0 and < 90)
                         {
-                            blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - fullChamferSize - Calc.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()} S{speedFinish} {Direction(tool)}\n" +
+                            blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - fullChamferSize - GeometryMath.ChamferRadiusLengths(bluntCustomAngle, fullChamferRadius).Z).NC()} {tool.SpindleOn(speedFinish)}\n" +
                             $"G1 X{externalDiameter.NC()} F{feedFinish.NC()}\n" +
                             $"Z{(profStockAllow - fullChamferSize).NC()} R{fullChamferRadius.NC()}\n" +
                             $"Z{profStockAllow.NC()} A-{bluntCustomAngle.NC()} R{fullChamferRadius.NC()}\n";
                         }
                         else if (bluntCustomRadius <= 0 && bluntCustomAngle is > 0 and < 90)
                         {
-                            blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - fullChamferSize).NC()} S{speedFinish} {Direction(tool)}\n" +
+                            blunt = $"G0 X{(externalDiameter + 5).NC(1)} Z{(profStockAllow - fullChamferSize).NC()} {tool.SpindleOn(speedFinish)}\n" +
                             $"G1 X{externalDiameter.NC()} F{feedFinish.NC()}\n" +
                             $"Z{profStockAllow.NC()} A-{bluntCustomAngle.NC()}\n";
                         }
@@ -262,26 +231,15 @@ namespace Sunduk.PWA.Infrastructure.Templates
             }
             
             var feed = cornerBlunt <= 0 ? $" F{feedFinish.NC()}" : string.Empty;
-            return machine switch
-            {
-                Machine.GS1500 =>
-                TurningReferentPoint +
-                tool.Description(ToolDescriptionOption.GoodwayLeft) + "\n" +
-                $"{blunt}X{internalDiameter.NC()}{feed}\n" +
-                $"W0.5\n" +
-                $"{CoolantOff(machine)}\n" +
-                TurningReferentPoint,
-
-                Machine.L230A =>
-                tool.Description(ToolDescriptionOption.L230) + "\n" +
-                $"{CoolantOn(machine)}\n" +
-                $"{blunt}X{internalDiameter.NC()}{feed}\n" +
-                $"W0.5\n" +
-                $"{CoolantOff(machine)}\n" +
-                TurningReferentPoint,
-
-                _ => string.Empty,
-            };
+            if (machine.MachineType != MachineType.Turning) return string.Empty;
+            return new GCodeBuilder()
+                .ReferentPoint(machine, leading: true)
+                .ToolCall(tool, machine, coordinateSystem, coolant, suppressCoolant: machine.LeadingReferentPoint)
+                .Line($"{blunt}X{internalDiameter.NC()}{feed}")
+                .Line("W0.5")
+                .CoolantOff(machine, coolant)
+                .ReferentPoint(machine, leading: false)
+                .ToString();
         }
     }
 }

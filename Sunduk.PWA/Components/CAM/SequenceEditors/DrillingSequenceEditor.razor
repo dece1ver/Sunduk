@@ -1,0 +1,424 @@
+<MudItem xs="12" md="4">
+    <MudSelect Label="Переход" T="DrillingSequences" @bind-Value="DrillingSequence" Variant="Variant.Filled" Margin="Margin.Dense">
+        <MudSelectItem Value="@(DrillingSequences.HighSpeedDrilling)">Высокоскоростное сверление</MudSelectItem>
+        <MudSelectItem Value="@(DrillingSequences.PeckingDrilling)">Прерывистое сверление</MudSelectItem>
+        <MudSelectItem Value="@(DrillingSequences.PeckingDeepDrilling)">Глубокое сверление</MudSelectItem>
+    </MudSelect>
+</MudItem>
+<MudItem xs="12" md="4">
+    <MudSelect Value="Tool" ValueChanged="OnToolChanged" Label="Инструмент" T="Tool" Variant="Variant.Filled" Margin="Margin.Dense">
+        @if (MachineType == MachineType.Turning)
+        {
+            @foreach (var tool in Tools.Where(x => x is TurningDrillingTool))
+            {
+                <MudSelectItem Value="@tool">@tool.PickerLabel</MudSelectItem>
+            }
+        }
+        @if (MachineType == MachineType.Milling)
+        {
+            @foreach (var tool in Tools.Where(x => x is MillingDrillingTool))
+            {
+                <MudSelectItem Value="@tool">@tool.PickerLabel</MudSelectItem>
+            }
+        }
+    </MudSelect>
+</MudItem>
+@if (Machine.CoordinateSystems.Count > 1)
+{
+    <MudItem xs="12" md="4">
+        <MudSelect Label="Система координат" T="CoordinateSystem" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SelectedCoordinateSystem">
+            @foreach (var cs in Machine.CoordinateSystems)
+            {
+                <MudSelectItem Value="@cs" />
+            }
+        </MudSelect>
+    </MudItem>
+}
+@if (MachineType == MachineType.Turning)
+{
+    <MudItem xs="12" md="4">
+        <MudSelect Label="Тип охлаждения" T="Coolant" Variant="Variant.Filled" Margin="Margin.Dense" @bind-Value="SelectedCoolant">
+            <MudSelectItem Value="@(Coolant.General)">Обычный</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.Through)">Через шпиндель</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.Full)">Вся подача СОЖ</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.Blow)">Обдув</MudSelectItem>
+            <MudSelectItem Value="@(Coolant.None)">Без СОЖ</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+}
+@switch (DrillingSequence)
+{
+    case DrillingSequences.HighSpeedDrilling:
+        <MudItem xs="12" sm="6" md="6">
+            <MudTextField Label="Начальный Z" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="6">
+            <MudTextField Label="Конечный Z" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        break;
+    case DrillingSequences.PeckingDrilling:
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="Глубина" @bind-Value="_PeckingDepth" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="Начальный Z" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="Конечный Z" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        break;
+    case DrillingSequences.PeckingDeepDrilling:
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="Глубина" @bind-Value="_PeckingDeepDepth" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="Начальный Z" @bind-Value="_DrillStart" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField Label="Конечный Z" @bind-Value="_DrillEnd" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+        </MudItem>
+        break;
+}
+@if (MachineType == MachineType.Milling)
+{
+    <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+        <MudNumericField Label="Количество отверстий" T="int" Min="1" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" Converter="Util.HolesConverter" ValueChanged="OnHolesCountChanged" />
+    </MudItem>
+    <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+        <MudSelect Label="Расположение" T="HolesSetterType" @bind-Value="HolesSetter" Variant="Variant.Filled" Margin="Margin.Dense">
+            <MudSelectItem Value="@(HolesSetterType.Manual)">Вручную</MudSelectItem>
+            <MudSelectItem Value="@(HolesSetterType.Cylinder)">На цилиндре</MudSelectItem>
+            <MudSelectItem Value="@(HolesSetterType.EvenlyCylinder)">Равномерно на цилиндре</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+    @switch (HolesSetter)
+    {
+        case HolesSetterType.EvenlyCylinder:
+            <MudItem xs="6">
+                <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField Label="Начальный угол" @bind-Value="StartAngle" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="°" Immediate="true" Converter="Util.DoubleConverter" />
+            </MudItem>
+            break;
+        case HolesSetterType.Cylinder:
+            <MudItem xs="@(HolesSetter is HolesSetterType.Cylinder ? 4 : 6)">
+                <MudTextField Label="Радиус" @bind-Value="HolesRadius" Variant="Variant.Filled" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Converter="Util.DoubleConverter" />
+            </MudItem>
+            @foreach (var hole in Holes)
+            {
+                <MudItem xs="6" sm="4" md="3" lg="2">
+                    @* ReSharper disable once UnknownCssClass *@
+                    <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" Underline="false" Class="mt-1">
+                        <MudGrid>
+                            <MudItem xs=12>
+                                <MudTextField Label="Угол" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudField>
+                </MudItem>
+            }
+            break;
+        case HolesSetterType.Manual:
+            @foreach (var hole in Holes)
+            {
+                <MudItem xs="6" sm="4" md="3" lg="2">
+                    @* ReSharper disable once UnknownCssClass *@
+                    <MudField Label="@($"Отверстие {Holes.IndexOf(hole) + 1}")" Variant="Variant.Filled" Underline="false" Class="mt-1">
+                        <MudGrid>
+                            <MudItem xs=6>
+                                <MudTextField Label="X" @bind-Value="Holes[Holes.IndexOf(hole)].X" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                            </MudItem>
+                            <MudItem xs=6>
+                                <MudTextField Label="Y" @bind-Value="Holes[Holes.IndexOf(hole)].Y" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Converter="Util.DoubleConverter" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudField>
+                </MudItem>
+            }
+            break;
+    }
+}
+<MudItem xs="6" md="6">
+    <MudTextField Label="Скорость резания" @bind-Value="SpeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+</MudItem>
+<MudItem xs="6" md="6">
+    <MudTextField Label="Подача" @bind-Value="_FeedFinish" Variant="Variant.Filled" Margin="Margin.Dense" Immediate="true" />
+</MudItem>
+<MudItem Class="mt-4" xs="12" sm="12" md="12">
+    <MudTextField T="string" Underline="false" Label="Предпросмотр" Style="font-family: 'Roboto Mono', monospace; font-size: medium;"
+                  ReadOnly="true" Variant="Variant.Filled" Text="@("\n" + ExampleText.Trim('\n'))" Lines="@(ExampleText.Trim('\n').Count(x => x == '\n') + 3)" />
+</MudItem>
+<MudItem Class="d-flex flex-row-reverse py-0 px-0 mt-4">
+    <MudButton Variant="Variant.Outlined" Size="Size.Large"
+               EndIcon="@Icons.Material.TwoTone.PlaylistAdd" Color="Color.Primary"
+               OnClick="Submit" Disabled="@(string.IsNullOrEmpty(ExampleText))">
+        @(SequenceToEdit is null ? "Добавить" : "Подтвердить")
+    </MudButton>
+</MudItem>
+
+@code {
+    [Parameter] public Machine Machine { get; set; }
+    [Parameter] public MachineType MachineType { get; set; }
+    [Parameter] public Material WorkpieceMaterial { get; set; }
+    [Parameter] public CoordinateSystem CoordinateSystem { get; set; }
+    [Parameter] public double SafePlane { get; set; }
+    [Parameter] public List<Tool> Tools { get; set; }
+    [Parameter] public Sequence SequenceToEdit { get; set; }
+    [Parameter] public EventCallback<Sequence> OnSubmit { get; set; }
+
+    private DrillingSequences DrillingSequence { get; set; }
+    private CoordinateSystem SelectedCoordinateSystem { get; set; }
+    private Coolant SelectedCoolant { get; set; }
+    private Tool Tool { get; set; }
+    private bool ToolCallPolar { get; set; }
+
+    public int SpeedFinish { get; set; }
+    private string _FeedFinish { get; set; } = "";
+    private double FeedFinish => _FeedFinish.GetDouble();
+
+    private string _DrillStart { get; set; } = "2";
+    private double DrillStart => _DrillStart.GetDouble(numberOption: Util.GetNumberOption.Any);
+    private string _DrillEnd { get; set; } = "-";
+    private double DrillEnd => _DrillEnd.GetDouble(numberOption: Util.GetNumberOption.Any);
+    private string _PeckingDepth { get; set; } = "0.25";
+    private double PeckingDepth => _PeckingDepth.GetDouble();
+    private string _PeckingDeepDepth { get; set; } = "2";
+    private double PeckingDeepDepth => _PeckingDeepDepth.GetDouble();
+
+    private List<Hole> Holes { get; set; } = new();
+    private int HolesCount { get; set; } = 1;
+    private double HolesRadius { get; set; }
+    private double StartAngle { get; set; } = 0;
+
+    private enum HolesSetterType
+    {
+        Manual,
+        Cylinder,
+        EvenlyCylinder
+    }
+
+    private HolesSetterType HolesSetter { get; set; }
+
+    private Sequence CurrentSequence { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (Holes.Count == 0) Holes.Add(new Hole());
+        HolesCount = 1;
+        SelectedCoordinateSystem = CoordinateSystem;
+        if (SequenceToEdit is not null) LoadFromSequence(SequenceToEdit);
+    }
+
+    private void LoadFromSequence(Sequence sequence)
+    {
+        switch (sequence)
+        {
+            case TurningHighSpeedDrillingSequence tHs:
+                DrillingSequence = DrillingSequences.HighSpeedDrilling;
+                Tool = tHs.Tool;
+                _DrillStart = tHs.StartZ.ToPrettyString();
+                _DrillEnd = tHs.EndZ.ToPrettyString();
+                SpeedFinish = tHs.Speed;
+                _FeedFinish = tHs.Feed.ToPrettyString();
+                SelectedCoordinateSystem = tHs.CoordinateSystem;
+                SelectedCoolant = tHs.Coolant;
+                break;
+            case MillingHighSpeedDrillingSequence mHs:
+                DrillingSequence = DrillingSequences.HighSpeedDrilling;
+                Tool = mHs.Tool;
+                _DrillStart = mHs.StartZ.ToPrettyString();
+                _DrillEnd = mHs.EndZ.ToPrettyString();
+                SpeedFinish = mHs.Speed;
+                _FeedFinish = mHs.Feed.ToPrettyString();
+                Holes = mHs.Holes;
+                ToolCallPolar = mHs.Polar;
+                SelectedCoordinateSystem = mHs.CoordinateSystem;
+                break;
+            case TurningPeckDrillingSequence tPeck:
+                DrillingSequence = DrillingSequences.PeckingDrilling;
+                Tool = tPeck.Tool;
+                _PeckingDepth = tPeck.Depth.ToPrettyString();
+                _DrillStart = tPeck.StartZ.ToPrettyString();
+                _DrillEnd = tPeck.EndZ.ToPrettyString();
+                SpeedFinish = tPeck.Speed;
+                _FeedFinish = tPeck.Feed.ToPrettyString();
+                SelectedCoordinateSystem = tPeck.CoordinateSystem;
+                SelectedCoolant = tPeck.Coolant;
+                break;
+            case MillingPeckDrillingSequence mPeck:
+                DrillingSequence = DrillingSequences.PeckingDrilling;
+                Tool = mPeck.Tool;
+                _PeckingDepth = mPeck.Depth.ToPrettyString();
+                _DrillStart = mPeck.StartZ.ToPrettyString();
+                _DrillEnd = mPeck.EndZ.ToPrettyString();
+                SpeedFinish = mPeck.Speed;
+                _FeedFinish = mPeck.Feed.ToPrettyString();
+                Holes = mPeck.Holes;
+                ToolCallPolar = mPeck.Polar;
+                SelectedCoordinateSystem = mPeck.CoordinateSystem;
+                break;
+            case TurningPeckDeepDrillingSequence tDeep:
+                DrillingSequence = DrillingSequences.PeckingDeepDrilling;
+                Tool = tDeep.Tool;
+                _PeckingDeepDepth = tDeep.Depth.ToPrettyString();
+                _DrillStart = tDeep.StartZ.ToPrettyString();
+                _DrillEnd = tDeep.EndZ.ToPrettyString();
+                SpeedFinish = tDeep.Speed;
+                _FeedFinish = tDeep.Feed.ToPrettyString();
+                SelectedCoordinateSystem = tDeep.CoordinateSystem;
+                SelectedCoolant = tDeep.Coolant;
+                break;
+            case MillingPeckDeepDrillingSequence mDeep:
+                DrillingSequence = DrillingSequences.PeckingDeepDrilling;
+                Tool = mDeep.Tool;
+                _PeckingDeepDepth = mDeep.Depth.ToPrettyString();
+                _DrillStart = mDeep.StartZ.ToPrettyString();
+                _DrillEnd = mDeep.EndZ.ToPrettyString();
+                SpeedFinish = mDeep.Speed;
+                _FeedFinish = mDeep.Feed.ToPrettyString();
+                Holes = mDeep.Holes;
+                ToolCallPolar = mDeep.Polar;
+                SelectedCoordinateSystem = mDeep.CoordinateSystem;
+                break;
+        }
+    }
+
+    private void OnToolChanged(Tool value)
+    {
+        Tool = value;
+    }
+
+    private void OnHolesCountChanged(int value)
+    {
+        if (value < 1) value = 1;
+        HolesCount = value;
+        while (Holes.Count < HolesCount)
+        {
+            Holes.Add(new Hole());
+        }
+        while (Holes.Count > HolesCount)
+        {
+            Holes.Remove(Holes[^1]);
+        }
+    }
+
+    private List<Hole> PolarHoles() => Util.PolarHoles(HolesCount, HolesRadius, StartAngle, HolesSetter is HolesSetterType.EvenlyCylinder, Holes);
+
+    public string ExampleText
+    {
+        get
+        {
+            switch (DrillingSequence)
+            {
+                case DrillingSequences.HighSpeedDrilling:
+                    if (SpeedFinish <= 0 || FeedFinish <= 0) return string.Empty;
+                    switch (MachineType)
+                    {
+                        case MachineType.Turning:
+                            CurrentSequence = DrillingSequenceFactory.CreateTurningHighSpeedDrilling(
+                                machine: Machine,
+                                coordinateSystem: SelectedCoordinateSystem,
+                                material: WorkpieceMaterial,
+                                tool: Tool as TurningDrillingTool,
+                                startZ: DrillStart,
+                                endZ: DrillEnd,
+                                speed: SpeedFinish,
+                                feed: FeedFinish,
+                                coolant: SelectedCoolant);
+                            return CurrentSequence.Operation;
+                        case MachineType.Milling:
+                            CurrentSequence = DrillingSequenceFactory.CreateMillingHighSpeedDrilling(
+                                machine: Machine,
+                                coordinateSystem: SelectedCoordinateSystem,
+                                material: WorkpieceMaterial,
+                                tool: Tool as MillingDrillingTool,
+                                startZ: DrillStart,
+                                endZ: DrillEnd,
+                                speed: SpeedFinish,
+                                feed: FeedFinish,
+                                holes: HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ? PolarHoles() : Holes,
+                                polar: HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder,
+                                safePlane: SafePlane);
+                            return CurrentSequence.Operation;
+                    }
+                    break;
+                case DrillingSequences.PeckingDrilling:
+                    if (SpeedFinish <= 0 || FeedFinish <= 0) return string.Empty;
+                    switch (MachineType)
+                    {
+                        case MachineType.Turning:
+                            CurrentSequence = DrillingSequenceFactory.CreateTurningPeckDrilling(
+                                machine: Machine,
+                                coordinateSystem: SelectedCoordinateSystem,
+                                material: WorkpieceMaterial,
+                                tool: Tool as TurningDrillingTool,
+                                depth: PeckingDepth,
+                                startZ: DrillStart,
+                                endZ: DrillEnd,
+                                speed: SpeedFinish,
+                                feed: FeedFinish,
+                                coolant: SelectedCoolant);
+                            return CurrentSequence.Operation;
+                        case MachineType.Milling:
+                            CurrentSequence = DrillingSequenceFactory.CreateMillingPeckDrilling(
+                                machine: Machine,
+                                coordinateSystem: SelectedCoordinateSystem,
+                                material: WorkpieceMaterial,
+                                tool: Tool as MillingDrillingTool,
+                                depth: PeckingDepth,
+                                startZ: DrillStart,
+                                endZ: DrillEnd,
+                                speed: SpeedFinish,
+                                feed: FeedFinish,
+                                holes: HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ? PolarHoles() : Holes,
+                                polar: HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder,
+                                safePlane: SafePlane);
+                            return CurrentSequence.Operation;
+                    }
+                    break;
+                case DrillingSequences.PeckingDeepDrilling:
+                    if (SpeedFinish <= 0 || FeedFinish <= 0) return string.Empty;
+                    switch (MachineType)
+                    {
+                        case MachineType.Turning:
+                            CurrentSequence = DrillingSequenceFactory.CreateTurningPeckDeepDrilling(
+                                machine: Machine,
+                                coordinateSystem: SelectedCoordinateSystem,
+                                material: WorkpieceMaterial,
+                                tool: Tool as TurningDrillingTool,
+                                depth: PeckingDeepDepth,
+                                startZ: DrillStart,
+                                endZ: DrillEnd,
+                                speed: SpeedFinish,
+                                feed: FeedFinish,
+                                coolant: SelectedCoolant);
+                            return CurrentSequence.Operation;
+                        case MachineType.Milling:
+                            CurrentSequence = DrillingSequenceFactory.CreateMillingPeckDeepDrilling(
+                                machine: Machine,
+                                coordinateSystem: SelectedCoordinateSystem,
+                                material: WorkpieceMaterial,
+                                tool: Tool as MillingDrillingTool,
+                                depth: PeckingDeepDepth,
+                                startZ: DrillStart,
+                                endZ: DrillEnd,
+                                speed: SpeedFinish,
+                                feed: FeedFinish,
+                                holes: HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder ? PolarHoles() : Holes,
+                                polar: HolesSetter is HolesSetterType.Cylinder or HolesSetterType.EvenlyCylinder,
+                                safePlane: SafePlane);
+                            return CurrentSequence.Operation;
+                    }
+                    break;
+            }
+            return string.Empty;
+        }
+    }
+
+    private async Task Submit()
+    {
+        if (CurrentSequence is null) return;
+        await OnSubmit.InvokeAsync(CurrentSequence);
+    }
+}

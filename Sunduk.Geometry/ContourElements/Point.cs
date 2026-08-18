@@ -1,6 +1,6 @@
-﻿using Sunduk.PWA.Infrastructure.Sequences.ContourElements.Base;
+using Sunduk.Geometry.ContourElements.Base;
 
-namespace Sunduk.PWA.Infrastructure.Sequences.ContourElements
+namespace Sunduk.Geometry.ContourElements
 {
     public sealed class Point : Element
     {

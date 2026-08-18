@@ -121,7 +121,7 @@
                            FilesChanged="UploadTemplates"
                            Class="flex-shrink-0">
                 <CustomContent Context="fileUpload">
-                    <MudButton Variant="Variant.Text"
+                    <MudButton Variant="Variant.Outlined"
                                StartIcon="@Icons.Material.Outlined.FileUpload"
                                Size="Size.Medium"
                                OnClick="@fileUpload.OpenFilePickerAsync">
@@ -783,7 +783,7 @@
                         expr.Functions[DegreeToRadianFunction] = (args) =>
                         {
                             if (args.Count() > 1) Util.ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {DegreeToRadianFunction}", CalculationErrors);
-                            double d = args[0].Evaluate() switch
+                            double d = args.Evaluate(0) switch
                             {
                                 double dd => dd,
                                 int ii => ii,
@@ -797,7 +797,7 @@
                         expr.Functions[RadianToDegreeFunction] = (args) =>
                         {
                             if (args.Count() > 1) Util.ThrowLogged<ArgumentOutOfRangeException>($"Слишком много аргументов для функции {RadianToDegreeFunction}", CalculationErrors);
-                            double d = args[0].Evaluate() switch
+                            double d = args.Evaluate(0) switch
                             {
                                 double dd => dd,
                                 int ii => ii,
