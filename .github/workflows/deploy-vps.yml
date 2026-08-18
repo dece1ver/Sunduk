@@ -32,11 +32,17 @@ jobs:
       - name: Deploy master → www.sunduk.one
         if: github.ref == 'refs/heads/master'
         run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} "rm -rf /var/www/www.sunduk.one/html/*"
-          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -r release/wwwroot/* root@${{ secrets.VPS_HOST }}:/var/www/www.sunduk.one/html/
+          tar -czf deploy.tar.gz -C release/wwwroot .
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no deploy.tar.gz root@${{ secrets.VPS_HOST }}:/tmp/
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} \
+            "rm -rf /var/www/www.sunduk.one/html/* && tar -xzf /tmp/deploy.tar.gz -C /var/www/www.sunduk.one/html/ && rm /tmp/deploy.tar.gz"
+          rm deploy.tar.gz
 
       - name: Deploy test → test.sunduk.one
         if: github.ref == 'refs/heads/test'
         run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} "rm -rf /var/www/test.sunduk.one/html/*"
-          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -r release/wwwroot/* root@${{ secrets.VPS_HOST }}:/var/www/test.sunduk.one/html/
+          tar -czf deploy.tar.gz -C release/wwwroot .
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no deploy.tar.gz root@${{ secrets.VPS_HOST }}:/tmp/
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} \
+            "rm -rf /var/www/test.sunduk.one/html/* && tar -xzf /tmp/deploy.tar.gz -C /var/www/test.sunduk.one/html/ && rm /tmp/deploy.tar.gz"
+          rm deploy.tar.gz
