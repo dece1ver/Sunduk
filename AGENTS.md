@@ -28,10 +28,11 @@ Run a single test project: `dotnet test Sunduk.Geometry.Tests/Sunduk.Geometry.Te
 
 ## Deployment & git
 
-- Two branches: `master` (prod → sunduk.one) and `test` (WIP → test.sunduk.one).
-- Deploy is GitHub Actions → GitHub Pages (`gh-pages` / `gh-test-pages`), triggered on push. `api-deploy.yml` publishes `Sunduk.WebApi` to a separate `sunduk-api` repo.
+- Two branches: `master` (prod → www.sunduk.one) and `test` (WIP → test.sunduk.one).
+- **Primary deploy:** GitHub Actions → VPS via rsync (`deploy-vps.yml`), triggered on push. Static files served by nginx with Let's Encrypt SSL (SNI-based routing on port 443). Requires secrets `VPS_HOST` and `VPS_SSH_KEY`.
+- **Fallback deploy:** GitHub Pages (`main.yml` / `main-test.yml` → `gh-pages` / `gh-test-pages`), kept as backup. `api-deploy.yml` publishes `Sunduk.WebApi` to a separate `sunduk-api` repo.
 - `Sunduk.WebApi` reads SMTP credentials (`FeedbackFrom`/`FeedbackTo`/`FeedbackPass`) from user-secrets (set in CI from repo secrets). Never hardcode or commit them.
-- Gotcha: `api-deploy.yml` sets up .NET **10** but the project targets `net10.0` — was previously on .NET 6 and has been updated.
+- VPS nginx uses stream module with SNI routing: port 443 → `ssl_preread` → backend per domain (www:8455, test:8456, dt:8444, etc.).
 
 ## Persistence gotcha
 
