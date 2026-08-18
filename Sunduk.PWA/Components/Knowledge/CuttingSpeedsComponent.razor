@@ -1,0 +1,77 @@
+@using MudBlazor
+
+<MudText Typo="Typo.h6" Class="mb-2">Типичные скорости резания (Vc, м/мин)</MudText>
+<MudText Typo="Typo.body2" Class="mb-4 mud-text-secondary">
+    Значения ориентировочные и зависят от сплава инструмента, типа охлаждения, состояния станка и износа пластины.
+</MudText>
+
+<style>
+    .speeds-table {
+        font-family: 'Roboto';
+        border: 1px solid var(--mud-palette-lines-default);
+        border-collapse: collapse;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .speeds-table th, .speeds-table td {
+        border: 1px solid var(--mud-palette-lines-default);
+        padding: 8px 12px;
+        text-align: center;
+    }
+
+    .speeds-table th {
+        background: var(--mud-palette-surface);
+        font-weight: 500;
+    }
+
+    .speeds-table td:first-child {
+        text-align: left;
+        font-weight: 500;
+    }
+
+    .speeds-table tr:hover {
+        background: var(--mud-palette-surface-hover);
+    }
+</style>
+
+<table class="speeds-table">
+    <thead>
+        <tr>
+            <th>Материал</th>
+            <th>Токарная</th>
+            <th>Фрезерная</th>
+            <th>Сверлильная</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in rows)
+        {
+            <tr>
+                <td>@row.Material</td>
+                <td>@row.Turning</td>
+                <td>@row.Milling</td>
+                <td>@row.Drilling</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<MudText Typo="Typo.body2" Class="mt-4 mud-text-secondary">
+    <b>Vc</b> — скорость резания (м/мин). Для пересчета в обороты: <b>n = Vc × 1000 / (π × D)</b>, где D — диаметр детали в мм.
+</MudText>
+
+@code {
+    record SpeedRow(string Material, string Turning, string Milling, string Drilling);
+
+    SpeedRow[] rows =
+    {
+        new("Конструкционная сталь", "80 – 200", "100 – 250", "60 – 150"),
+        new("Нержавеющая сталь", "40 – 80", "50 – 100", "30 – 60"),
+        new("Чугун", "80 – 150", "100 – 200", "60 – 120"),
+        new("Алюминий", "200 – 500", "300 – 800", "150 – 400"),
+        new("Латунь", "150 – 300", "200 – 500", "100 – 250"),
+        new("Титан", "30 – 60", "40 – 80", "20 – 50"),
+        new("Пластик / ПММА", "300 – 800", "400 – 1000", "200 – 500"),
+    };
+}
