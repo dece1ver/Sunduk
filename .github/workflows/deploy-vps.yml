@@ -22,14 +22,17 @@ jobs:
       - name: Add .nojekyll
         run: touch release/wwwroot/.nojekyll
 
-      - uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY_B64 }}" | base64 -d > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Deploy master → www.sunduk.one
         if: github.ref == 'refs/heads/master'
-        run: rsync -avz --delete release/wwwroot/ root@${{ secrets.VPS_HOST }}:/var/www/www.sunduk.one/html/
+        run: rsync -avz --delete -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" release/wwwroot/ root@${{ secrets.VPS_HOST }}:/var/www/www.sunduk.one/html/
 
       - name: Deploy test → test.sunduk.one
         if: github.ref == 'refs/heads/test'
-        run: rsync -avz --delete release/wwwroot/ root@${{ secrets.VPS_HOST }}:/var/www/test.sunduk.one/html/
+        run: rsync -avz --delete -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" release/wwwroot/ root@${{ secrets.VPS_HOST }}:/var/www/test.sunduk.one/html/
