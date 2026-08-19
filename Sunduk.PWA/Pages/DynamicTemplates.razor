@@ -345,8 +345,9 @@
                                                   @bind-Value="@template.Content"
                                                   Immediate="true"
                                                   Lines="@Math.Max(10, template.Content.Count(c => c == '\n') + 1)"
-                                                  Placeholder="Введите текст с переменными в формате {variable}"
-                                                  Class="code-field" />
+                                                   Placeholder="Введите текст с переменными в формате {variable}"
+                                                   Margin="Margin.Dense"
+                                                   Class="code-field" />
                                 </MudTabPanel>
 
                                 <MudTabPanel Text="Результат" Icon="@Icons.Material.Outlined.CheckCircle">
@@ -357,8 +358,9 @@
                                                   Lines="@Math.Max(10, template.Result.Count(c => c == '\n') + 1)"
                                                   Value="template.Result"
                                                   ReadOnly="true"
-                                                  Placeholder="Результат появится после вычисления"
-                                                  Class="code-field" />
+                                                   Placeholder="Результат появится после вычисления"
+                                                   Margin="Margin.Dense"
+                                                   Class="code-field" />
                                 </MudTabPanel>
                             </MudTabs>
                         </MudItem>

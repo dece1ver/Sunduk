@@ -22,18 +22,18 @@
         <MudItem xs="6">
             @if (WorkpieceForm == Form.Circle)
             {
-                <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
-                <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+                <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"></MudTextField>
+                <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"></MudTextField>
             }
             @if (WorkpieceForm == Form.Rectangle)
             {
-                <MudTextField @bind-Value="_WorkpieceWidth" Label="Ширина" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
-                <MudTextField @bind-Value="_WorkpieceHeight" Label="Высота" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
+                <MudTextField @bind-Value="_WorkpieceWidth" Label="Ширина" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"></MudTextField>
+                <MudTextField @bind-Value="_WorkpieceHeight" Label="Высота" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"></MudTextField>
             }
         </MudItem>
         <MudItem xs="6">
-            <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true"></MudTextField>
-            <MudTextField @bind-Value="_PartsCount" Label="Количество" Adornment="Adornment.End" AdornmentText="шт" Variant="Variant.Text" Immediate="true"></MudTextField>
+            <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"></MudTextField>
+            <MudTextField @bind-Value="_PartsCount" Label="Количество" Adornment="Adornment.End" AdornmentText="шт" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense"></MudTextField>
         </MudItem>
         <MudItem Class="mt-4" xs="12">
             <MudPaper Class="pa-4" Outlined="true">

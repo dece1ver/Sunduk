@@ -6,11 +6,11 @@
                 <MudGrid>
                     <MudItem xs="6">
                         <MudTextField @bind-Value="X" @onfocusin="@(() => CalcPolar = true)" DisableUnderLine="false" Label="X" Converter="Util.NullableDoubleConverterWithZero"
-                                      T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                                       T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Margin="Margin.Dense" />
                     </MudItem>
                     <MudItem xs="6">
                         <MudTextField @bind-Value="Y" @onfocusin="@(() => CalcPolar = true)" DisableUnderLine="false" Label="Y" Converter="Util.NullableDoubleConverterWithZero"
-                                      T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                                       T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Margin="Margin.Dense" />
                     </MudItem>
                 </MudGrid>
             </MudField>
@@ -20,11 +20,11 @@
                 <MudGrid>
                     <MudItem xs="6">
                         <MudTextField @bind-Value="Radius" @onfocusin="@(() => CalcPolar = false)" DisableUnderLine="false" Label="Радиус" Converter="Util.NullableDoubleConverterWithZero"
-                                      T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" />
+                                       T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" Margin="Margin.Dense" />
                     </MudItem>
                     <MudItem xs="6">
                         <MudTextField @bind-Value="Angle" @onfocusin="@(() => CalcPolar = false)" DisableUnderLine="false" Label="Угол" Converter="Util.NullableDoubleConverterWithZero"
-                                      T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="°" Immediate="true" />
+                                       T="double?" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="°" Immediate="true" Margin="Margin.Dense" />
                     </MudItem>
                 </MudGrid>
             </MudField>

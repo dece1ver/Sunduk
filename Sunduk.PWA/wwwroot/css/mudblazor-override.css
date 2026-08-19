@@ -1,0 +1,293 @@
+/* ============================================================
+   MudBlazor Override — Sunduk Design System
+   Angular forms (radius: 0), flat-style
+   Height is controlled via Margin="Margin.Dense" in razor files
+   ============================================================ */
+
+/* --- Global border-radius reset --- */
+
+.mud-button,
+.mud-icon-button,
+.mud-chip,
+.mud-chip-filled,
+.mud-chip-outlined,
+.mud-input-control,
+.mud-input,
+.mud-text-field,
+.mud-select,
+.mud-autocomplete,
+.mud-field,
+.mud-paper,
+.mud-card,
+.mud-dialog,
+.mud-snackbar,
+.mud-alert,
+.mud-tooltip,
+.mud-menu,
+.mud-list-item,
+.mud-nav-link,
+.mud-tab,
+.mud-tab-panel,
+.mud-expand-panel,
+.mud-radio-content,
+.mud-checkbox,
+.mud-switch,
+.mud-progress-linear,
+.mud-badge,
+.mud-table,
+.mud-tabs-header,
+.mud-picker,
+.mud-picker-container,
+.mud-dialog-container,
+.mud-overlay,
+.mud-popover,
+.mud-popover-provider,
+.mud-divider,
+.mud-breadcrumb,
+.mudfab-root {
+    border-radius: 0 !important;
+}
+
+/* --- Compact buttons --- */
+
+.mud-button {
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    padding: 4px 14px;
+    min-height: 32px;
+}
+
+.mud-button-text-size-small,
+.mud-button-filled-size-small,
+.mud-button-outlined-size-small {
+    padding: 2px 10px;
+    min-height: 28px;
+    font-size: 0.78rem;
+}
+
+.mud-icon-button {
+    padding: 4px;
+}
+
+.mud-icon-button .mud-icon-size-medium {
+    font-size: 1.15rem;
+}
+
+/* --- Compact chips --- */
+
+.mud-chip {
+    font-size: 0.72rem;
+    height: 24px;
+    padding: 0 8px;
+}
+
+/* --- Flat paper / cards --- */
+
+.mud-paper {
+    box-shadow: none;
+}
+
+.mud-card {
+    box-shadow: none;
+}
+
+/* --- Compact dialog --- */
+
+.mud-dialog .mud-dialog-title {
+    padding: 12px 16px;
+    font-size: 1rem;
+}
+
+.mud-dialog .mud-dialog-content {
+    padding: 12px 16px;
+}
+
+.mud-dialog .mud-dialog-actions {
+    padding: 8px 12px;
+}
+
+/* --- Compact table --- */
+
+.mud-table .mud-table-head .mud-table-cell {
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    font-weight: 600;
+}
+
+.mud-table .mud-table-body .mud-table-cell {
+    font-size: 0.82rem;
+    padding: 4px 10px;
+}
+
+.mud-table .mud-table-row {
+    min-height: 36px;
+}
+
+.mud-table-dense .mud-table-body .mud-table-cell {
+    padding: 3px 10px;
+}
+
+/* --- Compact list --- */
+
+.mud-list-item {
+    padding: 2px 10px;
+    font-size: 0.85rem;
+}
+
+.mud-nav-link {
+    padding: 4px 16px;
+    font-size: 0.85rem;
+}
+
+/* --- Compact tabs --- */
+
+.mud-tab {
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    padding: 8px 14px;
+    min-height: 36px;
+    min-width: auto;
+}
+
+/* --- Snackbar / Alert --- */
+
+.mud-snackbar {
+    font-size: 0.82rem;
+}
+
+.mud-alert {
+    font-size: 0.82rem;
+    padding: 6px 12px;
+}
+
+/* --- Dialog container padding --- */
+
+.mud-dialog-container {
+    padding: 24px;
+}
+
+/* --- Tooltip --- */
+
+.mud-tooltip {
+    font-size: 0.72rem;
+    padding: 4px 8px;
+}
+
+/* --- AppBar --- */
+
+.mud-appbar .mud-toolbar {
+    padding: 0 8px;
+    min-height: 40px;
+}
+
+.mud-appbar .mud-icon-button {
+    padding: 2px;
+    margin: 0 1px;
+}
+
+.mud-appbar .mud-icon-button .mud-icon-size-medium {
+    font-size: 1.15rem;
+}
+
+/* --- Drawer --- */
+
+.mud-drawer .mud-navmenu {
+    padding-top: 4px;
+}
+
+/* --- Calculator button special --- */
+
+.calculator-button {
+    min-height: 36px;
+    font-size: 0.9rem;
+}
+
+.calculator-button-dark {
+    min-height: 36px;
+    font-size: 0.9rem;
+    background-color: #2D2D30 !important;
+}
+
+.calculator-button-dark:hover {
+    background-color: #3a3a3e !important;
+}
+
+/* --- Expand panel --- */
+
+.mud-expand-panel {
+    padding: 6px 12px;
+}
+
+.mud-expand-panel .mud-expand-panel-text {
+    font-size: 0.85rem;
+}
+
+/* --- Picker --- */
+
+.mud-picker {
+    font-size: 0.85rem;
+}
+
+/* --- Scrollbar --- */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+/* --- MudSelect dropdown list --- */
+
+.mud-list {
+    padding: 0;
+}
+
+.mud-list-item .mud-list-item-text {
+    font-size: 0.85rem;
+}
+
+/* --- MudChipSet --- */
+
+.mud-chip-set {
+    gap: 4px;
+}
+
+/* --- Focus visible --- */
+
+.mud-button:focus-visible,
+.mud-icon-button:focus-visible,
+.mud-input:focus-visible {
+    outline: 2px solid var(--mud-palette-primary);
+    outline-offset: 1px;
+}
+
+/* --- MudTabs: remove extra space under indicator --- */
+
+.mud-tabs .mud-tabs-toolbar {
+    min-height: auto;
+    margin: 0;
+}
+
+.mud-tab {
+    padding-bottom: 0;
+}
+
+.mud-tab-indicator {
+    height: 2px;
+    bottom: 0;
+}

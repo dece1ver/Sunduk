@@ -11,25 +11,27 @@
         <MudItem xs="12" md="6">
             <MudField Label="Градусы в десятичной системе" Variant="Variant.Filled" Underline="false">
                 <MudTextField @bind-Value="DecimalAngleString"
-                              @onfocusin="@(() => _calcDecimal = false)"
-                              T="string"
-                              Variant="Variant.Text"
-                              Adornment="Adornment.End"
-                              AdornmentText="°"
-                              Immediate="true" />
+                               @onfocusin="@(() => _calcDecimal = false)"
+                               T="string"
+                               Variant="Variant.Text"
+                               Adornment="Adornment.End"
+                               AdornmentText="°"
+                               Immediate="true"
+                               Margin="Margin.Dense" />
             </MudField>
         </MudItem>
 
         <MudItem xs="12" md="6">
             <MudField Label="Радианы" Variant="Variant.Filled" Underline="false">
                 <MudTextField @bind-Value="RadiansAngleString"
-                              @onfocusin="@(() => _inputRadians = true)"
-                              @onfocusout="@(() => _inputRadians = false)"
-                              T="string"
-                              Variant="Variant.Text"
-                              Adornment="Adornment.End"
-                              AdornmentText="rad"
-                              Immediate="true" />
+                               @onfocusin="@(() => _inputRadians = true)"
+                               @onfocusout="@(() => _inputRadians = false)"
+                               T="string"
+                               Variant="Variant.Text"
+                               Adornment="Adornment.End"
+                               AdornmentText="rad"
+                               Immediate="true"
+                               Margin="Margin.Dense" />
             </MudField>
         </MudItem>
 
@@ -38,32 +40,35 @@
                 <MudGrid>
                     <MudItem xs="4">
                         <MudTextField @bind-Value="IntAngleString"
-                                      @onfocusin="@(() => _calcDecimal = true)"
-                                      T="string"
-                                      Variant="Variant.Text"
-                                      Adornment="Adornment.End"
-                                      AdornmentText="°"
-                                      Immediate="true" />
+                                       @onfocusin="@(() => _calcDecimal = true)"
+                                       T="string"
+                                       Variant="Variant.Text"
+                                       Adornment="Adornment.End"
+                                       AdornmentText="°"
+                                       Immediate="true"
+                                       Margin="Margin.Dense" />
                     </MudItem>
 
                     <MudItem xs="4">
                         <MudTextField @bind-Value="MinAngleString"
-                                      @onfocusin="@(() => _calcDecimal = true)"
-                                      T="string"
-                                      Variant="Variant.Text"
-                                      Adornment="Adornment.End"
-                                      AdornmentText="′"
-                                      Immediate="true" />
+                                       @onfocusin="@(() => _calcDecimal = true)"
+                                       T="string"
+                                       Variant="Variant.Text"
+                                       Adornment="Adornment.End"
+                                       AdornmentText="′"
+                                       Immediate="true"
+                                       Margin="Margin.Dense" />
                     </MudItem>
 
                     <MudItem xs="4">
                         <MudTextField @bind-Value="SecAngleString"
-                                      @onfocusin="@(() => _calcDecimal = true)"
-                                      T="string"
-                                      Variant="Variant.Text"
-                                      Adornment="Adornment.End"
-                                      AdornmentText="″"
-                                      Immediate="true" />
+                                       @onfocusin="@(() => _calcDecimal = true)"
+                                       T="string"
+                                       Variant="Variant.Text"
+                                       Adornment="Adornment.End"
+                                       AdornmentText="″"
+                                       Immediate="true"
+                                       Margin="Margin.Dense" />
                     </MudItem>
                 </MudGrid>
             </MudField>
