@@ -74,14 +74,8 @@
     {
         if (firstRender)
         {
-            try
-            {
-                _isDark = await LocalStorage.GetItemAsync<bool>("theme-dark");
-            }
-            catch
-            {
-                _isDark = true;
-            }
+            var saved = await LocalStorage.GetItemAsync<bool?>("theme-dark");
+            _isDark = saved ?? true;
             StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);

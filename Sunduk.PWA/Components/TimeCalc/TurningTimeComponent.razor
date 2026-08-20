@@ -329,7 +329,15 @@
     /// из реестра только чтобы получить формулы расчёта времени/подачи (диалект G-кода тут
     /// не используется). Встроенные станки удалить нельзя, поэтому токарный всегда найдётся.
     /// </summary>
-    private Machine Machine => MachineRegistry.Machines.First(m => m.MachineType == MachineType.Turning);
+    private Machine? Machine => MachineRegistry.Machines.FirstOrDefault(m => m.MachineType == MachineType.Turning);
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!MachineRegistry.Initialized)
+        {
+            await MachineRegistry.LoadAsync();
+        }
+    }
 
     public enum TurningTypes {Rough, Medium, Gentle}
 
@@ -512,6 +520,7 @@
     {
         get
         {
+            if (Machine is null) return string.Empty;
             switch (SequenceType)
             {
                 case SequenceType.General:

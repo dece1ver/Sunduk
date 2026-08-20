@@ -107,14 +107,13 @@ textarea[style*="Roboto Mono"] {
 }
 
 .section-button {
-    transition: background-color 0.12s ease, border-color 0.12s ease;
+    transition: background-color 0.12s ease;
     cursor: pointer;
-    border: 1px solid transparent;
+    border: none;
 }
 
 .section-button:hover {
     background-color: var(--mud-palette-surface-hover, rgba(255,255,255,0.06));
-    border-color: var(--mud-palette-lines-default);
 }
 
 /* --- Smooth theme transition --- */

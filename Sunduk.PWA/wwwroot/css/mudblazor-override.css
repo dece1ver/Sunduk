@@ -278,16 +278,20 @@
 
 /* --- MudTabs: remove extra space under indicator --- */
 
-.mud-tabs .mud-tabs-toolbar {
+.mud-tabs .mud-tabs-tabbar {
     min-height: auto;
     margin: 0;
+}
+
+.mud-tabs-tabbar .mud-tabs-tabbar-inner {
+    min-height: auto;
 }
 
 .mud-tab {
     padding-bottom: 0;
 }
 
-.mud-tab-indicator {
+.mud-tab-slider {
     height: 2px;
     bottom: 0;
 }

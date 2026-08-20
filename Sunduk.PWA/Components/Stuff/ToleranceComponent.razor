@@ -14,6 +14,7 @@
                        Label="Квалитет"
                        ValueChanged="@(v => Grade = v)"
                        Variant="Variant.Filled"
+                       Margin="Margin.Dense"
                        Clearable="true">
                 @foreach (var g in Tolerance.Grades)
                 {
@@ -25,6 +26,7 @@
             <MudSelectExtended T="string"
                                Label="Поле допуска"
                                Variant="Variant.Filled"
+                               Margin="Margin.Dense"
                                ItemCollection="@AvailableFields"
                                Value="@Field"
                                ValueChanged="OnFieldChanged"
