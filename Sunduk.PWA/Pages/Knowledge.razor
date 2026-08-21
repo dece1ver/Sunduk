@@ -1,8 +1,7 @@
 ﻿@page "/knowledge/{article}"
 @using MudBlazor.Services
 
-<MudContainer MaxWidth="MaxWidth.False" Class="mt-0 pl-0 pr-1">
-    <MudGrid Spacing="1" Class="mx-n1">
+    <MudGrid Spacing="1" Class="pa-2 mx-n1">
         <MudItem xs="12" sm="4" lg="3" >
             <MudList Dense="true" T="string" @bind-Value="Article" Class="mt-n1">
                 @* <MudListItem Dense="true" Class="pl-1" Gutters="false" Icon="@Icons.Material.Filled.Info" Value="About" Href="@($"/knowledge/{About}")">
@@ -97,7 +96,6 @@
             }
         </MudItem>
     </MudGrid>
-</MudContainer>
 
 
 @code 

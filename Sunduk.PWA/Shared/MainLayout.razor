@@ -38,7 +38,7 @@
             <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" @onclick="OpenChangelogDialogAsync" Color="Color.Inherit" Edge="Edge.End" />
         </MudTooltip>
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Breakpoint="Breakpoint.Lg" ClipMode="DrawerClipMode.Always" Elevation="0">
+    <MudDrawer @bind-Open="_drawerOpen" Breakpoint="Breakpoint.Md" ClipMode="DrawerClipMode.Always" Elevation="0">
         <CascadingValue Value="ExperimentalMode" Name="ExperimantalMode">
             <NavMenu />
         </CascadingValue>

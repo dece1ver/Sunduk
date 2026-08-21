@@ -3,9 +3,8 @@
 @inject IDialogService DialogService
 @inject SunducamState State
 @inject MachineRegistry MachineRegistry
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pa-0 ma-0">
     <MudAlert Class="rounded-0" Severity="Severity.Warning" Icon="fas fa-crutch">Раздел в разработке</MudAlert>
-    <MudGrid Spacing="1">
+    <MudGrid Spacing="1" Class="pa-2">
         <MudItem xs="12" Class="@(Mode is not Mode.General ? "mb-n3" : "mb-0")">
             <MudPaper Outlined="true" Class="pa-4 rounded-0">
                 <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false">
@@ -139,7 +138,7 @@
                 <MudItem xs=12 Class="mt-0">
                     <MudPaper Class="pa-4 rounded-0" Elevation="0" Outlined="false">
                         <MudGrid Spacing="1">
-                        <MudItem xs="Machine.CoordinateSystems.Count > 1 ? 8 : 12" sm="Machine.CoordinateSystems.Count > 1 ? 4 : 7" md="Machine.CoordinateSystems.Count > 1 ? 6 : 8" Class="d-flex align-center" style="gap: 4px;">
+                        <MudItem xs="12" sm="6" md="@(Machine.CoordinateSystems.Count > 1 ? 4 : 6)" Class="d-flex align-center" style="gap: 4px;">
                             <MudSelect Value="Machine" Label="Станок" T="Machine" Variant="Variant.Filled" Dense="true" ValueChanged="OnMachineChanged">
                                 @foreach (var machine in MachineRegistry.Machines)
                                 {
@@ -171,7 +170,7 @@
                                 </MudItem>
                             </MudHidden>
                         }
-                        <MudItem xs="12" sm="5" md="4">
+                        <MudItem xs="12" sm="6" md="6">
                             <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал детали" T="Material" Variant="Variant.Filled" Dense="true">
                                 <MudSelectItem Value="@Material.Steel">Черная сталь</MudSelectItem>
                                 <MudSelectItem Value="@Material.Stainless">Нержавеющая сталь</MudSelectItem>
@@ -208,13 +207,13 @@
                                 <MudTextField @bind-Value="_SafePlane" Label="Плоскость безопасности" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                             </MudItem>
                         }
-                        <MudItem xs="6" sm="Machine.MachineType == MachineType.Milling ? 3 : 4">
+                        <MudItem xs="6" sm="4" md="4">
                             <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
                         </MudItem>
-                        <MudItem xs="6" sm="Machine.MachineType == MachineType.Milling ? 3 : 4">
+                        <MudItem xs="6" sm="4" md="4">
                             <MudTextField @bind-Value="DrawingVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
-                        <MudItem xs="12" sm="Machine.MachineType == MachineType.Milling ? 3 : 4">
+                        <MudItem xs="12" sm="4" md="4">
                             <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
                     </MudGrid>
@@ -257,7 +256,6 @@
                 break;
         }
     </MudGrid>
-</MudContainer>
 
 @code
 {

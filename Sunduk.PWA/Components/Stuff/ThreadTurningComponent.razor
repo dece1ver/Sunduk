@@ -10,8 +10,7 @@
     }
 </style>
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid Spacing="1">
+    <MudGrid Spacing="1" Class="pa-2">
         <MudItem xs="12" sm="4">
             <MudSelect Label="Стандарт" T="ThreadStandard" Value="ThreadStandard" Variant="Variant.Filled" ValueChanged="OnStandardChanged">
                 <MudSelectItem Value="@(ThreadStandard.Metric)">@(ThreadStandard.Metric.Description())</MudSelectItem>
@@ -372,7 +371,6 @@
             <MudButton OnClick="@(() => _materialsDialogOpen = false)" Color="Color.Primary">Закрыть</MudButton>
         </DialogActions>
     </MudDialog>
-</MudContainer>
 
 
 @code

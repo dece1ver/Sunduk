@@ -1,6 +1,5 @@
-﻿@inject DrillAngleState State
-<MudContainer Class="mt-3">
-    <MudGrid Spacing="1">
+@inject DrillAngleState State
+<MudGrid Spacing="1" Class="pa-2">
         <MudItem xs="6">
             <MudTextField @bind-Value="_DrillDiameter" T="string" Label="Диаметр" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" 
                           @onfocus="() => CurrentImage = Images.DrillDiameter"
@@ -64,7 +63,6 @@
             </div>
         </MudItem>
     </MudGrid>
-</MudContainer>
 
 @code 
 {

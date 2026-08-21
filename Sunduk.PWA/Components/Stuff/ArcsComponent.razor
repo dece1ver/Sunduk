@@ -10,9 +10,13 @@
         <MudTabPanel Text="@("\"Затвор\"")">
             <Arc2Component />
         </MudTabPanel>
-        <MudTabPanel Text="Произвольная">
-            <ArcGeneralComponent />
-        </MudTabPanel>
+        @* Скрыто — требует доработки, не удалять *@
+        @if (false)
+        {
+            <MudTabPanel Text="Произвольная">
+                <ArcGeneralComponent />
+            </MudTabPanel>
+        }
     </MudTabs>
 </MudSwipeArea>
 
@@ -31,7 +35,8 @@
         }
         else if (direction == SwipeDirection.RightToLeft)
         {
-            if (tabs.GetState(x => x.ActivePanelIndex) < 3)
+            // 2 — с учётом скрытой «Произвольная» (было 3)
+            if (tabs.GetState(x => x.ActivePanelIndex) < 2)
             {
                 tabs.ActivatePanelAsync(tabs.GetState(x => x.ActivePanelIndex) + 1);
             }

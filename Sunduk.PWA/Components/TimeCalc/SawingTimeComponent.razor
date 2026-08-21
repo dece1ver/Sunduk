@@ -4,8 +4,7 @@
         padding: 0px 15px 0px 0px;
     }
 </style>
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid Spacing="1">
+    <MudGrid Spacing="1" Class="pa-2">
         <MudItem xs="6">
             <MudSelect @bind-Value="WorkpieceForm" Label="Форма заготовки" T="Form" Variant="Variant.Filled" Margin="Margin.Dense">
                 <MudSelectItem Value="@(Form.Circle)">Круглая</MudSelectItem>
@@ -116,7 +115,6 @@
             </MudPaper>
         </MudItem>
     </MudGrid>
-</MudContainer>
 
 
 @code

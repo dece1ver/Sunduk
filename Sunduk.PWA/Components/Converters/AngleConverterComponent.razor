@@ -1,6 +1,5 @@
 ﻿@inject AngleConverterState State
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
-    <MudGrid Spacing="1">
+    <MudGrid Spacing="1" Class="pa-2">
         @if (!ValidAngle())
         {
             <MudItem xs="12">
@@ -75,7 +74,6 @@
         </MudItem>
 
     </MudGrid>
-</MudContainer>
 
 
 @code
