@@ -1,12 +1,12 @@
 self.assetsManifest = {
-  "version": "bnqX8FX5",
+  "version": "gO8afEgD",
   "assets": [
     {
       "hash": "sha256-53l0jf516E+XTfPHvAf4QgEaEAFZFYsPH0my8qWlFcs=",
       "url": "LICENSE.txt"
     },
     {
-      "hash": "sha256-IUupasMjnt+uyy0AMhIXLvfJPM6HiK4w3xtmE8SMHak=",
+      "hash": "sha256-LDLY3qLWk6dRkw7PZG1wokYQ75H05B2SHjmAt6xJlbM=",
       "url": "Sunduk.styles.css"
     },
     {
@@ -262,12 +262,12 @@ self.assetsManifest = {
       "url": "_framework/Parlot.ti453vo5z1.wasm"
     },
     {
-      "hash": "sha256-cASGsRNDXJOlm0zrWSL/eHorZDwP7zNWyf7LMqSq+q8=",
-      "url": "_framework/Sunduk.Geometry.wcsk7edc87.wasm"
+      "hash": "sha256-LhuCcY65/BGk/YDRenY5Ff78fS2ZMg6W9y1IwAiZHnU=",
+      "url": "_framework/Sunduk.2whxgzpckc.wasm"
     },
     {
-      "hash": "sha256-y25HZRNjMvfquRx8XS82xcC53YKzSScafUnY2ECeHnA=",
-      "url": "_framework/Sunduk.der2uzduio.wasm"
+      "hash": "sha256-GGXGvGalVppaASfBrs6yscWCO25v1nGfw7q/HWcD7Cc=",
+      "url": "_framework/Sunduk.Geometry.s3xqb0pnxu.wasm"
     },
     {
       "hash": "sha256-vz/SY7IT6HI0fgNQ8GZWZ+2a6G0TdNW8NiXfBQzCDFg=",
@@ -934,7 +934,7 @@ self.assetsManifest = {
       "url": "_framework/blazor.webassembly.w3qd1tpl0e.js"
     },
     {
-      "hash": "sha256-+kNTIgNR/QruBGQ3yI0qA8U5bGgbILXuUbQUFP9eMtw=",
+      "hash": "sha256-38rYJ8/Koj6jyoekTOQvLUnfSTaw+n7dRjyLRgjgSUk=",
       "url": "_framework/dotnet.js"
     },
     {
@@ -1002,6 +1002,10 @@ self.assetsManifest = {
       "url": "css/fonts.css"
     },
     {
+      "hash": "sha256-Ig/VAsHSK2vdz0Wt5eFa4hIb0aWgzBRAcl5xaYN9GQc=",
+      "url": "css/mudblazor-override.css"
+    },
+    {
       "hash": "sha256-nVYmOm3EcbimCvNzfAYiY91Ho9OT5ii+iyGq5Iaf5IU=",
       "url": "css/regular.css"
     },
@@ -1010,7 +1014,7 @@ self.assetsManifest = {
       "url": "css/regular.min.css"
     },
     {
-      "hash": "sha256-Nu/hbkAaCel9TQf+WyusMXpl1lnBejJc778KgxEp+QQ=",
+      "hash": "sha256-HS0HnfTUi5v6sj+7eRv6AmlNUWVfc+B687f1uPGlWFE=",
       "url": "css/site.css"
     },
     {
@@ -1386,7 +1390,7 @@ self.assetsManifest = {
       "url": "img/stuffimages/tool_vectors/vector_8.svg"
     },
     {
-      "hash": "sha256-/u2l8OAbQ9/vLQr4o8NaUaIH40qIJhP+6FbnWOkQaWY=",
+      "hash": "sha256-Ra12Sagz7z5jWdTrQPzg8spfMrh2Lk5FZ5fWRbOfe2s=",
       "url": "index.html"
     },
     {
