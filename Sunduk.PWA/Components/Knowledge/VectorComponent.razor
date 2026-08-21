@@ -1,7 +1,6 @@
-﻿@inject ISnackbar Snackbar
+@inject ISnackbar Snackbar
 
-<MudContainer Class="ml-1 mt-2 pl-0 pr-1">
-    <MudGrid Spacing="1">
+<MudGrid Spacing="1" Class="pa-2">
         <MudItem xs="4">
             <MudCard Outlined="true" @onclick="@(() => Snackbar.Add($"Это вектор 4"))">
                 <MudCardHeader>
@@ -113,7 +112,6 @@
             </MudCard>
         </MudItem>
     </MudGrid>
-</MudContainer>
 
 @code 
 {

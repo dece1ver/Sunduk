@@ -1,4 +1,4 @@
-﻿@using MudBlazor.Services
+@using MudBlazor.Services
 <style>
     table, th, td {
         border: 1px solid gray;
@@ -6,8 +6,7 @@
     }
 </style>
 
-<MudContainer Class="mx-0 px-2">
-    <MudGrid>
+<MudGrid Spacing="1" Class="pa-2">
         <MudItem xs="12">
             <MudField Variant=Variant.Filled Label="Группы переменных" DisableUnderLine=true>
                 <table>
@@ -224,7 +223,6 @@
             </MudField>
         </MudItem>
     </MudGrid>
-</MudContainer>
 
 @code {
 

@@ -6,14 +6,14 @@
     }
 </style>
 
-<MudContainer MaxWidth="MaxWidth.False" Class="mt-2">
-    <MudGrid Spacing="1">
+<MudGrid Spacing="1" Class="pa-2">
         <MudItem xs="12" sm="4">
             <MudSelect T="int?"
                        Value="Grade"
                        Label="Квалитет"
                        ValueChanged="@(v => Grade = v)"
                        Variant="Variant.Filled"
+                       Margin="Margin.Dense"
                        Clearable="true">
                 @foreach (var g in Tolerance.Grades)
                 {
@@ -25,6 +25,7 @@
             <MudSelectExtended T="string"
                                Label="Поле допуска"
                                Variant="Variant.Filled"
+                               Margin="Margin.Dense"
                                ItemCollection="@AvailableFields"
                                Value="@Field"
                                ValueChanged="OnFieldChanged"
@@ -37,12 +38,13 @@
         </MudItem>
         <MudItem xs="12" sm="4">
             <MudTextField @bind-Value="Nominal"
-                          T="string"
-                          Label="Номинальный размер"
-                          Adornment="Adornment.End"
-                          AdornmentText="мм"
-                          Variant="Variant.Filled"
-                          Immediate="true" />
+                           T="string"
+                           Label="Номинальный размер"
+                           Adornment="Adornment.End"
+                           AdornmentText="мм"
+                           Variant="Variant.Filled"
+                           Immediate="true"
+                           Margin="Margin.Dense" />
         </MudItem>
         <MudItem xs="12">
             <MudRadioGroup Value="@IsHole" T="bool" Class="d-flex justify-center" ValueChanged="OnIsHoleChanged">
@@ -64,14 +66,22 @@
                             <td class="tl"><MudText Typo="Typo.caption">Размер:</MudText></td>
                             <td>
                                 <MudText Typo="Typo.caption" Style="font-family: 'Roboto Mono', monospace;">
-                                    <span>@(r.Nominal.ToPrettyString(3, Util.PrettyStringOption.AsIs))</span><span style="display: inline-flex; align-items: center;">
-                                        <span style="font-size: 1.2em;">(</span>
-                                        <span style="display: inline-flex; flex-direction: column; text-align: right; font-size: 0.75em; line-height: 1;">
-                                            <span>@(Dev(r.UpperDeviationMm))</span>
-                                            <span>@(Dev(r.LowerDeviationMm))</span>
+                                    <span>@(r.Nominal.ToPrettyString(3, Util.PrettyStringOption.AsIs))</span>
+                                    @{
+                                        bool showUpper = Math.Abs(r.UpperDeviationMm) > 1e-9;
+                                        bool showLower = Math.Abs(r.LowerDeviationMm) > 1e-9;
+                                    }
+                                    @if (showUpper || showLower)
+                                    {
+                                        <span style="display: inline-flex; align-items: center;">
+                                            <span style="font-size: 1.2em;">(</span>
+                                            <span style="display: inline-flex; flex-direction: column; text-align: right; font-size: 0.75em; line-height: 1;">
+                                                <span>@(showUpper ? Dev(r.UpperDeviationMm) : "\u00A0")</span>
+                                                <span>@(showLower ? Dev(r.LowerDeviationMm) : "\u00A0")</span>
+                                            </span>
+                                            <span style="font-size: 1.2em;">)</span>
                                         </span>
-                                        <span style="font-size: 1.2em;">)</span>
-                                    </span>
+                                    }
                                 </MudText>
                             </td>
                         </tr>
@@ -100,7 +110,6 @@
             </MudField>
         </MudItem>
     </MudGrid>
-</MudContainer>
 
 @code
 {

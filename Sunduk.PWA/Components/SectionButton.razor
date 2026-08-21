@@ -1,11 +1,11 @@
-﻿<MudLink Href="@Link" Underline="Underline.None">
-    <MudPaper Class="px-4 flex-grow-1 flex-shrink-0 py-6">
+﻿<MudLink Href="@Link" Underline="Underline.None" Class="section-button-link">
+    <MudPaper Class="section-button px-4 flex-grow-1 flex-shrink-0 py-6">
         <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="0">
             <MudIcon Size="Size.Large" Icon="@Icon"/>
             <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
                 <MudText Typo="Typo.caption">@Label</MudText>
             </MudHidden>
-            <MudHidden Breakpoint="Breakpoint.Xs">
+            <MudHidden Breakpoint="Breakpoint.Xs" Invert="false">
                 <MudText Typo="Typo.body2">@Label</MudText>
             </MudHidden>
         </MudStack>

@@ -11,6 +11,7 @@
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
+@inject IJSRuntime JSRuntime
 
 <style>
     .file-upload-input {
@@ -80,6 +81,8 @@
     }
 </MudPopover>
 
+<InputFile id="import-file-input" @ref="_importInputFile" OnChange="OnImportFileChanged" Accept=".json" style="display:none" />
+
 <MudToolBar Dense="true" Class="pt-3">
     <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
         <MudButtonGroup Variant="Variant.Outlined">
@@ -87,17 +90,10 @@
                        OnClick="AddTemplate"
                        Icon="@Icons.Material.Outlined.PostAdd"
                        Size="Size.Small"/>
-            <MudFileUpload T="IBrowserFile"
-                           Accept=".json"
-                           FilesChanged="UploadTemplates"
-                           Class="flex-shrink-0">
-                <CustomContent Context="fileUpload">
-                    <MudIconButton Variant="Variant.Text"
-                                   Icon="@Icons.Material.Outlined.FileUpload"
-                                   Size="Size.Small"
-                                   OnClick="@fileUpload.OpenFilePickerAsync" />
-                </CustomContent>
-            </MudFileUpload>
+            <MudIconButton Variant="Variant.Text"
+                           Icon="@Icons.Material.Outlined.FileUpload"
+                           Size="Size.Small"
+                           OnClick="TriggerImportFile" />
             <MudIconButton Variant="Variant.Text"
                        OnClick="DownloadTemplatesAsync"
                        Icon="@Icons.Material.Outlined.FileDownload"
@@ -116,19 +112,12 @@
                        Size="Size.Medium">
                 Создать
             </MudButton>
-            <MudFileUpload T="IBrowserFile"
-                           Accept=".json"
-                           FilesChanged="UploadTemplates"
-                           Class="flex-shrink-0">
-                <CustomContent Context="fileUpload">
-                    <MudButton Variant="Variant.Outlined"
-                               StartIcon="@Icons.Material.Outlined.FileUpload"
-                               Size="Size.Medium"
-                               OnClick="@fileUpload.OpenFilePickerAsync">
-                        Импорт
-                    </MudButton>
-                </CustomContent>
-            </MudFileUpload>
+            <MudButton Variant="Variant.Outlined"
+                       StartIcon="@Icons.Material.Outlined.FileUpload"
+                       Size="Size.Medium"
+                       OnClick="TriggerImportFile">
+                Импорт
+            </MudButton>
 
             <MudButton Variant="Variant.Text"
                        OnClick="DownloadTemplatesAsync"
@@ -345,8 +334,9 @@
                                                   @bind-Value="@template.Content"
                                                   Immediate="true"
                                                   Lines="@Math.Max(10, template.Content.Count(c => c == '\n') + 1)"
-                                                  Placeholder="Введите текст с переменными в формате {variable}"
-                                                  Class="code-field" />
+                                                   Placeholder="Введите текст с переменными в формате {variable}"
+                                                   Margin="Margin.Dense"
+                                                   Class="code-field" />
                                 </MudTabPanel>
 
                                 <MudTabPanel Text="Результат" Icon="@Icons.Material.Outlined.CheckCircle">
@@ -357,8 +347,9 @@
                                                   Lines="@Math.Max(10, template.Result.Count(c => c == '\n') + 1)"
                                                   Value="template.Result"
                                                   ReadOnly="true"
-                                                  Placeholder="Результат появится после вычисления"
-                                                  Class="code-field" />
+                                                   Placeholder="Результат появится после вычисления"
+                                                   Margin="Margin.Dense"
+                                                   Class="code-field" />
                                 </MudTabPanel>
                             </MudTabs>
                         </MudItem>
@@ -633,6 +624,19 @@
         var json = JsonSerializer.Serialize(new List<TemplateDefinition>() { template }, new JsonSerializerOptions { WriteIndented = true });
         var bytes = Encoding.UTF8.GetBytes(json);
         await BlazorDownloadFileService.DownloadFile($"sunduk-dt-{template.Name}.json", bytes, "application/json");
+    }
+
+    private InputFile? _importInputFile;
+
+    private async Task TriggerImportFile()
+    {
+        await JSRuntime.InvokeVoidAsync("eval",
+            "document.getElementById('import-file-input').click()");
+    }
+
+    private async Task OnImportFileChanged(InputFileChangeEventArgs e)
+    {
+        await UploadTemplates(e.File);
     }
 
     private async Task UploadTemplates(IBrowserFile file)
