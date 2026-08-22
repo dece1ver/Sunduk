@@ -6,7 +6,7 @@
     }
 
     .monofield {
-        font-family: 'Roboto Mono', monospace;
+        font-family: 'JetBrains Mono', monospace;
     }
 </style>
 
@@ -137,10 +137,10 @@
                                 }
                                 <path stroke="white" stroke-dasharray="10 5" stroke-width="1" fill="none" d="M -180,0 L 60,0" />
                                 <path stroke="white" stroke-width="1" fill="none" d="M 52,3 L 60,0 L 52,-3" />
-                                <text x="3" y="@(ThreadType == CuttingType.External ? -30 : -45)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="8">@($"X{Contour[0].X?.NC()} Z{Contour[0].Z?.NC()}")</text>
-                                <text x="@(ThreadType == CuttingType.External ? -5 : -3)" y="@(ThreadType == CuttingType.External ? -45 : -30)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="8">@($"X{Contour[1].X?.NC()} Z{Contour[1].Z?.NC()}")</text>
-                                <text x="-80" y="@(ThreadType == CuttingType.External ? -50 : -25)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="8">@($"X{Contour[2].X?.NC()} Z{Contour[2].Z?.NC()}")</text>
-                                <text x="35" y="12" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="10">Z+</text>
+                                <text x="3" y="@(ThreadType == CuttingType.External ? -30 : -45)" fill="white" style="font-family: 'JetBrains Mono', monospace;" font-size="8">@($"X{Contour[0].X?.NC()} Z{Contour[0].Z?.NC()}")</text>
+                                <text x="@(ThreadType == CuttingType.External ? -5 : -3)" y="@(ThreadType == CuttingType.External ? -45 : -30)" fill="white" style="font-family: 'JetBrains Mono', monospace;" font-size="8">@($"X{Contour[1].X?.NC()} Z{Contour[1].Z?.NC()}")</text>
+                                <text x="-80" y="@(ThreadType == CuttingType.External ? -50 : -25)" fill="white" style="font-family: 'JetBrains Mono', monospace;" font-size="8">@($"X{Contour[2].X?.NC()} Z{Contour[2].Z?.NC()}")</text>
+                                <text x="35" y="12" fill="white" style="font-family: 'JetBrains Mono', monospace;" font-size="10">Z+</text>
                             </g>
                         </svg>
                     </div>
@@ -301,7 +301,7 @@
 
         <MudExpansionPanel Text="Пример программы для Fanuc">
             <MudItem xs="12">
-                <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace; font-size: small;" Margin="Margin.Dense" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z{StartPointZ.NC()} S{SpindleSpeed.Round(100)} M3 G97\n" +
+                <MudTextField Variant="Variant.Outlined" Style="font-family: 'JetBrains Mono', monospace; font-size: small;" Margin="Margin.Dense" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z{StartPointZ.NC()} S{SpindleSpeed.Round(100)} M3 G97\n" +
                                                                                                                                                                                                                           $"G76 P0201{Thread.Profile(ThreadStandard)} Q{Passes[^2].Microns()} R{Passes[^1].NC()}\n" +
                                                                                                                                                                                                                           $"G76 X{EndDiameter} Z{EndPointZ.NC()} P{Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch).Microns()} Q{Passes[0].Microns()}{ThreadShift} F{ThreadPitch.NC()}")">
                 </MudTextField>
@@ -348,7 +348,7 @@
                     </MudField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace; font-size: small;" Margin="Margin.Dense" ReadOnly="true" Lines="ExampleLines" Value="@(TurningExample)" />
+                    <MudTextField Variant="Variant.Outlined" Style="font-family: 'JetBrains Mono', monospace; font-size: small;" Margin="Margin.Dense" ReadOnly="true" Lines="ExampleLines" Value="@(TurningExample)" />
                 </MudItem>
             </MudGrid>
         </MudExpansionPanel>

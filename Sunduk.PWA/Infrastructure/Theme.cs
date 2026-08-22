@@ -17,6 +17,7 @@ public static class AppTheme
 
     public static MudTheme AmberDark { get; } = new()
     {
+        Typography = BuildTypography(),
         PaletteLight = new PaletteLight()
         {
             Primary = "#F59E0B",
@@ -352,4 +353,14 @@ public static class AppTheme
             OverlayLight = "rgba(0,0,0, 0.05)",
         }
     };
+
+    private static Typography BuildTypography()
+    {
+        var t = new Typography();
+        t.Default.FontFamily = ["Inter", "system-ui", "Segoe UI", "sans-serif"];
+        t.Default.LetterSpacing = "0";
+        t.Button.TextTransform = "none";
+        t.Button.LetterSpacing = "0.01em";
+        return t;
+    }
 }

@@ -1,12 +1,20 @@
-﻿/* ============================================================
+/* ============================================================
    Sunduk — Site CSS
    Inter (body) + JetBrains Mono (mono/code)
+   Fonts are self-hosted (see css/fonts.css). Typography is the
+   single source of truth via MudTheme.Typography in Infrastructure/Theme.cs.
    ============================================================ */
 
+:root {
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+}
+
 html, body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-family: var(--font-ui);
     font-size: 14px;
     line-height: 1.45;
+    text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     margin: 0;
@@ -23,45 +31,37 @@ html.mud-light, body.mud-light {
     color: rgba(0,0,0, 0.87);
 }
 
-.mud-typography,
-.mud-input,
-.mud-select,
-.mud-button,
-.mud-list-item,
-.mud-nav-link,
-.mud-tab {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-}
-
 /* --- Monospace --- */
 
 .monofield {
-    font-family: 'JetBrains Mono', 'Roboto Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .monotext14 {
-    font-family: 'JetBrains Mono', 'Roboto Mono', ui-monospace, monospace;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
     font-size: 13px;
     padding-right: 10px;
     padding-left: 5px;
 }
 
 .monotext12 {
-    font-family: 'JetBrains Mono', 'Roboto Mono', ui-monospace, monospace;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 12px;
     padding-right: 10px;
     padding-left: 5px;
 }
 
 .text12 {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
     font-size: 12px;
     padding-right: 10px;
     padding-left: 5px;
 }
 
 .text14 {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
     font-size: 14px;
     padding-right: 10px;
     padding-left: 5px;
@@ -95,9 +95,16 @@ html.mud-light, body.mud-light {
 /* --- G-code preview font --- */
 
 .gcode-preview,
-.mud-text-field[style*="Roboto Mono"],
-textarea[style*="Roboto Mono"] {
-    font-family: 'JetBrains Mono', 'Roboto Mono', ui-monospace, monospace !important;
+.mud-text-field[style*="JetBrains Mono"],
+textarea[style*="JetBrains Mono"] {
+    font-family: var(--font-mono) !important;
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- Tabular figures for numeric data (tool tables, G-code, params) --- */
+
+.mud-table-cell {
+    font-variant-numeric: tabular-nums;
 }
 
 /* --- Section button (home grid) --- */
