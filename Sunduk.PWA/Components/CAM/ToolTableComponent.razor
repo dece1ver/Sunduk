@@ -1,4 +1,4 @@
-﻿@using MudBlazor.Extensions
+@using MudBlazor.Extensions
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
 <MudSwipeArea OnSwipeEnd="OnSwipe" Style="touch-action: pan-y;">
@@ -10,7 +10,7 @@
 
                 @foreach (var tool in Tools.Where(x => x.MachineType is MachineType.Milling))
                 {
-                    <MudText Style="font-family: 'Roboto Mono', monospace">T@(tool.Position.ToString("D2")) (@tool.TableDescription())</MudText>
+                    <MudText Style="font-family: 'JetBrains Mono', monospace">T@(tool.Position.ToString("D2")) (@tool.TableDescription())</MudText>
                 }
             </MudTabPanel>
 

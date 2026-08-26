@@ -80,10 +80,10 @@
                                 <path d="@AxesPath"/>
                             </g>
                             <g transform="@($"translate({Fmt(SX(0))},{Fmt(SY(-4 * AxesLength))})")">
-                                <text x="3" y="3" fill="#666" style="font-family: 'Roboto Mono', monospace;" font-size="9">X+</text>
+                                <text x="3" y="3" fill="#666" style="font-family: 'JetBrains Mono', monospace;" font-size="9">X+</text>
                             </g>
                             <g transform="@($"translate({Fmt(SX(AxesLength))},{Fmt(SY(0))})")">
-                                <text x="2" y="10" fill="#666" style="font-family: 'Roboto Mono', monospace;" font-size="9">Z+</text>
+                                <text x="2" y="10" fill="#666" style="font-family: 'JetBrains Mono', monospace;" font-size="9">Z+</text>
                             </g>
                             <circle cx="@Fmt(SX(CenterZ))" cy="@Fmt(SY(CenterX))" r="@Fmt(RadiusSize * Scale)"
                                     stroke="#666" stroke-width="1" stroke-dasharray="3,3" fill="none"/>
@@ -97,7 +97,7 @@
                         {
                             <circle cx="@Fmt(SX(marker.Point.Z))" cy="@Fmt(SY(marker.Point.X))" r="3" fill="@marker.Color"/>
                             <g transform="@($"translate({Fmt(SX(marker.Point.Z))},{Fmt(SY(marker.Point.X))})")">
-                                <text x="5" y="-5" fill="@marker.Color" style="font-family: 'Roboto Mono', monospace;" font-size="10">@marker.Label</text>
+                                <text x="5" y="-5" fill="@marker.Color" style="font-family: 'JetBrains Mono', monospace;" font-size="10">@marker.Label</text>
                             </g>
                         }
                     </svg>
@@ -122,7 +122,7 @@
                             <MudText Typo="Typo.body2">@($"Радиус дуги с учётом пластины: {(RadiusSize + InsertRadius).ToPrettyString()} мм")</MudText>
                         </MudItem>
                         <MudItem xs="12" Class="mt-2">
-                            <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace;" ReadOnly="true" AutoGrow="true" Lines="1" Value="@ArcMoveExample"/>
+                            <MudTextField Variant="Variant.Outlined" Style="font-family: 'JetBrains Mono', monospace;" ReadOnly="true" AutoGrow="true" Lines="1" Value="@ArcMoveExample"/>
                         </MudItem>
                     </MudGrid>
                 }

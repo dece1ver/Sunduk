@@ -6,7 +6,7 @@
     }
 
     .monofield {
-        font-family: 'Roboto Mono', monospace;
+        font-family: 'JetBrains Mono', monospace;
     }
 </style>
 
@@ -137,10 +137,10 @@
                                 }
                                 <path stroke="white" stroke-dasharray="10 5" stroke-width="1" fill="none" d="M -180,0 L 60,0" />
                                 <path stroke="white" stroke-width="1" fill="none" d="M 52,3 L 60,0 L 52,-3" />
-                                <text x="3" y="@(ThreadType == CuttingType.External ? -30 : -45)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="8">@($"X{Contour[0].X?.NC()} Z{Contour[0].Z?.NC()}")</text>
-                                <text x="@(ThreadType == CuttingType.External ? -5 : -3)" y="@(ThreadType == CuttingType.External ? -45 : -30)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="8">@($"X{Contour[1].X?.NC()} Z{Contour[1].Z?.NC()}")</text>
-                                <text x="-80" y="@(ThreadType == CuttingType.External ? -50 : -25)" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="8">@($"X{Contour[2].X?.NC()} Z{Contour[2].Z?.NC()}")</text>
-                                <text x="35" y="12" fill="white" style="font-family: 'Roboto Mono', monospace;" font-size="10">Z+</text>
+                                <text x="3" y="@(ThreadType == CuttingType.External ? -30 : -45)" fill="white" style="font-family: 'JetBrains Mono', monospace;" font-size="8">@($"X{Contour[0].X?.NC()} Z{Contour[0].Z?.NC()}")</text>
+                                <text x="@(ThreadType == CuttingType.External ? -5 : -3)" y="@(ThreadType == CuttingType.External ? -45 : -30)" fill="white" style="font-family: 'JetBrains Mono', monospace;" font-size="8">@($"X{Contour[1].X?.NC()} Z{Contour[1].Z?.NC()}")</text>
+                                <text x="-80" y="@(ThreadType == CuttingType.External ? -50 : -25)" fill="white" style="font-family: 'JetBrains Mono', monospace;" font-size="8">@($"X{Contour[2].X?.NC()} Z{Contour[2].Z?.NC()}")</text>
+                                <text x="35" y="12" fill="white" style="font-family: 'JetBrains Mono', monospace;" font-size="10">Z+</text>
                             </g>
                         </svg>
                     </div>
@@ -195,7 +195,7 @@
                     {
                         bool _isInternal = ThreadType == CuttingType.Internal;
                         string _gostLabel = _isInternal ? "Диаметр отверстия (ГОСТ 19257)" : "Диаметр стержня (ГОСТ 19258)";
-                        string _viscousLabel = _isInternal ? "Диаметр отверстия (вязкие)" : "Диаметр стержня (вязкие)";
+                        string _viscousLabel = _isInternal ? "Диаметр отверстия (вязкие, ГОСТ 19257)" : "Диаметр стержня (вязкие, ГОСТ 19258)";
 
                         string _gostTooltip = _isInternal
                             ? "Серый чугун ГОСТ 1412-85; стали ГОСТ 380-94, ГОСТ 1050-88, ГОСТ 4543-71, " +
@@ -239,6 +239,26 @@
                             _viscousValue = $"{_rod.dmax.ToPrettyString(3)}  ({(_tol >= 0 ? "+" : "")}{_tol.ToPrettyString(3)})";
                         }
 
+                        // Для P > 2 мм подъём витка в ГОСТ 19258-73 не нормирован (приложение, табл. 1 — до P = 2,0 мм).
+                        bool _riseExtrapolated = !_isInternal && Thread.IsRiseExtrapolated(ThreadPitch);
+
+                        // Готовая резьба по ГОСТ 16093 / ISO 965: тот же диаметр, что у заготовки, но без поправки на нарост витка.
+                        string? _finishedValue = null;
+                        try
+                        {
+                            if (Thread.GetGost16093(ThreadDiameter, ThreadPitch, ThreadPosition!.Value, Grade!.Value) is { } _fr)
+                            {
+                                double _dev = _fr.Min - _fr.Max;
+                                _finishedValue = _isInternal
+                                    ? $"{_fr.Min.ToPrettyString(3)}  (+{_fr.Tolerance.ToPrettyString(3)})"
+                                    : $"{_fr.Max.ToPrettyString(3)}  ({(_dev >= 0 ? "+" : "")}{_dev.ToPrettyString(3)})";
+                            }
+                        }
+                        catch
+                        {
+                            _finishedValue = null;
+                        }
+
                         <tr>
                             <td colspan="2"><MudDivider Class="my-1" /></td>
                         </tr>
@@ -246,6 +266,14 @@
                             <td class="tl"><MudText Typo="Typo.caption" Color="Color.Primary">Поле допуска:</MudText></td>
                             <td><MudText Typo="Typo.caption">@GostFieldLabel</MudText></td>
                         </tr>
+
+                        if (_finishedValue is not null)
+                        {
+                            <tr>
+                                <td class="tl"><MudText Typo="Typo.caption">Готовая резьба (ГОСТ 16093):</MudText></td>
+                                <td><MudText Typo="Typo.caption">@_finishedValue</MudText></td>
+                            </tr>
+                        }
 
                         if (_gostValue is not null)
                         {
@@ -268,11 +296,19 @@
                                     <MudText Typo="Typo.caption"
                                              Style="cursor: pointer; text-decoration: underline dotted;"
                                              @onclick="@(async () => await OpenMaterialsDialog(_viscousLabel, ViscousMaterials(_isInternal)))">
-                                        @_viscousLabel:
+                                        @_viscousLabel@(_riseExtrapolated ? "*" : ""):
                                     </MudText>
                                 </td>
                                 <td><MudText Typo="Typo.caption">@_viscousValue</MudText></td>
                             </tr>
+                            if (_riseExtrapolated)
+                            {
+                                <tr>
+                                    <td colspan="2">
+                                        <MudText Typo="Typo.caption" Color="Color.Warning">* При P &gt; 2 мм подъём витка в ГОСТ 19258-73 не нормирован — значение экстраполировано (не табличное).</MudText>
+                                    </td>
+                                </tr>
+                            }
                         }
                     }
                 </table>
@@ -301,7 +337,7 @@
 
         <MudExpansionPanel Text="Пример программы для Fanuc">
             <MudItem xs="12">
-                <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace; font-size: small;" Margin="Margin.Dense" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z{StartPointZ.NC()} S{SpindleSpeed.Round(100)} M3 G97\n" +
+                <MudTextField Variant="Variant.Outlined" Style="font-family: 'JetBrains Mono', monospace; font-size: small;" Margin="Margin.Dense" ReadOnly="true" Lines="3" Value="@($"G0 X{ApproachDiameter} Z{StartPointZ.NC()} S{SpindleSpeed.Round(100)} M3 G97\n" +
                                                                                                                                                                                                                           $"G76 P0201{Thread.Profile(ThreadStandard)} Q{Passes[^2].Microns()} R{Passes[^1].NC()}\n" +
                                                                                                                                                                                                                           $"G76 X{EndDiameter} Z{EndPointZ.NC()} P{Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch).Microns()} Q{Passes[0].Microns()}{ThreadShift} F{ThreadPitch.NC()}")">
                 </MudTextField>
@@ -348,7 +384,7 @@
                     </MudField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" Style="font-family: 'Roboto Mono', monospace; font-size: small;" Margin="Margin.Dense" ReadOnly="true" Lines="ExampleLines" Value="@(TurningExample)" />
+                    <MudTextField Variant="Variant.Outlined" Style="font-family: 'JetBrains Mono', monospace; font-size: small;" Margin="Margin.Dense" ReadOnly="true" Lines="ExampleLines" Value="@(TurningExample)" />
                 </MudItem>
             </MudGrid>
         </MudExpansionPanel>

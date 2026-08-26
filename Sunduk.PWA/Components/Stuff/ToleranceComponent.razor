@@ -65,7 +65,7 @@
                         <tr>
                             <td class="tl"><MudText Typo="Typo.caption">Размер:</MudText></td>
                             <td>
-                                <MudText Typo="Typo.caption" Style="font-family: 'Roboto Mono', monospace;">
+                                <MudText Typo="Typo.caption" Style="font-family: 'JetBrains Mono', monospace;">
                                     <span>@(r.Nominal.ToPrettyString(3, Util.PrettyStringOption.AsIs))</span>
                                     @{
                                         bool showUpper = Math.Abs(r.UpperDeviationMm) > 1e-9;
@@ -87,15 +87,15 @@
                         </tr>
                         <tr>
                             <td class="tl"><MudText Typo="Typo.caption">Наибольший размер:</MudText></td>
-                            <td><MudText Typo="Typo.caption" Style="font-family: 'Roboto Mono', monospace;">@(r.MaxSize.ToPrettyString(3, Util.PrettyStringOption.AsIs)) мм</MudText></td>
+                            <td><MudText Typo="Typo.caption" Style="font-family: 'JetBrains Mono', monospace;">@(r.MaxSize.ToPrettyString(3, Util.PrettyStringOption.AsIs)) мм</MudText></td>
                         </tr>
                         <tr>
                             <td class="tl"><MudText Typo="Typo.caption">Наименьший размер:</MudText></td>
-                            <td><MudText Typo="Typo.caption" Style="font-family: 'Roboto Mono', monospace;">@(r.MinSize.ToPrettyString(3, Util.PrettyStringOption.AsIs)) мм</MudText></td>
+                            <td><MudText Typo="Typo.caption" Style="font-family: 'JetBrains Mono', monospace;">@(r.MinSize.ToPrettyString(3, Util.PrettyStringOption.AsIs)) мм</MudText></td>
                         </tr>
                         <tr>
                             <td class="tl"><MudText Typo="Typo.caption">Середина размера:</MudText></td>
-                            <td><MudText Typo="Typo.caption" Style="font-family: 'Roboto Mono', monospace;">@(r.MiddleSize.ToPrettyString(4, Util.PrettyStringOption.AsIs)) мм</MudText></td>
+                            <td><MudText Typo="Typo.caption" Style="font-family: 'JetBrains Mono', monospace;">@(r.MiddleSize.ToPrettyString(4, Util.PrettyStringOption.AsIs)) мм</MudText></td>
                         </tr>
                     </table>
                 }

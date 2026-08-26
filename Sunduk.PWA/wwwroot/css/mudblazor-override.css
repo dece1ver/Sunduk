@@ -31,8 +31,7 @@
 .mud-expand-panel,
 .mud-radio-content,
 .mud-checkbox,
-.mud-switch,
-.mud-progress-linear,
+    .mud-progress-linear,
 .mud-badge,
 .mud-table,
 .mud-tabs-header,
@@ -144,6 +143,16 @@
 
 /* --- Compact tabs --- */
 
+.mud-tabs .mud-tabs-tabbar {
+    min-height: auto;
+    margin: 0;
+}
+
+.mud-tabs-tabbar .mud-tabs-tabbar-inner {
+    min-height: 40px;
+    align-items: center;
+}
+
 .mud-tab {
     font-size: 0.78rem;
     letter-spacing: 0.02em;
@@ -151,6 +160,8 @@
     padding: 8px 14px;
     min-height: 36px;
     min-width: auto;
+    align-items: center;
+    justify-content: center;
 }
 
 /* --- Snackbar / Alert --- */
@@ -276,22 +287,15 @@
     outline-offset: 1px;
 }
 
-/* --- MudTabs: remove extra space under indicator --- */
-
-.mud-tabs .mud-tabs-tabbar {
-    min-height: auto;
-    margin: 0;
-}
-
-.mud-tabs-tabbar .mud-tabs-tabbar-inner {
-    min-height: auto;
-}
-
-.mud-tab {
-    padding-bottom: 0;
-}
+/* --- MudTabs: keep active indicator at the very bottom --- */
 
 .mud-tab-slider {
     height: 2px;
     bottom: 0;
+}
+
+/* --- Switch: round thumb + circular hover (flat-style exception) --- */
+
+.mud-switch-base {
+    border-radius: 50% !important;
 }
