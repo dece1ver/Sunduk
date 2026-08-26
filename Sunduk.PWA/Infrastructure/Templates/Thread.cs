@@ -1450,7 +1450,8 @@ namespace Sunduk.PWA.Infrastructure.Templates
         /// <summary>
         /// Диапазон величины подъёма витка A для расчёта диаметров стержней (ГОСТ 19258-73).
         /// Min = Титановые сплавы (P ≤ 1.25) или Латунь (P ≥ 1.50), Max = 0.140·P (Коррозионностойкие).
-        /// Для P > 2.0 мм следует использовать ThreadRise19257.
+        /// Для P > 2,0 мм подъём витка ГОСТом не нормирован — значения экстраполированы
+        /// (см. IsRiseExtrapolated).
         /// </summary>
         public static (double Min, double Max) ThreadRise19258(double pitch) => (
             ThreadRise19258_Min(pitch),
@@ -1464,6 +1465,13 @@ namespace Sunduk.PWA.Infrastructure.Templates
             <= 1.75 => 0.180,
             _ => 0.200,
         };
+
+        /// <summary>Граница табличных шагов приложения ГОСТ 19258-73
+        /// (табл. 1 — от 0,2 до 2,0 мм включительно).</summary>
+        public const double Rise19258TableMaxPitch = 2.0;
+
+        /// <summary>true — подъём витка для шага не нормирован ГОСТ 19258-73 и рассчитан экстраполяцией.</summary>
+        public static bool IsRiseExtrapolated(double pitch) => pitch > Rise19258TableMaxPitch;
 
         /// <summary>Величина подъёма витка A для конкретного материала по ГОСТ 19257-73. A = C · P.</summary>
         public static double ThreadRise19257(double pitch, double materialCoefficient)
@@ -1514,6 +1522,24 @@ namespace Sunduk.PWA.Infrastructure.Templates
                 string dRange = double.IsNaN(dmin) ? $"??? … {dmax:F3}" : $"{dmin:F3} … {dmax:F3}";
                 string esStr = es <= 0 ? $"{es:F3}" : $"+{es:F3}";
                 return $"{Grade}{Position}  d: {dRange}  es={esStr}  Td={Td?.ToString("F3") ?? "—"}  Td2={Td2?.ToString("F3") ?? "—"}";
+            }
+        }
+
+        /// <summary>
+        /// Пределы готовой резьбы по ГОСТ 16093 (ISO 965): наружная — диаметр d,
+        /// внутренняя — внутренний диаметр D1 = d − 1.0825·P.
+        /// Без поправки на подъём витка (в отличие от ГОСТ 19257/19258).
+        /// </summary>
+        public readonly record struct Gost16093Result(
+            ThreadPosition Position, int Grade,
+            double Min, double Max,   // наружная: [d_min; d_max]; внутренняя: [D1min; D1max]
+            double EsEi,              // основное отклонение es / EI
+            double Tolerance)         // Td или TD1
+        {
+            public override string ToString()
+            {
+                string devStr = EsEi <= 0 ? $"{EsEi:F3}" : $"+{EsEi:F3}";
+                return $"{Grade}{Position}  {Min:F3} … {Max:F3}  dev={devStr}  T={Tolerance:F3}";
             }
         }
 
@@ -1683,6 +1709,34 @@ namespace Sunduk.PWA.Infrastructure.Templates
             double dMin = tD.HasValue ? Math.Round(diameter - (Math.Abs(es) + tD.Value) - a_min, 2) : double.NaN;
 
             return new(position, grade, dMax, dMin, es, tD, tD2, Math.Round(dMin - dMax, 2));
+        }
+
+        /// <summary>Рассчитывает пределы готовой резьбы по ГОСТ 16093-2004 (ISO 965),
+        /// без поправки на подъём витка: наружная — диаметр d,
+        /// внутренняя — внутренний диаметр D1 = d − 1.0825·P.
+        /// Возвращает null, если допуск диаметра не определён для данной степени точности.</summary>
+        public static Gost16093Result? GetGost16093(double diameter, double pitch, ThreadPosition position, int grade)
+        {
+            switch (position)
+            {
+                case ThreadPosition.d or ThreadPosition.e or ThreadPosition.f
+                              or ThreadPosition.g or ThreadPosition.h:
+                {
+                    double es = ExternalFundamentalDeviation(position, pitch);
+                    if (Td(pitch, grade) is not { } td) return null;
+                    double max = Math.Round(diameter + es, 3);
+                    return new(position, grade, Math.Round(max - td, 3), max, es, td);
+                }
+                case ThreadPosition.E or ThreadPosition.F or ThreadPosition.G or ThreadPosition.H:
+                {
+                    double ei = InternalFundamentalDeviation(position, pitch);
+                    if (TD1(pitch, grade) is not { } td1) return null;
+                    double min = Math.Round(diameter - 1.0825 * pitch + ei, 3);
+                    return new(position, grade, min, Math.Round(min + td1, 3), ei, td1);
+                }
+                default:
+                    throw new ArgumentException($"Недопустимое поле допуска {position}.", nameof(position));
+            }
         }
 
         #endregion
