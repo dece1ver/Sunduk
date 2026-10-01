@@ -197,6 +197,27 @@ namespace Sunduk.Tests
         }
 
         [Fact]
+        public void Availability_ОшибкаОпросаПоказывается()
+        {
+            // Раньше здесь был молчаливый catch, и устройство с устаревшей копией
+            // utils.js в кэше вечно показывало «проверяю…» без всякой диагностики.
+            var state = OfflineState.Error("устаревшая копия utils.js");
+
+            Assert.Equal(OfflineAvailability.ProbeFailed, OfflineStatusMonitor.Map(state));
+            Assert.Equal("устаревшая копия utils.js", state.Diagnostic);
+        }
+
+        [Fact]
+        public void Percent_СчитаетГотовностьКэша()
+        {
+            Assert.Equal(0, new OfflineState().Percent);                                   // total неизвестен
+            Assert.Equal(0, new OfflineState { Cached = 10, Total = 0 }.Percent);
+            Assert.Equal(50, new OfflineState { Cached = 500, Total = 1000 }.Percent);
+            Assert.Equal(100, new OfflineState { Cached = 1000, Total = 1000 }.Percent);
+            Assert.Equal(100, new OfflineState { Cached = 2000, Total = 1000 }.Percent);   // клампим
+        }
+
+        [Fact]
         public void Availability_БезСетиПоказываетОфлайнДажеЕслиЕстьОбновление()
         {
             var state = new OfflineState

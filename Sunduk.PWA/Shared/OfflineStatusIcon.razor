@@ -1,9 +1,7 @@
 @implements IDisposable
 @inject OfflineStatusMonitor Monitor
 
-<MudTooltip Text="@Tooltip" Placement="Placement.Start">
-    <MudIcon Icon="@Icon" Color="@IconColor" Size="@IconSize" />
-</MudTooltip>
+<MudIcon Icon="@Icon" Color="@IconColor" Size="@IconSize" title="@ShortTitle" />
 
 @code {
     [Parameter] public Size IconSize { get; set; } = Size.Small;
@@ -12,9 +10,26 @@
 
     private OfflineAvailability Availability => Monitor.Availability;
 
+    // Подробности — в диалоге «Описание». Здесь только короткая подсказка,
+    // чтобы по иконке было понятно, что приложение готово к работе без сети.
+    private string ShortTitle => Availability switch
+    {
+        OfflineAvailability.Unknown => "Проверяю состояние офлайн-режима",
+        OfflineAvailability.ProbeFailed => "Не удалось определить состояние офлайн-режима",
+        OfflineAvailability.Unsupported => "Офлайн-режим не поддерживается браузером",
+        OfflineAvailability.Preparing => "Загружается офлайн-версия",
+        OfflineAvailability.NotActivated => "Офлайн-версия ещё не готова",
+        OfflineAvailability.UpdateReady => "Обновление установлено — перезагрузите",
+        OfflineAvailability.Ready => "Готов к работе без интернета",
+        OfflineAvailability.Offline => "Работает без интернета",
+        OfflineAvailability.OfflineNoCache => "Офлайн-версия не загружена",
+        _ => "Офлайн-режим"
+    };
+
     private string Icon => Availability switch
     {
         OfflineAvailability.Unknown => Icons.Material.Outlined.HourglassEmpty,
+        OfflineAvailability.ProbeFailed => Icons.Material.Filled.ErrorOutline,
         OfflineAvailability.Unsupported => Icons.Material.Filled.CloudOff,
         OfflineAvailability.Preparing => Icons.Material.Filled.CloudDownload,
         OfflineAvailability.NotActivated => Icons.Material.Filled.CloudQueue,
@@ -28,6 +43,7 @@
     private Color IconColor => Availability switch
     {
         OfflineAvailability.Unknown => Color.Default,
+        OfflineAvailability.ProbeFailed => Color.Error,
         OfflineAvailability.Unsupported => Color.Default,
         OfflineAvailability.Preparing => Color.Warning,
         OfflineAvailability.NotActivated => Color.Warning,
@@ -37,26 +53,6 @@
         OfflineAvailability.OfflineNoCache => Color.Error,
         _ => Color.Default
     };
-
-    private string Tooltip => Availability switch
-    {
-        OfflineAvailability.Unknown => "Проверяю состояние офлайн-режима…",
-        OfflineAvailability.Unsupported => "Офлайн-режим недоступен: браузер не поддерживает service worker",
-        OfflineAvailability.Preparing => ProgressText(),
-        OfflineAvailability.NotActivated => "Service worker ещё не активировался, офлайн-версия не готова",
-        OfflineAvailability.UpdateReady => "Обновление скачано и установлено — перезагрузите страницу",
-        OfflineAvailability.Ready => "Готов к работе без интернета",
-        OfflineAvailability.Offline => "Интернета нет — работает из офлайн-кэша",
-        OfflineAvailability.OfflineNoCache => "Интернета нет, а офлайн-версия не загружена. Подключитесь к сети",
-        _ => "Состояние офлайн-режима неизвестно"
-    };
-
-    private string ProgressText()
-    {
-        var s = State;
-        if (s.Total > 0) return $"Загружается офлайн-версия: {s.Cached} из {s.Total}. Не отключайте интернет до конца";
-        return "Загружается офлайн-версия. Не отключайте интернет до конца";
-    }
 
     protected override void OnInitialized()
     {

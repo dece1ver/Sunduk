@@ -1,12 +1,18 @@
+using System;
+
 namespace Sunduk.PWA.Infrastructure.Offline
 {
     /// <summary>
-    /// Состояние офлайн-режима приложения. Отображается значком в MudAppBar.
+    /// Состояние офлайн-режима приложения. Показывается значком в MudAppBar
+    /// и подробной строкой статуса в диалоге «Описание».
     /// </summary>
     public enum OfflineAvailability
     {
         /// <summary>Состояние ещё не запрошено у браузера.</summary>
         Unknown,
+
+        /// <summary>Опрос браузера не удался — скорее всего устаревшая копия utils.js в кэше.</summary>
+        ProbeFailed,
 
         /// <summary>Браузер не умеет service worker / Cache Storage — офлайн невозможен.</summary>
         Unsupported,
@@ -17,7 +23,7 @@ namespace Sunduk.PWA.Infrastructure.Offline
         /// <summary>Service worker зарегистрирован, но ещё ни разу не активировался.</summary>
         NotActivated,
 
-        /// <summary>Новая версия скачана и установлена, но страница работает на старой — пора перезагрузить.</summary>
+        /// <summary>Новая версия установлена, но страница работает на старой — пора перезагрузить.</summary>
         UpdateReady,
 
         /// <summary>Сеть есть, офлайн-кэш собран, можно отключать интернет.</summary>
@@ -54,5 +60,17 @@ namespace Sunduk.PWA.Infrastructure.Offline
         public bool IsKnown => Supported || SwState != "none";
 
         public static readonly OfflineState Unknown = new();
+
+        /// <summary>Опрос не удался. Причина — в Diagnostic, показывается пользователю.</summary>
+        public static OfflineState Error(string diagnostic) => new() { ProbeFailed = true, Diagnostic = diagnostic };
+
+        /// <summary>Внутренний флаг «опрос упал». Не приходит из JS.</summary>
+        internal bool ProbeFailed { get; init; }
+
+        /// <summary>Техническая причина сбоя опроса — для показа пользователю.</summary>
+        public string? Diagnostic { get; init; }
+
+        /// <summary>Готовность офлайн-кэша в процентах.</summary>
+        public int Percent => Total > 0 ? (int)Math.Clamp(Cached * 100L / Total, 0, 100) : 0;
     }
 }

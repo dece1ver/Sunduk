@@ -1,7 +1,6 @@
 using Microsoft.JSInterop;
 using System;
 using System.Threading.Tasks;
-
 namespace Sunduk.PWA.Infrastructure.Offline
 {
     /// <summary>
@@ -12,6 +11,8 @@ namespace Sunduk.PWA.Infrastructure.Offline
     public sealed class OfflineStatusMonitor : IAsyncDisposable
     {
         private const string Module = "sundukOffline";
+        private const int ProbeAttempts = 12;
+        private static readonly TimeSpan ProbeRetryDelay = TimeSpan.FromSeconds(5);
 
         private readonly IJSRuntime _js;
         private DotNetObjectReference<OfflineStatusMonitor>? _selfRef;
@@ -38,19 +39,53 @@ namespace Sunduk.PWA.Infrastructure.Offline
             _started = true;
 
             _selfRef = DotNetObjectReference.Create(this);
-            try
+            await ProbeAsync(retryOnFailure: true);
+        }
+
+        /// <summary>Повторный опрос по кнопке «Проверить снова» в диалоге.</summary>
+        public Task RefreshAsync() => ProbeAsync(retryOnFailure: false);
+
+        private async Task ProbeAsync(bool retryOnFailure)
+        {
+            for (var attempt = 0; ; attempt++)
             {
-                State = await _js.InvokeAsync<OfflineState>($"{Module}.watch", _selfRef)
-                    ?? OfflineState.Unknown;
-            }
-            catch (JSException)
-            {
-                // Например, prerender или нестандартная сборка — тихо остаёмся в Unsupported.
-                State = OfflineState.Unknown;
+                try
+                {
+                    State = await _js.InvokeAsync<OfflineState>($"{Module}.watch", _selfRef)
+                        ?? OfflineState.Unknown;
+                }
+                catch (JSDisconnectedException)
+                {
+                    return;
+                }
+                catch (Exception e)
+                {
+                    // Раньше здесь стоял молчаливый catch, и устройство с устаревшей
+                    // копией utils.js в офлайн-кэше вечно показывало «проверяю…».
+                    // Теперь причина видна пользователю.
+                    State = OfflineState.Error(Describe(e));
+                    Console.Error.WriteLine($"OfflineStatusMonitor: не удалось получить состояние офлайна: {e}");
+
+                    if (!retryOnFailure || attempt + 1 >= ProbeAttempts) break;
+
+                    // Скорее всего кэш отдаёт старую utils.js без sundukOffline;
+                    // новая копия подтянется, когда активируется свежий service worker.
+                    await Task.Delay(ProbeRetryDelay);
+                    continue;
+                }
+
+                break;
             }
 
             StateChanged?.Invoke();
         }
+
+        private static string Describe(Exception e) => e switch
+        {
+            JSException js => "Не удалось опросить состояние service worker (устаревшая копия js/utils.js в кэше?). Перезагрузите приложение.",
+            TaskCanceledException => "Опрос состояния прерван по таймауту.",
+            _ => $"Опрос состояния не удался: {e.Message}"
+        };
 
         [JSInvokable]
         public async Task OnOfflineStateChanged()
@@ -75,13 +110,14 @@ namespace Sunduk.PWA.Infrastructure.Offline
                         LoadedVersion = loadedVersion
                     };
             }
-            catch (JSException)
-            {
-                return;
-            }
             catch (JSDisconnectedException)
             {
                 return;
+            }
+            catch (Exception e)
+            {
+                State = OfflineState.Error(Describe(e));
+                Console.Error.WriteLine($"OfflineStatusMonitor: сбой обновления состояния офлайна: {e}");
             }
 
             StateChanged?.Invoke();
@@ -90,6 +126,8 @@ namespace Sunduk.PWA.Infrastructure.Offline
         /// <summary>Переводит состояние браузера в статус для индикатора. Чистая функция.</summary>
         public static OfflineAvailability Map(OfflineState s)
         {
+            if (s.ProbeFailed) return OfflineAvailability.ProbeFailed;
+
             // Пока браузер не ответил, не показываем «не поддерживается» — это было бы
             // враньём на первом кадре, до завершения JS-вызова.
             if (!s.IsKnown) return OfflineAvailability.Unknown;

@@ -1,4 +1,6 @@
 ﻿@inject IDialogService DialogService
+@implements IDisposable
+@inject OfflineStatusMonitor OfflineMonitor
 
 <MudDialog>
     <DialogContent>
@@ -8,8 +10,36 @@
                     Sunduk - <MudLink Href="@wikiPwaLink">прогрессивное веб-приложение</MudLink> <MudLink Href="@msPwaOfflineSupportLink">с возможностью автономной работы</MudLink>.
                 </MudText>
                 <MudText Typo="Typo.body2" Align="Align.Left">
-                    Обновления скачиваются в фоновом режиме. Когда обновление установлено, значок облака рядом с логотипом в верхней панели подскажет — достаточно перезагрузить приложение. Текущий статус офлайн-режима можно посмотреть, наведя курсор на этот значок.
+                    Обновления скачиваются в фоновом режиме. Когда обновление установлено, значок в верхней панели покажет, что достаточно перезагрузить приложение.
                 </MudText>
+
+                <MudDivider DividerType="DividerType.Middle" Class="my-4" />
+
+                <div class="d-flex align-center mb-1">
+                    <MudIcon Icon="@StatusIcon" Color="@StatusColor" Size="Size.Small" Class="mr-2" />
+                    <MudText Typo="Typo.body2" Align="Align.Left">
+                        Офлайн-режим: @StatusText
+                    </MudText>
+                </div>
+
+                @if (IsPreparing)
+                {
+                    <MudProgressLinear Color="Color.Warning" Value="@OfflineState.Percent" Size="Size.Small" Class="my-2" />
+                    <MudText Typo="Typo.caption" Align="Align.Left">
+                        Загружено @OfflineState.Percent% — не отключайте интернет до конца
+                    </MudText>
+                }
+
+                @if (OfflineState.Diagnostic is not null)
+                {
+                    <MudText Typo="Typo.caption" Align="Align.Left" Color="Color.Error" Class="mt-2">
+                        @OfflineState.Diagnostic
+                    </MudText>
+                    <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Primary" Class="mt-1" OnClick="RefreshStatusAsync">
+                        Проверить снова
+                    </MudButton>
+                }
+
                 <MudDivider DividerType="DividerType.Middle" Class="my-6" />
                 <MudText Typo="Typo.h6" Align="Align.Left">
                     Changelog
@@ -51,8 +81,69 @@ https://github.com/dece1ver/Sunduk
 ";
     #endregion
 
+    public List<ChangelogInfo> Info = new();
+
+    private OfflineState OfflineState => OfflineMonitor.State;
+
+    private OfflineAvailability Availability => OfflineMonitor.Availability;
+
+    private bool IsPreparing => Availability is OfflineAvailability.Preparing or OfflineAvailability.NotActivated;
+
+    private string StatusText => Availability switch
+    {
+        OfflineAvailability.Unknown => "проверяю…",
+        OfflineAvailability.ProbeFailed => "не удалось определить",
+        OfflineAvailability.Unsupported => "не поддерживается браузером",
+        OfflineAvailability.Preparing => "загружается",
+        OfflineAvailability.NotActivated => "готовится",
+        OfflineAvailability.UpdateReady => "обновление установлено, перезагрузите",
+        OfflineAvailability.Ready => "готов к работе без интернета",
+        OfflineAvailability.Offline => "интернета нет, работает из кэша",
+        OfflineAvailability.OfflineNoCache => "интернета нет, офлайн-версия не загружена",
+        _ => "неизвестно"
+    };
+
+    private string StatusIcon => Availability switch
+    {
+        OfflineAvailability.Unknown => Icons.Material.Outlined.HourglassEmpty,
+        OfflineAvailability.ProbeFailed => Icons.Material.Filled.ErrorOutline,
+        OfflineAvailability.Unsupported => Icons.Material.Filled.CloudOff,
+        OfflineAvailability.Preparing => Icons.Material.Filled.CloudDownload,
+        OfflineAvailability.NotActivated => Icons.Material.Filled.CloudQueue,
+        OfflineAvailability.UpdateReady => Icons.Material.Filled.SystemUpdate,
+        OfflineAvailability.Ready => Icons.Material.Outlined.CloudDone,
+        OfflineAvailability.Offline => Icons.Material.Outlined.CloudOff,
+        OfflineAvailability.OfflineNoCache => Icons.Material.Filled.Warning,
+        _ => Icons.Material.Outlined.HourglassEmpty
+    };
+
+    private Color StatusColor => Availability switch
+    {
+        OfflineAvailability.Unknown => Color.Default,
+        OfflineAvailability.ProbeFailed => Color.Error,
+        OfflineAvailability.Unsupported => Color.Default,
+        OfflineAvailability.Preparing => Color.Warning,
+        OfflineAvailability.NotActivated => Color.Warning,
+        OfflineAvailability.UpdateReady => Color.Info,
+        OfflineAvailability.Ready => Color.Success,
+        OfflineAvailability.Offline => Color.Tertiary,
+        OfflineAvailability.OfflineNoCache => Color.Error,
+        _ => Color.Default
+    };
+
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private Task RefreshStatusAsync() => OfflineMonitor.RefreshAsync();
+
+    private void OnStateChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => OfflineMonitor.StateChanged -= OnStateChanged;
+
     protected override void OnInitialized()
     {
+        OfflineMonitor.StateChanged += OnStateChanged;
+        _ = OfflineMonitor.RefreshAsync();
         Info.Add(new ChangelogInfo(new Version(1,0), null, new[] {
             "Первая версия. Калькулятор режимов. Точение резьбы."}));
         Info.Add(new ChangelogInfo(new Version(1, 0, 1, 1), new DateTime(2021, 3, 24), new[] {
@@ -122,11 +213,6 @@ https://github.com/dece1ver/Sunduk
             "Расширение таблицы допусков под резьбу. Уточнение про экстраполяцию."}));
         Info.Reverse();
     }
-
-    public List<ChangelogInfo> Info = new();
-
-    [CascadingParameter]
-    private IMudDialogInstance MudDialog { get; set; } = default!;
 
     void Submit()
     {
