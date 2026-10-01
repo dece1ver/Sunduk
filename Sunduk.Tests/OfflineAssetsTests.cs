@@ -292,20 +292,36 @@ namespace Sunduk.Tests
         }
 
         [PublishFact]
-        public void ОпубликованныйРантайм_Fingerprinted()
+        public void ОпубликованныйРантайм_ЗагружаемыеМодулиСуществуют()
         {
-            var assets = PublishedAssets();
+            var root = FindPublishedWwwRoot()!;
+            var framework = Path.Combine(root, "_framework");
+            var loader = Directory.GetFiles(framework, "blazor.webassembly*.js").FirstOrDefault()
+                ?? throw new InvalidOperationException("Нет blazor.webassembly*.js в публикации");
 
-            // dotnet.js содержит встроенный boot-конфиг со списком fingerprinted-имён
-            // .wasm. Если сам dotnet.js не fingerprinted, старый экземпляр из HTTP-кеша
-            // (nginx отдаёт его с max-age=604800) ссылается на файлы, которых после
-            // деплоя уже нет, и рантайм не стартует.
-            Assert.False(assets.Contains("_framework/dotnet.js"),
-                "_framework/dotnet.js опубликован без content-hash. Проверьте, что " +
-                "WasmFingerprintDotnetJs не отключён в Sunduk.PWA.csproj.");
+            // blazor.webassembly.js приезжает из runtime-пакета Blazor и при публикации
+            // НЕ пересобирается под hard-fingerprinting. Он жёстко запрашивает
+            // "_framework/dotnet.js". Если в публикации только fingerprinted
+            // dotnet.<hash>.js, рантайм не стартует: "Failed to start platform".
+            // Проверяем инвариант, а не конкретное имя файла — тогда тест останется
+            // верным и при soft, и при hard fingerprinting.
+            var requested = Regex.Matches(File.ReadAllText(loader), "[\"'`]_framework/[^\"'`]+[\"'`]")
+                .Select(m => m.Value.Trim('"', '\'', '`'))
+                .Where(u => !u.Contains("{", StringComparison.Ordinal))
+                .Distinct()
+                .ToArray();
 
-            Assert.True(assets.Any(a => Regex.IsMatch(a, @"^_framework/dotnet\.[a-z0-9]{8,}\.js$")),
-                "Не найден fingerprinted dotnet.js вида _framework/dotnet.<hash>.js.");
+            Assert.True(requested.Length > 0,
+                $"Не удалось определить, какие модули запрашивает {Path.GetFileName(loader)}.");
+
+            var missing = requested
+                .Where(u => !File.Exists(Path.Combine(root, u.Replace('/', Path.DirectorySeparatorChar))))
+                .ToArray();
+
+            Assert.True(missing.Length == 0,
+                $"{Path.GetFileName(loader)} запрашивает файлы, которых нет в публикации: "
+                + string.Join(", ", missing)
+                + ". Проверьте WasmFingerprintDotnetJs в Sunduk.PWA.csproj.");
         }
 
         #endregion

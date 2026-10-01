@@ -37,6 +37,9 @@ const offlineAssetsExclude = [
 // завершиться — тогда офлайн-кэша не появляется вообще.
 const installBatchSize = 16;
 
+// Сколько ждём сеть при навигации, прежде чем отдать index.html из кэша.
+const navigationTimeoutMs = 3000;
+
 async function onInstall(event) {
     console.info('Service worker: Install');
 
@@ -101,34 +104,53 @@ async function onActivate(event) {
 async function onFetch(event) {
     if (event.request.method !== 'GET') return fetch(event.request);
 
-    // For all navigation requests, try to serve index.html from cache
-    // If you need some URLs to be server-rendered, edit the following check to exclude those URLs
     const isNavigation = event.request.mode === 'navigate';
-    const request = isNavigation ? 'index.html' : event.request;
+
+    // Навигация — network-first. Иначе после деплою пользователь продолжает видеть
+    // старую версию из кэша старого service worker, пока тот не обновится
+    // (установка идёт в фоне и занимает минуты). Запросов навигации ровно один
+    // и файл маленький, поэтому свежесть важнее миллисекунд.
+    // Без сети отдаём index.html из кэша.
+    if (isNavigation) {
+        try {
+            return await fetchWithTimeout(event.request, navigationTimeoutMs);
+        } catch (e) {
+            console.info('Service worker: навигация из сети недоступна, беру index.html из кэша:', e);
+        }
+        const cache = await caches.open(cacheName);
+        return (await cache.match('index.html', { ignoreSearch: true })) ?? offlineResponse();
+    }
 
     const cache = await caches.open(cacheName);
 
     // ignoreSearch обязателен: index.html может запрашивать ассеты с ?v=N, а в
     // манифесте лежат URL без query. Без ignoreSearch Cache Storage считает их
     // разными ключами, и ассет молча не находится в офлайне.
-    let cachedResponse = await cache.match(request, { ignoreSearch: true });
+    const cachedResponse = await cache.match(event.request, { ignoreSearch: true });
+    if (cachedResponse) return cachedResponse;
 
-    if (!cachedResponse) {
-        try {
-            return await fetch(event.request);
-        } catch (e) {
-            if (isNavigation) {
-                // Последний шанс отдать приложение, а не страницу ошибки браузера.
-                cachedResponse = await cache.match('index.html', { ignoreSearch: true });
-            }
-            if (cachedResponse) return cachedResponse;
-
-            console.warn('Service worker: ассет недоступен офлайн:', event.request.url, e);
-            return new Response('', { status: 504, statusText: 'Offline' });
-        }
+    try {
+        return await fetch(event.request);
+    } catch (e) {
+        // Раньше здесь промис просто реджектился, и один непрокэшированный ассет
+        // ронял загрузку. Отдаём пустой ответ, чтобы страница доехала.
+        console.warn('Service worker: ассет недоступен офлайн:', event.request.url, e);
+        return offlineResponse();
     }
+}
 
-    return cachedResponse;
+async function fetchWithTimeout(request, timeoutMs) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        return await fetch(request, { signal: controller.signal });
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+function offlineResponse() {
+    return new Response('', { status: 504, statusText: 'Offline' });
 }
 
 async function notifyClients(message) {
