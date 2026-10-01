@@ -1,0 +1,69 @@
+@implements IDisposable
+@inject OfflineStatusMonitor Monitor
+
+<MudTooltip Text="@Tooltip" Placement="Placement.Start">
+    <MudIcon Icon="@Icon" Color="@IconColor" Size="@IconSize" />
+</MudTooltip>
+
+@code {
+    [Parameter] public Size IconSize { get; set; } = Size.Small;
+
+    private OfflineState State => Monitor.State;
+
+    private OfflineAvailability Availability => Monitor.Availability;
+
+    private string Icon => Availability switch
+    {
+        OfflineAvailability.Unknown => Icons.Material.Outlined.HourglassEmpty,
+        OfflineAvailability.Unsupported => Icons.Material.Filled.CloudOff,
+        OfflineAvailability.Preparing => Icons.Material.Filled.CloudDownload,
+        OfflineAvailability.NotActivated => Icons.Material.Filled.CloudQueue,
+        OfflineAvailability.UpdateReady => Icons.Material.Filled.SystemUpdate,
+        OfflineAvailability.Ready => Icons.Material.Outlined.CloudDone,
+        OfflineAvailability.Offline => Icons.Material.Outlined.CloudOff,
+        OfflineAvailability.OfflineNoCache => Icons.Material.Filled.Warning,
+        _ => Icons.Material.Outlined.HourglassEmpty
+    };
+
+    private Color IconColor => Availability switch
+    {
+        OfflineAvailability.Unknown => Color.Default,
+        OfflineAvailability.Unsupported => Color.Default,
+        OfflineAvailability.Preparing => Color.Warning,
+        OfflineAvailability.NotActivated => Color.Warning,
+        OfflineAvailability.UpdateReady => Color.Info,
+        OfflineAvailability.Ready => Color.Success,
+        OfflineAvailability.Offline => Color.Tertiary,
+        OfflineAvailability.OfflineNoCache => Color.Error,
+        _ => Color.Default
+    };
+
+    private string Tooltip => Availability switch
+    {
+        OfflineAvailability.Unknown => "Проверяю состояние офлайн-режима…",
+        OfflineAvailability.Unsupported => "Офлайн-режим недоступен: браузер не поддерживает service worker",
+        OfflineAvailability.Preparing => ProgressText(),
+        OfflineAvailability.NotActivated => "Service worker ещё не активировался, офлайн-версия не готова",
+        OfflineAvailability.UpdateReady => "Обновление скачано и установлено — перезагрузите страницу",
+        OfflineAvailability.Ready => "Готов к работе без интернета",
+        OfflineAvailability.Offline => "Интернета нет — работает из офлайн-кэша",
+        OfflineAvailability.OfflineNoCache => "Интернета нет, а офлайн-версия не загружена. Подключитесь к сети",
+        _ => "Состояние офлайн-режима неизвестно"
+    };
+
+    private string ProgressText()
+    {
+        var s = State;
+        if (s.Total > 0) return $"Загружается офлайн-версия: {s.Cached} из {s.Total}. Не отключайте интернет до конца";
+        return "Загружается офлайн-версия. Не отключайте интернет до конца";
+    }
+
+    protected override void OnInitialized()
+    {
+        Monitor.StateChanged += OnStateChanged;
+    }
+
+    private void OnStateChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Monitor.StateChanged -= OnStateChanged;
+}

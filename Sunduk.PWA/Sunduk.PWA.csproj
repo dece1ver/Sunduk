@@ -16,7 +16,6 @@
 	<Description>Sunduk</Description>
 	<Nullable>enable</Nullable>
     <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
-    <WasmFingerprintDotnetJs>false</WasmFingerprintDotnetJs>
   </PropertyGroup>
 
   <ItemGroup>

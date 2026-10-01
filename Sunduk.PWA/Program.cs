@@ -14,6 +14,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using MudExtensions.Services;
+using Sunduk.PWA.Infrastructure.Offline;
 using Sunduk.PWA.Infrastructure.State;
 
 namespace Sunduk.PWA
@@ -86,6 +87,9 @@ namespace Sunduk.PWA
             // весь рантайм — один scope на всё время жизни вкладки, так что для наших целей
             // Scoped здесь эквивалентен Singleton (тот же экземпляр везде).
             builder.Services.AddScoped<MachineRegistry>();
+
+            // Scoped по той же причине: зависит от IJSRuntime.
+            builder.Services.AddScoped<OfflineStatusMonitor>();
 
             await builder.Build().RunAsync();
         }
