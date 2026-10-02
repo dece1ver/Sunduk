@@ -35,7 +35,6 @@
         <MudTooltip Text="QR-код и установка" Placement="Placement.Start">
             <MudIconButton Icon="@Icons.Material.Filled.QrCodeScanner" @onclick="OpenQrDialogAsync" Color="Color.Inherit" Edge="Edge.End" />
         </MudTooltip>
-        <OfflineStatusIcon IconSize="Size.Medium" />
         <MudTooltip Text="@version" Placement="Placement.Start">
             <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" @onclick="OpenChangelogDialogAsync" Color="Color.Inherit" Edge="Edge.End" />
         </MudTooltip>
@@ -79,7 +78,9 @@
             var saved = await LocalStorage.GetItemAsync<bool?>("theme-dark");
             _isDark = saved ?? true;
 
-            // Офлайн-индикатор в MudAppBar: подписываемся на состояние service worker.
+            // Состояние офлайн-режима. Показывается строкой статуса в диалоге
+            // «Описание», но следить за service worker нужно с первого рендера,
+            // иначе в диалоге не будет актуальных данных.
             await OfflineMonitor.StartAsync();
 
             StateHasChanged();
