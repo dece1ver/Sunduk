@@ -1,5 +1,6 @@
 ﻿@inject IDialogService DialogService
 @inject ILocalStorageService LocalStorage
+@inject OfflineStatusMonitor OfflineMonitor
 @inherits LayoutComponentBase
 @using MudBlazor.Services
 
@@ -76,6 +77,12 @@
         {
             var saved = await LocalStorage.GetItemAsync<bool?>("theme-dark");
             _isDark = saved ?? true;
+
+            // Состояние офлайн-режима. Показывается строкой статуса в диалоге
+            // «Описание», но следить за service worker нужно с первого рендера,
+            // иначе в диалоге не будет актуальных данных.
+            await OfflineMonitor.StartAsync();
+
             StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);
