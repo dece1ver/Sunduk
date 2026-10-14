@@ -21,8 +21,9 @@ offlineAssetsInclude.push(/\.webmanifest$/);
 
 // Мусор, который в офлайн-кэше только жрёт место и время загрузки:
 // исходники less/scss, метаданные, sourcemaps, неиспользуемые форматы шрифтов
-// (приложение грузит self-hosted fonts/*.woff2) и не-minified дубликаты
-// FontAwesome-стилей и скриптов.
+// (приложение грузит self-hosted fonts/*.woff2), не-minified дубликаты
+// FontAwesome-стилей и скриптов и сырые svg-иконки FontAwesome (иконки рисуются
+// шрифтом из css/all.min.css, отдельные файлы в wwwroot/svgs не нужны — 1690 файлов).
 const offlineAssetsExclude = [
     /^service-worker\.js$/,
     /\.(less|scss|yml|map)$/,
@@ -30,6 +31,7 @@ const offlineAssetsExclude = [
     /^webfonts\/.*\.(eot|ttf|woff|svg)$/,
     /^css\/(all|brands|fontawesome|regular|solid|svg-with-js|v4-shims)\.css$/,
     /^js\/(all|brands|conflict-detection|fontawesome|regular|solid|v4-shims)\.js$/,
+    /^svgs\//,
 ];
 
 // Сколько файлов качать одновременно. Последовательная загрузка 2000+ файлов
@@ -121,6 +123,24 @@ async function onFetch(event) {
         return (await cache.match('index.html', { ignoreSearch: true })) ?? offlineResponse();
     }
 
+    // Ассеты — сначала штатный путь браузера: fetch() уходит в HTTP-кэш (все
+    // имена файлов захэшированы, Cache-Control — неделя), поэтому сеть не
+    // задействована, зато работают WebAssembly.compileStreaming и кэш
+    // скомпилированного кода. Замер до остальных правок (218 ассемблей):
+    // cache-first стоил ~5 лишних секунд на каждой загрузке — caches.open()
+    // + cache.match() с ignoreSearch по кэшу из ~2000 записей на каждый
+    // из 242 запросов (1.0 с со включённым перехватом против 6.0 с без него).
+    let networkResponse = null;
+    try {
+        networkResponse = await fetch(event.request);
+    } catch (e) {
+        console.info('Service worker: сеть недоступна, беру ассет из офлайн-кэша:', event.request.url, e);
+    }
+
+    // Ошибочный ответ сети (404 и т.п.) не глотаем: если в кэше тоже нет —
+    // возвращаем именно его, чтобы поломка была видна.
+    if (networkResponse && (networkResponse.ok || networkResponse.status === 304)) return networkResponse;
+
     const cache = await caches.open(cacheName);
 
     // ignoreSearch обязателен: index.html может запрашивать ассеты с ?v=N, а в
@@ -129,14 +149,12 @@ async function onFetch(event) {
     const cachedResponse = await cache.match(event.request, { ignoreSearch: true });
     if (cachedResponse) return cachedResponse;
 
-    try {
-        return await fetch(event.request);
-    } catch (e) {
-        // Раньше здесь промис просто реджектился, и один непрокэшированный ассет
-        // ронял загрузку. Отдаём пустой ответ, чтобы страница доехала.
-        console.warn('Service worker: ассет недоступен офлайн:', event.request.url, e);
-        return offlineResponse();
-    }
+    // Раньше здесь промис просто реджектился, и один непрокэшированный ассет
+    // ронял загрузку. Отдаём пустой ответ, чтобы страница доехала.
+    if (networkResponse) return networkResponse;
+
+    console.warn('Service worker: ассет недоступен офлайн:', event.request.url);
+    return offlineResponse();
 }
 
 async function fetchWithTimeout(request, timeoutMs) {

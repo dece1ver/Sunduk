@@ -11,7 +11,18 @@
     <Version>1.0.8.7</Version>
     <NeutralLanguage />
     <NoWin32Manifest>true</NoWin32Manifest>
-	<PublishTrimmed>false</PublishTrimmed>
+	<!--
+		partial: тримятся пакеты и фреймворк, но не сама сборка Sunduk.
+		TrimMode=full ломал приложение: триммер убирал конструкторы Razor-компонентов
+		(CtorNotLocated для MainLayout), поэтому именно partial.
+		Сборки, которые нельзя тримовать из-за рефлексии, перечислены
+		в ILLink.Descriptors.xml.
+		ВАЖНО: публиковать только с чистым bin/obj — инкрементальная публикация
+		поверх старого вывода подкладывает устаревшие .wasm (на примере
+		Blazored.LocalStorage это давало "Method not found" в рантайме).
+	-->
+	<PublishTrimmed>true</PublishTrimmed>
+	<TrimMode>partial</TrimMode>
 	<UserSecretsId>d8e95f7a-203c-4a38-b42e-fa8e200063e5</UserSecretsId>
 	<Description>Sunduk</Description>
 	<Nullable>enable</Nullable>
@@ -24,6 +35,11 @@
     -->
     <WasmFingerprintDotnetJs>false</WasmFingerprintDotnetJs>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Сборки, которые нельзя тримовать: создают свои типы через рефлексию. -->
+    <TrimmerRootDescriptor Include="ILLink.Descriptors.xml" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Data\**" />
