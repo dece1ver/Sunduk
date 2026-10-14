@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Сборки, которые нельзя тримовать: свои типы они создают через рефлексию
+  (Fluxor-сторы BlazorCommon, hosted-сервисы, инициализатор редактора),
+  а Blazored.LocalStorage терял при тримминге метод GetItemAsync<T>.
+  Без этих исключений ILLink вырезает конструкторы/vtable и приложение падает
+  на старте с "invalid vtable method slot" / "no parameterless constructor" /
+  "Method not found". Все перечисленные сборки крошечные, по размеру потери
+  нулевые — экономим за счёт MudBlazor, фреймворка и прочего.
+-->
+<linker>
+  <assembly fullname="BlazorCommon.RazorLib" preserve="all" />
+  <assembly fullname="Fluxor" preserve="all" />
+  <assembly fullname="Fluxor.Blazor.Web" preserve="all" />
+  <assembly fullname="BlazorTextEditor.RazorLib" preserve="all" />
+  <assembly fullname="Blazored.LocalStorage" preserve="all" />
+  <!-- Hosted-сервисы и DI, которые BlazorCommon тянет из фреймворка:
+       их абстрактные методы тоже участвуют в vtable QueuedHostedService. -->
+  <assembly fullname="Microsoft.Extensions.Hosting.Abstractions" preserve="all" />
+  <assembly fullname="Microsoft.Extensions.DependencyInjection.Abstractions" preserve="all" />
+</linker>
