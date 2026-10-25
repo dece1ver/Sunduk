@@ -26,6 +26,18 @@
             </div>
 
             <div>
+                <MudText Typo="Typo.overline" Class="d-block">Точность результатов</MudText>
+                @FormatEditor(Settings.ResultFormat, v => Settings.SetResultFormatAsync(v))
+                <MudText Typo="Typo.caption" Class="d-block">Относится ко всем результатам расчётов, кроме SunduCAM.</MudText>
+            </div>
+
+            <div>
+                <MudText Typo="Typo.overline" Class="d-block">Точность в SunduCAM</MudText>
+                @FormatEditor(Settings.CamFormat, v => Settings.SetCamFormatAsync(v))
+                <MudText Typo="Typo.caption" Class="d-block">Числа в управляющей программе. Хвостовые нули нужны не всем стойкам, по умолчанию их нет.</MudText>
+            </div>
+
+            <div>
                 <MudText Typo="Typo.overline" Class="d-block">Данные</MudText>
                 <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="ResetAllAsync">Сбросить всё</MudButton>
                 <MudText Typo="Typo.caption" Class="d-block">Удаляет станки и инструменты, параметры, настройки и значения калькуляторов на этом устройстве.</MudText>
@@ -36,6 +48,25 @@
 
 @code
 {
+    /// <summary> Знаки после точки, хвостовые нули и пример: поле «0.000» / «0.###». </summary>
+    private RenderFragment FormatEditor(ResultFormat format, Func<ResultFormat, Task> save) => __builder =>
+    {
+        <div class="d-flex align-center flex-wrap" style="gap: 16px;">
+            <MudNumericField T="int" Label="Знаков после точки" Variant="Variant.Text" Margin="Margin.Dense"
+                             Style="max-width: 170px;"
+                             Min="0" Max="ResultFormat.MaxDecimals" Step="1"
+                             Value="format.Decimals"
+                             ValueChanged="@(v => save(format with { Decimals = Math.Clamp(v, 0, ResultFormat.MaxDecimals) }))" />
+            <MudSwitch T="bool" Color="Color.Primary" Label="Хвостовые нули"
+                       Disabled="format.Decimals == 0"
+                       Value="format.TrailingZeros"
+                       ValueChanged="@(v => save(format with { TrailingZeros = v }))" />
+        </div>
+        <MudText Typo="Typo.caption" Class="d-block monofield">
+            Формат @format.Pattern: 12.5 → @format.Format(12.5), 0.25 → @format.Format(0.25), 3.14159 → @format.Format(3.14159)
+        </MudText>
+    };
+
     private async Task ResetAllAsync()
     {
         var parameters = new DialogParameters<ConfirmDialog>

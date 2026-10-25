@@ -890,7 +890,7 @@
                                 return "[?]";
 
                             var r = sub.Evaluate();
-                            return r is double d ? d.ToString("0.###").Replace(',', '.') :
+                            return r is double d ? d.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs) :
                                    r is int i ? i.ToString() :
                                    r is long l ? l.ToString() :
                                    r?.ToString() ?? "[?]";

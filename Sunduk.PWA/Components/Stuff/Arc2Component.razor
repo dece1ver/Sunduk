@@ -75,7 +75,7 @@
                     <MudItem xs="12" Class="mt-2">
                         @if (Math.Abs(PartDiameter - StartDiameter) > 0.001)
                         {
-                            <MudText Typo="Typo.body2">@($"Глубина: {RadiusDepth.ToPrettyString(3)} мм")</MudText>
+                            <MudText Typo="Typo.body2">@($"Глубина: {RadiusDepth.ToPrettyString()} мм")</MudText>
                         }
                         @if (PartDiameter <= 0 && RadiusSize <= 0)
                         {
@@ -101,7 +101,7 @@
 @*                    <MudItem xs="12">
                         @if (PartDiameter != NippelStartDiameter)
                         {
-                            <MudText Typo="Typo.body2">@($"Угол между осью и касательной: {Angle.ToPrettyString(3)}°")</MudText>
+                            <MudText Typo="Typo.body2">@($"Угол между осью и касательной: {Angle.ToPrettyString()}°")</MudText>
                         }
                         @if (PartDiameter <= 0 && RadiusSize <= 0)
                         {

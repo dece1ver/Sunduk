@@ -41,6 +41,7 @@ html.mud-light, body.mud-light {
 /* Значение в поле ввода MudBlazor: шрифт задан на самом input, а не на обёртке с классом */
 .monofield .mud-input-slot,
 .monofield .mud-input-adornment,
+.monofield .mud-input-adornment .mud-typography,
 .monofield textarea {
     font-family: var(--font-mono) !important;
     font-variant-numeric: tabular-nums;

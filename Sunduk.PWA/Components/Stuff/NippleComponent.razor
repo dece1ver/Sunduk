@@ -73,7 +73,7 @@
                     <MudItem xs="12" Class="mt-2">
                         @if (NippleDiameter != NippelStartDiameter)
                         {
-                            <MudText Typo="Typo.body2">@($"Начальный диаметр: {NippelStartDiameter.ToPrettyString(3)} мм")</MudText>
+                            <MudText Typo="Typo.body2">@($"Начальный диаметр: {NippelStartDiameter.ToPrettyString()} мм")</MudText>
                         }
                         @if (NippleDiameter <= 0 && RadiusSize <= 0)
                         {
@@ -103,7 +103,7 @@
                     <MudItem xs="12">
                         @if (NippleDiameter != NippelStartDiameter)
                         {
-                            <MudText Typo="Typo.body2">@($"Угол между осью и касательной: {Angle.ToPrettyString(3)}°")</MudText>
+                            <MudText Typo="Typo.body2">@($"Угол между осью и касательной: {Angle.ToPrettyString()}°")</MudText>
                         }
                         @if (NippleDiameter <= 0 && RadiusSize <= 0)
                         {

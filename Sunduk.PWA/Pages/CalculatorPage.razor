@@ -576,19 +576,19 @@
         {
             case TrigonometricFunction.Sin:
                 UserExpression = $"Sin({userExpr})".Replace(',', '.');
-                Answer = Math.Sin(userExpr.Radians()).ToString("0.####").Replace(',', '.');
+                Answer = Math.Sin(userExpr.Radians()).ToPrettyString(stringOption: Util.PrettyStringOption.AsIs);
                 break;
             case TrigonometricFunction.Cos:
                 UserExpression = $"Cos({userExpr})".Replace(',', '.');
-                Answer = Math.Cos(userExpr.Radians()).ToString("0.####").Replace(',', '.');
+                Answer = Math.Cos(userExpr.Radians()).ToPrettyString(stringOption: Util.PrettyStringOption.AsIs);
                 break;
             case TrigonometricFunction.Tan:
                 UserExpression = $"Tan({userExpr})".Replace(',', '.');
-                Answer = Math.Tan(userExpr.Radians()).ToString("0.####").Replace(',', '.');
+                Answer = Math.Tan(userExpr.Radians()).ToPrettyString(stringOption: Util.PrettyStringOption.AsIs);
                 break;
             case TrigonometricFunction.Atan:
                 UserExpression = $"Atan({userExpr})".Replace(',', '.');
-                Answer = Math.Atan(userExpr).Degrees().ToString("0.####").Replace(',', '.');
+                Answer = Math.Atan(userExpr).Degrees().ToPrettyString(stringOption: Util.PrettyStringOption.AsIs);
                 break;
             default:
                 break;
@@ -640,7 +640,7 @@
                 Snackbar.Add("Не удалось вычислить");
                 return;
             }
-            var result = r is double d ? d.ToString("0.####").Replace(',', '.') :
+            var result = r is double d ? d.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs) :
                          r is int i ? i.ToString() :
                          r is long l ? l.ToString() :
                          r?.ToString() ?? "[?]";

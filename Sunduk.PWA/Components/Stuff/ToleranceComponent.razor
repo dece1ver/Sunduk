@@ -1,107 +1,153 @@
+@using System.Globalization
+@using System.Text.RegularExpressions
+@using Microsoft.JSInterop
 @using Sunduk.PWA.Infrastructure.Tolerances
 @inject ToleranceState State
+@inject IJSRuntime JS
+@inject ISnackbar Snackbar
 <style>
-    .tl {
-        padding: 0px 15px 0px 0px;
+    .tol-value {
+        cursor: pointer;
+        user-select: none;
+        border-radius: 4px;
+        padding: 0 6px;
+        transition: background-color .15s;
+    }
+
+    .tol-value:hover {
+        background-color: var(--mud-palette-action-default-hover);
+    }
+
+    .tol-value.copied {
+        animation: tol-copied .7s ease-out;
+    }
+
+    @@keyframes tol-copied {
+        0% { background-color: var(--mud-palette-primary); color: var(--mud-palette-primary-text); transform: scale(1.06); }
+        100% { background-color: transparent; transform: scale(1); }
     }
 </style>
 
 <MudGrid Spacing="1" Class="pa-2">
-        <MudItem xs="12" sm="4">
-            <MudSelect T="int?"
-                       Value="Grade"
-                       Label="Квалитет"
-                       ValueChanged="@(v => Grade = v)"
-                       Variant="Variant.Text"
-                       Margin="Margin.Dense"
-                       Clearable="true">
-                @foreach (var g in Tolerance.Grades)
-                {
-                    <MudSelectItem T="int?" Value="@((int?)g)">IT@(g)</MudSelectItem>
-                }
-            </MudSelect>
-        </MudItem>
-        <MudItem xs="12" sm="4">
-            <MudSelectExtended T="string"
-                               Label="Поле допуска"
-                               Variant="Variant.Text"
-                               Margin="Margin.Dense"
-                               ItemCollection="@AvailableFields"
-                               Value="@Field"
-                               ValueChanged="OnFieldChanged"
-                               SearchBox="true"
-                               SearchBoxClearable="true"
-                               SearchBoxPlaceholder="Поиск..."
-                               Virtualize="true"
-                               Clearable="true"
-                               AnchorOrigin="Origin.BottomCenter" />
-        </MudItem>
-        <MudItem xs="12" sm="4">
-            <MudTextField Class="monofield" @bind-Value="Nominal"
+        <MudItem xs="12" sm="5">
+            <MudTextField Class="monofield" @bind-Value="Nominal" @ref="_nominalField"
                            T="string"
                            Label="Номинальный размер"
+                           InputMode="DecimalMode"
                            Adornment="Adornment.End"
                            AdornmentText="мм"
                            Variant="Variant.Text"
                            Immediate="true"
                            Margin="Margin.Dense" />
         </MudItem>
+        <MudItem xs="12" sm="7">
+            <MudTextField T="string"
+                          Value="@_designText"
+                          ValueChanged="OnDesignationChanged"
+                          Label="Допуск"
+                          Placeholder="H7, f6 или 40 H7"
+                          HelperText="@(_designError is null ? "Заглавная буква — отверстие, строчная — вал" : null)"
+                          Error="@(_designError is not null)"
+                          ErrorText="@_designError"
+                          Variant="Variant.Text"
+                          Immediate="true"
+                          Margin="Margin.Dense"
+                          Clearable="true" />
+        </MudItem>
         <MudItem xs="12">
-            <MudRadioGroup Value="@IsHole" T="bool" Class="d-flex justify-center" ValueChanged="OnIsHoleChanged">
-                <MudRadio Value="true" Color="Color.Primary">Отверстие</MudRadio>
-                <MudRadio Value="false" Color="Color.Primary">Вал</MudRadio>
-            </MudRadioGroup>
+            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Primary"
+                       StartIcon="@(_showPickers ? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore)"
+                       OnClick="() => _showPickers = !_showPickers">
+                Выбрать из списков
+            </MudButton>
+        </MudItem>
+        <MudItem xs="12">
+            <MudCollapse Expanded="_showPickers">
+                <MudGrid Spacing="1">
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="int?"
+                                   Value="Grade"
+                                   Label="Квалитет"
+                                   ValueChanged="OnGradeChanged"
+                                   Variant="Variant.Text"
+                                   Margin="Margin.Dense"
+                                   Clearable="true">
+                            @foreach (var g in Tolerance.Grades)
+                            {
+                                <MudSelectItem T="int?" Value="@((int?)g)">IT@(g)</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudSelectExtended T="string"
+                                           Label="Поле допуска"
+                                           Variant="Variant.Text"
+                                           Margin="Margin.Dense"
+                                           ItemCollection="@AvailableFields"
+                                           Value="@Field"
+                                           ValueChanged="OnFieldChanged"
+                                           SearchBox="true"
+                                           SearchBoxClearable="true"
+                                           SearchBoxPlaceholder="Поиск..."
+                                           Virtualize="true"
+                                           Clearable="true"
+                                           AnchorOrigin="Origin.BottomCenter" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudRadioGroup Value="@IsHole" T="bool" Class="d-flex justify-center" ValueChanged="OnIsHoleChanged">
+                            <MudRadio Value="true" Color="Color.Primary">Отверстие</MudRadio>
+                            <MudRadio Value="false" Color="Color.Primary">Вал</MudRadio>
+                        </MudRadioGroup>
+                    </MudItem>
+                </MudGrid>
+            </MudCollapse>
         </MudItem>
 
         <MudItem xs="12">
             <MudField Label="Результат" Variant="Variant.Filled" Underline="false">
                 @if (Result is { } r)
                 {
-                    <table>
-                        <tr>
-                            <td class="tl"><MudText Typo="Typo.caption">Поле допуска:</MudText></td>
-                            <td><MudText Typo="Typo.caption" Color="Color.Primary">@Designation</MudText></td>
-                        </tr>
-                        <tr>
-                            <td class="tl"><MudText Typo="Typo.caption">Размер:</MudText></td>
-                            <td>
-                                <MudText Typo="Typo.caption" Style="font-family: 'JetBrains Mono', monospace;">
-                                    <span>@(r.Nominal.ToPrettyString(3, Util.PrettyStringOption.AsIs))</span>
-                                    @{
-                                        bool showUpper = Math.Abs(r.UpperDeviationMm) > 1e-9;
-                                        bool showLower = Math.Abs(r.LowerDeviationMm) > 1e-9;
-                                    }
-                                    @if (showUpper || showLower)
-                                    {
-                                        <span style="display: inline-flex; align-items: center;">
-                                            <span style="font-size: 1.2em;">(</span>
-                                            <span style="display: inline-flex; flex-direction: column; text-align: right; font-size: 0.75em; line-height: 1;">
-                                                <span>@(showUpper ? Dev(r.UpperDeviationMm) : "\u00A0")</span>
-                                                <span>@(showLower ? Dev(r.LowerDeviationMm) : "\u00A0")</span>
-                                            </span>
-                                            <span style="font-size: 1.2em;">)</span>
-                                        </span>
-                                    }
-                                </MudText>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="tl"><MudText Typo="Typo.caption">Наибольший размер:</MudText></td>
-                            <td><MudText Typo="Typo.caption" Style="font-family: 'JetBrains Mono', monospace;">@(r.MaxSize.ToPrettyString(3, Util.PrettyStringOption.AsIs)) мм</MudText></td>
-                        </tr>
-                        <tr>
-                            <td class="tl"><MudText Typo="Typo.caption">Наименьший размер:</MudText></td>
-                            <td><MudText Typo="Typo.caption" Style="font-family: 'JetBrains Mono', monospace;">@(r.MinSize.ToPrettyString(3, Util.PrettyStringOption.AsIs)) мм</MudText></td>
-                        </tr>
-                        <tr>
-                            <td class="tl"><MudText Typo="Typo.caption">Середина размера:</MudText></td>
-                            <td><MudText Typo="Typo.caption" Style="font-family: 'JetBrains Mono', monospace;">@(r.MiddleSize.ToPrettyString(4, Util.PrettyStringOption.AsIs)) мм</MudText></td>
-                        </tr>
-                    </table>
+                    <div class="d-flex align-center flex-wrap mb-2" style="gap: 8px;">
+                        <MudText Typo="Typo.subtitle1" Style="font-family: 'JetBrains Mono', monospace;">
+                            <span>@(r.Nominal.ToString("0.#####", CultureInfo.InvariantCulture))</span>
+                            <span style="color: var(--mud-palette-primary);">@Designation</span>
+                            @{
+                                bool showUpper = Math.Abs(r.UpperDeviationMm) > 1e-9;
+                                bool showLower = Math.Abs(r.LowerDeviationMm) > 1e-9;
+                            }
+                            @if (showUpper || showLower)
+                            {
+                                <span style="display: inline-flex; align-items: center;">
+                                    <span style="font-size: 1.2em;">(</span>
+                                    <span style="display: inline-flex; flex-direction: column; text-align: right; font-size: 0.75em; line-height: 1;">
+                                        <span>@(showUpper ? Dev(r.UpperDeviationMm) : " ")</span>
+                                        <span>@(showLower ? Dev(r.LowerDeviationMm) : " ")</span>
+                                    </span>
+                                    <span style="font-size: 1.2em;">)</span>
+                                </span>
+                            }
+                        </MudText>
+                    </div>
+                    @foreach (var row in Rows(r))
+                    {
+                        <div class="d-flex align-center justify-space-between">
+                            <MudText Typo="Typo.caption">@row.Label</MudText>
+                            <div class="tol-value @(_copiedKey == row.Label ? "copied" : null)" role="button" tabindex="0"
+                                 title="Нажмите, чтобы скопировать (с точкой)"
+                                 @onclick="() => CopyAsync(row.Label, row.Value)"
+                                 @onkeydown="e => OnValueKey(e, row.Label, row.Value)">
+                                <MudText Typo="Typo.h6" Style="font-family: 'JetBrains Mono', monospace;">@row.Value мм</MudText>
+                            </div>
+                        </div>
+                    }
                 }
                 else if (!string.IsNullOrEmpty(ErrorMessage))
                 {
                     <MudText Typo="Typo.caption" Color="Color.Error">@ErrorMessage</MudText>
+                }
+                else if (_designError is not null)
+                {
+                    <MudText Typo="Typo.caption">Исправьте обозначение допуска.</MudText>
                 }
                 else
                 {
@@ -113,6 +159,18 @@
 
 @code
 {
+    private static readonly Regex DesignationRegex = new(
+        @"^\s*[Øø⌀]?\s*(?<n>\d+(?:[.,]\d*)?)?\s*(?<l>[a-zA-Z]{1,2})?\s*(?<g>\d{1,2})?\s*$",
+        RegexOptions.Compiled);
+
+    /// <summary> Цифровая клавиатура с запятой на телефоне. </summary>
+    private static InputMode DecimalMode => InputMode.@decimal;
+
+    private MudTextField<string>? _nominalField;
+    private string _designText = string.Empty;
+    private string? _designError;
+    private bool _showPickers;
+
     public string Nominal { get => State.Nominal; set => State.Nominal = value; }
     public int? Grade { get => State.Grade; set => State.Grade = value; }
     public string? Field { get => State.Field; set => State.Field = value; }
@@ -131,6 +189,8 @@
         get
         {
             ErrorMessage = string.Empty;
+            // Пока обозначение в поле введено с ошибкой, прежний результат не показываем
+            if (_designError is not null) return null;
             if (string.IsNullOrEmpty(Field) || Grade is null || NominalValue <= 0)
                 return null;
             if (Tolerance.TryCalculate(NominalValue, Designation, out var r, out var error))
@@ -140,7 +200,84 @@
         }
     }
 
-    private void OnFieldChanged(string value) => Field = value;
+    protected override void OnInitialized() => SyncDesignText();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && _nominalField is not null)
+        {
+            // Квалитет и поле запоминаются, поэтому обычно остаётся только ввести размер
+            await _nominalField.FocusAsync();
+            await _nominalField.SelectAsync();
+        }
+    }
+
+    /// <summary> Обновляет текстовое обозначение по выбранным в списках значениям. </summary>
+    private void SyncDesignText()
+    {
+        _designText = Designation;
+        _designError = null;
+    }
+
+    /// <summary> Разбирает обозначение вида «H7», «f6» или «40 H7» и переносит его в состояние. </summary>
+    private void OnDesignationChanged(string? text)
+    {
+        _designText = text ?? string.Empty;
+        _designError = null;
+        if (string.IsNullOrWhiteSpace(_designText)) return;
+
+        var m = DesignationRegex.Match(_designText);
+        if (!m.Success)
+        {
+            _designError = "Формат: H7, f6 или 40 H7";
+            return;
+        }
+
+        bool hole = false;
+        string letter = string.Empty;
+        if (m.Groups["l"].Success)
+        {
+            var raw = m.Groups["l"].Value;
+            hole = raw.Any(char.IsUpper);
+            letter = hole ? raw.ToUpperInvariant() : raw.ToLowerInvariant();
+            if (!(hole ? Tolerance.HoleLetters : Tolerance.ShaftLetters).Contains(letter))
+            {
+                _designError = $"Неизвестное поле «{raw}»";
+                return;
+            }
+        }
+
+        int grade = 0;
+        if (m.Groups["g"].Success)
+        {
+            grade = int.Parse(m.Groups["g"].Value, CultureInfo.InvariantCulture);
+            if (!Tolerance.Grades.Contains(grade))
+            {
+                _designError = $"Квалитет IT{grade} не поддерживается (IT{Tolerance.Grades[0]}–IT{Tolerance.Grades[^1]})";
+                return;
+            }
+        }
+
+        if (m.Groups["n"].Success) Nominal = m.Groups["n"].Value;
+        if (m.Groups["l"].Success)
+        {
+            IsHole = hole;
+            Field = letter;
+        }
+        if (m.Groups["g"].Success) Grade = grade;
+    }
+
+    private void OnGradeChanged(int? value)
+    {
+        Grade = value;
+        SyncDesignText();
+    }
+
+    private void OnFieldChanged(string value)
+    {
+        Field = value;
+        SyncDesignText();
+    }
 
     private void OnIsHoleChanged(bool value)
     {
@@ -151,12 +288,55 @@
         {
             Field = value ? Field.ToUpperInvariant() : Field.ToLowerInvariant();
         }
+        SyncDesignText();
+    }
+
+    /// <summary>
+    /// Строки результата в порядке обработки: у отверстия сначала наименьший размер (его выбирают
+    /// первым), у вала — наибольший.
+    /// </summary>
+    private IEnumerable<(string Label, string Value)> Rows(Tolerance.Result r)
+    {
+        // Копируется ровно то, что показано: число с точкой в формате из параметров приложения
+        static string Fmt(double v) => v.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs);
+        var min = ("Наименьший", Fmt(r.MinSize));
+        var middle = ("Середина", Fmt(r.MiddleSize));
+        var max = ("Наибольший", Fmt(r.MaxSize));
+        return r.IsHole ? new[] { min, middle, max } : new[] { max, middle, min };
+    }
+
+    /// <summary> Подпись строки, значение которой только что скопировали: нужна для анимации. </summary>
+    private string? _copiedKey;
+
+    private async Task OnValueKey(KeyboardEventArgs e, string key, string text)
+    {
+        if (e.Key is "Enter" or " ") await CopyAsync(key, text);
+    }
+
+    private async Task CopyAsync(string key, string text)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", text);
+            // Сначала сбрасываем, чтобы повторный клик по той же строке запустил анимацию заново
+            _copiedKey = null;
+            StateHasChanged();
+            await Task.Yield();
+            _copiedKey = key;
+            StateHasChanged();
+            await Task.Delay(700);
+            if (_copiedKey == key) _copiedKey = null;
+        }
+        catch
+        {
+            Snackbar.Add("Не удалось скопировать", Severity.Warning);
+        }
     }
 
     /// <summary>Форматирует отклонение в мм со знаком.</summary>
     private static string Dev(double value)
     {
-        string v = value.ToPrettyString(3, Util.PrettyStringOption.AsIs);
+        string v = value.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs);
         return value > 0 ? $"+{v}" : v;
     }
 }

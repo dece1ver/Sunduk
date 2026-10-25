@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using MudBlazor;
 using Sunduk.PWA.Infrastructure.Sequences;
+using Sunduk.PWA.Infrastructure.State;
 using Sunduk.PWA.Infrastructure.Sequences.Base;
 using Sunduk.Geometry.ContourElements;
 using Sunduk.Geometry.ContourElements.Base;
@@ -80,16 +81,15 @@ namespace Sunduk.PWA.Infrastructure
         /// Форматирует число в строку подходящую для СЧПУ
         /// </summary>
         /// <param name="value">Число</param>
-        /// <param name="precision">Точность</param>
+        /// <param name="precision">Знаков после точки; без значения — по параметрам приложения</param>
         /// <param name="option">Опция плавающей точки</param>
         /// <returns>Отформатированную строку</returns>
-        public static string NC(this double value, int precision = 3, NcDecimalPointOption option = NcDecimalPointOption.With)
+        public static string NC(this double value, int? precision = null, NcDecimalPointOption option = NcDecimalPointOption.With)
         {
-            string result = value.ToString($"F{precision}", CultureInfo.InvariantCulture).Contains('.')
-                ? value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0')
-                : value.ToString($"F{precision}");
-            return option == NcDecimalPointOption.With 
-                ? result.Contains('.') ? result : result + '.' 
+            // Хвостовые нули и число знаков по умолчанию берутся из параметров приложения
+            string result = ResultFormats.Active.Format(value, precision);
+            return option == NcDecimalPointOption.With
+                ? result.Contains('.') ? result : result + '.'
                 : result.TrimEnd('.');
         }
 
@@ -385,14 +385,12 @@ namespace Sunduk.PWA.Infrastructure
         /// Форматирует число в такую строку, какую хочу я
         /// </summary>
         /// <param name="value">Число</param>
-        /// <param name="precision">Точность</param>
+        /// <param name="precision">Знаков после точки; без значения — по параметрам приложения</param>
         /// <returns>Строку содержащую число</returns>
-        public static string ToPrettyString(this double value, int precision = 3, PrettyStringOption stringOption = PrettyStringOption.ZeroToEmpty)
+        public static string ToPrettyString(this double value, int? precision = null, PrettyStringOption stringOption = PrettyStringOption.ZeroToEmpty)
         {
             if (value == 0 && stringOption == PrettyStringOption.ZeroToEmpty) return string.Empty;
-            string result = value.ToString($"F{precision}").Replace(",", ".");
-            if (result.Contains('.')) return result.TrimEnd('0').TrimEnd('.');
-            return result;
+            return ResultFormats.Active.Format(value, precision);
         }
 
 

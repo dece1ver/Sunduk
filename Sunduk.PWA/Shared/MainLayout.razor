@@ -47,7 +47,8 @@
         </CascadingValue>
     </MudDrawer>
     <MudMainContent Class="main-content-with-bottom-nav">
-        <CascadingValue Value="ExperimentalMode" Name="ExperimantalMode">
+        @* Ключ меняется вместе с форматом чисел: страница создаётся заново и показывает результаты в новом формате *@
+        <CascadingValue Value="ExperimentalMode" Name="ExperimantalMode" @key="Settings.FormatVersion">
             @Body
         </CascadingValue>
     </MudMainContent>
@@ -84,9 +85,14 @@
 
     protected override void OnInitialized()
     {
+        UpdateFormatContext(Navigation.ToBaseRelativePath(Navigation.Uri));
         Navigation.LocationChanged += OnLocationChanged;
         Settings.Changed += OnSettingsChanged;
     }
+
+    /// <summary> В SunduCAM числа форматируются по его собственным параметрам, везде остальное — по общим. </summary>
+    private static void UpdateFormatContext(string relativePath) =>
+        ResultFormats.IsCam = relativePath.StartsWith("sunducam", StringComparison.OrdinalIgnoreCase);
 
     private void UpdateBottomSections() => _bottomSections = Settings.NavOrder == NavOrderMode.ByUsage
         ? NavUsage.Top()
@@ -98,8 +104,12 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) =>
-        _ = NavUsage.RecordAsync(Navigation.ToBaseRelativePath(e.Location));
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        var relativePath = Navigation.ToBaseRelativePath(e.Location);
+        UpdateFormatContext(relativePath);
+        _ = NavUsage.RecordAsync(relativePath);
+    }
 
     public void Dispose()
     {

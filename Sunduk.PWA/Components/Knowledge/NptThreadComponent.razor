@@ -84,13 +84,13 @@
     {
         Thread.GetNptValues(template, out _,
             out _, out _, out _, out var length);
-        return length.ToPrettyString(2);
+        return length.ToPrettyString();
     }
 
     private string GetNptPlane(string template)
     {
         Thread.GetNptValues(template, out _,
             out _, out _, out var length, out _);
-        return length.ToPrettyString(2);
+        return length.ToPrettyString();
     }
 }

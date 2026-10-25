@@ -153,11 +153,11 @@
                 <table>
                     <tr>
                         <td class="tl"><MudText Typo="Typo.caption">Верхний диаметр:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@(ThreadDiameter.ToPrettyString(3)) мм</MudText></td>
+                        <td><MudText Typo="Typo.caption">@(ThreadDiameter.ToPrettyString()) мм</MudText></td>
                     </tr>
                     <tr>
                         <td class="tl"><MudText Typo="Typo.caption">Нижний диаметр:</MudText></td>
-                        <td><MudText Typo="Typo.caption">@((ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)).ToPrettyString(3)) мм</MudText></td>
+                        <td><MudText Typo="Typo.caption">@((ThreadDiameter - 2 * Thread.ProfileHeight(ThreadStandard, ThreadType, ThreadPitch)).ToPrettyString()) мм</MudText></td>
                     </tr>
                     @if (ThreadType == CuttingType.Internal && ThreadStandard == ThreadStandard.Metric)
                     {
@@ -218,25 +218,25 @@
                         {
                             var _n = Thread.GetHoleNominalForField(ThreadDiameter, ThreadPitch, ThreadPosition!.Value, Grade!.Value);
                             if (_n is { } _hn)
-                                _gostValue = $"{_hn.Nominal.ToPrettyString(2)}  (+{_hn.Dev.ToPrettyString(2)})";
+                                _gostValue = $"{_hn.Nominal.ToPrettyString()}  (+{_hn.Dev.ToPrettyString()})";
                         }
                         else
                         {
                             var _n = Thread.GetRodNominalForField(ThreadDiameter, ThreadPitch, ThreadPosition!.Value, Grade!.Value);
                             if (_n is { } _rn)
-                                _gostValue = $"{_rn.Nominal.ToPrettyString(2)}  ({_rn.Dev.ToPrettyString(2)})";
+                                _gostValue = $"{_rn.Nominal.ToPrettyString()}  ({_rn.Dev.ToPrettyString()})";
                         }
 
                         string? _viscousValue = null;
                         if (_isInternal && GostResult is Thread.Gost19257Result _hole)
                         {
                             double _tol = _hole.D1max - _hole.D1min;
-                            _viscousValue = $"{_hole.D1min.ToPrettyString(3)}  ({(_tol >= 0 ? "+" : "")}{_tol.ToPrettyString(3)})";
+                            _viscousValue = $"{_hole.D1min.ToPrettyString()}  ({(_tol >= 0 ? "+" : "")}{_tol.ToPrettyString()})";
                         }
                         else if (!_isInternal && GostResult is Thread.Gost19258Result _rod)
                         {
                             double _tol = _rod.dmin - _rod.dmax;
-                            _viscousValue = $"{_rod.dmax.ToPrettyString(3)}  ({(_tol >= 0 ? "+" : "")}{_tol.ToPrettyString(3)})";
+                            _viscousValue = $"{_rod.dmax.ToPrettyString()}  ({(_tol >= 0 ? "+" : "")}{_tol.ToPrettyString()})";
                         }
 
                         // Для P > 2 мм подъём витка в ГОСТ 19258-73 не нормирован (приложение, табл. 1 — до P = 2,0 мм).
@@ -250,8 +250,8 @@
                             {
                                 double _dev = _fr.Min - _fr.Max;
                                 _finishedValue = _isInternal
-                                    ? $"{_fr.Min.ToPrettyString(3)}  (+{_fr.Tolerance.ToPrettyString(3)})"
-                                    : $"{_fr.Max.ToPrettyString(3)}  ({(_dev >= 0 ? "+" : "")}{_dev.ToPrettyString(3)})";
+                                    ? $"{_fr.Min.ToPrettyString()}  (+{_fr.Tolerance.ToPrettyString()})"
+                                    : $"{_fr.Max.ToPrettyString()}  ({(_dev >= 0 ? "+" : "")}{_dev.ToPrettyString()})";
                             }
                         }
                         catch
@@ -327,8 +327,8 @@
                     {
                         <tr>
                             <td><MudText Typo="Typo.caption">@(index + 1)</MudText></td>
-                            <td><MudText Typo="Typo.caption">@value.ToString("N3").Replace(",", ".")</MudText></td>
-                            <td><MudText Typo="Typo.caption">@TotalPasses[index].ToString("N3").Replace(",", ".")</MudText></td>
+                            <td><MudText Typo="Typo.caption">@value.ToPrettyString(stringOption: Util.PrettyStringOption.AsIs)</MudText></td>
+                            <td><MudText Typo="Typo.caption">@TotalPasses[index].ToPrettyString(stringOption: Util.PrettyStringOption.AsIs)</MudText></td>
                         </tr>
                     }
                 </table>
@@ -468,11 +468,11 @@
             return ThreadStandard switch
             {
                 ThreadStandard.Metric
-                    => $"{Thread.DrillDiameter(ThreadDiameter, ThreadPitch).ToPrettyString(2)} мм",
+                    => $"{Thread.DrillDiameter(ThreadDiameter, ThreadPitch).ToPrettyString()} мм",
                 ThreadStandard.BSPP when Thread.BsppHoleDiameter(CurrentThreadTemplate) > 0
-                    => $"{Thread.BsppHoleDiameter(CurrentThreadTemplate).ToPrettyString(2)} мм",
+                    => $"{Thread.BsppHoleDiameter(CurrentThreadTemplate).ToPrettyString()} мм",
                 ThreadStandard.NPT when Thread.NptHoleDiameter(CurrentThreadTemplate) > 0
-                    => $"{Thread.NptHoleDiameter(CurrentThreadTemplate).ToPrettyString(2)} мм",
+                    => $"{Thread.NptHoleDiameter(CurrentThreadTemplate).ToPrettyString()} мм",
                 _ => "—",
             };
         }

@@ -288,7 +288,7 @@
                 <MudPaper Outlined="true" Class="mt-4 mx-1">
                     <MudGrid Justify="Justify.FlexStart" Spacing="1">
                         <MudItem Class="my-2">
-                            <MudText Style="margin-top: 7px; margin-left: 10px;" Typo="Typo.body2">@($"Суммарное время с учетом смены инструмента: {(FullOperationTime.FullTime / 60).ToPrettyString(2)} мин. ({FullOperationTime.FullTime.ToPrettyString(2)} сек.)")</MudText>
+                            <MudText Style="margin-top: 7px; margin-left: 10px;" Typo="Typo.body2">@($"Суммарное время с учетом смены инструмента: {(FullOperationTime.FullTime / 60).ToPrettyString()} мин. ({FullOperationTime.FullTime.ToPrettyString()} сек.)")</MudText>
                         </MudItem>
                         <MudItem Class="d-flex justify-end flex-grow-1 gap-4">
                             <MudIconButton Style="@($"margin-top: 3px; margin-left: 4px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true"
@@ -489,11 +489,11 @@
     {
         var result = (sequence.MachineTime.CuttingTime, sequence.MachineTime.RapidTime) switch
         {
-            (> 0, > 0) => $"[ {sequence.MachineTime.CuttingTime.ToPrettyString(2)} + {sequence.MachineTime.RapidTime.ToPrettyString(2)} = {sequence.MachineTime.FullTime.ToPrettyString(2)} ]",
+            (> 0, > 0) => $"[ {sequence.MachineTime.CuttingTime.ToPrettyString()} + {sequence.MachineTime.RapidTime.ToPrettyString()} = {sequence.MachineTime.FullTime.ToPrettyString()} ]",
             (0, > 0) => $"[ {sequence.MachineTime.RapidTime.ToPrettyString()} ]",
             _ => string.Empty
             };
-        if (sequence.MachineTime.FullTime > 300) result += $" ({(sequence.MachineTime.FullTime/60).ToPrettyString(2)}м)";
+        if (sequence.MachineTime.FullTime > 300) result += $" ({(sequence.MachineTime.FullTime/60).ToPrettyString()}м)";
         return result;
     }
 
@@ -694,8 +694,8 @@
             and not TailstockOnSequence 
             and not TailstockOffSequence 
             and not StopSequence
-            ? $"{CurrentSequence.Name}\nВремя резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString(2)} сек.\nВремя перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString(2)} сек.\nОбщее: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек{(CurrentSequence.MachineTime.FullTime > 300 ? $" ({(CurrentSequence.MachineTime.FullTime / 60).ToPrettyString(2)}м)" : "")}."
-            : $"{CurrentSequence.Name}\nВремя: {CurrentSequence.MachineTime.FullTime.ToPrettyString(2)} сек";
+            ? $"{CurrentSequence.Name}\nВремя резания: {CurrentSequence.MachineTime.CuttingTime.ToPrettyString()} сек.\nВремя перемещений: {CurrentSequence.MachineTime.RapidTime.ToPrettyString()} сек.\nОбщее: {CurrentSequence.MachineTime.FullTime.ToPrettyString()} сек{(CurrentSequence.MachineTime.FullTime > 300 ? $" ({(CurrentSequence.MachineTime.FullTime / 60).ToPrettyString()}м)" : "")}."
+            : $"{CurrentSequence.Name}\nВремя: {CurrentSequence.MachineTime.FullTime.ToPrettyString()} сек";
     }
 
     private void OnMaterialChanged(Material value)
