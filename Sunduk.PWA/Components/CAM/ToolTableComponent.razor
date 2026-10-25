@@ -1,118 +1,62 @@
-@using MudBlazor.Extensions
-@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@using Sunduk.PWA.Infrastructure.Tools
+@using Sunduk.PWA.Infrastructure.Tools.Base
+@inject MachineRegistry MachineRegistry
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
-<MudSwipeArea OnSwipeEnd="OnSwipe" Style="touch-action: pan-y;">
-    <MudTabs @ref="_toolTabs" Elevation="0">
-        @if (MachineType == MachineType.Milling)
+<div class="tool-list">
+    <div class="tool-list-toolbar">
+        <MudSelect T="string" Class="tool-filter-select" Label="Вид инструмента" Variant="Variant.Text" Margin="Margin.Dense"
+                   Value="_filterKey" ValueChanged="@(v => _filterKey = v ?? string.Empty)" ToStringFunc="FilterTitle">
+            <MudSelectItem T="string" Value="@string.Empty">@FilterTitle(string.Empty)</MudSelectItem>
+            @foreach (var kind in KindsWithTools)
+            {
+                <MudSelectItem T="string" Value="@kind.ToolType.Name">@FilterTitle(kind.ToolType.Name)</MudSelectItem>
+            }
+        </MudSelect>
+
+        @if (_filter is { } selected)
         {
-            // Общий список
-            <MudTabPanel Text="Общий" Style="font-size: x-small">
-
-                @foreach (var tool in Tools.Where(x => x.MachineType is MachineType.Milling))
+            <MudTooltip Text="@($"Добавить: {selected.Singular.ToLower()}")">
+                <MudIconButton Class="tool-add" Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Size="Size.Medium" aria-label="@($"Добавить: {selected.Singular.ToLower()}")"
+                               OnClick="@(() => AddAsync(selected))" />
+            </MudTooltip>
+        }
+        else
+        {
+            <MudMenu Class="tool-add" Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Size="Size.Medium" AriaLabel="Добавить инструмент"
+                     AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                @foreach (var kind in ToolKinds.For(MachineType))
                 {
-                    <MudText Style="font-family: 'JetBrains Mono', monospace">T@(tool.Position.ToString("D2")) (@tool.TableDescription())</MudText>
+                    var current = kind;
+                    <MudMenuItem OnClick="@(() => AddAsync(current))">@current.Singular</MudMenuItem>
                 }
-            </MudTabPanel>
-
-            <MudTabPanel Text="Расточки" Style="font-size: x-small">
-                <MillingBoreToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
-            </MudTabPanel>
-
-            <MudTabPanel Text="Фасочники" Style="font-size: x-small">
-                <MillingChamferToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
-            </MudTabPanel>
-            
-            <MudTabPanel Text="Сверла" Style="font-size: x-small">
-                <MillingDrillingToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
-            </MudTabPanel>
-
-            <MudTabPanel Text="Специальный" Style="font-size: x-small">
-                <MillingSpecialToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
-            </MudTabPanel>
-
-            <MudTabPanel Text="Метчики" Style="font-size: x-small">
-                <MillingTappingToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
-            </MudTabPanel>
-
-            <MudTabPanel Text="Резьбофрезы" Style="font-size: x-small">
-                <MillingThreadCuttingToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
-            </MudTabPanel>
-
-            <MudTabPanel Text="Фрезы" Style="font-size: x-small">
-                <MillingToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
-            </MudTabPanel>
+            </MudMenu>
         }
+    </div>
 
-        @if (MachineType == MachineType.Turning)
-        {
-            // GroovingExternal
-            <MudTabPanel Text="Канавки наружные" Style="font-size: x-small">
-                <GroovingExternalToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
-            </MudTabPanel>
+    @if (!VisibleTools.Any())
+    {
+        <MudText Typo="Typo.body2" Class="pa-4" Style="opacity: 0.7;">
+            Инструментов пока нет. Нажмите «Добавить» и выберите вид инструмента.
+        </MudText>
+    }
 
-
-            // GroovingFace
-            <MudTabPanel Text="Канавки торцевые" Style="font-size: x-small">
-                 <GroovingFaceToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
-            </MudTabPanel>
-
-
-            // GroovingInternal
-            <MudTabPanel Text="Канавки внутренние" Style="font-size: x-small">
-                <GroovingInternalToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
-            </MudTabPanel>
-
-
-            // SpecialTurning
-            <MudTabPanel Text="Спец" Style="font-size: x-small">
-                <TurningSpecialToolsComponent @bind-Tools="Tools" ReadOnly="false" />
-            </MudTabPanel>
-
-            // ThreadingExternal
-            <MudTabPanel Text="Резьбовые наружные" Style="font-size: x-small">
-                <ThreadingExternalToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
-            </MudTabPanel>
-
-
-            // ThreadingInternal
-            <MudTabPanel Text="Резьбовые внутренние" Style="font-size: x-small">
-                <ThreadingInternalToolsComponent @bind-Tools="Tools" ReadOnly="false"/>
-            </MudTabPanel>
-
-            // TurningExternalBurnishing
-            <MudTabPanel Text="Накатки наружные" Style="font-size: x-small">
-                <TurningExternalBurnishingToolsComponent @bind-Tools="Tools" ReadOnly="false" />
-            </MudTabPanel>
-
-            // TurningInternalBurnishing
-            <MudTabPanel Text="Накатки внутренние" Style="font-size: x-small">
-                <TurningInternalBurnishingToolsComponent @bind-Tools="Tools" ReadOnly="false" />
-            </MudTabPanel>
-
-            // TurningDrilling
-            <MudTabPanel Text="Сверла" Style="font-size: x-small">
-                <TurningDrillingToolsComponent @bind-Tools="Tools" ReadOnly="false" />
-            </MudTabPanel>
-
-
-            // TurningExternal
-            <MudTabPanel Text="Точение наружное" Style="font-size: x-small">
-                <TurningExternalToolsComponent @bind-Tools="Tools" ReadOnly="false" />
-            </MudTabPanel>
-
-            // TurningInternal
-            <MudTabPanel Text="Точение внутреннее" Style="font-size: x-small">
-                <TurningInternalToolsComponent @bind-Tools="Tools" ReadOnly="false" />
-            </MudTabPanel>
-
-
-            // TurningTapping
-            <MudTabPanel Text="Метчики" Style="font-size: x-small">
-                <TurningTappingToolsComponent @bind-Tools="Tools" ReadOnly="false" />
-            </MudTabPanel>
-        }
-    </MudTabs>
-</MudSwipeArea>
+    @foreach (var tool in VisibleTools)
+    {
+        var current = tool;
+        <button type="button" class="tool-row" @onclick="@(() => EditAsync(current))">
+            <span class="tool-row-number monofield">T@(Number(current))</span>
+            <span class="tool-row-body">
+                <span class="tool-row-title">@current.TableDescription()</span>
+                <span class="tool-row-subtitle">
+                    @(ToolKinds.Find(current)?.Singular)@(current.Hand == Tool.ToolHand.Left ? " · левое" : string.Empty)
+                </span>
+            </span>
+            <MudIcon Icon="@Icons.Material.Outlined.Edit" Size="Size.Small" Class="tool-row-icon" />
+        </button>
+    }
+</div>
 
 @code {
 
@@ -122,43 +66,110 @@
     [Parameter]
     public MachineType MachineType { get; set; }
 
-    public int Tabs => MachineType == MachineType.Turning ? 9 : 4;
+    /// <summary> Выбранный вид инструмента (имя класса); пустая строка — показывать все. </summary>
+    private string _filterKey = string.Empty;
 
-    private static double[] _chamferAngleTemplates = { 30, 45, 60, };
+    private ToolKind? _filter => ToolKinds.For(MachineType).FirstOrDefault(k => k.ToolType.Name == _filterKey);
 
-    MudTabs _toolTabs = default!;
-
-    public void OnSwipe(SwipeEventArgs args)
+    private string FilterTitle(string? key)
     {
-        if (args.TouchEventArgs.PointerType != "touch") return;
-
-        switch (args.SwipeDirection)
-        {
-            case SwipeDirection.LeftToRight:
-                {
-                    if (_toolTabs.GetState(x => x.ActivePanelIndex) > 0)
-                    {
-                        _toolTabs.ActivatePanelAsync(_toolTabs.GetState(x => x.ActivePanelIndex) - 1);
-                    }
-                    break;
-                }
-            case SwipeDirection.RightToLeft:
-                {
-                    if (_toolTabs.GetState(x => x.ActivePanelIndex) < Tabs)
-                    {
-                        _toolTabs.ActivatePanelAsync(_toolTabs.GetState(x => x.ActivePanelIndex) + 1);
-                    }
-                    break;
-                }
-        }
+        if (string.IsNullOrEmpty(key)) return $"Все ({MachineTools.Count})";
+        var kind = ToolKinds.For(MachineType).FirstOrDefault(k => k.ToolType.Name == key);
+        return kind is null ? key : $"{kind.Title} ({CountOf(kind)})";
     }
 
-     private async Task<IEnumerable<double>> SearchAsync(double value)
-    {
-    // In real life use an asynchronous function for fetching data from an api.
-        await Task.Delay(5);
+    private List<Tool> MachineTools => Tools.Where(x => x.MachineType == MachineType).ToList();
 
-    // if text is null or empty, show complete list
-        return string.IsNullOrEmpty(value.ToString(CultureInfo.InvariantCulture)) ? _chamferAngleTemplates : _chamferAngleTemplates.Where(x => x.ToString(CultureInfo.InvariantCulture).Contains(value.ToString(CultureInfo.InvariantCulture), StringComparison.InvariantCultureIgnoreCase));
+    private IEnumerable<ToolKind> KindsWithTools =>
+        ToolKinds.For(MachineType).Where(k => Tools.Any(t => t.GetType() == k.ToolType));
+
+    private int CountOf(ToolKind kind) => Tools.Count(t => t.GetType() == kind.ToolType);
+
+    private IEnumerable<Tool> VisibleTools => MachineTools
+        .Where(t => _filter is null || t.GetType() == _filter.ToolType)
+        .OrderBy(t => t.Position);
+
+    protected override void OnParametersSet()
+    {
+        // Станок могли переключить: вид инструмента другого типа станка здесь недоступен
+        if (_filterKey.Length > 0 && _filter is null) _filterKey = string.Empty;
+    }
+
+    private string Number(Tool tool) => MachineType == MachineType.Turning
+        ? tool.Position.ToolNumber()
+        : tool.Position.ToString("D2");
+
+    private async Task EditAsync(Tool tool)
+    {
+        var kind = ToolKinds.Find(tool);
+        if (kind is null) return;
+
+        // Правим копию, а не сам инструмент: «Отмена» ничего не меняет, а переходы,
+        // ссылающиеся на этот объект, продолжают ссылаться на него же после сохранения
+        var copy = kind.Create();
+        kind.CopyValues(tool, copy);
+
+        var result = await ShowDialogAsync(kind.Singular, copy, kind, isNew: false);
+        if (result is null) return;
+
+        if (result == ToolEditDialog.ToolEditAction.Delete)
+        {
+            await DeleteAsync(tool);
+            return;
+        }
+
+        kind.CopyValues(copy, tool);
+        await PersistAsync();
+    }
+
+    private async Task AddAsync(ToolKind kind)
+    {
+        var tool = kind.Create();
+        var result = await ShowDialogAsync($"{kind.Singular}: новый", tool, kind, isNew: true);
+        if (result != ToolEditDialog.ToolEditAction.Save) return;
+
+        Tools.Add(tool);
+        _filterKey = kind.ToolType.Name;
+        await PersistAsync();
+    }
+
+    private async Task DeleteAsync(Tool tool)
+    {
+        var index = Tools.IndexOf(tool);
+        if (index < 0) return;
+        Tools.RemoveAt(index);
+        await PersistAsync();
+
+        // Подтверждение не спрашиваем: удаление можно сразу отменить
+        Snackbar.Add($"Удалён T{Number(tool)}", Severity.Normal, config =>
+        {
+            config.Action = "Вернуть";
+            config.ActionColor = Color.Primary;
+            config.OnClick = async _ =>
+            {
+                Tools.Insert(Math.Min(index, Tools.Count), tool);
+                await PersistAsync();
+            };
+        });
+    }
+
+    private async Task<ToolEditDialog.ToolEditAction?> ShowDialogAsync(string title, Tool tool, ToolKind kind, bool isNew)
+    {
+        var parameters = new DialogParameters<ToolEditDialog>
+        {
+            { x => x.Tool, tool },
+            { x => x.Kind, kind },
+            { x => x.IsNew, isNew },
+        };
+        var options = new DialogOptions { CloseButton = true, CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<ToolEditDialog>(title, parameters, options);
+        var result = await dialog.Result;
+        return result is { Canceled: false, Data: ToolEditDialog.ToolEditAction action } ? action : null;
+    }
+
+    private async Task PersistAsync()
+    {
+        await MachineRegistry.SaveAsync();
+        await InvokeAsync(StateHasChanged);
     }
 }

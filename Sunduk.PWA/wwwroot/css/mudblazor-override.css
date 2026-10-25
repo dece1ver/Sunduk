@@ -210,21 +210,43 @@
     padding-top: 4px;
 }
 
-/* --- Calculator button special --- */
+/* --- Calculator --- */
 
-.calculator-button {
-    min-height: 36px;
-    font-size: 0.9rem;
+/* Сетка из 6 равных колонок: кнопки не выходят за края и не наезжают друг на друга
+   на узких экранах (minmax(0, 1fr) разрешает колонке быть уже содержимого). */
+.calculator-keys {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 4px;
 }
 
-.calculator-button-dark {
-    min-height: 36px;
-    font-size: 0.9rem;
-    background-color: #2D2D30 !important;
+.calculator-key {
+    min-width: 0;
+    min-height: 44px;
+    padding: 0 2px;
+    font-size: clamp(0.78rem, 3.6vw, 0.95rem);
+    overflow: hidden;
+    white-space: nowrap;
+    touch-action: manipulation;
 }
 
-.calculator-button-dark:hover {
-    background-color: #3a3a3e !important;
+.calculator-key-num {
+    background-color: var(--mud-palette-background-gray) !important;
+}
+
+.calculator-key-num:hover {
+    background-color: var(--mud-palette-action-default-hover) !important;
+}
+
+@media (min-width: 960px) {
+    .calculator-key {
+        min-height: 36px;
+    }
+}
+
+/* Чип выравнивается по левому краю клавиш (у MudChip свой внешний отступ) */
+.calculator-chip-set .mud-chip {
+    margin-left: 0;
 }
 
 /* --- Expand panel --- */
@@ -298,4 +320,154 @@
 
 .mud-switch-base {
     border-radius: 50% !important;
+}
+
+/* --- Bottom navigation (phones) --- */
+
+.bottom-nav {
+    display: none;
+}
+
+@media (max-width: 599.98px) {
+    .bottom-nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1100;
+        display: flex;
+        height: calc(52px + env(safe-area-inset-bottom));
+        padding-bottom: env(safe-area-inset-bottom);
+        background: var(--mud-palette-appbar-background);
+        border-top: 1px solid var(--mud-palette-lines-default);
+    }
+
+    .bottom-nav-item {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--mud-palette-text-secondary);
+        font: inherit;
+        font-size: 0.68rem;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .bottom-nav-item.active {
+        color: var(--mud-palette-primary);
+    }
+
+    /* Контент не должен прятаться под панелью */
+    .main-content-with-bottom-nav {
+        padding-bottom: calc(52px + env(safe-area-inset-bottom));
+    }
+}
+
+/* --- Tool list (CAM) --- */
+
+.tool-list-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 0;
+}
+
+.tool-filter-select {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Кнопка «+» по высоте равна строке ввода селекта и стоит на одной с ней нижней линии:
+   4px снизу — это внешний отступ mud-input-control, у .mud-menu свой align-self: center. */
+.tool-add {
+    align-self: flex-end;
+    flex: 0 0 auto;
+    width: 26.6px;
+    height: 26.6px;
+    margin-bottom: 4px;
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--mud-palette-primary);
+}
+
+.tool-add .mud-icon-button {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+}
+
+.tool-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 52px;
+    padding: 6px 8px;
+    border: 0;
+    border-bottom: 1px solid var(--mud-palette-lines-default);
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.tool-row:hover {
+    background: var(--mud-palette-table-hover);
+}
+
+.tool-row-number {
+    flex: 0 0 auto;
+    min-width: 3.4em;
+    color: var(--mud-palette-primary);
+    font-weight: 600;
+}
+
+.tool-row-body {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.tool-row-title {
+    overflow-wrap: anywhere;
+}
+
+.tool-row-subtitle {
+    font-size: 0.72rem;
+    color: var(--mud-palette-text-secondary);
+}
+
+.tool-row-icon {
+    flex: 0 0 auto;
+    opacity: 0.5;
+}
+
+/* --- Adornments: префикс/суффикс на одной строке со значением ---
+   Блок adornment центрируется по всей высоте поля, а его текст лежит во вложенном абзаце с
+   собственной высотой строки (21px против 16.6px у значения). Из-за этого «Ø», «R», «мм» стояли
+   ниже значения, причём на разную величину в зависимости от высоты поля и шрифта.
+   Ставим блок на тот же верхний отступ (3px у compact Text) и ту же высоту строки, что у input. */
+
+.mud-input.mud-input-text.mud-input-margin-dense > .mud-input-adornment {
+    align-self: flex-start;
+    height: auto;
+    max-height: none;
+    padding-top: 3px;
+}
+
+.mud-input.mud-input-text.mud-input-margin-dense > .mud-input-adornment .mud-typography {
+    line-height: inherit;
 }

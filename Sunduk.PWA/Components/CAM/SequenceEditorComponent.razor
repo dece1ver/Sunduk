@@ -1,6 +1,6 @@
 <MudGrid Spacing="1">
     <MudItem xs="12" md="4">
-        <MudSelect Label="Тип" T="SequenceType" Variant="Variant.Filled" Margin="Margin.Dense" Value="@Type" ValueChanged="OnSequenceChanged" Disabled="@(Sequence is not null)">
+        <MudSelect Label="Тип" T="SequenceType" Variant="Variant.Text" Margin="Margin.Dense" Value="@Type" ValueChanged="OnSequenceChanged" Disabled="@(Sequence is not null)">
             <MudSelectItem Value="@SequenceType.General">Общие</MudSelectItem>
             @if (MachineType == MachineType.Turning)
             {

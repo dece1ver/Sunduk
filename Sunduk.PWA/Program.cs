@@ -91,6 +91,10 @@ namespace Sunduk.PWA
             // Scoped по той же причине: зависит от IJSRuntime.
             builder.Services.AddScoped<OfflineStatusMonitor>();
 
+            // Scoped по той же причине: зависит от ILocalStorageService.
+            builder.Services.AddScoped<NavUsage>();
+            builder.Services.AddScoped<AppSettings>();
+
             await builder.Build().RunAsync();
         }
     }

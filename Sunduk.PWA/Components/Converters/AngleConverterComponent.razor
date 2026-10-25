@@ -9,7 +9,7 @@
 
         <MudItem xs="12" md="6">
             <MudField Label="Градусы в десятичной системе" Variant="Variant.Filled" Underline="false">
-                <MudTextField @bind-Value="DecimalAngleString"
+                <MudTextField Class="monofield" @bind-Value="DecimalAngleString"
                                @onfocusin="@(() => _calcDecimal = false)"
                                T="string"
                                Variant="Variant.Text"
@@ -22,7 +22,7 @@
 
         <MudItem xs="12" md="6">
             <MudField Label="Радианы" Variant="Variant.Filled" Underline="false">
-                <MudTextField @bind-Value="RadiansAngleString"
+                <MudTextField Class="monofield" @bind-Value="RadiansAngleString"
                                @onfocusin="@(() => _inputRadians = true)"
                                @onfocusout="@(() => _inputRadians = false)"
                                T="string"
@@ -38,7 +38,7 @@
             <MudField Label="Градусная система" Variant="Variant.Filled" Underline="false">
                 <MudGrid>
                     <MudItem xs="4">
-                        <MudTextField @bind-Value="IntAngleString"
+                        <MudTextField Class="monofield" @bind-Value="IntAngleString"
                                        @onfocusin="@(() => _calcDecimal = true)"
                                        T="string"
                                        Variant="Variant.Text"
@@ -49,7 +49,7 @@
                     </MudItem>
 
                     <MudItem xs="4">
-                        <MudTextField @bind-Value="MinAngleString"
+                        <MudTextField Class="monofield" @bind-Value="MinAngleString"
                                        @onfocusin="@(() => _calcDecimal = true)"
                                        T="string"
                                        Variant="Variant.Text"
@@ -60,7 +60,7 @@
                     </MudItem>
 
                     <MudItem xs="4">
-                        <MudTextField @bind-Value="SecAngleString"
+                        <MudTextField Class="monofield" @bind-Value="SecAngleString"
                                        @onfocusin="@(() => _calcDecimal = true)"
                                        T="string"
                                        Variant="Variant.Text"

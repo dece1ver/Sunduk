@@ -1,24 +1,19 @@
 @inject HoleCapacityState State
-<style>
-    .monofield {
-        font-family: 'JetBrains Mono', monospace;
-    }
-</style>
 <MudGrid Spacing="1" Class="pa-2">
         <MudItem xs="12" sm="6">
             <MudField Label="Параметры" Variant="Variant.Filled" Underline="false" Class="mt-1"
                       @onfocusout="(() => CurrentImage = Images.Base)">
                 <MudGrid Spacing="0">
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_HoleDiameter" T="string" Label="Диаметр отверстия" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                        <MudTextField Class="monofield" @bind-Value="_HoleDiameter" T="string" Label="Диаметр отверстия" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
                                       @onfocus="() => CurrentImage = Images.HoleDiameter" Margin="Margin.Dense" />
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_ToolSize" T="string" Label="Размер с пластиной" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                        <MudTextField Class="monofield" @bind-Value="_ToolSize" T="string" Label="Размер с пластиной" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
                                       @onfocus="FocusToolSize" Margin="Margin.Dense" />
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_MinimalDiameter" T="string" Label="Минимальный диаметр" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                        <MudTextField Class="monofield" @bind-Value="_MinimalDiameter" T="string" Label="Минимальный диаметр" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
                                       @onfocus="FocusMinimalDiameter" Margin="Margin.Dense"/>
                     </MudItem>
                 </MudGrid>

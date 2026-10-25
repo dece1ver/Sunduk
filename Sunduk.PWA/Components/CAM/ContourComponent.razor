@@ -132,7 +132,7 @@
                         <defs>
                             @if (!string.IsNullOrEmpty(Path))
                             {
-                                <path id="contour" stroke="#FF5722" stroke-width="@Math.Max(1.5, Scale * 0.5)" fill="none" d="@Path"/>
+                                <path id="contour" stroke="var(--mud-palette-primary)" stroke-width="@Math.Max(1.5, Scale * 0.5)" fill="none" d="@Path"/>
                             }
                         </defs>
                         @if (!string.IsNullOrEmpty(Path))

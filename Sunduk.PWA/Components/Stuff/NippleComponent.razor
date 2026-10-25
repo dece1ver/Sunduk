@@ -1,24 +1,19 @@
 @inject NippleState State
-<style>
-    .monofield {
-        font-family: 'JetBrains Mono', monospace;
-    }
-</style>
     <MudGrid Spacing="1" Class="pa-2">
         <MudItem xs="12" sm="6">
             <MudField Label="Параметры" Variant="Variant.Filled" Underline="false" Class="mt-1"
             @onfocusout="(() => CurrentImage = Images.NippleBase)">
                 <MudGrid Spacing="0">
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_NippleDiameter" T="string" Label="Диаметр на сфере ниппеля" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                        <MudTextField Class="monofield" @bind-Value="_NippleDiameter" T="string" Label="Диаметр на сфере ниппеля" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
                                       @onfocus="() => CurrentImage = Images.NippleDiameter" Margin="Margin.Dense"/>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_ArcCenter" T="string" Label="Размер от торца до центра дуги" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                        <MudTextField Class="monofield" @bind-Value="_ArcCenter" T="string" Label="Размер от торца до центра дуги" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
                                       @onfocus="() => CurrentImage = Images.NippleArcCenter" Margin="Margin.Dense"/>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                        <MudTextField Class="monofield" @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
                                       @onfocus="() => CurrentImage = Images.NippleToolRaduis" Margin="Margin.Dense"/>
                     </MudItem>
                 </MudGrid>
@@ -129,12 +124,12 @@
                         <MudItem xs="6" md="4">
                             @if (RoundCorner)
                             {
-                                <MudTextField @bind-Value="_NippleBlunt" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"  Class="ma-n4" Underline="false"/>
+                                <MudTextField @bind-Value="_NippleBlunt" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"  Class="ma-n4 monofield" Underline="false"/>
                             }
                         </MudItem>
                     </MudGrid>
                     <MudItem xs="12">
-                        <MudTextField Variant="Variant.Outlined" Style="font-family: 'JetBrains Mono', monospace;" ReadOnly="true" Lines="ExampleLines" AutoGrow="true" Value="@RadiusExample" />
+                        <MudTextField Variant="Variant.Text" Style="font-family: 'JetBrains Mono', monospace;" ReadOnly="true" Lines="ExampleLines" AutoGrow="true" Value="@RadiusExample" />
                     </MudItem>
                 </MudExpansionPanel>
             </MudItem>

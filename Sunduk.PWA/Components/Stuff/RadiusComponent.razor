@@ -16,15 +16,15 @@
                         </MudRadioGroup>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_RadiusDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                        <MudTextField Class="monofield" @bind-Value="_RadiusDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
                                       @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalPartDiameter : Images.InternalPartDiameter" Margin="Margin.Dense"/>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_RadiusSize" T="string" Label="Радиус скругления" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                        <MudTextField Class="monofield" @bind-Value="_RadiusSize" T="string" Label="Радиус скругления" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
                                       @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalRadiusSize : Images.InternalRadiusSize" Margin="Margin.Dense"/>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                        <MudTextField Class="monofield" @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
                                       @onfocus="() => CurrentImage = RadiusType == Radius.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense"/>
                     </MudItem>
                 </MudGrid>
@@ -135,7 +135,7 @@
                     </MudRadioGroup>
                 </MudItem>
                 <MudItem xs="12">
-                        <MudTextField Variant="Variant.Outlined" Style="font-family: 'JetBrains Mono', monospace;" Lines="@ExampleLines" ReadOnly="true" AutoGrow="true" Value="@RadiusExample" />
+                        <MudTextField Variant="Variant.Text" Style="font-family: 'JetBrains Mono', monospace;" Lines="@ExampleLines" ReadOnly="true" AutoGrow="true" Value="@RadiusExample" />
                 </MudItem>
             </MudExpansionPanel>
         </MudItem>

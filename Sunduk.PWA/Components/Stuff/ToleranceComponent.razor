@@ -12,7 +12,7 @@
                        Value="Grade"
                        Label="Квалитет"
                        ValueChanged="@(v => Grade = v)"
-                       Variant="Variant.Filled"
+                       Variant="Variant.Text"
                        Margin="Margin.Dense"
                        Clearable="true">
                 @foreach (var g in Tolerance.Grades)
@@ -24,7 +24,7 @@
         <MudItem xs="12" sm="4">
             <MudSelectExtended T="string"
                                Label="Поле допуска"
-                               Variant="Variant.Filled"
+                               Variant="Variant.Text"
                                Margin="Margin.Dense"
                                ItemCollection="@AvailableFields"
                                Value="@Field"
@@ -37,12 +37,12 @@
                                AnchorOrigin="Origin.BottomCenter" />
         </MudItem>
         <MudItem xs="12" sm="4">
-            <MudTextField @bind-Value="Nominal"
+            <MudTextField Class="monofield" @bind-Value="Nominal"
                            T="string"
                            Label="Номинальный размер"
                            Adornment="Adornment.End"
                            AdornmentText="мм"
-                           Variant="Variant.Filled"
+                           Variant="Variant.Text"
                            Immediate="true"
                            Margin="Margin.Dense" />
         </MudItem>

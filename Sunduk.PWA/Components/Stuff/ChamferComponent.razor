@@ -1,10 +1,5 @@
 @using System.Threading.Tasks
 @inject ChamferState State
-<style>
-    .monofield {
-        font-family: 'JetBrains Mono', monospace;
-    }
-</style>
     <MudGrid Spacing="1" Class="pa-2">
         <MudItem xs="12" sm="6">
             <MudField Label="Параметры фаски" Variant="Variant.Filled" Underline="false" Class="mt-1"
@@ -17,19 +12,19 @@
                         </MudRadioGroup>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_ChamferEndDiameter" T="string" Label="Конечный диаметр" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                        <MudTextField Class="monofield" Variant="Variant.Text" @bind-Value="_ChamferEndDiameter" T="string" Label="Конечный диаметр" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
                                       @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalEndDiameter : Images.InternalEndDiameter" Margin="Margin.Dense" />
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_ChamferSize" @onfocusin="@(() => calcStartDiam = true)" T="string" Label="Глубина" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                        <MudTextField Class="monofield" Variant="Variant.Text" @bind-Value="_ChamferSize" @onfocusin="@(() => calcStartDiam = true)" T="string" Label="Глубина" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
                                       @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferSize : Images.InternalChamferSize" Margin="Margin.Dense" />
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_Angle" T="string" Label="Угол" Adornment="Adornment.End" AdornmentText="°" Immediate="true"
+                        <MudTextField Class="monofield" Variant="Variant.Text" @bind-Value="_Angle" T="string" Label="Угол" Adornment="Adornment.End" AdornmentText="°" Immediate="true"
                                       @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalChamferAngle : Images.InternalChamferAngle" Margin="Margin.Dense" />
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_ChamferStartDiameter" @onfocusin="@(() => calcStartDiam = false)" T="string" Label="Начальный диаметр" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                        <MudTextField Class="monofield" Variant="Variant.Text" @bind-Value="_ChamferStartDiameter" @onfocusin="@(() => calcStartDiam = false)" T="string" Label="Начальный диаметр" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
                                       @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalStartDiameter : Images.InternalStartDiameter" Margin="Margin.Dense" />
                     </MudItem>
                 </MudGrid>
@@ -135,14 +130,14 @@
                 <MudGrid Spacing="1">
                     <MudHidden Breakpoint="Breakpoint.Xs">
                         <MudItem xs="12" sm="6" Class="mt-2">
-                            <MudTextField @bind-Value="_ChamferInsertRadius" T="string" Label="Радиус пластины" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" Class="mr-3"
+                            <MudTextField Variant="Variant.Text" @bind-Value="_ChamferInsertRadius" T="string" Label="Радиус пластины" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" Class="mr-3 monofield"
                                           @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense">
                             </MudTextField>
                         </MudItem>
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
                         <MudItem xs="12" sm="6">
-                            <MudTextField @bind-Value="_ChamferInsertRadius" T="string" Label="Радиус пластины" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                            <MudTextField Class="monofield" Variant="Variant.Text" @bind-Value="_ChamferInsertRadius" T="string" Label="Радиус пластины" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
                                           @onfocus="() => CurrentImage = ChamferType == Chamfer.External ? Images.ExternalToolRadius : Images.InternalToolRadius" Margin="Margin.Dense">
                             </MudTextField>
                         </MudItem>
@@ -206,12 +201,12 @@
                         <MudItem xs="6" md="4">
                             @if (RoundCorners)
                             {
-                                <MudTextField @bind-Value="_RoundCorner" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" Class="ma-0" Underline="false"/>
+                                <MudTextField @bind-Value="_RoundCorner" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм" Class="ma-0 monofield" Underline="false"/>
                             }
                         </MudItem>
                     </MudGrid>
                     <MudItem xs="12">
-                        <MudTextField Variant="Variant.Outlined" Style="font-family: 'JetBrains Mono', monospace;" Lines="ExampleLines" AutoGrow="true" Value="@ChamferExample" ReadOnly="true"  />
+                        <MudTextField Variant="Variant.Text" Style="font-family: 'JetBrains Mono', monospace;" Lines="ExampleLines" AutoGrow="true" Value="@ChamferExample" ReadOnly="true"  />
                     </MudItem>
                 </MudExpansionPanel>
             </MudItem>

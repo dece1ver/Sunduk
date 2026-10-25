@@ -1,6 +1,9 @@
 ﻿@inject IDialogService DialogService
-@inject ILocalStorageService LocalStorage
+@inject AppSettings Settings
 @inject OfflineStatusMonitor OfflineMonitor
+@inject NavigationManager Navigation
+@inject NavUsage NavUsage
+@implements IDisposable
 @inherits LayoutComponentBase
 @using MudBlazor.Services
 
@@ -25,9 +28,8 @@
         {
             <MudText Typo="Typo.caption">@Breakpoint</MudText>
         }
-        <MudTooltip Text="@(IsDark ? "Светлая тема" : "Тёмная тема")" Placement="Placement.Start">
-            <MudIconButton Icon="@(IsDark ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
-                           OnClick="ToggleThemeAsync" Color="Color.Inherit" />
+        <MudTooltip Text="Параметры" Placement="Placement.Start">
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" @onclick="OpenSettingsDialogAsync" Color="Color.Inherit" />
         </MudTooltip>
         <MudTooltip Text="Обратная связь" Placement="Placement.Start">
             <MudIconButton Icon="@Icons.Material.Filled.Feedback" @onclick="OpenFeedBackDialogAsync" Color="Color.Inherit" Edge="Edge.End" />
@@ -44,11 +46,23 @@
             <NavMenu />
         </CascadingValue>
     </MudDrawer>
-    <MudMainContent>
+    <MudMainContent Class="main-content-with-bottom-nav">
         <CascadingValue Value="ExperimentalMode" Name="ExperimantalMode">
             @Body
         </CascadingValue>
     </MudMainContent>
+    @* Нижняя панель для телефонов: частые разделы под большим пальцем. На широких экранах скрыта (там боковое меню). *@
+    <nav class="bottom-nav" aria-label="Основные разделы">
+        @foreach (var section in _bottomSections)
+        {
+            <NavLink class="bottom-nav-item" href="@section.Href" Match="NavLinkMatch.Prefix">
+                <MudIcon Icon="@section.Icon" /><span>@section.Title</span>
+            </NavLink>
+        }
+        <button type="button" class="bottom-nav-item" @onclick="DrawerToggle">
+            <MudIcon Icon="@Icons.Material.Filled.Apps" /><span>Ещё</span>
+        </button>
+    </nav>
 </MudLayout>
 
 @code
@@ -56,27 +70,51 @@
     public static bool DebugMode { get; set; } = false;
     public bool ExperimentalMode { get; set; } = DebugMode;
 
-    private bool _isDark = true;
-
     public bool IsDark
     {
-        get => _isDark;
-        set
-        {
-            if (_isDark == value) return;
-            _isDark = value;
-            _ = LocalStorage.SetItemAsync("theme-dark", value);
-        }
+        get => Settings.IsDark;
+        set => _ = Settings.SetDarkAsync(value);
     }
 
     public MudTheme CurrentTheme => AppTheme.GetTheme(IsDark, isAmber: false);
+
+    // Набор разделов в нижней панели считается один раз при запуске: порядок не должен
+    // перескакивать на глазах, иначе пропадает мышечная память.
+    private IReadOnlyList<NavSection> _bottomSections = NavUsage.Sections.Take(NavUsage.Slots).ToList();
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        Settings.Changed += OnSettingsChanged;
+    }
+
+    private void UpdateBottomSections() => _bottomSections = Settings.NavOrder == NavOrderMode.ByUsage
+        ? NavUsage.Top()
+        : NavUsage.Sections.Take(NavUsage.Slots).ToList();
+
+    private void OnSettingsChanged()
+    {
+        UpdateBottomSections();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) =>
+        _ = NavUsage.RecordAsync(Navigation.ToBaseRelativePath(e.Location));
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+        Settings.Changed -= OnSettingsChanged;
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            var saved = await LocalStorage.GetItemAsync<bool?>("theme-dark");
-            _isDark = saved ?? true;
+            await Settings.LoadAsync();
+            await NavUsage.LoadAsync();
+            UpdateBottomSections();
+            await NavUsage.RecordAsync(Navigation.ToBaseRelativePath(Navigation.Uri));
 
             // Состояние офлайн-режима. Показывается строкой статуса в диалоге
             // «Описание», но следить за service worker нужно с первого рендера,
@@ -88,16 +126,23 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task ToggleThemeAsync()
-    {
-        IsDark = !IsDark;
-    }
-
     public Breakpoint Breakpoint { get; set; }
 
     string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "?";
 
     bool _drawerOpen = true;
+
+    private Task OpenSettingsDialogAsync()
+    {
+        var options = new DialogOptions() {
+            FullScreen = false,
+            CloseButton = true,
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        };
+        return DialogService.ShowAsync<SettingsDialog>("Параметры", options);
+    }
 
     private Task OpenQrDialogAsync()
     {

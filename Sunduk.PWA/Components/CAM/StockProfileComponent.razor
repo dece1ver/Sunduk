@@ -5,12 +5,12 @@
             <svg height="140" width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="@ViewBox" preserveAspectRatio="xMidYMid meet">
                 @if (!string.IsNullOrEmpty(ExternalPath))
                 {
-                    <path fill="#FF5722" fill-opacity="0.25" fill-rule="evenodd" stroke="none" d="@(ExternalPath + " " + InternalHolePath)"/>
-                    <path fill="none" stroke="#FF5722" stroke-width="@Math.Max(1, Scale * 0.25)" d="@ExternalOutlinePath"/>
+                    <path fill="var(--mud-palette-primary)" fill-opacity="0.25" fill-rule="evenodd" stroke="none" d="@(ExternalPath + " " + InternalHolePath)"/>
+                    <path fill="none" stroke="var(--mud-palette-primary)" stroke-width="@Math.Max(1, Scale * 0.25)" d="@ExternalOutlinePath"/>
                 }
                 @if (!string.IsNullOrEmpty(InternalHoleOutlinePath))
                 {
-                    <path fill="none" stroke="#FF5722" stroke-width="@Math.Max(1, Scale * 0.2)" stroke-dasharray="3,2" d="@InternalHoleOutlinePath"/>
+                    <path fill="none" stroke="var(--mud-palette-primary)" stroke-width="@Math.Max(1, Scale * 0.2)" stroke-dasharray="3,2" d="@InternalHoleOutlinePath"/>
                 }
                 @if (Valid)
                 {

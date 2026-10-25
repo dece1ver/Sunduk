@@ -5,19 +5,19 @@
                       @onfocusout="(() => CurrentImage = Images.Base)">
                 <MudGrid Spacing="0">
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_PartDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
+                        <MudTextField Class="monofield" @bind-Value="_PartDiameter" T="string" Label="Конечный диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true"
                                       @onfocus="() => CurrentImage = Images.PartDiameter" Margin="Margin.Dense"/>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_RadiusSize" T="string" Label="Радиус дуги" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                        <MudTextField Class="monofield" @bind-Value="_RadiusSize" T="string" Label="Радиус дуги" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
                                       @onfocus="() => CurrentImage = Images.ArcRadius" Margin="Margin.Dense"/>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_StartDiameter" T="string" Label="Начальный диаметр" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                        <MudTextField Class="monofield" @bind-Value="_StartDiameter" T="string" Label="Начальный диаметр" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
                                       @onfocus="() => CurrentImage = Images.StartDiameter" Margin="Margin.Dense"/>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
+                        <MudTextField Class="monofield" @bind-Value="_InsertRadius" T="string" Label="Радиус пластины" Variant="Variant.Text" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"
                                       @onfocus="() => CurrentImage = Images.ToolRadius" Margin="Margin.Dense"/>
                     </MudItem>
                 </MudGrid>
@@ -122,12 +122,12 @@
                         <MudItem xs="6" md="4">
                             @if (RoundCorner)
                             {
-                                <MudTextField @bind-Value="_Blunt" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"  Class="ma-n4" Underline="false"/>
+                                <MudTextField @bind-Value="_Blunt" T="string" Label="Радиус скругления" Variant="Variant.Text" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.End" AdornmentText="мм"  Class="ma-n4 monofield" Underline="false"/>
                             }
                         </MudItem>
                     </MudGrid>
                     <MudItem xs="12">
-                        <MudTextField Variant="Variant.Outlined" Style="font-family: 'JetBrains Mono', monospace;" ReadOnly="true" AutoGrow="true" Lines="ExampleLines" Value="@RadiusExample" />
+                        <MudTextField Variant="Variant.Text" Style="font-family: 'JetBrains Mono', monospace;" ReadOnly="true" AutoGrow="true" Lines="ExampleLines" Value="@RadiusExample" />
                     </MudItem>
                 </MudExpansionPanel>
             </MudItem>

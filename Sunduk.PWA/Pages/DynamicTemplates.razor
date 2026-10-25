@@ -329,7 +329,7 @@
                                      PanelClass="pa-3">
                                 <MudTabPanel Text="Заготовка" Icon="@Icons.Material.Outlined.Edit">
                                     <MudTextField T="string"
-                                                  Variant="Variant.Filled"
+                                                  Variant="Variant.Text"
                                                   AutoGrow="true"
                                                   @bind-Value="@template.Content"
                                                   Immediate="true"
@@ -341,7 +341,7 @@
 
                                 <MudTabPanel Text="Результат" Icon="@Icons.Material.Outlined.CheckCircle">
                                     <MudTextField T="string"
-                                                  Variant="Variant.Filled"
+                                                  Variant="Variant.Text"
                                                   AutoGrow="true"
                                                   Immediate="true"
                                                   Lines="@Math.Max(10, template.Result.Count(c => c == '\n') + 1)"

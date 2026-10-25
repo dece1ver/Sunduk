@@ -1,12 +1,12 @@
 @inject DrillAngleState State
 <MudGrid Spacing="1" Class="pa-2">
         <MudItem xs="6">
-            <MudTextField @bind-Value="_DrillDiameter" T="string" Label="Диаметр" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" 
+            <MudTextField Class="monofield" @bind-Value="_DrillDiameter" T="string" Label="Диаметр" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="мм" Immediate="true" 
                           @onfocus="() => CurrentImage = Images.DrillDiameter"
                           @onfocusout="() => CurrentImage = Images.Drill"/>
         </MudItem>
         <MudItem xs="6">
-            <MudTextField @bind-Value="_DrillAngle" T="string" Label="Угол" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentText="°" Immediate="true"
+            <MudTextField Class="monofield" @bind-Value="_DrillAngle" T="string" Label="Угол" Variant="Variant.Text" Adornment="Adornment.End" AdornmentText="°" Immediate="true"
                           @onfocus="() => CurrentImage = Images.DrillAngle"
                           @onfocusout="() => CurrentImage = Images.Drill"/>
         </MudItem>

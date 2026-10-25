@@ -1,0 +1,54 @@
+@inject AppSettings Settings
+@inject IDialogService DialogService
+@inject NavigationManager Navigation
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="3">
+            <div>
+                <MudText Typo="Typo.overline" Class="d-block">Внешний вид</MudText>
+                <MudSwitch T="bool" Value="Settings.IsDark" ValueChanged="@(v => Settings.SetDarkAsync(v))" Color="Color.Primary" Label="Тёмная тема" />
+            </div>
+
+            <div>
+                <MudText Typo="Typo.overline" Class="d-block">Нижняя панель на телефоне</MudText>
+                <MudRadioGroup T="NavOrderMode" Value="Settings.NavOrder" ValueChanged="@(v => Settings.SetNavOrderAsync(v))">
+                    <MudRadio Value="NavOrderMode.Default" Color="Color.Primary">Стандартная: режимы, хрень, допуски, база знаний</MudRadio>
+                    <MudRadio Value="NavOrderMode.ByUsage" Color="Color.Primary">По использованию: самые частые разделы</MudRadio>
+                </MudRadioGroup>
+                <MudText Typo="Typo.caption" Class="d-block">«Ещё» остаётся последней кнопкой в любом режиме. Статистика хранится только на этом устройстве.</MudText>
+            </div>
+
+            <div>
+                <MudText Typo="Typo.overline" Class="d-block">Калькулятор режимов</MudText>
+                <MudSwitch T="bool" Value="Settings.CalculatorEnabled" ValueChanged="@(v => Settings.SetCalculatorEnabledAsync(v))" Color="Color.Primary" Label="Калькулятор выражений" />
+                <MudText Typo="Typo.caption" Class="d-block">Если выключен, блок убирается со страницы, а в полях режимов всегда показывается системная клавиатура.</MudText>
+            </div>
+
+            <div>
+                <MudText Typo="Typo.overline" Class="d-block">Данные</MudText>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="ResetAllAsync">Сбросить всё</MudButton>
+                <MudText Typo="Typo.caption" Class="d-block">Удаляет станки и инструменты, параметры, настройки и значения калькуляторов на этом устройстве.</MudText>
+            </div>
+        </MudStack>
+    </DialogContent>
+</MudDialog>
+
+@code
+{
+    private async Task ResetAllAsync()
+    {
+        var parameters = new DialogParameters<ConfirmDialog>
+        {
+            { x => x.Message, "Удалить все данные приложения на этом устройстве: станки, инструменты, параметры и настройки калькуляторов? Это нельзя отменить." },
+            { x => x.OkMessage, "Сбросить" },
+        };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Сбросить всё?", parameters);
+        var result = await dialog.Result;
+        if (result is null || result.Canceled) return;
+
+        await Settings.ResetAllAsync();
+        // Полная перезагрузка: состояние калькуляторов и станков живёт ещё и в памяти
+        Navigation.NavigateTo("/", forceLoad: true);
+    }
+}

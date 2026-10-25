@@ -1,7 +1,7 @@
 ﻿<MudDialog OnKeyUp="HandleKeyDown">
     <DialogContent>
         <MudText>@Message</MudText>
-        <MudTextField T="string"
+        <MudTextField Variant="Variant.Text" T="string"
                       @ref="textField"
                       @bind-Text="Input"
                       AutoFocus="true"

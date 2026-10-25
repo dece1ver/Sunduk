@@ -102,6 +102,7 @@ public static class AppTheme
 
     public static MudTheme AmberLight { get; } = new()
     {
+        Typography = BuildTypography(),
         PaletteLight = new PaletteLight()
         {
             Primary = "#D97706",
@@ -188,6 +189,7 @@ public static class AppTheme
 
     public static MudTheme OrangeDark { get; } = new()
     {
+        Typography = BuildTypography(),
         PaletteLight = new PaletteLight()
         {
             Primary = "#FF5722",
@@ -272,6 +274,7 @@ public static class AppTheme
 
     public static MudTheme OrangeLight { get; } = new()
     {
+        Typography = BuildTypography(),
         PaletteLight = new PaletteLight()
         {
             Primary = "#E64A19",

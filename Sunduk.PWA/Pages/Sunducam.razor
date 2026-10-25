@@ -139,7 +139,7 @@
                     <MudPaper Class="pa-4 rounded-0" Elevation="0" Outlined="false">
                         <MudGrid Spacing="1">
                         <MudItem xs="12" sm="6" md="@(Machine.CoordinateSystems.Count > 1 ? 4 : 6)" Class="d-flex align-center" style="gap: 4px;">
-                            <MudSelect Value="Machine" Label="Станок" T="Machine" Variant="Variant.Filled" Dense="true" ValueChanged="OnMachineChanged">
+                            <MudSelect Value="Machine" Label="Станок" T="Machine" Variant="Variant.Text" Dense="true" ValueChanged="OnMachineChanged">
                                 @foreach (var machine in MachineRegistry.Machines)
                                 {
                                     <MudSelectItem Value="@machine">@machine.Name</MudSelectItem>
@@ -150,7 +150,7 @@
                         {
                             <MudHidden Breakpoint="Breakpoint.MdAndDown">
                                 <MudItem xs="4" sm="3" md="2">
-                                    <MudSelect @bind-Value="CoordinateSystem" Label="Система координат" T="CoordinateSystem" Variant="Variant.Filled" Dense="true">
+                                    <MudSelect @bind-Value="CoordinateSystem" Label="Система координат" T="CoordinateSystem" Variant="Variant.Text" Dense="true">
                                         @foreach (var cs in Machine.CoordinateSystems)
                                         {
                                             <MudSelectItem Value="@cs"/>
@@ -161,7 +161,7 @@
 
                             <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
                                 <MudItem xs="4" sm="3" md="2">
-                                    <MudSelect @bind-Value="CoordinateSystem" Label="СК" T="CoordinateSystem" Variant="Variant.Filled" Dense="true">
+                                    <MudSelect @bind-Value="CoordinateSystem" Label="СК" T="CoordinateSystem" Variant="Variant.Text" Dense="true">
                                         @foreach (var cs in Machine.CoordinateSystems)
                                         {
                                             <MudSelectItem Value="@cs"/>
@@ -171,50 +171,50 @@
                             </MudHidden>
                         }
                         <MudItem xs="12" sm="6" md="6">
-                            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал детали" T="Material" Variant="Variant.Filled" Dense="true">
+                            <MudSelect @bind-Value="WorkpieceMaterial" Label="Материал детали" T="Material" Variant="Variant.Text" Dense="true">
                                 <MudSelectItem Value="@Material.Steel">Черная сталь</MudSelectItem>
                                 <MudSelectItem Value="@Material.Stainless">Нержавеющая сталь</MudSelectItem>
                                 <MudSelectItem Value="@Material.Brass">Бронза</MudSelectItem>
                             </MudSelect>
                         </MudItem>
                         <MudItem xs="12" sm="6" md="6">
-                            <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            <MudTextField @bind-Value="DetailName" Label="Наименование" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
                         <MudItem xs="12" sm="6" md="6">
-                            <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            <MudTextField @bind-Value="DetailNumber" Label="Обозначение" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
                         @if (MachineType == MachineType.Turning)
                         {
                             <MudItem xs="6" sm="4">
-                                <MudTextField @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                                <MudTextField Class="monofield" @bind-Value="_WorkpieceExternalDiameter" Label="Наружный диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
                             </MudItem>
                             <MudItem xs="6" sm="4">
-                                <MudTextField @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                                <MudTextField Class="monofield" @bind-Value="_WorkpieceInternalDiameter" Label="Внутренний диаметр" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
                             </MudItem>
                             <MudItem xs="6" sm="4">
-                                <MudTextField @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                                <MudTextField Class="monofield" @bind-Value="_WorkpieceLength" Label="Длина заготовки" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
                             </MudItem>
                             <MudItem xs="6" sm="4">
-                                <MudTextField @bind-Value="_WorkpieceFacingAllowance" Label="Припуск по торцу" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                                <MudTextField Class="monofield" @bind-Value="_WorkpieceFacingAllowance" Label="Припуск по торцу" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
                             </MudItem>
                             <MudItem xs="12" sm="4">
-                                <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                                <MudTextField @bind-Value="SpindleLimit" Label="Ограничение оборотов" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
                             </MudItem>
                         }
                         else
                         {
                             <MudItem xs="6" sm="3">
-                                <MudTextField @bind-Value="_SafePlane" Label="Плоскость безопасности" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                                <MudTextField Class="monofield" @bind-Value="_SafePlane" Label="Плоскость безопасности" Adornment="Adornment.End" AdornmentText="мм" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
                             </MudItem>
                         }
                         <MudItem xs="6" sm="4" md="4">
-                            <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Filled" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
+                            <MudNumericField @bind-Value="OperationNumber" Label="Номер установа" Variant="Variant.Text" Immediate="true" Format="D1" Min="0" Max="10" Margin="Margin.Dense" />
                         </MudItem>
                         <MudItem xs="6" sm="4" md="4">
-                            <MudTextField @bind-Value="DrawingVersion" Label="Версия чертежа" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            <MudTextField @bind-Value="DrawingVersion" Label="Версия чертежа" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
                         <MudItem xs="12" sm="4" md="4">
-                            <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Filled" Immediate="true" Margin="Margin.Dense" />
+                            <MudTextField @bind-Value="Author" Label="Автор" Variant="Variant.Text" Immediate="true" Margin="Margin.Dense" />
                         </MudItem>
                     </MudGrid>
                     </MudPaper>

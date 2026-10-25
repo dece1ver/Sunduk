@@ -1,0 +1,77 @@
+@using Sunduk.PWA.Infrastructure.Tools
+@using Sunduk.PWA.Infrastructure.Tools.Base
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            @foreach (var field in Kind.Fields)
+            {
+                if (!field.Visible(Tool)) continue;
+
+                switch (field)
+                {
+                    case NumberField n:
+                        <MudTextField Class="monofield" T="double" Label="@n.Label" Variant="Variant.Text" Margin="Margin.Dense"
+                                      Value="n.Get(Tool)" ValueChanged="@(v => n.Set(Tool, v))"
+                                      Converter="@(n.Kind == NumberKind.HalfAngle ? Util.HalfAngleDoubleConverter : Util.DoubleConverter)"
+                                      Adornment="@(n.Prefix is not null ? Adornment.Start : n.Suffix is not null ? Adornment.End : Adornment.None)"
+                                      AdornmentText="@(n.Prefix ?? n.Suffix)"
+                                      ReadOnly="n.ReadOnly(Tool)" />
+                        break;
+                    case IntField i:
+                        <MudTextField Class="monofield" T="int" Label="@i.Label" Variant="Variant.Text" Margin="Margin.Dense"
+                                      Value="i.Get(Tool)" ValueChanged="@(v => i.Set(Tool, v))"
+                                      Converter="@PositionConverter(i)"
+                                      Adornment="@(i.Prefix is not null ? Adornment.Start : Adornment.None)"
+                                      AdornmentText="@i.Prefix" />
+                        break;
+                    case TextField t:
+                        <MudTextField T="string" Label="@t.Label" Variant="Variant.Text" Margin="Margin.Dense"
+                                      Value="t.Get(Tool)" ValueChanged="@(v => t.Set(Tool, v))" Immediate="true" />
+                        break;
+                    case SelectField s:
+                        <MudSelect T="object" Label="@s.Label" Variant="Variant.Text" Margin="Margin.Dense"
+                                   Value="s.Get(Tool)" ValueChanged="@(v => s.Set(Tool, v))">
+                            @foreach (var option in s.Options(Tool))
+                            {
+                                <MudSelectItem T="object" Value="@option.Value">@option.Text</MudSelectItem>
+                            }
+                        </MudSelect>
+                        break;
+                }
+            }
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        @if (!IsNew)
+        {
+            <MudButton Color="Color.Error" StartIcon="@Icons.Material.Outlined.Delete" OnClick="Delete">Удалить</MudButton>
+            <MudSpacer />
+        }
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="Save">Сохранить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code
+{
+    public enum ToolEditAction { Save, Delete }
+
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+
+    /// <summary> Редактируемая копия. Исходный инструмент меняется только после «Сохранить». </summary>
+    [Parameter, EditorRequired] public Tool Tool { get; set; } = default!;
+
+    [Parameter, EditorRequired] public ToolKind Kind { get; set; } = default!;
+
+    [Parameter] public bool IsNew { get; set; }
+
+    /// <summary> Номер с нулями слева (T0101), чтобы в форме он выглядел так же, как в списке и в УП. </summary>
+    private static MudBlazor.IConverter<int, string?> PositionConverter(IntField field) => MudBlazor.Conversions.From(
+        (int value) => field.Digits > 0 ? value.ToString($"D{field.Digits}") : value.ToString(),
+        text => text.GetInt(1, Util.GetNumberOption.OnlyPositive));
+
+    void Save() => MudDialog.Close(DialogResult.Ok(ToolEditAction.Save));
+    void Delete() => MudDialog.Close(DialogResult.Ok(ToolEditAction.Delete));
+    void Cancel() => MudDialog.Cancel();
+}

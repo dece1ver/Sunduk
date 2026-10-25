@@ -43,11 +43,11 @@
                         <MudTabPanel Text="Общее">
                             <MudGrid Spacing="1">
                                 <MudItem xs="12" sm="6" md="4">
-                                    <MudTextField T="string" Value="machine.Name" Label="Название" Variant="Variant.Filled" Margin="Margin.Dense"
+                                    <MudTextField T="string" Value="machine.Name" Label="Название" Variant="Variant.Text" Margin="Margin.Dense"
                                                   Immediate="true" ValueChanged="@(v => { machine.Name = v; Persist(); })" />
                                 </MudItem>
                                 <MudItem xs="12" sm="6" md="4">
-                                    <MudSelect T="MachineType" Value="machine.MachineType" Label="Тип" Variant="Variant.Filled" Margin="Margin.Dense"
+                                    <MudSelect T="MachineType" Value="machine.MachineType" Label="Тип" Variant="Variant.Text" Margin="Margin.Dense"
                                                ValueChanged="@(v => { machine.MachineType = v; Persist(); })">
                                         <MudSelectItem Value="MachineType.Turning">Токарный</MudSelectItem>
                                         <MudSelectItem Value="MachineType.Milling">Фрезерный</MudSelectItem>
@@ -81,24 +81,24 @@
                                     <MudText Typo="Typo.subtitle2">Шапка программы</MudText>
                                 </MudItem>
                                 <MudItem xs="12" sm="6" md="6">
-                                    <MudSelect T="HeaderStyle" Value="machine.HeaderStyle" Label="Формат номера программы" Variant="Variant.Filled" Margin="Margin.Dense"
+                                    <MudSelect T="HeaderStyle" Value="machine.HeaderStyle" Label="Формат номера программы" Variant="Variant.Text" Margin="Margin.Dense"
                                                ValueChanged="@(v => { machine.HeaderStyle = v; Persist(); })">
                                         <MudSelectItem Value="HeaderStyle.ONumber">O-номер (O0001 (номер) / (имя)(версия))</MudSelectItem>
                                         <MudSelectItem Value="HeaderStyle.AngleBracketName">&lt;Номер&gt; ( &lt;номер&gt;(имя) / (версия) )</MudSelectItem>
                                     </MudSelect>
                                 </MudItem>
                                 <MudItem xs="12" sm="6" md="6">
-                                    <MudTextField T="string" Value="machine.TransitionTemplate" Label="Шаблон перехода" Variant="Variant.Filled" Margin="Margin.Dense"
+                                    <MudTextField T="string" Value="machine.TransitionTemplate" Label="Шаблон перехода" Variant="Variant.Text" Margin="Margin.Dense"
                                                   Lines="3" Immediate="true"
                                                   ValueChanged="@(v => { machine.TransitionTemplate = v; Persist(); })" />
                                 </MudItem>
                                 <MudItem xs="12">
-                                    <MudTextField T="string" Value="machine.HeaderExtraLines" Label="Дополнительные строки шапки" Variant="Variant.Filled" Margin="Margin.Dense"
+                                    <MudTextField T="string" Value="machine.HeaderExtraLines" Label="Дополнительные строки шапки" Variant="Variant.Text" Margin="Margin.Dense"
                                                   Lines="3" Immediate="true"
                                                   ValueChanged="@(v => { machine.HeaderExtraLines = v; Persist(); })" />
                                 </MudItem>
                                 <MudItem xs="12" sm="6" md="6">
-                                    <MudTextField T="string" Value="machine.HeaderTemplate" Label="Шаблон шапки (автор/дата/время)" Variant="Variant.Filled" Margin="Margin.Dense"
+                                    <MudTextField T="string" Value="machine.HeaderTemplate" Label="Шаблон шапки (автор/дата/время)" Variant="Variant.Text" Margin="Margin.Dense"
                                                   Lines="2" Immediate="true"
                                                   ValueChanged="@(v => { machine.HeaderTemplate = v; Persist(); })" />
                                 </MudItem>
@@ -109,11 +109,11 @@
                             {
                                 <MudGrid Spacing="1">
                                     <MudItem xs="6" sm="3" md="3">
-                                        <MudNumericField T="int" Value="machine.SafetySpeedCap" Label="Максимум оборотов" Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudNumericField T="int" Value="machine.SafetySpeedCap" Label="Максимум оборотов" Variant="Variant.Text" Margin="Margin.Dense"
                                                           ValueChanged="@(v => { machine.SafetySpeedCap = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="6" sm="3" md="3">
-                                        <MudNumericField T="int" Value="machine.SafetyDefaultSpeed" Label="Обороты по умолчанию" Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudNumericField T="int" Value="machine.SafetyDefaultSpeed" Label="Обороты по умолчанию" Variant="Variant.Text" Margin="Margin.Dense"
                                                           ValueChanged="@(v => { machine.SafetyDefaultSpeed = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="12" sm="6" md="6" Class="d-flex flex-column justify-center" style="gap: 0;">
@@ -123,7 +123,7 @@
                                                      Class="mt-n3" ValueChanged="@(v => { machine.TrailingReferentPoint = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="12">
-                                        <MudTextField T="string" Value="machine.SafetyStringTemplate" Label="Строка безопасности" Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.SafetyStringTemplate" Label="Строка безопасности" Variant="Variant.Text" Margin="Margin.Dense"
                                                       Lines="4" Immediate="true"
                                                       HelperText="Необязательно: G-код перед первым переходом на этом станке — построчно, как должно попасть в УП. Плейсхолдеры: {CS} — система координат (см. вкладку «Общее»), {S} — ограничение оборотов (с учётом полей выше). Пусто — строка не добавляется."
                                                       ValueChanged="@(v => { machine.SafetyStringTemplate = v; Persist(); })" />
@@ -133,27 +133,27 @@
                                         <MudText Typo="Typo.subtitle2">Коды станка</MudText>
                                     </MudItem>
                                     <MudItem xs="6" sm="3">
-                                        <MudTextField T="string" Value="machine.TailstockOnCode" Label="Задняя бабка — подвод" Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.TailstockOnCode" Label="Задняя бабка — подвод" Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.TailstockOnCode = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="6" sm="3">
-                                        <MudTextField T="string" Value="machine.TailstockOffCode" Label="Задняя бабка — отвод" Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.TailstockOffCode" Label="Задняя бабка — отвод" Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.TailstockOffCode = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="6" sm="3">
-                                        <MudTextField T="string" Value="machine.SpindleClampCode" Label="Зажим шпинделя" Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.SpindleClampCode" Label="Зажим шпинделя" Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.SpindleClampCode = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="6" sm="3">
-                                        <MudTextField T="string" Value="machine.SpindleUnclampCode" Label="Разжим шпинделя" Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.SpindleUnclampCode" Label="Разжим шпинделя" Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.SpindleUnclampCode = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="6" sm="3">
-                                        <MudTextField T="string" Value="machine.CoolantOnCode" Label="СОЖ вкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.CoolantOnCode" Label="СОЖ вкл." Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.CoolantOnCode = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="6" sm="3">
-                                        <MudTextField T="string" Value="machine.CoolantOffCode" Label="СОЖ выкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.CoolantOffCode" Label="СОЖ выкл." Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.CoolantOffCode = v; Persist(); })" />
                                     </MudItem>
                                 </MudGrid>
@@ -162,31 +162,31 @@
                             {
                                 <MudGrid Spacing="1">
                                     <MudItem xs="6" sm="4" md="3">
-                                        <MudTextField T="string" Value="machine.CoolantOnCode" Label="СОЖ вкл. (общая)" Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.CoolantOnCode" Label="СОЖ вкл. (общая)" Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.CoolantOnCode = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="6" sm="4" md="3">
-                                        <MudTextField T="string" Value="machine.CoolantOffCode" Label="СОЖ выкл. (общая)" Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.CoolantOffCode" Label="СОЖ выкл. (общая)" Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.CoolantOffCode = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="6" sm="4" md="3">
-                                        <MudTextField T="string" Value="machine.CoolantThroughOnCode" Label="СОЖ через инструмент вкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.CoolantThroughOnCode" Label="СОЖ через инструмент вкл." Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.CoolantThroughOnCode = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="6" sm="4" md="3">
-                                        <MudTextField T="string" Value="machine.CoolantThroughOffCode" Label="СОЖ через инструмент выкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.CoolantThroughOffCode" Label="СОЖ через инструмент выкл." Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.CoolantThroughOffCode = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="6" sm="4" md="3">
-                                        <MudTextField T="string" Value="machine.CoolantFullOffCode" Label="СОЖ полная выкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.CoolantFullOffCode" Label="СОЖ полная выкл." Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.CoolantFullOffCode = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="6" sm="4" md="3">
-                                        <MudTextField T="string" Value="machine.CoolantBlowOnCode" Label="Обдув вкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.CoolantBlowOnCode" Label="Обдув вкл." Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.CoolantBlowOnCode = v; Persist(); })" />
                                     </MudItem>
                                     <MudItem xs="6" sm="4" md="3">
-                                        <MudTextField T="string" Value="machine.CoolantBlowOffCode" Label="Обдув выкл." Variant="Variant.Filled" Margin="Margin.Dense"
+                                        <MudTextField T="string" Value="machine.CoolantBlowOffCode" Label="Обдув выкл." Variant="Variant.Text" Margin="Margin.Dense"
                                                       ValueChanged="@(v => { machine.CoolantBlowOffCode = v; Persist(); })" />
                                     </MudItem>
                                 </MudGrid>
