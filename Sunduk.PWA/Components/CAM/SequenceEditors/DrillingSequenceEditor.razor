@@ -287,6 +287,11 @@
     private void OnToolChanged(Tool value)
     {
         Tool = value;
+        if (value is DrillingTool drillingTool)
+        {
+            SpeedFinish = Operation.DrillCuttingSpeed(WorkpieceMaterial, drillingTool);
+            _FeedFinish = Operation.DrillFeed(Machine, WorkpieceMaterial, drillingTool).ToPrettyString();
+        }
     }
 
     private void OnHolesCountChanged(int value)

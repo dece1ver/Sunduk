@@ -263,6 +263,8 @@ else
     {
         _FacingCustomChamferAngle = "45";
         SelectedCoordinateSystem = CoordinateSystem;
+        SpeedRough = Operation.CuttingSpeedRough(WorkpieceMaterial);
+        SpeedFinish = Operation.CuttingSpeedFinish(WorkpieceMaterial);
         if (SequenceToEdit is not null) LoadFromSequence(SequenceToEdit);
     }
 
@@ -347,6 +349,11 @@ else
     private void OnToolChanged(Tool value)
     {
         Tool = value;
+        if (value is TurningTool turningTool)
+        {
+            _FeedRough = Operation.FeedRough(turningTool.Radius).ToPrettyString();
+            _FeedFinish = Operation.FeedFinish(turningTool.Radius).ToPrettyString();
+        }
     }
 
     private void OnTurningSequenceChanged(TurningSequences value)

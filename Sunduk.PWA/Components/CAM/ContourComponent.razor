@@ -1,3 +1,4 @@
+@using Sunduk.PWA.Infrastructure.Visualization
 @inject ISnackbar Snackbar
 
 <MudField Label="Контур" Variant="Variant.Filled" Margin="Margin.Dense" Underline="false">
@@ -96,22 +97,23 @@
 
                                         break;
                                 }
-                                <MudItem Class="d-flex justify-end flex-grow-1 gap-4">
-                                    <MudItem>
-                                        <MudIconButton Style="@($"margin-top: 3px; margin-left: 4px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true"
+                                <MudItem Class="d-flex justify-end flex-grow-1">
+                                    @* три слота одинакового размера в фиксированном порядке: у первой строки "−" нет, но место под него остаётся *@
+                                    <div class="d-flex" style="gap: 8px; margin-top: 3px;">
+                                        <MudIconButton Style="@($"height: {ButtonSize}px; width: {ButtonSize}px; min-width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true"
                                         Icon="@Icons.Material.Filled.Calculate" OnClick="(() => CalculateElement(Contour.IndexOf(element)))"/>
-                                    </MudItem>
-                                    <MudItem>
-                                        <MudIconButton Style="@($"margin-top: 3px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true"
+                                        <MudIconButton Style="@($"height: {ButtonSize}px; width: {ButtonSize}px; min-width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true"
                                         Icon="@Icons.Material.Filled.Add" OnClick="(() => InsertAfter(Contour.IndexOf(element)))"/>
-                                    </MudItem>
-                                    @if(Contour.IndexOf(element) > 0)
-                                    {
-                                    <MudItem>
-                                        <MudIconButton Style="@($"margin-top: 3px; margin-left: 4px; height: {ButtonSize}px; width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true"
-                                        Icon="@Icons.Material.Filled.Remove" OnClick="(() => RemoveAt(Contour.IndexOf(element)))"/>
-                                    </MudItem>
-                                    }
+                                        @if (Contour.IndexOf(element) > 0)
+                                        {
+                                            <MudIconButton Style="@($"height: {ButtonSize}px; width: {ButtonSize}px; min-width: {ButtonSize}px")" Variant="ButtonsVariant" DisableElevation="true"
+                                            Icon="@Icons.Material.Filled.Remove" OnClick="(() => RemoveAt(Contour.IndexOf(element)))"/>
+                                        }
+                                        else
+                                        {
+                                            <div style="@($"height: {ButtonSize}px; width: {ButtonSize}px; min-width: {ButtonSize}px")"></div>
+                                        }
+                                    </div>
                                 </MudItem>
 
                             </MudGrid>
@@ -119,41 +121,55 @@
                         </MudPaper>
                     </MudListItem>
                 }
-                <MudText Class="pa-2" Style="font-family: 'JetBrains Mono', monospace; font-size: small; color: var(--mud-palette-text-secondary); white-space: pre-wrap;">
-                    @Path
-                </MudText>
             </MudList>
         </MudItem>
         <MudItem xs="12" lg="6">
+            @{ var scene = BuildScene(); }
             <MudPaper Outlined="true" Class="mt-1">
-                <div style="text-align: center;">
-                    <svg height="@FieldHeight" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                         viewBox="@ViewBox" preserveAspectRatio="xMidYMid meet">
-                        <defs>
-                            @if (!string.IsNullOrEmpty(Path))
-                            {
-                                <path id="contour" stroke="var(--mud-palette-primary)" stroke-width="@Math.Max(1.5, Scale * 0.5)" fill="none" d="@Path"/>
-                            }
-                        </defs>
-                        @if (!string.IsNullOrEmpty(Path))
+                @if (scene.Valid)
+                {
+                    var path = scene.Toolpath;
+                    <svg viewBox="0 0 @TurningScene.F(TurningScene.Width) @TurningScene.F(scene.Height)" width="100%" style="display: block;"
+                         xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        @if (scene.HasStock)
                         {
-                            <use xlink:href="#contour"/>
+                            <path d="@scene.StockFillPath" fill="var(--mud-palette-text-secondary)" fill-opacity="0.18" fill-rule="evenodd" stroke="none" />
+                            <path d="@scene.StockOutlinePath" fill="none" stroke="var(--mud-palette-text-secondary)" stroke-width="1" />
+                            <path d="@scene.HoleOutlinePath" fill="none" stroke="var(--mud-palette-text-secondary)" stroke-width="1" stroke-dasharray="3,2" />
                         }
-                        @* Система координат: ось Z — горизонталь, ось X — вертикаль (токарная обработка) *@
-                        @if (HasContour)
+                        @* ось вращения и торец Z0 *@
+                        @if (scene.AxisVisible)
                         {
-                            <g stroke="white" stroke-width="@Math.Max(1, Scale * 0.25)" fill="none">
-                                <path d="@(CsGeometry)"/>
-                            </g>
-                            <g transform="translate(@XPlusX,@XPlusY)">
-                                <text x="0" y="0" fill="white" style="font-family: 'JetBrains Mono', monospace;" font-size="10">X+</text>
-                            </g>
-                            <g transform="translate(@ZPlusX,@ZPlusY)">
-                                <text x="0" y="0" fill="white" style="font-family: 'JetBrains Mono', monospace;" font-size="10">Z+</text>
-                            </g>
+                            <path d="M 0,@TurningScene.F(scene.Y(0)) L @TurningScene.F(TurningScene.Width),@TurningScene.F(scene.Y(0))" stroke="var(--mud-palette-text-secondary)" stroke-width="1" stroke-dasharray="8,3,2,3" fill="none" />
+                        }
+                        <path d="M @TurningScene.F(scene.X(0)),0 L @TurningScene.F(scene.X(0)),@TurningScene.F(scene.Height)" stroke="var(--mud-palette-text-secondary)" stroke-width="1" stroke-dasharray="2,3" fill="none" />
+                        <text x="@TurningScene.F(scene.X(0) + 3)" y="11" font-size="10" fill="var(--mud-palette-text-secondary)">Z0</text>
+                        @if (path is not null)
+                        {
+                            @* номинальный контур детали *@
+                            <path d="@scene.PathD(path.Nominal)" fill="none" stroke="var(--mud-palette-primary)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+                        }
+                        @* система координат — всегда в левом верхнем углу, поверх остального *@
+                        <g stroke="var(--mud-palette-text-primary)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M 14,46 L 48,46 M 42,41 L 48,46 L 42,51" />
+                            <path d="M 14,46 L 14,12 M 9,18 L 14,12 L 19,18" />
+                        </g>
+                        <text x="52" y="50" font-size="12" font-weight="bold" fill="var(--mud-palette-text-primary)">Z+</text>
+                        <text x="20" y="16" font-size="12" font-weight="bold" fill="var(--mud-palette-text-primary)">X+</text>
+                        @* подписи R/C на узлах; серые/красные — угол не скруглён, G-код R/C там не пишет *@
+                        @if (path is not null)
+                        {
+                            @foreach (var mark in path.Corners)
+                            {
+                                @((MarkupString)CornerMarkup(scene, mark))
+                            }
                         }
                     </svg>
-                </div>
+                }
+                else
+                {
+                    <MudText Class="pa-4" Typo="Typo.body2" Color="Color.Secondary">Задайте как минимум две точки контура</MudText>
+                }
             </MudPaper>
         </MudItem>
     </MudGrid>
@@ -161,17 +177,12 @@
 
 
 @code {
-    public const double Scale = 4;
-    public const double Padding = 12;
-    private const double CsLength = 6;
-
     public Variant FieldsVariant => Variant.Filled;
     public Variant ButtonsVariant => Variant.Filled;
     public bool FieldsUnderline => false;
     public bool FirstFieldsUnderline => false;
     public int ButtonSize => 48;
     public int FieldsWidth => 87;
-    public int FieldHeight => Contour.Count < 6 ? 330 : Contour.Count * 55;
 
     [Parameter]
     public List<Element> Contour { get; set; } = new List<Element>
@@ -182,6 +193,34 @@
     [Parameter]
     public EventCallback<List<Element>> ContourChanged { get; set; }
 
+    /// <summary>Состояние заготовки перед этим переходом (после всех предыдущих), null — не показывать.</summary>
+    [Parameter]
+    public StockProfile? Stock { get; set; }
+
+    [Parameter]
+    public double StockLength { get; set; }
+
+    [Parameter]
+    public double FacingAllowance { get; set; }
+
+    /// <summary>Считается на каждый рендер: поля контура правятся прямо в элементах (без обратного
+    /// вызова родителю), поэтому кэшировать по параметрам нельзя.</summary>
+    /// <summary>Подпись R/C у узла. Собирается как разметка (элемент text в Razor-блоке кода
+    /// трактуется как служебный тег); все подставляемые значения — числа или экранированный текст.</summary>
+    static string CornerMarkup(TurningScene scene, CornerMark mark)
+    {
+        var color = mark.Applied ? "var(--mud-palette-primary)" : "var(--mud-palette-error)";
+        var x = scene.X(mark.Node.Z);
+        var y = scene.Y(mark.Node.R);
+        var hint = System.Net.WebUtility.HtmlEncode(mark.Reason ?? "Скругление/фаска применены");
+        var label = System.Net.WebUtility.HtmlEncode(mark.Label + (mark.Applied ? string.Empty : " ✕"));
+        return $"<circle cx=\"{TurningScene.F(x)}\" cy=\"{TurningScene.F(y)}\" r=\"2.5\" fill=\"none\" stroke=\"{color}\" stroke-width=\"1\"/>" +
+               $"<text x=\"{TurningScene.F(x + 6)}\" y=\"{TurningScene.F(y - 6)}\" font-size=\"11\" fill=\"{color}\"><title>{hint}</title>{label}</text>";
+    }
+
+    TurningScene BuildScene()
+        => new(TurningToolpath.Build(Contour), Stock, StockLength, FacingAllowance);
+
     public ElementType Type { get; set; }
 
     public enum ElementType
@@ -189,96 +228,6 @@
         Point,
         Line,
         Arc
-    }
-
-    bool HasContour => Contour.Count > 0 && Contour[0].X != null && Contour[0].Z != null;
-
-    /// Экран X ← Z контура (горизонталь), экран Y ← -X/2 (вертикаль, диаметр → радиус).
-    double SX(double? z) => (z ?? 0) * Scale;
-    double SY(double? x) => -(x ?? 0) / 2 * Scale;
-
-    double AbsMaxX => Contour.Count > 0 ? Math.Max(2.0, Math.Max(Math.Abs(Contour.Where(e => e.X is not null).Select(e => e.X.Value).DefaultIfEmpty(0).Max()),
-                                                              Math.Abs(Contour.Where(e => e.X is not null).Select(e => e.X.Value).DefaultIfEmpty(0).Min()))) : 2;
-    double AbsMaxLength => Contour.Count > 0 ? Math.Max(2.0, Math.Max(Math.Abs(Contour.Where(e => e.Z is not null).Select(e => e.Z.Value).DefaultIfEmpty(0).Max()),
-                                                                Math.Abs(Contour.Where(e => e.Z is not null).Select(e => e.Z.Value).DefaultIfEmpty(0).Min()))) : 2;
-
-    string XPlusX => (SX(0) + 4).ToString(System.Globalization.CultureInfo.InvariantCulture);
-    string XPlusY => (SY(Math.Max(2 * AbsMaxX, 1)) - 3).ToString(System.Globalization.CultureInfo.InvariantCulture);
-    string ZPlusX => (SX(Math.Max(AbsMaxLength * 0.45, 2)) + 3).ToString(System.Globalization.CultureInfo.InvariantCulture);
-    string ZPlusY => (SY(0) + 3).ToString(System.Globalization.CultureInfo.InvariantCulture);
-
-    public string ViewBox
-    {
-        get
-        {
-            if (!HasContour) return $"{-Padding} {-Padding} {2 * Padding} {2 * Padding}";
-            double maxZ = Contour.Where(e => e.Z is not null).Select(e => e.Z.Value).Max();
-            double minZ = Contour.Where(e => e.Z is not null).Select(e => e.Z.Value).Min();
-            double maxX = Contour.Where(e => e.X is not null).Select(e => e.X.Value).Max();
-            double minX = Contour.Where(e => e.X is not null).Select(e => e.X.Value).Min();
-            double sxMin = SX(minZ);
-            double sxMax = SX(maxZ);
-            double syMin = SY(maxX);
-            double syMax = SY(minX);
-            double left = sxMin - Padding;
-            double top = syMin - Padding;
-            double width = sxMax - sxMin + 2 * Padding;
-            double height = syMax - syMin + 2 * Padding;
-            return $"{left.ToString(System.Globalization.CultureInfo.InvariantCulture)} {top.ToString(System.Globalization.CultureInfo.InvariantCulture)} {Math.Max(width, 1).ToString(System.Globalization.CultureInfo.InvariantCulture)} {Math.Max(height, 1).ToString(System.Globalization.CultureInfo.InvariantCulture)}";
-        }
-    }
-
-    string CsGeometry =>
-        $"M {SX(-CsLength).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(0).ToString(System.Globalization.CultureInfo.InvariantCulture)} L {SX(CsLength).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(0).ToString(System.Globalization.CultureInfo.InvariantCulture)} " +
-        $"M {SX(0).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(-CsLength).ToString(System.Globalization.CultureInfo.InvariantCulture)} L {SX(0).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(CsLength).ToString(System.Globalization.CultureInfo.InvariantCulture)} " +
-        $"M {SX(-3).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(CsLength * 0.85).ToString(System.Globalization.CultureInfo.InvariantCulture)} L {SX(0).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(CsLength).ToString(System.Globalization.CultureInfo.InvariantCulture)} L {SX(3).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(CsLength * 0.85).ToString(System.Globalization.CultureInfo.InvariantCulture)}";
-
-    public string Path
-    {
-        get
-        {
-            if (Contour is null || Contour.Count == 0) return string.Empty;
-            if (Contour[0].X is null && Contour[0].Z is null) return string.Empty;
-
-            var sb = new System.Text.StringBuilder();
-            for (int i = 0; i < Contour.Count; i++)
-            {
-                var element = Contour[i];
-                var prev = i > 0 ? Contour[i - 1] : null;
-                switch (element)
-                {
-                    case Point point:
-                        sb.Append($"M {SX(point.Z).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(point.X).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
-                        if (point.Blunt > 0 && i + 1 < Contour.Count)
-                        {
-                            var next = Contour[i + 1];
-                            var nextX = next.X ?? point.X;
-                            var nextZ = next.Z ?? point.Z;
-                            bool downZ = (point.Z ?? 0) > (nextZ ?? 0);
-                            double bluntJx = downZ ? -point.Blunt : point.Blunt;
-                            sb.Append($"A{(point.Blunt * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},{(point.Blunt * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},0,0,{(downZ ? 0 : 1)},{SX((point.Z ?? 0) + bluntJx).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(nextX).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
-                        }
-                        break;
-                    case Line line:
-                        var (lX, lZ) = Resolve(line.X, line.Z, prev);
-                        sb.Append($"L {SX(lZ).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(lX).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
-                        break;
-                    case Arc arc:
-                        var (aX, aZ) = Resolve(arc.X, arc.Z, prev);
-                        if (ValidArc(i))
-                        {
-                            int sweep = arc.Direction is Sunduk.Geometry.Direction.CCW ? 0 : 1;
-                            sb.Append($"A{(arc.Radius * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},{(arc.Radius * Scale).ToString(System.Globalization.CultureInfo.InvariantCulture)},0,0,{sweep},{SX(aZ).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(aX).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
-                        }
-                        else
-                        {
-                            sb.Append($"L {SX(aZ).ToString(System.Globalization.CultureInfo.InvariantCulture)},{SY(aX).ToString(System.Globalization.CultureInfo.InvariantCulture)} ");
-                        }
-                        break;
-                }
-            }
-            return sb.ToString();
-        }
     }
 
     static (double? x, double? z) Resolve(double? x, double? z, Element prev)

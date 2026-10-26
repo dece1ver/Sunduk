@@ -28,7 +28,9 @@
             break;
         case SequenceType.ExternalTurning:
             <ExternalTurningSequenceEditor Machine="Machine" MachineType="MachineType" CoordinateSystem="CoordinateSystem" WorkpieceMaterial="WorkpieceMaterial"
-                                            Tools="Tools" CyclesCount="CyclesCount" SequenceToEdit="Sequence" OnSubmit="Submit" />
+                                            Tools="Tools" CyclesCount="CyclesCount" SequenceToEdit="Sequence" OnSubmit="Submit"
+                                            Program="Program" WorkpieceExternalDiameter="WorkpieceExternalDiameter" WorkpieceInternalDiameter="WorkpieceInternalDiameter"
+                                            WorkpieceLength="WorkpieceLength" WorkpieceFacingAllowance="WorkpieceFacingAllowance" />
             break;
         case SequenceType.Drilling:
             <DrillingSequenceEditor Machine="Machine" MachineType="MachineType" WorkpieceMaterial="WorkpieceMaterial" CoordinateSystem="CoordinateSystem"
@@ -79,6 +81,9 @@
 
     [Parameter]
     public double WorkpieceInternalDiameter { get; set; }
+
+    [Parameter]
+    public double WorkpieceFacingAllowance { get; set; }
 
     [Parameter]
     public double WorkpieceCurrentInternalDiameter { get; set; }

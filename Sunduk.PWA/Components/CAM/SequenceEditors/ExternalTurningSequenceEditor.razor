@@ -60,7 +60,7 @@ else
     </MudItem>
 }
 <MudItem xs="12">
-    <ContourComponent @bind-Contour="Contour"></ContourComponent>
+    <ContourComponent @bind-Contour="Contour" Stock="StockBefore" StockLength="WorkpieceLength" FacingAllowance="WorkpieceFacingAllowance"></ContourComponent>
 </MudItem>
 <MudItem Class="mt-4" xs="12" sm="12" md="12">
     <MudTextField T="string" Underline="false" Label="Предпросмотр" Style="font-family: 'JetBrains Mono', monospace; font-size: medium;"
@@ -82,6 +82,22 @@ else
     [Parameter] public List<Tool> Tools { get; set; }
     [Parameter] public int CyclesCount { get; set; }
     [Parameter] public Sequence SequenceToEdit { get; set; }
+    [Parameter] public List<Sequence> Program { get; set; }
+    [Parameter] public double WorkpieceExternalDiameter { get; set; }
+    [Parameter] public double WorkpieceInternalDiameter { get; set; }
+    [Parameter] public double WorkpieceLength { get; set; }
+    [Parameter] public double WorkpieceFacingAllowance { get; set; }
+
+    /// <summary>Заготовка перед этим переходом: при правке — по переходам до него, при добавлении — по всей программе.</summary>
+    private StockProfile StockBefore
+    {
+        get
+        {
+            if (Program is null || WorkpieceExternalDiameter <= 0) return null;
+            var index = SequenceToEdit is null ? -1 : Program.IndexOf(SequenceToEdit);
+            return StockProfile.Build(Program, index >= 0 ? index : Program.Count, WorkpieceExternalDiameter, WorkpieceInternalDiameter, WorkpieceFacingAllowance);
+        }
+    }
     [Parameter] public EventCallback<Sequence> OnSubmit { get; set; }
 
     private TurningSequences TurningSequence { get; set; }
@@ -109,6 +125,8 @@ else
     protected override void OnInitialized()
     {
         SelectedCoordinateSystem = CoordinateSystem;
+        SpeedRough = Operation.CuttingSpeedRough(WorkpieceMaterial);
+        SpeedFinish = Operation.CuttingSpeedFinish(WorkpieceMaterial);
         if (SequenceToEdit is not null) LoadFromSequence(SequenceToEdit);
     }
 
@@ -146,6 +164,11 @@ else
     private void OnToolChanged(Tool value)
     {
         Tool = value;
+        if (value is TurningTool turningTool)
+        {
+            _FeedRough = Operation.FeedRough(turningTool.Radius).ToPrettyString();
+            _FeedFinish = Operation.FeedFinish(turningTool.Radius).ToPrettyString();
+        }
     }
 
     public string ExampleText

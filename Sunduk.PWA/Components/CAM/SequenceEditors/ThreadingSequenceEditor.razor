@@ -403,6 +403,7 @@
         if (Holes.Count == 0) Holes.Add(new Hole());
         HolesCount = 1;
         SelectedCoordinateSystem = CoordinateSystem;
+        SetDefaultSpeed();
         if (SequenceToEdit is not null) LoadFromSequence(SequenceToEdit);
     }
 
@@ -489,6 +490,21 @@
     {
         ThreadingSequence = value;
         Tool = null;
+        SetDefaultSpeed();
+    }
+
+    /// <summary>Скорость по умолчанию: резьбонарезание — 120 м/мин, метчик — 5 м/мин.</summary>
+    private void SetDefaultSpeed()
+    {
+        switch (ThreadingSequence)
+        {
+            case ThreadingSequences.ThreadCutting:
+                SpeedFinish = 120;
+                break;
+            case ThreadingSequences.Tapping:
+                _TapCutSpeed = "5";
+                break;
+        }
     }
 
     private void OnThreadCuttingTypeChanged(CuttingType value)

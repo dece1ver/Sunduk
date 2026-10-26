@@ -99,6 +99,11 @@
     private void OnToolChanged(Tool value)
     {
         Tool = value;
+        if (value is TurningBurnishingTool burnishingTool)
+        {
+            SpeedFinish = Operation.BurnishingSpeed(burnishingTool);
+            _FeedFinish = Operation.BurnishingFeed(burnishingTool).ToPrettyString();
+        }
     }
 
     public string ExampleText
